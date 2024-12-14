@@ -19,9 +19,8 @@ RestartSec=30
 StartLimitBurst=5
 StartLimitInterval=60
 TimeoutSec=120
-StandardOutput=syslog
-StandardError=syslog
-SyslogFacility=syslog
+StandardOutput=journal
+StandardError=journal
 SyslogIdentifier=cosmovisor
 LimitNOFILE=65535
 

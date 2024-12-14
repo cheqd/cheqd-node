@@ -12,10 +12,8 @@ RestartSec=30
 StartLimitBurst=5
 StartLimitInterval=60
 TimeoutSec=120
-StandardOutput=syslog
-StandardError=syslog
-SyslogFacility=syslog
-SyslogIdentifier=cheqd-noded
+StandardOutput=journal
+StandardError=journal
 LimitNOFILE=65535
 
 [Install]

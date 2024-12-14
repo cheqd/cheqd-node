@@ -58,12 +58,12 @@ DEFAULT_DAEMON_RESTART_DELAY = "120s"
 ###############################################################
 STANDALONE_SERVICE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/installer/templates/cheqd-noded.service"
 COSMOVISOR_SERVICE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/installer/templates/cheqd-cosmovisor.service"
-LOGROTATE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/installer/templates/logrotate.conf"
-RSYSLOG_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/installer/templates/rsyslog.conf"
+JOURNAL_TEMPLATE=f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/installer/templates/journald.conf"
 DEFAULT_STANDALONE_SERVICE_NAME = 'cheqd-noded'
 DEFAULT_COSMOVISOR_SERVICE_NAME = 'cheqd-cosmovisor'
 DEFAULT_STANDALONE_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_STANDALONE_SERVICE_NAME}.service"
 DEFAULT_COSMOVISOR_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_COSMOVISOR_SERVICE_NAME}.service"
+DEFAULT_JOURNAL_CONFIG_FILE= "/etc/systemd/journald.conf"
 DEFAULT_LOGROTATE_FILE = "/etc/logrotate.d/cheqd-node"
 DEFAULT_RSYSLOG_FILE = "/etc/rsyslog.d/cheqd-node.conf"
 DEFAULT_LOGIN_SHELL_ENV_FILE_PATH = "/etc/profile.d/cheqd-node.sh"
@@ -270,12 +270,6 @@ class Installer():
         return os.path.join(self.cheqd_root_dir, "data")
 
     @property
-    def cheqd_log_dir(self):
-        # cheqd-noded log directory
-        # Default: /home/cheqd/.cheqdnode/log
-        return os.path.join(self.cheqd_root_dir, "log")
-
-    @property
     def cheqd_user_bashrc_path(self):
         # Path where .bashrc file for cheqd user will be created
         # Default: /home/cheqd/.bashrc
@@ -367,62 +361,9 @@ class Installer():
                 # If the service file is successfully created, return the string
                 return s
             else:
-                logging.exception(f"URL is not valid: {RSYSLOG_TEMPLATE}")
+                logging.exception(f"URL is not valid: {COSMOVISOR_SERVICE_TEMPLATE}")
         except Exception as e:
             logging.exception(f"Failed to set up service file from template. Reason: {e}")
-
-    @property
-    def rsyslog_cfg(self):
-        # Modify rsyslog template file to replace values for environment variables
-        # The template file is fetched from GitHub repo
-        # Some of these variables are explicitly asked during the installer process. Others are set to default values.
-        try:
-            # Determine the binary name for logging based on installation type
-            if self.interviewer.is_cosmovisor_needed:
-                binary_name = DEFAULT_COSMOVISOR_BINARY_NAME
-            else:
-                binary_name = DEFAULT_BINARY_NAME
-
-            # Fetch the template file from GitHub
-            if is_valid_url(RSYSLOG_TEMPLATE):
-                with request.urlopen(RSYSLOG_TEMPLATE) as response:
-                    # Replace the values for environment variables in the template file
-                    s = re.sub(
-                        r'({BINARY_FOR_LOGGING}|{CHEQD_LOG_DIR})',
-                        lambda m: {'{BINARY_FOR_LOGGING}': binary_name,
-                                    '{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
-                        response.read().decode("utf-8").strip()
-                    )
-
-                    # If the rsyslog file is successfully created, return the string
-                    return s
-            else:
-                logging.exception(f"URL is not valid: {RSYSLOG_TEMPLATE}")
-        except Exception as e:
-            logging.exception(f"Failed to set up rsyslog from template. Reason: {e}")
-
-    @property
-    def logrotate_cfg(self):
-        # Modify logrotate template file to replace values for environment variables
-        # The logrotate template file is fetched from the GitHub repo
-        # Logrotate is used to rotate the log files of the cheqd-node every day, and keep a maximum of 7 days of logs.
-        try:
-            # Fetch the template file from GitHub
-            if is_valid_url(LOGROTATE_TEMPLATE):
-                with request.urlopen(LOGROTATE_TEMPLATE) as response:
-                    # Replace the values for environment variables in the template file
-                    s = re.sub(
-                        r'({CHEQD_LOG_DIR})',
-                        lambda m: {'{CHEQD_LOG_DIR}': self.cheqd_log_dir}[m.group()],
-                        response.read().decode("utf-8").strip()
-                    )
-
-                # If the logrotate file is successfully created, return the string
-                return s
-            else:
-                logging.exception(f"URL is not valid: {LOGROTATE_TEMPLATE}")
-        except Exception as e:
-            logging.exception(f"Failed to set up logrotate from template. Reason: {e}")
 
     @post_process
     def exec(self, cmd, use_stdout=True, suppress_err=False):
@@ -521,8 +462,8 @@ class Installer():
                 logging.error("Failed to configure systemd service for node operations")
                 return False
 
-            # Configure systemd services for rsyslog and logrotate
-            if self.setup_logging_systemd():
+            # Configure systemd services for logging
+            if self.setup_journal_logging():
                 logging.info("Successfully configured systemd service for logging")
             else:
                 logging.error("Failed to configure systemd service for logging")
@@ -679,28 +620,6 @@ class Installer():
             else:
                 logging.debug("No user data or configs to remove. Skipping...")
 
-            # Setup logging related directories
-            if not os.path.exists(self.cheqd_log_dir):
-                # Create ~/.cheqdnode/log directory
-                logging.info(f"Creating log directory: {self.cheqd_log_dir}")
-                os.makedirs(self.cheqd_log_dir, exist_ok=True)
-
-                # Create blank ~/.cheqdnode/log/stdout.log file. Overwrite if it already exists.
-                # Using the .open() method without doing anything in it will create the file
-                # "w" mode is used to overwrite the file if it already exists
-                with open(os.path.join(self.cheqd_log_dir, "stdout.log"), "w") as file:
-                    logging.debug(f"Created blank stdout.log file in {self.cheqd_log_dir}")
-            else:
-                logging.info(f"Skipping log directory creation because {self.cheqd_log_dir} already exists")
-
-            # Create symlink from cheqd-noded log folder from /var/log/cheqd-node
-            # This step is necessary since many logging tools look for logs in /var/log
-            if not os.path.exists("/var/log/cheqd-node"):
-                logging.info("Creating a symlink from cheqd-noded log folder to /var/log/cheqd-node")
-                os.symlink(self.cheqd_log_dir, "/var/log/cheqd-node", target_is_directory=True)
-            else:
-                logging.debug("Skipping linking because /var/log/cheqd-node already exists")
-
             # Create a bash file in /etc/profile.d/ to set environment variables
             # This file will be sourced by all users for their LOGIN shells
             if not os.path.exists(DEFAULT_LOGIN_SHELL_ENV_FILE_PATH):
@@ -757,9 +676,6 @@ class Installer():
             # Always execute these since they might be lost if directories are removed and recreated
             logging.info(f"Setting ownership of {self.cheqd_home_dir} to {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}")
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_home_dir}")
-
-            logging.info(f"Setting ownership of {self.cheqd_log_dir} to syslog:{DEFAULT_CHEQD_USER}")
-            self.exec(f"chown -R syslog:{DEFAULT_CHEQD_USER} {self.cheqd_log_dir}")
 
             # Return True if all steps are successful
             return True
@@ -1191,67 +1107,44 @@ class Installer():
             return False
 
     # Setup logging related systemd services
-    def setup_logging_systemd(self) -> bool:
-        # Install cheqd-node configuration for rsyslog if user wants to rewrite rsyslog service file
+    def setup_journal_logging(self) -> bool:
+        # Install cheqd-node configuration for journal if user wants to rewrite journal service file
         # Also run if setup is from scratch/first-time install
         try:
-            if self.interviewer.rewrite_rsyslog:
-                # Remove existing rsyslog service file if it exists
-                if os.path.exists(DEFAULT_RSYSLOG_FILE):
-                    logging.warning("Removing existing rsyslog configuration as requested")
-                    self.remove_safe(DEFAULT_RSYSLOG_FILE)
+            if self.interviewer.rewrite_journal:
+                # Remove existing journal configuration file if it exists
+                if os.path.exists(DEFAULT_JOURNAL_CONFIG_FILE):
+                    logging.warning("Removing existing journal configuration as requested")
+                    self.remove_safe(DEFAULT_JOURNAL_CONFIG_FILE)
                 else:
-                    logging.debug("Rsyslog configuration doesn't need to be removed. Skipping...")
+                    logging.debug("Default configuration doesn't need to be removed. Skipping...")
 
-                # Determine the binary name for logging based on installation type
-                if self.interviewer.is_cosmovisor_needed:
-                    binary_name = DEFAULT_COSMOVISOR_BINARY_NAME
+                logging.info("Configuring journald configuration for logging")
+
+                # Modify journald template file with values specific to the installation
+                with open(DEFAULT_JOURNAL_CONFIG_FILE, "w"):
+                    if is_valid_url(JOURNAL_TEMPLATE):
+                        with request.urlopen(JOURNAL_TEMPLATE) as response, open(DEFAULT_JOURNAL_CONFIG_FILE, "w") as file:
+                            file.write(response.read().decode("utf-8").strip())
+
+                # Restarting journald service
+                if self.restart_systemd_service("systemd-journald.service"):
+                    logging.info("Successfully configured journald service")
                 else:
-                    binary_name = DEFAULT_BINARY_NAME
-
-                logging.info(f"Configuring rsyslog systemd service for {binary_name} logging")
-
-                # Modify rsyslog template file with values specific to the installation
-                with open(DEFAULT_RSYSLOG_FILE, "w") as fname:
-                    fname.write(self.rsyslog_cfg)
-
-                # Restarting rsyslog can take a lot of time: https://github.com/rsyslog/rsyslog/issues/3133
-                if self.restart_systemd_service("rsyslog.service"):
-                    logging.info("Successfully configured rsyslog service")
-                else:
-                    logging.exception("Failed to configure rsyslog service")
+                    logging.exception("Failed to configure journald service")
                     return False
 
-            # Install cheqd-node configuration for logrotate if user wants to rewrite logrotate service file
-            # Also run if setup is from scratch/first-time install
-            if self.interviewer.rewrite_logrotate:
-                # Remove existing logrotate service file if it exists
-                if os.path.exists(DEFAULT_LOGROTATE_FILE):
-                    logging.warning("Removing existing logrotate configuration as requested")
-                    self.remove_safe(DEFAULT_LOGROTATE_FILE)
-                else:
-                    logging.debug("Logrotate configuration doesn't need to be removed. Skipping...")
+            if os.path.exists(DEFAULT_RSYSLOG_FILE):
+                logging.warning("Removing existing rsyslog configuration as requested")
+                self.remove_safe(DEFAULT_RSYSLOG_FILE)
+            else:
+                logging.debug("Default configuration doesn't need to be removed. Skipping...")
 
-                logging.info("Configuring logrotate systemd service for cheqd-node logging")
-
-                # Modify logrotate template file with values specific to the installation
-                with open(DEFAULT_LOGROTATE_FILE, "w") as fname:
-                    fname.write(self.logrotate_cfg)
-
-                # Restart logrotate.service
-                if self.restart_systemd_service("logrotate.service"):
-                    logging.info("Successfully configured logrotate service")
-                else:
-                    logging.exception("Failed to configure logrotate service")
-                    return False
-
-                # Restart logrotate.timer
-                if self.restart_systemd_service("logrotate.timer"):
-                    logging.info("Successfully configured logrotate timer")
-                else:
-                    logging.exception("Failed to configure logrotate timer")
-                    return False
-
+            if os.path.exists(DEFAULT_LOGROTATE_FILE):
+                logging.warning("Removing existing logrotate configuration as requested")
+                self.remove_safe(DEFAULT_LOGROTATE_FILE)
+            else:
+                logging.debug("Default configuration doesn't need to be removed. Skipping...")
             # Return True if both rsyslog and logrotate services are configured
             return True
         except Exception as e:
@@ -1416,7 +1309,7 @@ class Installer():
 
             # Use apt-get to install dependencies
             logging.info("Install pv to show progress of extraction")
-            self.exec("sudo apt-get install -y pv")
+            self.exec("sudo apt-get install -y pv lz4")
             return True
         except Exception as e:
             logging.exception(f"Failed to install dependencies. Reason: {e}")
@@ -1682,8 +1575,7 @@ class Interviewer:
         self._daemon_restart_after_upgrade = DEFAULT_DAEMON_RESTART_AFTER_UPGRADE
         self._is_from_scratch = True
         self._rewrite_node_systemd = True
-        self._rewrite_rsyslog = True
-        self._rewrite_logrotate = True
+        self._rewrite_journal = True
 
     ### This section sets @property variables ###
     @property
@@ -1723,12 +1615,8 @@ class Interviewer:
         return self._rewrite_node_systemd
 
     @property
-    def rewrite_rsyslog(self) -> bool:
-        return self._rewrite_rsyslog
-
-    @property
-    def rewrite_logrotate(self) -> bool:
-        return self._rewrite_logrotate
+    def rewrite_journal(self) -> bool:
+        return self._rewrite_journal
 
     @property
     def is_cosmovisor_needed(self) -> bool:
@@ -1819,13 +1707,9 @@ class Interviewer:
     def rewrite_node_systemd(self, rns):
         self._rewrite_node_systemd = rns
 
-    @rewrite_rsyslog.setter
-    def rewrite_rsyslog(self, rr):
-        self._rewrite_rsyslog = rr
-
-    @rewrite_logrotate.setter
-    def rewrite_logrotate(self, rl):
-        self._rewrite_logrotate = rl
+    @rewrite_journal.setter
+    def rewrite_journal(self, rr):
+        self._rewrite_journal = rr
 
     @is_cosmovisor_needed.setter
     def is_cosmovisor_needed(self, icn):
@@ -2299,33 +2183,19 @@ class Interviewer:
         except Exception as e:
             logging.exception(f"Failed to set whether overwrite existing systemd configuration. Reason: {e}")
 
-    # If an existing installation is detected, ask user if they want to overwrite existing logrotate configuration
-    def ask_for_rewrite_logrotate(self):
-        try:
-            answer = self.ask("Overwrite existing configuration for logrotate? (yes/no)", default="yes")
-            if answer.lower().startswith("y"):
-                self.rewrite_logrotate = True
-            elif answer.lower().startswith("n"):
-                self.rewrite_logrotate = False
-            else:
-                logging.error("Please choose either 'yes' or 'no'\n")
-                self.ask_for_rewrite_logrotate()
-        except Exception as e:
-            logging.exception(f"Failed to set whether overwrite existing configuration for logrotate. Reason: {e}")
-
     # If an existing installation is detected, ask user if they want to overwrite existing rsyslog configuration
-    def ask_for_rewrite_rsyslog(self):
+    def ask_for_rewrite_journal(self):
         try:
-            answer = self.ask("Overwrite existing configuration for cheqd-node logging? (yes/no)", default="yes")
+            answer = self.ask("Overwrite existing configuration for cheqd-node logging, including the journald configuration file? (yes/no)", default="yes")
             if answer.lower().startswith("y"):
-                self.rewrite_rsyslog = True
+                self.rewrite_journal = True
             elif answer.lower().startswith("n"):
-                self.rewrite_rsyslog = False
+                self.rewrite_journal = False
             else:
                 logging.error("Please choose either 'yes' or 'no'\n")
-                self.ask_for_rewrite_rsyslog()
+                self.ask_for_rewrite_journal()
         except Exception as e:
-            logging.exception(f"Failed to set whether overwrite existing rsyslog configuration. Reason: {e}")
+            logging.exception(f"Failed to set whether overwrite existing jorunal configuration. Reason: {e}")
 
     # Ask user if they want to download a snapshot of the existing chain to speed up node synchronization.
     # This is only applicable if installing from scratch.
@@ -2395,8 +2265,7 @@ if __name__ == '__main__':
     # 3. Install Cosmovisor if not installed, or bump Cosmovisor version
     # 4. (if applicable) Cosmovisor settings
     # 6. Rewrite node systemd config
-    # 7. Rewrite rsyslog config
-    # 8. Rewrite logrotate config
+    # 7. Rewrite journal config
     def upgrade_steps():
         try:
             interviewer.ask_for_version()
@@ -2414,11 +2283,8 @@ if __name__ == '__main__':
             if interviewer.is_systemd_config_installed(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) is True or interviewer.is_systemd_config_installed(DEFAULT_STANDALONE_SERVICE_FILE_PATH) is True:
                 interviewer.ask_for_rewrite_node_systemd()
 
-            if interviewer.is_systemd_config_installed(DEFAULT_RSYSLOG_FILE) is True:
-                interviewer.ask_for_rewrite_rsyslog()
-
-            if interviewer.is_systemd_config_installed(DEFAULT_LOGROTATE_FILE) is True:
-                interviewer.ask_for_rewrite_logrotate()
+            if interviewer.is_systemd_config_installed(DEFAULT_JOURNAL_CONFIG_FILE) is True:
+                interviewer.ask_for_rewrite_journal()
 
         except Exception as e:
             logging.exception(f"Unable to complete user interview process for upgrade. Reason for exiting: {e}")
