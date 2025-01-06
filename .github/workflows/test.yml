@@ -349,10 +349,9 @@ jobs:
         # run: |
         #   python ./.github/scripts/xml_combine.py report-unit.xml report-integration.xml > report.xml
 
-      - uses: mikepenz/action-junit-report@v4
+      - uses: mikepenz/action-junit-report@v5
         with:
           report_paths: "report.xml"
           check_name: ""
-          suite_regex: "*"
           include_passed: true
           detailed_summary: true
