@@ -16,9 +16,9 @@ type HumanReadableEvent struct {
 }
 
 func ReadableEvents(events []types.Event) []HumanReadableEvent {
-	readableEvents := make([]HumanReadableEvent, len(events))
+	readableEvents := make([]HumanReadableEvent, 0, len(events))
 	for _, event := range events {
-		readableAttributes := make([]HumanReadableEventAttribute, len(event.Attributes))
+		readableAttributes := make([]HumanReadableEventAttribute, 0, len(event.Attributes))
 		for i, attribute := range event.Attributes {
 			readableAttributes[i] = HumanReadableEventAttribute{
 				Key:   attribute.Key,
@@ -26,7 +26,7 @@ func ReadableEvents(events []types.Event) []HumanReadableEvent {
 				Index: attribute.Index,
 			}
 		}
-		readableEvents = append(readableEvents, 0, HumanReadableEvent{
+		readableEvents = append(readableEvents, HumanReadableEvent{
 			Type:       event.Type,
 			Attributes: readableAttributes,
 		})
