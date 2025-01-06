@@ -183,6 +183,8 @@ verify:
 tidy:
 	@echo "Cleaning up all go module dependencies..."
 	@find . -name 'go.mod' -type f -execdir go mod tidy \;
+	@echo "Syncing go workspaces..."
+	@go work sync;
 
 .PHONY: verify tidy
 

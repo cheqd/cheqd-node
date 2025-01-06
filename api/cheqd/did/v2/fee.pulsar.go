@@ -5,7 +5,7 @@ import (
 	fmt "fmt"
 	_ "github.com/cosmos/cosmos-proto"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
-	v1beta1 "github.com/cosmos/cosmos-sdk/api/cosmos/base/v1beta1"
+	types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
@@ -217,11 +217,11 @@ func (x *fastReflection_FeeParams) Get(descriptor protoreflect.FieldDescriptor) 
 func (x *fastReflection_FeeParams) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	case "cheqd.did.v2.FeeParams.create_did":
-		x.CreateDid = value.Message().Interface().(*v1beta1.Coin)
+		x.CreateDid = value.Message().Interface().(*types.Coin)
 	case "cheqd.did.v2.FeeParams.update_did":
-		x.UpdateDid = value.Message().Interface().(*v1beta1.Coin)
+		x.UpdateDid = value.Message().Interface().(*types.Coin)
 	case "cheqd.did.v2.FeeParams.deactivate_did":
-		x.DeactivateDid = value.Message().Interface().(*v1beta1.Coin)
+		x.DeactivateDid = value.Message().Interface().(*types.Coin)
 	case "cheqd.did.v2.FeeParams.burn_factor":
 		x.BurnFactor = value.Interface().(string)
 	default:
@@ -246,17 +246,17 @@ func (x *fastReflection_FeeParams) Mutable(fd protoreflect.FieldDescriptor) prot
 	switch fd.FullName() {
 	case "cheqd.did.v2.FeeParams.create_did":
 		if x.CreateDid == nil {
-			x.CreateDid = new(v1beta1.Coin)
+			x.CreateDid = new(types.Coin)
 		}
 		return protoreflect.ValueOfMessage(x.CreateDid.ProtoReflect())
 	case "cheqd.did.v2.FeeParams.update_did":
 		if x.UpdateDid == nil {
-			x.UpdateDid = new(v1beta1.Coin)
+			x.UpdateDid = new(types.Coin)
 		}
 		return protoreflect.ValueOfMessage(x.UpdateDid.ProtoReflect())
 	case "cheqd.did.v2.FeeParams.deactivate_did":
 		if x.DeactivateDid == nil {
-			x.DeactivateDid = new(v1beta1.Coin)
+			x.DeactivateDid = new(types.Coin)
 		}
 		return protoreflect.ValueOfMessage(x.DeactivateDid.ProtoReflect())
 	case "cheqd.did.v2.FeeParams.burn_factor":
@@ -275,13 +275,13 @@ func (x *fastReflection_FeeParams) Mutable(fd protoreflect.FieldDescriptor) prot
 func (x *fastReflection_FeeParams) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	case "cheqd.did.v2.FeeParams.create_did":
-		m := new(v1beta1.Coin)
+		m := new(types.Coin)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "cheqd.did.v2.FeeParams.update_did":
-		m := new(v1beta1.Coin)
+		m := new(types.Coin)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "cheqd.did.v2.FeeParams.deactivate_did":
-		m := new(v1beta1.Coin)
+		m := new(types.Coin)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "cheqd.did.v2.FeeParams.burn_factor":
 		return protoreflect.ValueOfString("")
@@ -527,7 +527,7 @@ func (x *fastReflection_FeeParams) ProtoMethods() *protoiface.Methods {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				if x.CreateDid == nil {
-					x.CreateDid = &v1beta1.Coin{}
+					x.CreateDid = &types.Coin{}
 				}
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.CreateDid); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
@@ -563,7 +563,7 @@ func (x *fastReflection_FeeParams) ProtoMethods() *protoiface.Methods {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				if x.UpdateDid == nil {
-					x.UpdateDid = &v1beta1.Coin{}
+					x.UpdateDid = &types.Coin{}
 				}
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.UpdateDid); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
@@ -599,7 +599,7 @@ func (x *fastReflection_FeeParams) ProtoMethods() *protoiface.Methods {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				if x.DeactivateDid == nil {
-					x.DeactivateDid = &v1beta1.Coin{}
+					x.DeactivateDid = &types.Coin{}
 				}
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.DeactivateDid); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
@@ -694,15 +694,15 @@ type FeeParams struct {
 	// Fixed fee for creating a DID
 	//
 	// Default: 50 CHEQ or 50000000000ncheq
-	CreateDid *v1beta1.Coin `protobuf:"bytes,1,opt,name=create_did,json=createDid,proto3" json:"create_did,omitempty"`
+	CreateDid *types.Coin `protobuf:"bytes,1,opt,name=create_did,json=createDid,proto3" json:"create_did,omitempty"`
 	// Fixed fee for updating a DID
 	//
 	// Default: 25 CHEQ or 25000000000ncheq
-	UpdateDid *v1beta1.Coin `protobuf:"bytes,2,opt,name=update_did,json=updateDid,proto3" json:"update_did,omitempty"`
+	UpdateDid *types.Coin `protobuf:"bytes,2,opt,name=update_did,json=updateDid,proto3" json:"update_did,omitempty"`
 	// Fixed fee for deactivating a DID
 	//
 	// Default: 10 CHEQ or 10000000000ncheq
-	DeactivateDid *v1beta1.Coin `protobuf:"bytes,3,opt,name=deactivate_did,json=deactivateDid,proto3" json:"deactivate_did,omitempty"`
+	DeactivateDid *types.Coin `protobuf:"bytes,3,opt,name=deactivate_did,json=deactivateDid,proto3" json:"deactivate_did,omitempty"`
 	// Percentage of the fixed fee that will be burned
 	//
 	// Default: 0.5 (50%)
@@ -729,21 +729,21 @@ func (*FeeParams) Descriptor() ([]byte, []int) {
 	return file_cheqd_did_v2_fee_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *FeeParams) GetCreateDid() *v1beta1.Coin {
+func (x *FeeParams) GetCreateDid() *types.Coin {
 	if x != nil {
 		return x.CreateDid
 	}
 	return nil
 }
 
-func (x *FeeParams) GetUpdateDid() *v1beta1.Coin {
+func (x *FeeParams) GetUpdateDid() *types.Coin {
 	if x != nil {
 		return x.UpdateDid
 	}
 	return nil
 }
 
-func (x *FeeParams) GetDeactivateDid() *v1beta1.Coin {
+func (x *FeeParams) GetDeactivateDid() *types.Coin {
 	if x != nil {
 		return x.DeactivateDid
 	}
@@ -814,8 +814,8 @@ func file_cheqd_did_v2_fee_proto_rawDescGZIP() []byte {
 
 var file_cheqd_did_v2_fee_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_cheqd_did_v2_fee_proto_goTypes = []interface{}{
-	(*FeeParams)(nil),    // 0: cheqd.did.v2.FeeParams
-	(*v1beta1.Coin)(nil), // 1: cosmos.base.v1beta1.Coin
+	(*FeeParams)(nil),  // 0: cheqd.did.v2.FeeParams
+	(*types.Coin)(nil), // 1: cosmos.base.v1beta1.Coin
 }
 var file_cheqd_did_v2_fee_proto_depIdxs = []int32{
 	1, // 0: cheqd.did.v2.FeeParams.create_did:type_name -> cosmos.base.v1beta1.Coin
