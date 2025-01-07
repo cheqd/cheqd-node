@@ -5,9 +5,12 @@ import (
 )
 
 var (
-	ValidTestDID   = "did:cheqd:testnet:zABCDEFG123456789abcd"
-	ValidTestDID2  = "did:cheqd:testnet:zABCDEFG987654321abcd"
-	InvalidTestDID = "badDid"
+	ValidTestDID       = "did:cheqd:testnet:zABCDEFG123456789abcd"
+	ValidTestDID2      = "did:cheqd:testnet:zABCDEFG987654321abcd"
+	InvalidTestDID     = "badDid"
+	ValidParticipantID = 123
+	ValidParamsRef     = "https://resolver.cheqd.net/1.0/identifiers/did:cheqd:testnet:09b20561-7339-40ea-a377-05ea35a0e82a/resources/08f35fe3-bc2a-4666-90da-972a5b05645f"
+	ValidCurveType     = "Bls12381BBSVerificationKeyDock2023"
 )
 
 type TestJWKKey struct {

@@ -28,7 +28,6 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 		Expect(err.Error()).To(ContainSubstring(testCase.errorMsg))
 	}
 },
-
 	Entry(
 		"DIDDoc is valid",
 		DIDDocTestCase{
@@ -259,7 +258,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 			errorMsg: "",
 		}),
 	Entry(
-		"Assertion method has wrong fragment",
+		"Assertion method can accept arbitrary fragment",
 		DIDDocTestCase{
 			didDoc: &DidDoc{
 				Id:         ValidTestDID,
@@ -282,8 +281,40 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 					return strconv.Quote(string(b))
 				}()},
 			},
-			isValid:  false,
-			errorMsg: "assertionMethod should be a valid key reference within the DID document's verification method",
+			isValid:  true,
+			errorMsg: "",
+		}),
+	Entry(
+		"Assertion method can accept metadata",
+		DIDDocTestCase{
+			didDoc: &DidDoc{
+				Id:         ValidTestDID,
+				Controller: []string{ValidTestDID},
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                     fmt.Sprintf("%s#fragment", ValidTestDID),
+						VerificationMethodType: "Ed25519VerificationKey2020",
+						Controller:             ValidTestDID,
+						VerificationMaterial:   ValidEd25519VerificationKey2020VerificationMaterial,
+					},
+				},
+				AssertionMethod: []string{fmt.Sprintf("%s#fragment", ValidTestDID), func() string {
+					b, _ := json.Marshal(AssertionMethodJSONUnescaped{
+						Id:              fmt.Sprintf("%s#fragment", ValidTestDID),
+						Type:            "Ed25519VerificationKey2018",
+						Controller:      ValidTestDID,
+						PublicKeyBase58: &ValidEd25519VerificationKey2018VerificationMaterial, // arbitrarily chosen, loosely validated
+						Metadata: &AssertionMethodJSONUnescapedMetadata{
+							ParticipantId: &ValidParticipantID,
+							ParamsRef:     &ValidParamsRef,
+							CurveType:     &ValidCurveType,
+						},
+					})
+					return strconv.Quote(string(b))
+				}()},
+			},
+			isValid:  true,
+			errorMsg: "",
 		}),
 	Entry(
 		"Assertion method has invalid protobuf value",
@@ -371,6 +402,6 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 				}()},
 			},
 			isValid:  false,
-			errorMsg: "assertionMethod should be a DIDUrl or an Escaped JSON string",
+			errorMsg: "assertionMethod should be a valid DIDUrl or an Escaped JSON string",
 		}),
 )
