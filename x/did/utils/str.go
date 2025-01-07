@@ -116,6 +116,9 @@ func ValidateProtobufFields(jsonString string) error {
 	}
 
 	for key, value := range input {
+		if key == "metadata" {
+			continue
+		}
 		switch value.(type) {
 		case string, int, int32, int64, float32, float64, bool, proto.Message:
 			continue
