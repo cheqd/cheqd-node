@@ -1139,6 +1139,12 @@ func (app *App) RegisterUpgradeHandlers() {
 			return migrations, nil
 		},
 	)
+	app.UpgradeKeeper.SetUpgradeHandler(
+		"v3.1",
+		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+		},
+	)
 }
 
 // configure store loader that checks if version == upgradeHeight and applies store upgrades
