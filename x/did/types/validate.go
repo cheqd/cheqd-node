@@ -107,7 +107,7 @@ func IsDIDUrl(allowedNamespaces []string, pathRule, queryRule, fragmentRule Vali
 	})
 }
 
-func IsAssertionMethod(allowedNamespaces []string, didDoc DidDoc) *CustomErrorRule {
+func IsAssertionMethod(allowedNamespaces []string, didDoc DidDoc, bypass bool) *CustomErrorRule {
 	return NewCustomErrorRule(func(value interface{}) error {
 		casted, ok := value.(string)
 		if !ok {
@@ -126,7 +126,7 @@ func IsAssertionMethod(allowedNamespaces []string, didDoc DidDoc) *CustomErrorRu
 			}
 
 			return validation.ValidateStruct(&result,
-				validation.Field(&result.Id, validation.Required, IsAssertionMethod(allowedNamespaces, didDoc)),
+				validation.Field(&result.Id, validation.Required, IsAssertionMethod(allowedNamespaces, didDoc, true)),
 				validation.Field(&result.Controller, validation.Required, IsDID(allowedNamespaces)),
 			)
 		}
@@ -134,6 +134,10 @@ func IsAssertionMethod(allowedNamespaces []string, didDoc DidDoc) *CustomErrorRu
 		err = validation.Validate(value, IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(didDoc.Id))
 		if err != nil {
 			return errors.New("assertionMethod should be a valid DIDUrl or an Escaped JSON string with id, type and controller values")
+		}
+
+		if bypass {
+			return nil
 		}
 
 		for _, v := range didDoc.VerificationMethod {

@@ -273,7 +273,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 				},
 				AssertionMethod: []string{fmt.Sprintf("%s#fragment", ValidTestDID), func() string {
 					b, _ := json.Marshal(AssertionMethodJSONUnescaped{
-						Id:              fmt.Sprintf("%s#fragment", ValidTestDID),
+						Id:              fmt.Sprintf("%s#fragment-1", ValidTestDID),
 						Type:            "Ed25519VerificationKey2018",
 						Controller:      ValidTestDID,
 						PublicKeyBase58: &ValidEd25519VerificationKey2018VerificationMaterial, // arbitrarily chosen, loosely validated
