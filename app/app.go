@@ -1175,7 +1175,7 @@ func ConfigureFeeMarketModule(ctx sdk.Context, keeper *feemarketkeeper.Keeper) e
 	params.Enabled = true
 	params.FeeDenom = resourcetypes.BaseMinimalDenom
 	params.DistributeFees = false // burn fees
-	params.MinBaseGasPrice = sdk.MustNewDecFromStr("0.005")
+	params.MinBaseGasPrice = sdk.MustNewDecFromStr("0.5")
 	params.MaxBlockUtilization = feemarkettypes.DefaultMaxBlockUtilization
 	if err := keeper.SetParams(ctx, params); err != nil {
 		return err
