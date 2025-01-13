@@ -465,7 +465,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 
 		assertionMethodJSONEscaped2 := func() string {
 			b, _ := json.Marshal(types.AssertionMethodJSONUnescaped{
-				Id:                 keyID,
+				Id:                 did + "#key2",
 				Type:               "Ed25519VerificationKey2020",
 				Controller:         did,
 				PublicKeyMultibase: &publicKeyMultibase, // arbitrarily chosen, loosely validated
