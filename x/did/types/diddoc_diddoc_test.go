@@ -271,7 +271,7 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 						VerificationMaterial:   ValidEd25519VerificationKey2020VerificationMaterial,
 					},
 				},
-				AssertionMethod: []string{fmt.Sprintf("%s#fragment-1", ValidTestDID), func() string {
+				AssertionMethod: []string{fmt.Sprintf("%s#fragment", ValidTestDID), func() string {
 					b, _ := json.Marshal(AssertionMethodJSONUnescaped{
 						Id:              fmt.Sprintf("%s#fragment-1", ValidTestDID),
 						Type:            "Ed25519VerificationKey2018",
