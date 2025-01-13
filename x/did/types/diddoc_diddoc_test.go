@@ -404,4 +404,50 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 			isValid:  false,
 			errorMsg: "assertionMethod should be a valid DIDUrl or an Escaped JSON string",
 		}),
+	Entry(
+		"Assertion method contains invalid JSON-escaped string: duplicate inline key fragment definition",
+		DIDDocTestCase{
+			didDoc: &DidDoc{
+				Id:         ValidTestDID,
+				Controller: []string{ValidTestDID},
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                     fmt.Sprintf("%s#fragment", ValidTestDID),
+						VerificationMethodType: "Ed25519VerificationKey2020",
+						Controller:             ValidTestDID,
+						VerificationMaterial:   ValidEd25519VerificationKey2020VerificationMaterial,
+					},
+				},
+				AssertionMethod: []string{fmt.Sprintf("\"{\"id\":\"%s#fragment\",\"verificationMethodType\":\"Ed25519VerificationKey2020\",\"controller\":\"%s\",\"verificationMaterial\":\"%s\"}\"", ValidTestDID, ValidTestDID, ValidEd25519VerificationKey2020VerificationMaterial)},
+			},
+			isValid:  false,
+			errorMsg: "assertion_method: (0: assertionMethod should be a valid DIDUrl or an Escaped JSON string with id, type and controller values.).",
+		}),
+	Entry(
+		"Assertion method contains invalid JSON-escaped string: deserialised JSON contains duplicate key fragment definition",
+		DIDDocTestCase{
+			didDoc: &DidDoc{
+				Id:         ValidTestDID,
+				Controller: []string{ValidTestDID},
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                     fmt.Sprintf("%s#fragment", ValidTestDID),
+						VerificationMethodType: "Ed25519VerificationKey2020",
+						Controller:             ValidTestDID,
+						VerificationMaterial:   ValidEd25519VerificationKey2020VerificationMaterial,
+					},
+				},
+				AssertionMethod: []string{fmt.Sprintf("%s#fragment", ValidTestDID), func() string {
+					b, _ := json.Marshal(AssertionMethodJSONUnescaped{
+						Id:              fmt.Sprintf("%s#fragment", ValidTestDID),
+						Type:            "Ed25519VerificationKey2020",
+						Controller:      ValidTestDID,
+						PublicKeyBase58: &ValidEd25519VerificationKey2020VerificationMaterial,
+					})
+					return strconv.Quote(string(b))
+				}()},
+			},
+			isValid:  false,
+			errorMsg: "assertionMethod should be a unique inline key fragment definition",
+		}),
 )

@@ -125,6 +125,15 @@ func IsAssertionMethod(allowedNamespaces []string, didDoc DidDoc, bypass bool) *
 				return errors.New("assertionMethod should be a valid DIDUrl or an Escaped JSON string with id, type and controller values")
 			}
 
+			for _, v := range didDoc.VerificationMethod {
+				// reject, if identical to existing verification method
+				if v.Id == result.Id && v.VerificationMethodType == result.Type && v.Controller == result.Controller && ((result.PublicKeyJwk != nil && v.VerificationMaterial == *result.PublicKeyJwk) ||
+					(result.PublicKeyBase58 != nil && v.VerificationMaterial == *result.PublicKeyBase58) ||
+					(result.PublicKeyMultibase != nil && v.VerificationMaterial == *result.PublicKeyMultibase)) {
+					return errors.New("assertionMethod should be a unique inline key fragment definition")
+				}
+			}
+
 			return validation.ValidateStruct(&result,
 				validation.Field(&result.Id, validation.Required, IsAssertionMethod(allowedNamespaces, didDoc, true)),
 				validation.Field(&result.Controller, validation.Required, IsDID(allowedNamespaces)),
