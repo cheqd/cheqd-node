@@ -96,7 +96,7 @@ func (didDoc DidDoc) Validate(allowedNamespaces []string) error {
 			IsUniqueStrList(), validation.Each(IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(didDoc.Id)),
 		),
 		validation.Field(&didDoc.AssertionMethod,
-			IsUniqueStrList(), validation.Each(IsAssertionMethod(allowedNamespaces, didDoc))),
+			IsUniqueStrList(), validation.Each(IsAssertionMethod(allowedNamespaces, didDoc, false))),
 		validation.Field(&didDoc.CapabilityInvocation,
 			IsUniqueStrList(), validation.Each(IsDIDUrl(allowedNamespaces, Empty, Empty, Required), HasPrefix(didDoc.Id)),
 		),
