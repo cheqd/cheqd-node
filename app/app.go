@@ -1140,9 +1140,17 @@ func (app *App) RegisterUpgradeHandlers() {
 		},
 	)
 	app.UpgradeKeeper.SetUpgradeHandler(
-		"v3.1",
+		upgradeV3.MinorUpgradeName,
 		func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+			migrations, err := app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+			if err != nil {
+				return migrations, err
+			}
+			err = ConfigureFeeMarketModule(ctx, app.FeeMarketKeeper)
+			if err != nil {
+				return migrations, err
+			}
+			return migrations, nil
 		},
 	)
 }
@@ -1186,7 +1194,7 @@ func ConfigureFeeMarketModule(ctx sdk.Context, keeper *feemarketkeeper.Keeper) e
 		return err
 	}
 
-	state.BaseGasPrice = sdk.MustNewDecFromStr("0.005")
+	state.BaseGasPrice = sdk.MustNewDecFromStr("0.5")
 
 	return keeper.SetState(ctx, state)
 }
