@@ -423,12 +423,21 @@ var _ = Describe("cheqd cli - positive did", func() {
 		publicKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(publicKey)
 		publicKeyBase58 := testsetup.GenerateEd25519VerificationKey2018VerificationMaterial(publicKey)
 
+		participantId := 123
+		paramsRef := "https://resolver.cheqd.net/1.0/identifiers/did:cheqd:testnet:09b20561-7339-40ea-a377-05ea35a0e82a/resources/08f35fe3-bc2a-4666-90da-972a5b05645f"
+		curveType := "Bls12381BBSVerificationKeyDock2023"
+
 		assertionMethodJSONEscaped := func() string {
 			b, _ := json.Marshal(types.AssertionMethodJSONUnescaped{
 				Id:              keyID,
 				Type:            "Ed25519VerificationKey2018",
 				Controller:      did,
 				PublicKeyBase58: &publicKeyBase58, // arbitrarily chosen, loosely validated
+				Metadata: 	  &types.AssertionMethodJSONUnescapedMetadata{
+					ParticipantId: &participantId,
+					ParamsRef:     &paramsRef,
+					CurveType:     &curveType,
+				},
 			})
 			return strconv.Quote(string(b))
 		}()
@@ -538,5 +547,74 @@ var _ = Describe("cheqd cli - positive did", func() {
 
 		// Check that the DID Doc is deactivated
 		Expect(resp2.Value.Metadata.Deactivated).To(BeTrue())
+	})
+
+	It("can create diddoc with empty controller, update it using the authentication key and query the result (Ed25519VerificationKey2020)", func() {
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can create diddoc with empty controller (Ed25519VerificationKey2020)"))
+		// Create a new DID Doc
+		did := "did:cheqd:" + network.DidNamespace + ":" + uuid.NewString()
+		keyID := did + "#key1"
+
+		publicKey, privateKey, err := ed25519.GenerateKey(nil)
+		Expect(err).To(BeNil())
+
+		publicKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(publicKey)
+
+		keyID2 := did + "#key2"
+
+		publicKey2, _, err := ed25519.GenerateKey(nil)
+		Expect(err).To(BeNil())
+
+		publicKeyMultibase2 := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(publicKey2)
+
+		payload := didcli.DIDDocument{
+			ID: did,
+			Controller: []string{},
+			VerificationMethod: []didcli.VerificationMethod{
+				map[string]any{
+					"id":                 keyID,
+					"type":               "Ed25519VerificationKey2020",
+					"controller":         did,
+					"publicKeyMultibase": publicKeyMultibase,
+				},
+				map[string]any{
+					"id":                 keyID2,
+					"type":               "Ed25519VerificationKey2020",
+					"controller":         did,
+					"publicKeyMultibase": publicKeyMultibase2,
+				},
+			},
+			Authentication: []string{keyID},
+		}
+
+		signInputs := []didcli.SignInput{
+			{
+				VerificationMethodID: keyID,
+				PrivKey:              privateKey,
+			},
+		}
+
+		versionID := uuid.NewString()
+
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid.String()))
+		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(0))
+
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can update diddoc with empty controller (Ed25519VerificationKey2020)"))
+		// Update the DID Doc, removing the second verification method
+		payload2 := didcli.DIDDocument{
+			ID: did,
+			VerificationMethod: []didcli.VerificationMethod{
+				payload.VerificationMethod[0],
+			},
+			Authentication: []string{keyID},
+		}
+
+		versionID2 := uuid.NewString()
+
+		res2, err := cli.UpdateDidDoc(tmpDir, payload2, signInputs, versionID2, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid.String()))
+
+		Expect(err).To(BeNil())
+		Expect(res2.Code).To(BeEquivalentTo(0))
 	})
 })
