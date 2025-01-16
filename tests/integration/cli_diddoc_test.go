@@ -616,5 +616,24 @@ var _ = Describe("cheqd cli - positive did", func() {
 
 		Expect(err).To(BeNil())
 		Expect(res2.Code).To(BeEquivalentTo(0))
+
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can query diddoc with empty controller (Ed25519VerificationKey2020)"))
+		// Query the DID Doc
+		resp, err := cli.QueryDidDoc(did)
+		Expect(err).To(BeNil())
+
+		didDoc := resp.Value.DidDoc
+		Expect(didDoc.Id).To(BeEquivalentTo(did))
+		Expect(didDoc.Controller).To(HaveLen(0))
+		Expect(didDoc.Authentication).To(HaveLen(1))
+		Expect(didDoc.Authentication[0]).To(BeEquivalentTo(keyID))
+		Expect(didDoc.VerificationMethod).To(HaveLen(1))
+		Expect(didDoc.VerificationMethod[0].Id).To(BeEquivalentTo(keyID))
+		Expect(didDoc.VerificationMethod[0].VerificationMethodType).To(BeEquivalentTo("Ed25519VerificationKey2020"))
+		Expect(didDoc.VerificationMethod[0].Controller).To(BeEquivalentTo(did))
+		Expect(didDoc.VerificationMethod[0].VerificationMaterial).To(BeEquivalentTo(publicKeyMultibase))
+
+		// Check that DIDDoc is not deactivated
+		Expect(resp.Value.Metadata.Deactivated).To(BeFalse())
 	})
 })
