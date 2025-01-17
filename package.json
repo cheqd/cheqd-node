@@ -17,10 +17,10 @@
     "url": "git+https://github.com/cheqd/cheqd-node.git"
   },
   "devDependencies": {
-    "@semantic-release/commit-analyzer": "^13.0.0",
+    "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/git": "^10.0.1",
     "conventional-changelog-conventionalcommits": "^8.0.0",
-    "semantic-release": "^24.2.0",
+    "semantic-release": "^24.2.1",
     "swagger-combine": "^1.4.0"
   },
   "engines": {
