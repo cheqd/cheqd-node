@@ -208,6 +208,24 @@ var _ = DescribeTable("DIDDoc Validation tests", func(testCase DIDDocTestCase) {
 			errorMsg: "controller: there should be no duplicates.",
 		}),
 	Entry(
+		"Controller empty, no authentication",
+		DIDDocTestCase{
+			didDoc: &DidDoc{
+				Id:         ValidTestDID,
+				Controller: []string{},
+				VerificationMethod: []*VerificationMethod{
+					{
+						Id:                     fmt.Sprintf("%s#fragment", ValidTestDID),
+						VerificationMethodType: "Ed25519VerificationKey2020",
+						Controller:             ValidTestDID,
+						VerificationMaterial:   ValidEd25519VerificationKey2020VerificationMaterial,
+					},
+				},
+			},
+			isValid:  true,
+			errorMsg: "",
+		}),
+	Entry(
 		"Verification method is duplicated",
 		DIDDocTestCase{
 			didDoc: &DidDoc{
