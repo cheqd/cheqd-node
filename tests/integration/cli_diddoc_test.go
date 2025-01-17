@@ -730,4 +730,120 @@ var _ = Describe("cheqd cli - positive did", func() {
 		Expect(didDoc.VerificationMethod[0].Controller).To(BeEquivalentTo(did2))
 		Expect(didDoc.VerificationMethod[0].VerificationMaterial).To(BeEquivalentTo(publicKeyMultibase2))
 	})
+
+	It("can create diddoc with controller being another deactivated diddoc (Ed25519VerificationKey2020)", func() {
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can create diddoc with controller being another deactivated diddoc (Ed25519VerificationKey2020)"))
+		// Create a new DID Doc
+		did1 := "did:cheqd:" + network.DidNamespace + ":" + uuid.NewString()
+		keyID1 := did1 + "#key1"
+
+		publicKey1, privateKey1, err := ed25519.GenerateKey(nil)
+		Expect(err).To(BeNil())
+
+		publicKeyMultibase1 := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(publicKey1)
+
+		did2 := "did:cheqd:" + network.DidNamespace + ":" + uuid.NewString()
+		keyID2 := did2 + "#key1"
+
+		publicKey2, privateKey2, err := ed25519.GenerateKey(nil)
+		Expect(err).To(BeNil())
+
+		publicKeyMultibase2 := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(publicKey2)
+
+		payload1 := didcli.DIDDocument{
+			ID: did1,
+			VerificationMethod: []didcli.VerificationMethod{
+				map[string]any{
+					"id":                 keyID1,
+					"type":               "Ed25519VerificationKey2020",
+					"controller":         did1,
+					"publicKeyMultibase": publicKeyMultibase1,
+				},
+			},
+			Authentication: []string{keyID1},
+		}
+
+		signInputs1 := []didcli.SignInput{
+			{
+				VerificationMethodID: keyID1,
+				PrivKey:              privateKey1,
+			},
+		}
+
+		versionID1 := uuid.NewString()
+
+		res1, err := cli.CreateDidDoc(tmpDir, payload1, signInputs1, versionID1, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid.String()))
+		Expect(err).To(BeNil())
+		Expect(res1.Code).To(BeEquivalentTo(0))
+
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can deactivate diddoc with controller being another deactivated diddoc (Ed25519VerificationKey2020)"))
+		// Deactivate the DID Doc
+		deactivatedPayload1 := types.MsgDeactivateDidDocPayload{
+			Id: did1,
+		}
+
+		versionIDDeactivated1 := uuid.NewString()
+
+		resDeactivated, err := cli.DeactivateDidDoc(tmpDir, deactivatedPayload1, signInputs1, versionIDDeactivated1, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.DeactivateDid.String()))
+		Expect(err).To(BeNil())
+		Expect(resDeactivated.Code).To(BeEquivalentTo(0))
+
+		// Query the DID Doc
+		respDeactivated, err := cli.QueryDidDoc(did1)
+		Expect(err).To(BeNil())
+
+		// Check that the DID Doc is deactivated
+		Expect(respDeactivated.Value.Metadata.Deactivated).To(BeTrue())
+
+		payload2 := didcli.DIDDocument{
+			ID:         did2,
+			Controller: []string{did1},
+			VerificationMethod: []didcli.VerificationMethod{
+				map[string]any{
+					"id":                 keyID2,
+					"type":               "Ed25519VerificationKey2020",
+					"controller":         did2,
+					"publicKeyMultibase": publicKeyMultibase2,
+				},
+			},
+			Authentication: []string{keyID2},
+		}
+
+		signInputs2 := []didcli.SignInput{
+			{
+				VerificationMethodID: keyID1,
+				PrivKey:              privateKey1,
+			},
+			{
+				VerificationMethodID: keyID2,
+				PrivKey:              privateKey2,
+			},
+		}
+
+		versionID2 := uuid.NewString()
+
+		res2, err := cli.CreateDidDoc(tmpDir, payload2, signInputs2, versionID2, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid.String()))
+		Expect(err).To(BeNil())
+		Expect(res2.Code).To(BeEquivalentTo(0))
+
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can query diddoc with controller being another deactivated diddoc (Ed25519VerificationKey2020)"))
+		// Query the DID Doc
+		resp, err := cli.QueryDidDoc(did2)
+		Expect(err).To(BeNil())
+
+		didDoc := resp.Value.DidDoc
+		Expect(didDoc.Id).To(BeEquivalentTo(did2))
+		Expect(didDoc.Controller).To(HaveLen(1))
+		Expect(didDoc.Controller[0]).To(BeEquivalentTo(did1))
+		Expect(didDoc.Authentication).To(HaveLen(1))
+		Expect(didDoc.Authentication[0]).To(BeEquivalentTo(keyID2))
+		Expect(didDoc.VerificationMethod).To(HaveLen(1))
+		Expect(didDoc.VerificationMethod[0].Id).To(BeEquivalentTo(keyID2))
+		Expect(didDoc.VerificationMethod[0].VerificationMethodType).To(BeEquivalentTo("Ed25519VerificationKey2020"))
+		Expect(didDoc.VerificationMethod[0].Controller).To(BeEquivalentTo(did2))
+		Expect(didDoc.VerificationMethod[0].VerificationMaterial).To(BeEquivalentTo(publicKeyMultibase2))
+
+		// Check that DIDDoc is not deactivated
+		Expect(resp.Value.Metadata.Deactivated).To(BeFalse())
+	})
 })
