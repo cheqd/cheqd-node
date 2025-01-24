@@ -3,6 +3,8 @@
 package integration
 
 import (
+	"strconv"
+
 	cli "github.com/cheqd/cheqd-node/tests/integration/cli"
 	helpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 
@@ -128,7 +130,7 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions)", func() {
 		coins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1_000_000_000))
 
 		// define static fees, in which case gas price is multiplied by roughly 2 or greater, times the minimal base denom
-		feeParams := helpers.GenerateFees(gasPrice.Price.Amount.Mul(sdkmath.LegacyNewDec(2)).Mul(sdkmath.LegacyNewDec(didtypes.BaseFactor)).String())
+		feeParams := helpers.GenerateFees(strconv.FormatInt(gasPrice.Price.Amount.Mul(sdkmath.LegacyNewDec(2)).Mul(sdkmath.LegacyNewDec(didtypes.BaseFactor)).RoundInt64(), 10))
 
 		// send the coins, balance assertions are intentionally omitted or out of scope
 		res, err := cli.SendTokensTx(testdata.BASE_ACCOUNT_1, testdata.BASE_ACCOUNT_2_ADDR, coins.String(), feeParams)

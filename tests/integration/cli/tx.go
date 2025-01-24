@@ -181,5 +181,5 @@ func VoteProposalTx(from, option, id string, feeParams []string) (sdk.TxResponse
 }
 
 func SendTokensTx(from, to, amount string, feeParams []string) (sdk.TxResponse, error) {
-	return Tx("bank", "send", from, feeParams, to, amount)
+	return Tx("bank", "send", from, feeParams, from, to, amount)
 }
