@@ -63,8 +63,8 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 		// assert no error
 		Expect(err).To(BeNil())
 
-		// generate fixed fees, in which case 500,000,000 ncheq or 0.5 cheq
-		fees := helpers.GenerateFees("500000000ncheq")
+		// generate fixed fees, in which case 1,000,000,000 ncheq or 1 cheq
+		fees := helpers.GenerateFees("1000000000ncheq")
 
 		// burn the coins
 		res, err := cli.BurnMsg(testdata.BASE_ACCOUNT_3, coins.String(), fees)
@@ -90,6 +90,9 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions)", func() {
 	It("should successfully submit a non-taxable transaction with sufficient fees (--gas-prices)", func() {
 		// query feemarket gas price for the base minimal denom
 		gasPrice, err := cli.QueryFeemarketGasPrice(didtypes.BaseMinimalDenom)
+
+		// print the gas price
+		By("Gas Price: " + gasPrice.Price.String())
 
 		// assert no error
 		Expect(err).To(BeNil())
@@ -120,6 +123,9 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions)", func() {
 	It("should successfully submit a non-taxable transaction with sufficient fees (--fees)", func() {
 		// query feemarket gas price for the base minimal denom
 		gasPrice, err := cli.QueryFeemarketGasPrice(didtypes.BaseMinimalDenom)
+
+		// print the gas price
+		By("Gas Price: " + gasPrice.Price.String())
 
 		// assert no error
 		Expect(err).To(BeNil())
