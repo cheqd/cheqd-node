@@ -47,7 +47,7 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 		diff := balanceBefore.Sub(balanceAfter)
 
 		// assert the difference is equal to the coins burnt
-		total := burnCoins.Add(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(500_000_000)))
+		total := burnCoins.Add(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(3_000_000_000)))
 
 		// assert the difference is equal to the coins burnt
 		Expect(diff).To(Equal(total))
@@ -69,7 +69,7 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 		// burn the coins
 		res, err := cli.BurnMsg(testdata.BASE_ACCOUNT_3, coins.String(), fees)
 
-		// assert no error
+		// assert error
 		Expect(err).NotTo(BeNil())
 
 		// assert the response code is 0
@@ -133,10 +133,11 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions)", func() {
 		// define the coins to send, in which case 1,000,000,000 ncheq or 1 cheq
 		coins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1_000_000_000))
 
-		// compute static fees
-		gasPrice.Price.Amount = gasPrice.Price.Amount.Mul(sdkmath.LegacyNewDec(2)).Mul(sdkmath.LegacyNewDec(didtypes.BaseFactor))
+		// define static fees, in which case gas price is multiplied by roughly 3 or greater, times the minimal base denom
+		// consider multiplying in the range of [1.5, 3] times the gas price
+		gasPrice.Price.Amount = gasPrice.Price.Amount.Mul(sdkmath.LegacyNewDec(3)).Mul(sdkmath.LegacyNewDec(didtypes.BaseFactor))
 
-		// define static fees, in which case gas price is multiplied by roughly 2 or greater, times the minimal base denom
+		// define feeParams
 		feeParams := helpers.GenerateFees(gasPrice.Price.String())
 
 		// send the coins, balance assertions are intentionally omitted or out of scope
