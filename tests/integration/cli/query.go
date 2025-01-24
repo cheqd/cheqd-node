@@ -166,6 +166,21 @@ func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 	return resp, nil
 }
 
+func QueryFeemarketGasPrice(denom string) (feemarkettypes.GasPriceResponse, error) {
+	res, err := Query("feemarket", "gas-price", denom)
+	if err != nil {
+		return feemarkettypes.GasPriceResponse{}, err
+	}
+
+	var resp feemarkettypes.GasPriceResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return feemarkettypes.GasPriceResponse{}, err
+	}
+
+	return resp, nil
+}
+
 func QueryFeemarketParams() (feemarkettypes.Params, error) {
 	res, err := Query("feemarket", "params")
 	if err != nil {

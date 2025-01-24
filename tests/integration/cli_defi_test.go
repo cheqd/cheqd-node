@@ -6,6 +6,7 @@ import (
 	cli "github.com/cheqd/cheqd-node/tests/integration/cli"
 	helpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -52,7 +53,7 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 		Expect(diff).To(Equal(total))
 	})
 
-	It("shouldn't burn as their are insufficient funds in the sender", func() {
+	It("shouldn't burn if sender has insufficient funds", func() {
 		// define the coins to burn, in which case 1,000,000 ncheq or 0.01 cheq
 		coins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1_000_000))
 
@@ -82,5 +83,60 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 
 		// assert the balance before and after burning the coins are equal
 		Expect(balanceBefore).To(Equal(balanceAfter))
+	})
+})
+
+var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions)", func() {
+	It("should successfully submit a non-taxable transaction with sufficient fees (--gas-prices)", func() {
+		// query feemarket gas price for the base minimal denom
+		gasPrice, err := cli.QueryFeemarketGasPrice(didtypes.BaseMinimalDenom)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// define the coins to send, in which case 1,000,000,000 ncheq or 1 cheq
+		coins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1_000_000_000))
+
+		// compute gas price, using offset
+		gasPrice.Price.Amount = gasPrice.Price.Amount.Mul(sdkmath.LegacyNewDec(didtypes.FeeOffset))
+
+		// define feeParams
+		feeParams := []string{
+			"--gas", cli.Gas,
+			"--gas-adjustment", cli.GasAdjustment,
+			"--gas-prices", gasPrice.Price.String(),
+		}
+
+		// send the coins, balance assertions are intentionally omitted or out of scope
+		res, err := cli.SendTokensTx(testdata.BASE_ACCOUNT_1, testdata.BASE_ACCOUNT_2_ADDR, coins.String(), feeParams)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// assert the response code is 0
+		Expect(res.Code).To(BeEquivalentTo(0))
+	})
+
+	It("should successfully submit a non-taxable transaction with sufficient fees (--fees)", func() {
+		// query feemarket gas price for the base minimal denom
+		gasPrice, err := cli.QueryFeemarketGasPrice(didtypes.BaseMinimalDenom)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// define the coins to send, in which case 1,000,000,000 ncheq or 1 cheq
+		coins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1_000_000_000))
+
+		// define static fees, in which case gas price is multiplied by roughly 2 or greater, times the minimal base denom
+		feeParams := helpers.GenerateFees(gasPrice.Price.Amount.Mul(sdkmath.LegacyNewDec(2)).Mul(sdkmath.LegacyNewDec(didtypes.BaseFactor)).String())
+
+		// send the coins, balance assertions are intentionally omitted or out of scope
+		res, err := cli.SendTokensTx(testdata.BASE_ACCOUNT_1, testdata.BASE_ACCOUNT_2_ADDR, coins.String(), feeParams)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// assert the response code is 0
+		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 })

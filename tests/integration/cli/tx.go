@@ -176,3 +176,7 @@ func SubmitProposalTx(from, pathToDir string, feeParams []string) (sdk.TxRespons
 func VoteProposalTx(from, option, id string, feeParams []string) (sdk.TxResponse, error) {
 	return Tx("gov", "vote", from, feeParams, option, id)
 }
+
+func SendTokensTx(from, to, amount string, feeParams []string) (sdk.TxResponse, error) {
+	return Tx("bank", "send", from, feeParams, to, amount)
+}

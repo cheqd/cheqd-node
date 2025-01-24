@@ -399,6 +399,100 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		Expect((feeCollectorBalance.Amount).GT(math.NewInt(0)))
 	})
 
+	It("Non TaxableTx Lifecycle - Ensure minimum gas prices", func() {
+		// keys and addresses
+		priv1, _, addr1 := testdata.KeyTestPubAddr()
+
+		// msg and signatures
+		msg := testdata.NewTestMsg(addr1)
+		feeAmount := sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 1*didtypes.BaseFactor)) // 1 CHEQ
+		gasLimit := testdata.NewTestGasLimit()
+		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
+		s.txBuilder.SetFeeAmount(feeAmount)
+		s.txBuilder.SetGasLimit(gasLimit)
+		s.txBuilder.SetFeePayer(addr1)
+
+		privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
+		tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+		Expect(err).To(BeNil())
+
+		// set account with sufficient funds
+		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
+		s.app.AccountKeeper.SetAccount(s.ctx, acc)
+		amount := sdk.NewInt(300_000_000_000) // 300 CHEQ
+		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
+		Expect(err).To(BeNil())
+
+		dfd := cheqdante.NewOverAllDecorator(decorators...)
+		antehandler := sdk.ChainAnteDecorators(dfd)
+
+		// get feemarket params
+		feemarketParams, err := s.app.FeeMarketKeeper.GetParams(s.ctx)
+		Expect(err).To(BeNil())
+
+		// enforced enablement
+		feemarketParams.Enabled = true
+
+		// enforce burn
+		feemarketParams.DistributeFees = false
+
+		// enforce maximum block utilisation
+		feemarketParams.MaxBlockUtilization = feemarkettypes.DefaultMaxBlockUtilization
+
+		// set minimum gas prices to realistic value
+		feemarketParams.MinBaseGasPrice = sdk.MustNewDecFromStr("0.5")
+
+		err = s.app.FeeMarketKeeper.SetParams(s.ctx, feemarketParams)
+		Expect(err).To(BeNil())
+
+		// get feemarket state
+		feemarketState, err := s.app.FeeMarketKeeper.GetState(s.ctx)
+		Expect(err).To(BeNil())
+
+		// set base gas price to realistic value
+		feemarketState.BaseGasPrice = sdk.MustNewDecFromStr("0.5")
+
+		// set feemarket state
+		err = s.app.FeeMarketKeeper.SetState(s.ctx, feemarketState)
+		Expect(err).To(BeNil())
+
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
+		posthandler := sdk.ChainPostDecorators(taxDecorator)
+
+		// get supply before tx
+		supplyBefore, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
+		Expect(err).To(BeNil())
+
+		// antehandler should not error since we make sure that the fee is sufficient in DeliverTx (simulate=false only, Posthandler will check it otherwise)
+		newCtx, err := antehandler(s.ctx, tx, false)
+		Expect(err).To(BeNil(), "Tx errored when non-taxable on deliverTx")
+		_, _, proposer := testdata.KeyTestPubAddr()
+		s.ctx = newCtx
+		a := s.ctx.BlockHeader()
+		a.ProposerAddress = proposer
+		newCtx = s.ctx.WithBlockHeader(a)
+		s.ctx = newCtx
+		_, err = posthandler(s.ctx, tx, false, true)
+		Expect(err).To(BeNil(), "Tx errored when non-taxable on deliverTx from posthandler")
+
+		// check balance of fee payer
+		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
+		Expect(amount.Sub(sdk.NewInt(feeAmount.AmountOf(didtypes.BaseMinimalDenom).Int64()))).To(Equal(balance.Amount), "Fee amount subtracted was not equal to fee amount required for non-taxable tx")
+
+		// get supply after tx
+		supplyAfter, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
+		Expect(err).To(BeNil())
+
+		// check that supply was not deflated
+		Expect(supplyBefore).To(Equal(supplyAfter), "Supply was deflated")
+
+		// check that reward has been sent to the fee collector
+		feeCollector := s.app.AccountKeeper.GetModuleAddress(feemarkettypes.FeeCollectorName)
+		feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
+
+		Expect((feeCollectorBalance.Amount).GT(math.NewInt(0)))
+	})
+
 	It("TaxableTx Lifecycle on Simulation", func() {
 		// keys and addresses
 		priv1, _, addr1 := testdata.KeyTestPubAddr()
