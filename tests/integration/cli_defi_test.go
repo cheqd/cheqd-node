@@ -25,8 +25,8 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 		// assert no error
 		Expect(err).To(BeNil())
 
-		// generate fixed fees, in which case 500,000,000 ncheq or 0.5 cheq
-		fees := helpers.GenerateFees("500000000ncheq")
+		// generate fixed fees, in which case 1,000,000,000 ncheq or 1 cheq
+		fees := helpers.GenerateFees("1000000000ncheq")
 
 		// burn the coins
 		res, err := cli.BurnMsg(testdata.BASE_ACCOUNT_1, burnCoins.String(), fees)
