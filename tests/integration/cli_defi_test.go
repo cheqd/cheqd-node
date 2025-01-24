@@ -25,8 +25,8 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 		// assert no error
 		Expect(err).To(BeNil())
 
-		// generate fixed fees, in which case 1,000,000,000 ncheq or 1 cheq
-		fees := helpers.GenerateFees("1000000000ncheq")
+		// generate fixed fees, in which case 2,000,000,000 ncheq or 2 cheq
+		fees := helpers.GenerateFees("2000000000ncheq")
 
 		// burn the coins
 		res, err := cli.BurnMsg(testdata.BASE_ACCOUNT_1, burnCoins.String(), fees)
@@ -63,8 +63,8 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 		// assert no error
 		Expect(err).To(BeNil())
 
-		// generate fixed fees, in which case 1,000,000,000 ncheq or 1 cheq
-		fees := helpers.GenerateFees("1000000000ncheq")
+		// generate fixed fees, in which case 2,000,000,000 ncheq or 2 cheq
+		fees := helpers.GenerateFees("2000000000ncheq")
 
 		// burn the coins
 		res, err := cli.BurnMsg(testdata.BASE_ACCOUNT_3, coins.String(), fees)
