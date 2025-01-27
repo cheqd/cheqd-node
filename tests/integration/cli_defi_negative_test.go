@@ -31,8 +31,8 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions) negative",
 		// compute gas price, using offset
 		gasPrice.Price.Amount = gasPrice.Price.Amount.Mul(sdkmath.LegacyNewDec(didtypes.FeeOffset))
 
-		// invalidate the gas price
-		insufficientGasPrice := gasPrice.Price.Amount.Mul(sdkmath.LegacyMustNewDecFromStr("0.1"))
+		// invalidate the gas price, in which case 100 times less than the required
+		insufficientGasPrice := gasPrice.Price.Amount.Mul(sdkmath.LegacyMustNewDecFromStr("0.01"))
 
 		// define feeParams
 		feeParams := []string{
@@ -68,8 +68,8 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions) negative",
 		// consider multiplying in the range of [1.5, 3] times the gas price
 		gasPrice.Price.Amount = gasPrice.Price.Amount.Mul(sdkmath.LegacyNewDec(3)).Mul(sdkmath.LegacyNewDec(didtypes.BaseFactor))
 
-		// invalidate the static fees
-		insufficientGasPrice := gasPrice.Price.Amount.Mul(sdkmath.LegacyMustNewDecFromStr("0.1"))
+		// invalidate the static fees, in which case 100 times less than the required
+		insufficientGasPrice := gasPrice.Price.Amount.Mul(sdkmath.LegacyMustNewDecFromStr("0.01"))
 
 		// define feeParams
 		feeParams := helpers.GenerateFees(insufficientGasPrice.String())
