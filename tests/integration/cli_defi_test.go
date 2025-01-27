@@ -47,7 +47,7 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 		diff := balanceBefore.Sub(balanceAfter)
 
 		// assert the difference is equal to the coins burnt
-		total := burnCoins.Add(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(3_000_000_000)))
+		total := burnCoins.Add(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(3_500_000_000)))
 
 		// assert the difference is equal to the coins burnt
 		Expect(diff).To(Equal(total))
