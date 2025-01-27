@@ -1176,9 +1176,6 @@ func (app *App) setupUpgradeStoreLoaders() {
 }
 
 func ConfigureFeeMarketModule(ctx sdk.Context, keeper *feemarketkeeper.Keeper) error {
-	// initialise feemarket module
-	keeper.InitGenesis(ctx, *feemarkettypes.DefaultGenesisState())
-
 	// get feemarket params
 	params, err := keeper.GetParams(ctx)
 	if err != nil {
@@ -1191,8 +1188,6 @@ func ConfigureFeeMarketModule(ctx sdk.Context, keeper *feemarketkeeper.Keeper) e
 	params.DistributeFees = false // burn fees
 	params.MinBaseGasPrice = sdk.MustNewDecFromStr("0.5")
 	params.MaxBlockUtilization = feemarkettypes.DefaultMaxBlockUtilization
-
-	println("feemarket params", params.String())
 
 	// set feemarket params
 	if err := keeper.SetParams(ctx, params); err != nil {
@@ -1207,8 +1202,6 @@ func ConfigureFeeMarketModule(ctx sdk.Context, keeper *feemarketkeeper.Keeper) e
 
 	// configure feemarket state
 	state.BaseGasPrice = sdk.MustNewDecFromStr("0.5")
-
-	println("feemarket state", state.String())
 
 	// set feemarket state
 	return keeper.SetState(ctx, state)

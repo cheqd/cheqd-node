@@ -25,8 +25,8 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 		// assert no error
 		Expect(err).To(BeNil())
 
-		// generate fixed fees, in which case 3,000,000,000 ncheq or 3 cheq
-		fees := helpers.GenerateFees("3000000000ncheq")
+		// generate fixed fees, in which case 3,500,000,000 ncheq or 3.5 cheq
+		fees := helpers.GenerateFees("3500000000ncheq")
 
 		// burn the coins
 		res, err := cli.BurnMsg(testdata.BASE_ACCOUNT_1, burnCoins.String(), fees)
@@ -63,8 +63,8 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 		// assert no error
 		Expect(err).To(BeNil())
 
-		// generate fixed fees, in which case 3,000,000,000 ncheq or 3 cheq
-		fees := helpers.GenerateFees("3000000000ncheq")
+		// generate fixed fees, in which case 3,500,000,000 ncheq or 3.5 cheq
+		fees := helpers.GenerateFees("3500000000ncheq")
 
 		// burn the coins
 		res, err := cli.BurnMsg(testdata.BASE_ACCOUNT_3, coins.String(), fees)
@@ -93,18 +93,6 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions)", func() {
 
 		// print the gas price
 		By("Gas Price: " + gasPrice.Price.String())
-
-		// query feemarket gas prices
-		gasPrices, err := cli.QueryFeemarketGasPrices()
-
-		// print the gas prices
-		By("Gas Prices: " + gasPrices.String())
-
-		// query feemarket params
-		params, err := cli.QueryFeemarketParams()
-
-		// print the params
-		By("Params: " + params.String())
 
 		// assert no error
 		Expect(err).To(BeNil())
@@ -138,18 +126,6 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions)", func() {
 
 		// print the gas price
 		By("Gas Price: " + gasPrice.Price.String())
-
-		// query feemarket gas prices
-		gasPrices, err := cli.QueryFeemarketGasPrices()
-
-		// print the gas prices
-		By("Gas Prices: " + gasPrices.String())
-
-		// query feemarket params
-		params, err := cli.QueryFeemarketParams()
-
-		// print the params
-		By("Params: " + params.String())
 
 		// assert no error
 		Expect(err).To(BeNil())
