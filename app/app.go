@@ -1192,6 +1192,8 @@ func ConfigureFeeMarketModule(ctx sdk.Context, keeper *feemarketkeeper.Keeper) e
 	params.MinBaseGasPrice = sdk.MustNewDecFromStr("0.5")
 	params.MaxBlockUtilization = feemarkettypes.DefaultMaxBlockUtilization
 
+	println("feemarket params", params.String())
+
 	// set feemarket params
 	if err := keeper.SetParams(ctx, params); err != nil {
 		return err
@@ -1205,6 +1207,8 @@ func ConfigureFeeMarketModule(ctx sdk.Context, keeper *feemarketkeeper.Keeper) e
 
 	// configure feemarket state
 	state.BaseGasPrice = sdk.MustNewDecFromStr("0.5")
+
+	println("feemarket state", state.String())
 
 	// set feemarket state
 	return keeper.SetState(ctx, state)
