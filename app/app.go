@@ -1176,27 +1176,37 @@ func (app *App) setupUpgradeStoreLoaders() {
 }
 
 func ConfigureFeeMarketModule(ctx sdk.Context, keeper *feemarketkeeper.Keeper) error {
+	// initialise feemarket module
+	keeper.InitGenesis(ctx, *feemarkettypes.DefaultGenesisState())
+
+	// get feemarket params
 	params, err := keeper.GetParams(ctx)
 	if err != nil {
 		return err
 	}
 
+	// configure feemarket params
 	params.Enabled = true
 	params.FeeDenom = resourcetypes.BaseMinimalDenom
 	params.DistributeFees = false // burn fees
 	params.MinBaseGasPrice = sdk.MustNewDecFromStr("0.5")
 	params.MaxBlockUtilization = feemarkettypes.DefaultMaxBlockUtilization
+
+	// set feemarket params
 	if err := keeper.SetParams(ctx, params); err != nil {
 		return err
 	}
 
+	// get feemarket state
 	state, err := keeper.GetState(ctx)
 	if err != nil {
 		return err
 	}
 
+	// configure feemarket state
 	state.BaseGasPrice = sdk.MustNewDecFromStr("0.5")
 
+	// set feemarket state
 	return keeper.SetState(ctx, state)
 }
 
