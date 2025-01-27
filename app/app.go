@@ -1147,10 +1147,10 @@ func (app *App) RegisterUpgradeHandlers() {
 				return migrations, err
 			}
 			SetExplicitModuleAccountPermissions(ctx, app.AccountKeeper)
-			err = ConfigureFeeMarketModule(ctx, app.FeeMarketKeeper)
+			/* err = ConfigureFeeMarketModule(ctx, app.FeeMarketKeeper)
 			if err != nil {
 				return migrations, err
-			}
+			} */
 			return migrations, nil
 		},
 	)
