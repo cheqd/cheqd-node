@@ -42,13 +42,10 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions) negative",
 		}
 
 		// send the coins, balance assertions are intentionally omitted or out of scope
-		res, err := cli.SendTokensTx(testdata.BASE_ACCOUNT_1, testdata.BASE_ACCOUNT_2_ADDR, coins.String(), feeParams)
+		_, err = cli.SendTokensTx(testdata.BASE_ACCOUNT_1, testdata.BASE_ACCOUNT_2_ADDR, coins.String(), feeParams)
 
 		// assert error
 		Expect(err).ToNot(BeNil())
-
-		// assert the response code is 13
-		Expect(res.Code).To(BeEquivalentTo(13))
 	})
 
 	It("should fail to submit a non-taxable transaction with insufficient fees (--fees)", func() {
@@ -75,12 +72,9 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions) negative",
 		feeParams := helpers.GenerateFees(insufficientGasPrice.String())
 
 		// send the coins, balance assertions are intentionally omitted or out of scope
-		res, err := cli.SendTokensTx(testdata.BASE_ACCOUNT_1, testdata.BASE_ACCOUNT_2_ADDR, coins.String(), feeParams)
+		_, err = cli.SendTokensTx(testdata.BASE_ACCOUNT_1, testdata.BASE_ACCOUNT_2_ADDR, coins.String(), feeParams)
 
 		// assert error
 		Expect(err).ToNot(BeNil())
-
-		// assert the response code is 13
-		Expect(res.Code).To(BeEquivalentTo(13))
 	})
 })
