@@ -94,6 +94,12 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions)", func() {
 		// print the gas price
 		By("Gas Price: " + gasPrice.Price.String())
 
+		// query feemarket gas prices
+		gasPrices, err := cli.QueryFeemarketGasPrices()
+
+		// print the gas prices
+		By("Gas Prices: " + gasPrices.String())
+
 		// assert no error
 		Expect(err).To(BeNil())
 
@@ -126,6 +132,12 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions)", func() {
 
 		// print the gas price
 		By("Gas Price: " + gasPrice.Price.String())
+
+		// query feemarket gas prices
+		gasPrices, err := cli.QueryFeemarketGasPrices()
+
+		// print the gas prices
+		By("Gas Prices: " + gasPrices.String())
 
 		// assert no error
 		Expect(err).To(BeNil())

@@ -181,6 +181,21 @@ func QueryFeemarketGasPrice(denom string) (feemarkettypes.GasPriceResponse, erro
 	return resp, nil
 }
 
+func QueryFeemarketGasPrices() (feemarkettypes.GasPricesResponse, error) {
+	res, err := Query("feemarket", "gas-prices")
+	if err != nil {
+		return feemarkettypes.GasPricesResponse{}, err
+	}
+
+	var resp feemarkettypes.GasPricesResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return feemarkettypes.GasPricesResponse{}, err
+	}
+
+	return resp, nil
+}
+
 func QueryFeemarketParams() (feemarkettypes.Params, error) {
 	res, err := Query("feemarket", "params")
 	if err != nil {
