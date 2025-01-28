@@ -183,7 +183,7 @@ jobs:
           tar -xvf cheqd-noded-"${LEGACY_VERSION}"-linux-amd64.tar.gz -C ${{ env.RUNNER_BIN_DIR }}
           sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
         env:
-          LEGACY_VERSION: 2.0.1
+          LEGACY_VERSION: 3.0.1
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -259,7 +259,7 @@ jobs:
       - name: Run integration tests on upgraded network
         working-directory: ./tests/integration
         run: |
-          ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --skip-file cli_defi_test.go --junit-report ../../report-upgraded-integration.xml
+          ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --skip-file cli_defi_test.go --skip-file cli_defi_negative_test.go --junit-report ../../report-upgraded-integration.xml
 
       - name: Upload post-upgrade integration tests result
         uses: actions/upload-artifact@v4
@@ -286,7 +286,7 @@ jobs:
       - name: Run pricing integration tests after successful param change proposal
         working-directory: ./tests/integration
         run: |
-          ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --skip-file cli_diddoc_test.go --skip-file cli_diddoc_negative_test.go --skip-file cli_resource_test.go --skip-file cli_resource_negative_test.go --skip-file cli_defi_test.go --junit-report ../../report-pricing-change.xml
+          ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --skip-file cli_diddoc_test.go --skip-file cli_diddoc_negative_test.go --skip-file cli_resource_test.go --skip-file cli_resource_negative_test.go --skip-file cli_defi_test.go --skip-file cli_defi_negative_test.go --junit-report ../../report-pricing-change.xml
 
       - name: Upload pricing change tests result
         uses: actions/upload-artifact@v4
