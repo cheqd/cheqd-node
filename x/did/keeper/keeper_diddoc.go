@@ -145,7 +145,7 @@ func (k Keeper) GetAllDidDocVersions(ctx *sdk.Context, did string) ([]*types.Met
 	return result, nil
 }
 
-// SetDidDocLatestVersion sets the latest version id value for a diddoc
+// SetLatestDidDocVersion sets the latest version id value for a diddoc
 func (k Keeper) SetLatestDidDocVersion(ctx *sdk.Context, did, version string) error {
 	// Update counter. We use latest version as existence indicator.
 	if !k.HasLatestDidDocVersion(ctx, did) {
@@ -162,7 +162,7 @@ func (k Keeper) SetLatestDidDocVersion(ctx *sdk.Context, did, version string) er
 	return nil
 }
 
-// GetDidDocLatestVersion returns the latest version id value for a diddoc
+// GetLatestDidDocVersion returns the latest version id value for a diddoc
 func (k Keeper) GetLatestDidDocVersion(ctx *sdk.Context, id string) (string, error) {
 	store := ctx.KVStore(k.storeKey)
 

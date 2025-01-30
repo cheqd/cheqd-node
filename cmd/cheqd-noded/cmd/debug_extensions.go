@@ -32,7 +32,7 @@ func ed25519Cmd() *cobra.Command {
 	return cmd
 }
 
-// ed25519Cmd returns cobra Command.
+// ed25519RandomCmd returns cobra Command.
 func ed25519RandomCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "random",
@@ -64,7 +64,7 @@ func ed25519RandomCmd() *cobra.Command {
 	return cmd
 }
 
-// ed25519publicKeyBase64ToJwk returns cobra Command.
+// ed25519publicKeyBase64ToJwkCmd returns cobra Command.
 func ed25519publicKeyBase64ToJwkCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "base64-jwk",
