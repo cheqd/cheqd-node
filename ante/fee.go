@@ -5,6 +5,7 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -67,6 +68,9 @@ func CheckTxFee(ctx sdk.Context, gasPrice sdk.DecCoin, feeCoin sdk.Coin, feeGas 
 		gasConsumed := int64(ctx.GasMeter().GasConsumed())
 		gcDec := sdkmath.LegacyNewDec(gasConsumed)
 		glDec := sdkmath.LegacyNewDec(feeGas)
+
+		// multiply gasPrice by offset
+		gasPrice.Amount = gasPrice.Amount.Mul(sdkmath.LegacyNewDec(didtypes.FeeOffset))
 
 		consumedFeeAmount := gasPrice.Amount.Mul(gcDec)
 		limitFee := gasPrice.Amount.Mul(glDec)
