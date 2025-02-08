@@ -157,7 +157,7 @@ func Setup(isCheckTx bool) (*TestApp, error) {
 	return app, nil
 }
 
-// Setup initializes a new SimApp. A Nop logger is set in SimApp.
+// SetupTest initializes a new SimApp. A Nop logger is set in SimApp.
 func SetupTest(isCheckTx bool) (*TestApp, error) {
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()

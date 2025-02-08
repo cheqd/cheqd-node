@@ -10,7 +10,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// GetDidCount get the total number of did
+// GetDidDocCount get the total number of did
 func (k Keeper) GetDidDocCount(ctx *sdk.Context) uint64 {
 	store := ctx.KVStore(k.storeKey)
 
@@ -32,7 +32,7 @@ func (k Keeper) GetDidDocCount(ctx *sdk.Context) uint64 {
 	return count
 }
 
-// SetDidCount set the total number of did
+// SetDidDocCount set the total number of did
 func (k Keeper) SetDidDocCount(ctx *sdk.Context, count uint64) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -95,7 +95,7 @@ func (k Keeper) GetLatestDidDoc(ctx *sdk.Context, did string) (types.DidDocWithM
 	return latestVersion, nil
 }
 
-// SetDid set a specific did in the store. Updates DID counter if the DID is new.
+// SetDidDocVersion set a specific did in the store. Updates DID counter if the DID is new.
 func (k Keeper) SetDidDocVersion(ctx *sdk.Context, value *types.DidDocWithMetadata, override bool) error {
 	if !override && k.HasDidDocVersion(ctx, value.DidDoc.Id, value.Metadata.VersionId) {
 		return types.ErrDidDocExists.Wrap("diddoc version already exists")
@@ -111,7 +111,7 @@ func (k Keeper) SetDidDocVersion(ctx *sdk.Context, value *types.DidDocWithMetada
 	return nil
 }
 
-// GetDid returns a did from its id
+// GetDidDocVersion returns a did from its id
 func (k Keeper) GetDidDocVersion(ctx *sdk.Context, id, version string) (types.DidDocWithMetadata, error) {
 	store := ctx.KVStore(k.storeKey)
 
