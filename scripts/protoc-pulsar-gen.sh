@@ -23,5 +23,14 @@ for proto_dir in $proto_dirs; do
   proto_files=$(find "${proto_dir}" -maxdepth 1 -name '*.proto')
   for f in $proto_files; do
     buf generate --template buf.gen.pulsar.yaml "$f"
+
+    # replace github.com/cheqd/cheqd-node/api/v2/cosmos/base with cosmossdk.io/api/cosmos/base
+    sed -i 's/github.com\/cheqd\/cheqd-node\/api\/v2\/cosmos\/base/cosmossdk.io\/api\/cosmos\/base/g' "../api/${f%.*}.pulsar.go"
+
+    # replace amino
+    sed -i 's/github.com\/cheqd\/cheqd-node\/api\/v2\/amino/cosmossdk.io\/api\/amino/g' "../api/${f%.*}.pulsar.go"
+
+    # replace msg/v1
+    sed -i 's/github.com\/cheqd\/cheqd-node\/api\/v2\/cosmos\/msg\/v1/cosmossdk.io\/api\/cosmos\/msg\/v1/g' "../api/${f%.*}.pulsar.go"
   done
 done
