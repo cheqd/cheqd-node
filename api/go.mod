@@ -1,6 +1,6 @@
 module github.com/cheqd/cheqd-node/api/v2
 
-go 1.22.0
+go 1.22.6
 
 toolchain go1.23.4
 
