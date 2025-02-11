@@ -3,9 +3,9 @@ package resourcev2
 
 import (
 	fmt "fmt"
+	v1beta1 "cosmossdk.io/api/cosmos/base/v1beta1"
 	_ "github.com/cosmos/cosmos-proto"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
-	types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
@@ -217,11 +217,11 @@ func (x *fastReflection_FeeParams) Get(descriptor protoreflect.FieldDescriptor) 
 func (x *fastReflection_FeeParams) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	case "cheqd.resource.v2.FeeParams.image":
-		x.Image = value.Message().Interface().(*types.Coin)
+		x.Image = value.Message().Interface().(*v1beta1.Coin)
 	case "cheqd.resource.v2.FeeParams.json":
-		x.Json = value.Message().Interface().(*types.Coin)
+		x.Json = value.Message().Interface().(*v1beta1.Coin)
 	case "cheqd.resource.v2.FeeParams.default":
-		x.Default = value.Message().Interface().(*types.Coin)
+		x.Default = value.Message().Interface().(*v1beta1.Coin)
 	case "cheqd.resource.v2.FeeParams.burn_factor":
 		x.BurnFactor = value.Interface().(string)
 	default:
@@ -246,17 +246,17 @@ func (x *fastReflection_FeeParams) Mutable(fd protoreflect.FieldDescriptor) prot
 	switch fd.FullName() {
 	case "cheqd.resource.v2.FeeParams.image":
 		if x.Image == nil {
-			x.Image = new(types.Coin)
+			x.Image = new(v1beta1.Coin)
 		}
 		return protoreflect.ValueOfMessage(x.Image.ProtoReflect())
 	case "cheqd.resource.v2.FeeParams.json":
 		if x.Json == nil {
-			x.Json = new(types.Coin)
+			x.Json = new(v1beta1.Coin)
 		}
 		return protoreflect.ValueOfMessage(x.Json.ProtoReflect())
 	case "cheqd.resource.v2.FeeParams.default":
 		if x.Default == nil {
-			x.Default = new(types.Coin)
+			x.Default = new(v1beta1.Coin)
 		}
 		return protoreflect.ValueOfMessage(x.Default.ProtoReflect())
 	case "cheqd.resource.v2.FeeParams.burn_factor":
@@ -275,13 +275,13 @@ func (x *fastReflection_FeeParams) Mutable(fd protoreflect.FieldDescriptor) prot
 func (x *fastReflection_FeeParams) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	case "cheqd.resource.v2.FeeParams.image":
-		m := new(types.Coin)
+		m := new(v1beta1.Coin)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "cheqd.resource.v2.FeeParams.json":
-		m := new(types.Coin)
+		m := new(v1beta1.Coin)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "cheqd.resource.v2.FeeParams.default":
-		m := new(types.Coin)
+		m := new(v1beta1.Coin)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "cheqd.resource.v2.FeeParams.burn_factor":
 		return protoreflect.ValueOfString("")
@@ -527,7 +527,7 @@ func (x *fastReflection_FeeParams) ProtoMethods() *protoiface.Methods {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				if x.Image == nil {
-					x.Image = &types.Coin{}
+					x.Image = &v1beta1.Coin{}
 				}
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Image); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
@@ -563,7 +563,7 @@ func (x *fastReflection_FeeParams) ProtoMethods() *protoiface.Methods {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				if x.Json == nil {
-					x.Json = &types.Coin{}
+					x.Json = &v1beta1.Coin{}
 				}
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Json); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
@@ -599,7 +599,7 @@ func (x *fastReflection_FeeParams) ProtoMethods() *protoiface.Methods {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				if x.Default == nil {
-					x.Default = &types.Coin{}
+					x.Default = &v1beta1.Coin{}
 				}
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Default); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
@@ -695,15 +695,15 @@ type FeeParams struct {
 	// Fixed fee for creating a resource with media type 'image/*'
 	//
 	// Default: 10 CHEQ or 10000000000ncheq
-	Image *types.Coin `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
+	Image *v1beta1.Coin `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
 	// Fixed fee for creating a resource with media type 'application/json'
 	//
 	// Default: 2.5 CHEQ or 2500000000ncheq
-	Json *types.Coin `protobuf:"bytes,2,opt,name=json,proto3" json:"json,omitempty"`
+	Json *v1beta1.Coin `protobuf:"bytes,2,opt,name=json,proto3" json:"json,omitempty"`
 	// Fixed fee for creating a resource with all other media types
 	//
 	// Default: 5 CHEQ or 5000000000ncheq
-	Default *types.Coin `protobuf:"bytes,3,opt,name=default,proto3" json:"default,omitempty"`
+	Default *v1beta1.Coin `protobuf:"bytes,3,opt,name=default,proto3" json:"default,omitempty"`
 	// Percentage of the fixed fee that will be burned
 	//
 	// Default: 0.5 (50%)
@@ -730,21 +730,21 @@ func (*FeeParams) Descriptor() ([]byte, []int) {
 	return file_cheqd_resource_v2_fee_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *FeeParams) GetImage() *types.Coin {
+func (x *FeeParams) GetImage() *v1beta1.Coin {
 	if x != nil {
 		return x.Image
 	}
 	return nil
 }
 
-func (x *FeeParams) GetJson() *types.Coin {
+func (x *FeeParams) GetJson() *v1beta1.Coin {
 	if x != nil {
 		return x.Json
 	}
 	return nil
 }
 
-func (x *FeeParams) GetDefault() *types.Coin {
+func (x *FeeParams) GetDefault() *v1beta1.Coin {
 	if x != nil {
 		return x.Default
 	}
@@ -816,8 +816,8 @@ func file_cheqd_resource_v2_fee_proto_rawDescGZIP() []byte {
 
 var file_cheqd_resource_v2_fee_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_cheqd_resource_v2_fee_proto_goTypes = []interface{}{
-	(*FeeParams)(nil),  // 0: cheqd.resource.v2.FeeParams
-	(*types.Coin)(nil), // 1: cosmos.base.v1beta1.Coin
+	(*FeeParams)(nil),    // 0: cheqd.resource.v2.FeeParams
+	(*v1beta1.Coin)(nil), // 1: cosmos.base.v1beta1.Coin
 }
 var file_cheqd_resource_v2_fee_proto_depIdxs = []int32{
 	1, // 0: cheqd.resource.v2.FeeParams.image:type_name -> cosmos.base.v1beta1.Coin

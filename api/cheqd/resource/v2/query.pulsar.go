@@ -3,8 +3,8 @@ package resourcev2
 
 import (
 	fmt "fmt"
+	v1beta1 "cosmossdk.io/api/cosmos/base/query/v1beta1"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
-	query "github.com/cosmos/cosmos-sdk/types/query"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -2027,7 +2027,7 @@ func (x *fastReflection_QueryCollectionResourcesRequest) Set(fd protoreflect.Fie
 	case "cheqd.resource.v2.QueryCollectionResourcesRequest.collection_id":
 		x.CollectionId = value.Interface().(string)
 	case "cheqd.resource.v2.QueryCollectionResourcesRequest.pagination":
-		x.Pagination = value.Message().Interface().(*query.PageRequest)
+		x.Pagination = value.Message().Interface().(*v1beta1.PageRequest)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryCollectionResourcesRequest"))
@@ -2050,7 +2050,7 @@ func (x *fastReflection_QueryCollectionResourcesRequest) Mutable(fd protoreflect
 	switch fd.FullName() {
 	case "cheqd.resource.v2.QueryCollectionResourcesRequest.pagination":
 		if x.Pagination == nil {
-			x.Pagination = new(query.PageRequest)
+			x.Pagination = new(v1beta1.PageRequest)
 		}
 		return protoreflect.ValueOfMessage(x.Pagination.ProtoReflect())
 	case "cheqd.resource.v2.QueryCollectionResourcesRequest.collection_id":
@@ -2071,7 +2071,7 @@ func (x *fastReflection_QueryCollectionResourcesRequest) NewField(fd protoreflec
 	case "cheqd.resource.v2.QueryCollectionResourcesRequest.collection_id":
 		return protoreflect.ValueOfString("")
 	case "cheqd.resource.v2.QueryCollectionResourcesRequest.pagination":
-		m := new(query.PageRequest)
+		m := new(v1beta1.PageRequest)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
@@ -2311,7 +2311,7 @@ func (x *fastReflection_QueryCollectionResourcesRequest) ProtoMethods() *protoif
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				if x.Pagination == nil {
-					x.Pagination = &query.PageRequest{}
+					x.Pagination = &v1beta1.PageRequest{}
 				}
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Pagination); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
@@ -2582,7 +2582,7 @@ func (x *fastReflection_QueryCollectionResourcesResponse) Set(fd protoreflect.Fi
 		clv := lv.(*_QueryCollectionResourcesResponse_1_list)
 		x.Resources = *clv.list
 	case "cheqd.resource.v2.QueryCollectionResourcesResponse.pagination":
-		x.Pagination = value.Message().Interface().(*query.PageResponse)
+		x.Pagination = value.Message().Interface().(*v1beta1.PageResponse)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.resource.v2.QueryCollectionResourcesResponse"))
@@ -2611,7 +2611,7 @@ func (x *fastReflection_QueryCollectionResourcesResponse) Mutable(fd protoreflec
 		return protoreflect.ValueOfList(value)
 	case "cheqd.resource.v2.QueryCollectionResourcesResponse.pagination":
 		if x.Pagination == nil {
-			x.Pagination = new(query.PageResponse)
+			x.Pagination = new(v1beta1.PageResponse)
 		}
 		return protoreflect.ValueOfMessage(x.Pagination.ProtoReflect())
 	default:
@@ -2631,7 +2631,7 @@ func (x *fastReflection_QueryCollectionResourcesResponse) NewField(fd protorefle
 		list := []*Metadata{}
 		return protoreflect.ValueOfList(&_QueryCollectionResourcesResponse_1_list{list: &list})
 	case "cheqd.resource.v2.QueryCollectionResourcesResponse.pagination":
-		m := new(query.PageResponse)
+		m := new(v1beta1.PageResponse)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
@@ -2884,7 +2884,7 @@ func (x *fastReflection_QueryCollectionResourcesResponse) ProtoMethods() *protoi
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				if x.Pagination == nil {
-					x.Pagination = &query.PageResponse{}
+					x.Pagination = &v1beta1.PageResponse{}
 				}
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Pagination); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
@@ -3132,7 +3132,7 @@ type QueryCollectionResourcesRequest struct {
 	// - wGHEXrZvJxR8vw5P3UWH1j
 	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
 	// pagination defines an optional pagination for the request.
-	Pagination *query.PageRequest `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Pagination *v1beta1.PageRequest `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
 func (x *QueryCollectionResourcesRequest) Reset() {
@@ -3162,7 +3162,7 @@ func (x *QueryCollectionResourcesRequest) GetCollectionId() string {
 	return ""
 }
 
-func (x *QueryCollectionResourcesRequest) GetPagination() *query.PageRequest {
+func (x *QueryCollectionResourcesRequest) GetPagination() *v1beta1.PageRequest {
 	if x != nil {
 		return x.Pagination
 	}
@@ -3178,7 +3178,7 @@ type QueryCollectionResourcesResponse struct {
 	// resources is the requested collection of resource metadata
 	Resources []*Metadata `protobuf:"bytes,1,rep,name=resources,proto3" json:"resources,omitempty"`
 	// pagination defines the pagination in the response.
-	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	Pagination *v1beta1.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
 func (x *QueryCollectionResourcesResponse) Reset() {
@@ -3208,7 +3208,7 @@ func (x *QueryCollectionResourcesResponse) GetResources() []*Metadata {
 	return nil
 }
 
-func (x *QueryCollectionResourcesResponse) GetPagination() *query.PageResponse {
+func (x *QueryCollectionResourcesResponse) GetPagination() *v1beta1.PageResponse {
 	if x != nil {
 		return x.Pagination
 	}
@@ -3345,8 +3345,8 @@ var file_cheqd_resource_v2_query_proto_goTypes = []interface{}{
 	(*QueryCollectionResourcesResponse)(nil), // 5: cheqd.resource.v2.QueryCollectionResourcesResponse
 	(*ResourceWithMetadata)(nil),             // 6: cheqd.resource.v2.ResourceWithMetadata
 	(*Metadata)(nil),                         // 7: cheqd.resource.v2.Metadata
-	(*query.PageRequest)(nil),                // 8: cosmos.base.query.v1beta1.PageRequest
-	(*query.PageResponse)(nil),               // 9: cosmos.base.query.v1beta1.PageResponse
+	(*v1beta1.PageRequest)(nil),              // 8: cosmos.base.query.v1beta1.PageRequest
+	(*v1beta1.PageResponse)(nil),             // 9: cosmos.base.query.v1beta1.PageResponse
 }
 var file_cheqd_resource_v2_query_proto_depIdxs = []int32{
 	6, // 0: cheqd.resource.v2.QueryResourceResponse.resource:type_name -> cheqd.resource.v2.ResourceWithMetadata

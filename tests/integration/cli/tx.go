@@ -2,6 +2,7 @@ package cli
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
@@ -42,6 +43,8 @@ func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxRe
 
 	// Other args
 	args = append(args, txArgs...)
+
+	fmt.Println("args", args)
 
 	output, err := Exec(args...)
 	if err != nil {
@@ -175,4 +178,8 @@ func SubmitProposalTx(from, pathToDir string, feeParams []string) (sdk.TxRespons
 
 func VoteProposalTx(from, option, id string, feeParams []string) (sdk.TxResponse, error) {
 	return Tx("gov", "vote", from, feeParams, option, id)
+}
+
+func SendTokensTx(from, to, amount string, feeParams []string) (sdk.TxResponse, error) {
+	return Tx("bank", "send", from, feeParams, from, to, amount)
 }
