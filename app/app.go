@@ -521,6 +521,9 @@ func New(
 		app.MsgServiceRouter(),
 	)
 
+	// Register with query router
+	app.ICAHostKeeper.WithQueryRouter(app.GRPCQueryRouter())
+
 	// Create IBC Router
 	ibcRouter := porttypes.NewRouter()
 
