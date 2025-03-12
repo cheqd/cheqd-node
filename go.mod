@@ -218,7 +218,7 @@ replace (
 	// cheqd-node/api module replacement
 	github.com/cheqd/cheqd-node/api/v2 => ./api
 
-	// replace cosmos-sdk v0.47.10
+	// replace cosmos-sdk v0.47.17
 	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.47.17-height-mismatch-patched
 
 	github.com/cosmos/gogoproto v1.5.0 => github.com/cosmos/gogoproto v1.4.10
