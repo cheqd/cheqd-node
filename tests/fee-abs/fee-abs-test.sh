@@ -79,8 +79,8 @@ CHEQD_RELAYER_MNEMONIC=$(echo "${CHEQD_RELAYER_ACCOUNT}" | jq --raw-output '.mne
 
 echo "${CHEQD_RELAYER_MNEMONIC}" > cheqd_relayer_mnemonic.txt
 
-info "Send some tokens to it" # ---
-RES=$(docker compose exec cheqd cheqd-noded tx bank send cheqd-user "${CHEQD_RELAYER_ADDRESS}" 500000000000000000ncheq --gas-prices 50ncheq --chain-id cheqd -y --keyring-backend test)
+info "Send some cheqd tokens to it" # ---
+RES=$(docker compose exec cheqd cheqd-noded tx bank send cheqd-user "${CHEQD_RELAYER_ADDRESS}" 500000000000000000ncheq --fees 2000000000ncheq --chain-id cheqd -y --keyring-backend test)
 assert_tx_successful "${RES}"
 
 info "Create relayer user on osmosis" # ---
@@ -91,7 +91,7 @@ OSMOSIS_RELAYER_MNEMONIC=$(echo "${OSMOSIS_RELAYER_ACCOUNT}" | jq --raw-output '
 
 echo "${OSMOSIS_RELAYER_MNEMONIC}" > osmo_relayer_mnemonic.txt
 
-info "Send some tokens to it" # ---
+info "Send some osmo tokens to it" # ---
 RES=$(docker compose exec osmosis osmosisd tx bank send osmosis-user "${OSMOSIS_RELAYER_ADDRESS}" 1000000000uosmo --fees 500uosmo --chain-id osmosis -y --keyring-backend test --output json)
 assert_tx_successful "${RES}"
 sleep 10 # Wait for state
@@ -134,7 +134,7 @@ OSMOSIS_RELAYER_ADDRESS=$(docker compose exec osmosis osmosisd keys show --addre
 info "Transfer cheqd -> osmosis" # ---
 PORT="transfer"
 CHANNEL="channel-0"
-docker compose exec cheqd cheqd-noded tx ibc-transfer transfer $PORT $CHANNEL "$OSMOSIS_USER_ADDRESS" 10000000000ncheq --from cheqd-user --chain-id cheqd --gas-prices 50ncheq --keyring-backend test -y
+docker compose exec cheqd cheqd-noded tx ibc-transfer transfer $PORT $CHANNEL "$OSMOSIS_USER_ADDRESS" 10000000000ncheq --from cheqd-user --chain-id cheqd --gas-prices 10000ncheq --keyring-backend test -y
 sleep 30 # Wait for relayer
 
 info "Get balances" # ---
@@ -143,7 +143,8 @@ BALANCES=$(docker compose exec osmosis osmosisd query bank balances "$OSMOSIS_US
 
 info "Denom trace" # ---
 DENOM=$(echo "$BALANCES" | jq --raw-output '.balances[0].denom')
-DENOM_CUT=$(echo "$DENOM" | cut -c 5-)
+DENOM_CUT=$DENOM
+# DENOM_CUT=$(echo "$DENOM" | cut -c 5-)
 docker compose exec osmosis osmosisd query ibc-transfer denom-trace "$DENOM_CUT"
 
 info "Send 100OSMO to cheqd"
@@ -166,23 +167,28 @@ POOL_ID=$(docker compose exec osmosis osmosisd q tx $TX_HASH --output json | jq 
 echo "pool id: $POOL_ID"
 
 info "enable fee abs"
-docker compose exec cheqd cheqd-noded tx gov submit-legacy-proposal param-change /cheqd/proposal.json --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 50ncheq --gas 350000
+
+RES=$(docker compose exec cheqd cheqd-noded tx gov submit-legacy-proposal param-change /cheqd/proposal.json --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
+assert_tx_successful "${RES}"
 sleep 5 
-docker compose exec cheqd cheqd-noded tx gov vote 1 yes --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 50ncheq
+RES=$(docker compose exec cheqd cheqd-noded tx gov vote 1 yes --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
+assert_tx_successful "${RES}"
 sleep 5 
 
 info "add host zone config"
-docker compose exec cheqd cheqd-noded tx gov submit-legacy-proposal add-hostzone-config /cheqd/host_zone.json --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 50ncheq --gas 350000
+RES=$(docker compose exec cheqd cheqd-noded tx gov submit-legacy-proposal add-hostzone-config /cheqd/host_zone.json --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
+assert_tx_successful "${RES}"
 sleep 5
-docker compose exec cheqd cheqd-noded tx gov vote 2 yes --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 50ncheq
+RES=$(docker compose exec cheqd cheqd-noded tx gov vote 2 yes --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
+assert_tx_successful "${RES}"
 sleep 5
 
 info "fund fee-abs module account"
-RES=$(docker compose exec cheqd cheqd-noded tx feeabs fund 500000000ncheq --from $CHEQD_USER_ADDRESS --fees 10000000ncheq --chain-id cheqd -y --keyring-backend test)
+RES=$(docker compose exec cheqd cheqd-noded tx feeabs fund 500000000ncheq --from $CHEQD_USER_ADDRESS --gas-prices 10000ncheq --gas 350000 --chain-id cheqd -y --keyring-backend test)
 assert_tx_successful "${RES}"
 sleep 120
 
-echo docker compose exec cheqd cheqd-noded tx feeabs fund 500000000ncheq --from $CHEQD_USER_ADDRESS --fees 10000000ncheq --chain-id cheqd -y --keyring-backend test
+echo docker compose exec cheqd cheqd-noded tx feeabs fund 500000000ncheq --from $CHEQD_USER_ADDRESS --gas-prices 10000ncheq --gas 350000 --chain-id cheqd -y --keyring-backend test
 
 info "pay fees using osmo in cheqd"
 RES=$(docker compose exec cheqd cheqd-noded tx bank send cheqd-user "$CHEQD_RELAYER_ADDRESS" 50000000ncheq --fees 10000000"$DENOM" --chain-id cheqd -y --keyring-backend test)
