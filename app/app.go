@@ -540,7 +540,7 @@ func New(
 		appCodec,
 		app.keys[icqtypes.StoreKey],
 		app.IBCKeeper.ChannelKeeper,
-		app.IBCKeeper.ChannelKeeper, // may be replaced with middleware
+		app.IBCKeeper.ChannelKeeper,
 		&app.IBCKeeper.PortKeeper,
 		app.ScopedICQKeeper,
 		bApp.GRPCQueryRouter(),
