@@ -42,6 +42,20 @@ function assert_network_running() {
   fi
 }
 
+function assert_network_running_comet_v38_or_above() {
+  RES="$1"
+  LATEST_HEIGHT=$(echo "${RES}" | jq --raw-output '.sync_info.latest_block_height')
+  info "latest height: ${LATEST_HEIGHT}"
+
+  if [[ $LATEST_HEIGHT -gt 1 ]]
+  then
+      info "network is running"
+  else
+      err "network is not running"
+      exit 1
+  fi
+}
+
 
 info "Cleanup"
 docker compose down --volumes --remove-orphans
@@ -68,7 +82,7 @@ CHEQD_STATUS=$(docker compose exec cheqd cheqd-noded status 2>&1)
 assert_network_running "${CHEQD_STATUS}"
 
 OSMOSIS_STATUS=$(docker compose exec osmosis osmosisd status 2>&1)
-assert_network_running "${OSMOSIS_STATUS}"
+assert_network_running_comet_v38_or_above "${OSMOSIS_STATUS}"
 
 
 info "Create relayer user on cheqd"  # ---
