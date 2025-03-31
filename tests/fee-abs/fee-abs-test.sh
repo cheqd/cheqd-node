@@ -152,8 +152,8 @@ docker compose exec cheqd cheqd-noded tx ibc-transfer transfer $PORT $CHANNEL "$
 sleep 30 # Wait for relayer
 
 info "Get balances" # ---
-CHEQD_BALANCE_2=$(docker compose exec cheqd cheqd-noded query bank balances "$CHEQD_USER_ADDRESS" --output json)
-BALANCES=$(docker compose exec osmosis osmosisd query bank balances "$OSMOSIS_USER_ADDRESS" --output json)
+CHEQD_BALANCE_2=$(docker compose exec cheqd cheqd-noded query bank balances "$CHEQD_USER_ADDRESS" --output json 2>&1)
+BALANCES=$(docker compose exec osmosis osmosisd query bank balances "$OSMOSIS_USER_ADDRESS" --output json 2>&1)
 
 info "Denom trace" # ---
 DENOM=$(echo "$BALANCES" | jq --raw-output '.balances[0].denom')
@@ -161,8 +161,8 @@ DENOM_CUT=$DENOM
 # DENOM_CUT=$(echo "$DENOM" | cut -c 5-)
 docker compose exec osmosis osmosisd query ibc-transfer denom-trace "$DENOM_CUT"
 
-info "Send 100OSMO to cheqd"
-docker compose exec osmosis osmosisd tx ibc-transfer transfer $PORT $CHANNEL "$CHEQD_USER_ADDRESS" 100000000uosmo --from osmosis-user --chain-id osmosis --fees 500uosmo --keyring-backend test -y
+info "Send 1000OSMO to cheqd"
+docker compose exec osmosis osmosisd tx ibc-transfer transfer $PORT $CHANNEL "$CHEQD_USER_ADDRESS" 1000000000uosmo --from osmosis-user --chain-id osmosis --fees 500uosmo --keyring-backend test -y
 sleep 30
 
 CHEQD_BALANCE_2=$(docker compose exec cheqd cheqd-noded query bank balances "$CHEQD_USER_ADDRESS" --output json)
@@ -184,10 +184,10 @@ info "enable fee abs"
 
 RES=$(docker compose exec cheqd cheqd-noded tx gov submit-legacy-proposal param-change /cheqd/proposal.json --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
 assert_tx_successful "${RES}"
-sleep 5 
+sleep 5
 RES=$(docker compose exec cheqd cheqd-noded tx gov vote 1 yes --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
 assert_tx_successful "${RES}"
-sleep 5 
+sleep 5
 
 info "add host zone config"
 RES=$(docker compose exec cheqd cheqd-noded tx gov submit-legacy-proposal add-hostzone-config /cheqd/host_zone.json --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
@@ -205,12 +205,12 @@ sleep 120
 echo docker compose exec cheqd cheqd-noded tx feeabs fund 500000000ncheq --from $CHEQD_USER_ADDRESS --gas-prices 10000ncheq --gas 350000 --chain-id cheqd -y --keyring-backend test
 
 info "pay fees using osmo in cheqd"
-RES=$(docker compose exec cheqd cheqd-noded tx bank send cheqd-user "$CHEQD_RELAYER_ADDRESS" 50000000ncheq --fees 10000000"$DENOM" --chain-id cheqd -y --keyring-backend test)
+RES=$(docker compose exec cheqd cheqd-noded tx bank send cheqd-user "$CHEQD_RELAYER_ADDRESS" 50000000ncheq --fees 100000000"$DENOM" --chain-id cheqd -y --keyring-backend test)
 assert_tx_successful "${RES}"
 sleep 120
 
 info "pay fees using osmo in cheqd (try again)"
-RES=$(docker compose exec cheqd cheqd-noded tx bank send cheqd-user "$CHEQD_RELAYER_ADDRESS" 50000000ncheq --fees 10000000"$DENOM" --chain-id cheqd -y --keyring-backend test)
+RES=$(docker compose exec cheqd cheqd-noded tx bank send cheqd-user "$CHEQD_RELAYER_ADDRESS" 50000000ncheq --fees 100000000"$DENOM" --chain-id cheqd -y --keyring-backend test)
 assert_tx_successful "${RES}"
 
 sleep 5
