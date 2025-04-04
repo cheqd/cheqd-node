@@ -236,7 +236,7 @@ replace (
 	// TODO Remove it: https://github.com/cosmos/cosmos-sdk/issues/10409
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.0
 
-	github.com/osmosis-labs/fee-abstraction/v7 => github.com/cheqd/fee-abstraction/v7 v7.0.3-0.20240919093501-645e58a8252d
+	github.com/osmosis-labs/fee-abstraction/v7 => github.com/cheqd/fee-abstraction/v7 v7.0.3-0.20250402151959-20551574d865
 
 	github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.4-sdk47.0.20240919093317-104ec7d7b634
 

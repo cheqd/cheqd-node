@@ -170,6 +170,16 @@ jobs:
           name: report-integration.xml
           path: report-integration.xml
 
+  fee-abstraction-tests:
+    name: "Fee Abstraction Tests"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Execute fee-abstraction logic by paying in `uosmo`
+        working-directory: ./tests/fee-abs
+        run: bash fee-abs-test.sh
+
   upgrade-tests:
     name: "Upgrade Tests"
     runs-on: ubuntu-24.04

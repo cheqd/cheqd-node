@@ -48,7 +48,7 @@ sleep 5
 
 # execute
 info "execute crosschain_registry modify_chain_channel_links"
-EXE_MSG='{"modify_chain_channel_links": {"operations": [{"operation": "set","source_chain": "cheqd","destination_chain": "osmosis","channel_id": "channel-0"},{"operation": "set","source_chain": "osmosis","destination_chain": "cheqd","channel_id": "channel-0"}]}}'
+EXE_MSG='{"modify_chain_channel_links": {"operations": [{"operation": "set","source_chain": "cheqd","destination_chain": "osmosis","channel_id": "channel-1"},{"operation": "set","source_chain": "osmosis","destination_chain": "cheqd","channel_id": "channel-1"}]}}'
 RES=$(osmosisd tx wasm execute "$SWAPREGISTRY_ADDRESS" "$EXE_MSG" --keyring-backend=test --home=$HOME/.osmosisd --from osmosis-user --chain-id osmosis --yes --fees 5000uosmo)
 assert_tx_successful $RES
 sleep 5
