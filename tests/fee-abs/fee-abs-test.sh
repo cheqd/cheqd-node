@@ -214,6 +214,7 @@ info "wait for exchange rate to be updated"
 sleep 600
 
 info "pay fees using osmo in cheqd (recursively)"
+# shellcheck disable=SC2034
 for i in {1..20}; do
   RES=$(docker compose exec cheqd cheqd-noded tx bank send cheqd-user "$CHEQD_RELAYER_ADDRESS" 50000000ncheq --fees 200000000000ibc/ED07A3391A112B175915CD8FAF43A2DA8E4790EDE12566649D0C2F97716B8518 --chain-id cheqd -y --keyring-backend test)
   exit_if_tx_successful "${RES}"
