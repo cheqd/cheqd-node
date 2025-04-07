@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -102,6 +103,9 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	icq "github.com/cosmos/ibc-apps/modules/async-icq/v7"
+	icqkeeper "github.com/cosmos/ibc-apps/modules/async-icq/v7/keeper"
+	icqtypes "github.com/cosmos/ibc-apps/modules/async-icq/v7/types"
 	ica "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts"
 	icacontroller "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller"
 	icacontrollerkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller/keeper"
@@ -175,6 +179,7 @@ var (
 		transfer.AppModuleBasic{},
 		ica.AppModuleBasic{},
 		upgrade.AppModuleBasic{},
+		icq.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
@@ -193,6 +198,7 @@ var (
 		authtypes.FeeCollectorName:      nil,
 		distrtypes.ModuleName:           nil,
 		icatypes.ModuleName:             nil,
+		icqtypes.ModuleName:             nil,
 		minttypes.ModuleName:            {authtypes.Minter},
 		stakingtypes.BondedPoolName:     {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName:  {authtypes.Burner, authtypes.Staking},
@@ -243,6 +249,7 @@ type App struct {
 	IBCFeeKeeper          ibcfeekeeper.Keeper
 	ICAControllerKeeper   icacontrollerkeeper.Keeper
 	ICAHostKeeper         icahostkeeper.Keeper
+	ICQKeeper             *icqkeeper.Keeper
 	EvidenceKeeper        evidencekeeper.Keeper
 	TransferKeeper        ibctransferkeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
@@ -325,6 +332,7 @@ func New(
 		ibctransfertypes.StoreKey,
 		icacontrollertypes.StoreKey,
 		icahosttypes.StoreKey,
+		icqtypes.StoreKey,
 		capabilitytypes.StoreKey,
 		authzkeeper.StoreKey,
 		group.StoreKey,
@@ -362,6 +370,7 @@ func New(
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	scopedICAControllerKeeper := app.CapabilityKeeper.ScopeToModule(icacontrollertypes.SubModuleName)
 	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
+	scopedICQKeeper := app.CapabilityKeeper.ScopeToModule(icqtypes.ModuleName)
 	scopedResourceKeeper := app.CapabilityKeeper.ScopeToModule(resourcetypes.ModuleName)
 	scopedFeeabsKeeper := app.CapabilityKeeper.ScopeToModule(feeabstypes.ModuleName)
 
@@ -526,6 +535,25 @@ func New(
 
 	// Create IBC Router
 	ibcRouter := porttypes.NewRouter()
+
+	// ICQ Keeper
+	icqKeeper := icqkeeper.NewKeeper(
+		appCodec,
+		app.keys[icqtypes.StoreKey],
+		app.IBCKeeper.ChannelKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.ScopedICQKeeper,
+		bApp.GRPCQueryRouter(),
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+	app.ICQKeeper = &icqKeeper
+
+	// Create Async ICQ module
+	icqModule := icq.NewIBCModule(*app.ICQKeeper)
+
+	// Add icq modules to IBC router
+	ibcRouter.AddRoute(icqtypes.ModuleName, icqModule)
 
 	// Middleware Stacks
 
@@ -728,6 +756,7 @@ func New(
 		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		icqtypes.ModuleName,
 		feemarkettypes.ModuleName,
 	)
 
@@ -758,6 +787,7 @@ func New(
 		ibcfeetypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		feemarkettypes.ModuleName,
+		icqtypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -782,6 +812,7 @@ func New(
 		ibctransfertypes.ModuleName,
 		feeabstypes.ModuleName,
 		icatypes.ModuleName,
+		icqtypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		feegrant.ModuleName,
 		group.ModuleName,
@@ -874,6 +905,7 @@ func New(
 	app.ScopedTransferKeeper = scopedTransferKeeper
 	app.ScopedICAControllerKeeper = scopedICAControllerKeeper
 	app.ScopedICAHostKeeper = scopedICAHostKeeper
+	app.ScopedICQKeeper = scopedICQKeeper
 	app.ScopedResourceKeeper = scopedResourceKeeper
 	app.ScopedFeeAbsKeeper = scopedFeeabsKeeper
 
@@ -1154,6 +1186,11 @@ func (app *App) RegisterUpgradeHandlers() {
 			if err != nil {
 				return migrations, err
 			}
+			// remove the old host zone config and add the new one
+			err = ReplaceHostZoneConfig(ctx, &app.FeeabsKeeper)
+			if err != nil {
+				return migrations, err
+			}
 			return migrations, nil
 		},
 	)
@@ -1230,4 +1267,27 @@ func SetExplicitModuleAccountPermissions(ctx sdk.Context, accountKeeper authkeep
 	} else {
 		panic("failed to cast module account to *ModuleAccount")
 	}
+}
+
+func ReplaceHostZoneConfig(ctx sdk.Context, feeAbsKeeper *feeabskeeper.Keeper) error {
+	// disregard, if not mainnet
+	if ctx.ChainID() != "cheqd-mainnet-1" {
+		return nil
+	}
+	// remove the old host zone config and add the new one
+	err := feeAbsKeeper.DeleteHostZoneConfig(ctx, "ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4")
+	// ignore error if not found
+	if err != nil && !errors.Is(err, feeabstypes.ErrHostZoneConfigNotFound) {
+		return err
+	}
+	err = feeAbsKeeper.SetHostZoneConfig(ctx, feeabstypes.HostChainFeeAbsConfig{
+		IbcDenom:                "ibc/F5FABF52B54E65064B57BF6DBD8E5FAD22CEE9F4B8A57ADBB20CCD0173AA72A4",
+		OsmosisPoolTokenDenomIn: "ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4",
+		PoolId:                  1273,
+		MinSwapAmount:           0,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }

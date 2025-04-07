@@ -2,7 +2,7 @@
 
 ```bash
 # Cd to the test directory
-cd tests/ibc-defi
+cd tests/fee-abs
 
 # Run test
 bash fee-abs-test.sh

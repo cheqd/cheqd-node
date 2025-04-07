@@ -36,7 +36,7 @@ CHEQD_RELAYER_MNEMONIC=$(echo "${CHEQD_RELAYER_ACCOUNT}" | jq --raw-output '.mne
 echo "${CHEQD_RELAYER_MNEMONIC}" > cheqd_relayer_mnemonic.txt
 
 info "Send some tokens to it"
-RES=$(cheqd-noded tx bank send cheqd-user "${CHEQD_RELAYER_ADDRESS}" 500000000000000000ncheq --gas-prices 50ncheq --chain-id cheqd -y --keyring-backend test)
+RES=$(cheqd-noded tx bank send cheqd-user "${CHEQD_RELAYER_ADDRESS}" 500000000000000000ncheq --gas-prices 5000ncheq --chain-id cheqd -y --keyring-backend test)
 assert_tx_successful "${RES}"
 
 info "Create relayer user on osmosis"
