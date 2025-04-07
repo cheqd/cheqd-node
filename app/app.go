@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -1185,6 +1186,11 @@ func (app *App) RegisterUpgradeHandlers() {
 			if err != nil {
 				return migrations, err
 			}
+			// remove the old host zone config and add the new one
+			err = ReplaceHostZoneConfig(ctx, &app.FeeabsKeeper)
+			if err != nil {
+				return migrations, err
+			}
 			return migrations, nil
 		},
 	)
@@ -1261,4 +1267,27 @@ func SetExplicitModuleAccountPermissions(ctx sdk.Context, accountKeeper authkeep
 	} else {
 		panic("failed to cast module account to *ModuleAccount")
 	}
+}
+
+func ReplaceHostZoneConfig(ctx sdk.Context, feeAbsKeeper *feeabskeeper.Keeper) error {
+	// disregard, if not mainnet
+	if ctx.ChainID() != "cheqd-mainnet-1" {
+		return nil
+	}
+	// remove the old host zone config and add the new one
+	err := feeAbsKeeper.DeleteHostZoneConfig(ctx, "ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4")
+	// ignore error if not found
+	if err != nil && !errors.Is(err, feeabstypes.ErrHostZoneConfigNotFound) {
+		return err
+	}
+	err = feeAbsKeeper.SetHostZoneConfig(ctx, feeabstypes.HostChainFeeAbsConfig{
+		IbcDenom:                "ibc/F5FABF52B54E65064B57BF6DBD8E5FAD22CEE9F4B8A57ADBB20CCD0173AA72A4",
+		OsmosisPoolTokenDenomIn: "ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4",
+		PoolId:                  1273,
+		MinSwapAmount:           0,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }
