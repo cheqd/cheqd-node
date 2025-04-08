@@ -17,8 +17,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank/testutil"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	feeabsante "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/ante"
-	"github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/types"
+	feeabsante "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/ante"
+	"github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/types"
 	feemarketante "github.com/skip-mev/feemarket/x/feemarket/ante"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )

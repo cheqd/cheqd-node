@@ -1,8 +1,8 @@
 package ante
 
 import (
-	feeabskeeper "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/keeper"
-	feeabstypes "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/types"
+	feeabskeeper "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/keeper"
+	feeabstypes "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/types"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"

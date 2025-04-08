@@ -33,8 +33,8 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	portkeeper "github.com/cosmos/ibc-go/v7/modules/core/05-port/keeper"
-	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
+	portkeeper "github.com/cosmos/ibc-go/v8/modules/core/05-port/keeper"
+	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 )
 
 type TestSetup struct {

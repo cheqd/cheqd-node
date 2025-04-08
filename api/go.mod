@@ -5,7 +5,7 @@ go 1.22.6
 toolchain go1.23.4
 
 require (
-	cosmossdk.io/api v0.3.1
+	cosmossdk.io/api v0.7.6
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/gogoproto v1.7.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240610135401-a8a62080eff3
@@ -22,7 +22,7 @@ require (
 )
 
 replace (
-	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.47.17-height-mismatch-patched
+	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.50.13-height-mismatch-patched
 
-	github.com/cosmos/iavl => github.com/cheqd/iavl v0.20.1-uneven-heights
+// github.com/cosmos/iavl => github.com/cheqd/iavl v0.20.1-uneven-heights
 )
