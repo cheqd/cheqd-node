@@ -1665,7 +1665,7 @@ class Interviewer:
     @property
     def is_cosmovisor_needed(self) -> bool:
         return self._is_cosmovisor_needed
-    
+
     @property
     def is_cosmovisor_config_needed(self) -> bool:
         return self._is_cosmovisor_config_needed
@@ -1762,7 +1762,7 @@ class Interviewer:
     @is_cosmovisor_needed.setter
     def is_cosmovisor_needed(self, icn):
         self._is_cosmovisor_needed = icn
-    
+
     @is_cosmovisor_config_needed.setter
     def is_cosmovisor_config_needed(self, icn):
         self._is_cosmovisor_config_needed = icn
