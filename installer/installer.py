@@ -1127,7 +1127,7 @@ class Installer():
 
                 # Write cosmovisor-config.toml file
                 if self.interviewer.is_cosmovisor_config_needed:
-                    with open(DEFAULT_COSMOVISOR_CONFIG_FILE_PATH, "w") as fname:
+                    with open(f"{self.cheqd_root_dir}/cosmovisor/config.toml", "w") as fname:
                         fname.write(self.cosmovisor_config_cfg)
 
                 return True
