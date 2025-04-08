@@ -42,7 +42,7 @@ DEFAULT_DEBUG_BRANCH = os.getenv("DEFAULT_DEBUG_BRANCH") if os.getenv("DEFAULT_D
 ###############################################################
 ###     		Cosmovisor configuration      				###
 ###############################################################
-DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.3.0"
+DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.7.1"
 COSMOVISOR_BINARY_URL = "https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2F{}/cosmovisor-{}-linux-{}.tar.gz"
 DEFAULT_USE_COSMOVISOR = "yes"
 DEFAULT_BUMP_COSMOVISOR = "yes"
@@ -51,18 +51,21 @@ DEFAULT_DAEMON_RESTART_AFTER_UPGRADE = "true"
 DEFAULT_DAEMON_POLL_INTERVAL = "300s"
 DEFAULT_UNSAFE_SKIP_BACKUP = "true"
 DEFAULT_DAEMON_RESTART_DELAY = "120s"
-
+DAEMON_DOWNLOAD_MUST_HAVE_CHECKSUM="true"
+DAEMON_SHUTDOWN_GRACE="30s"
 
 ###############################################################
 ###     			Systemd configuration      				###
 ###############################################################
 STANDALONE_SERVICE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/installer/templates/cheqd-noded.service"
 COSMOVISOR_SERVICE_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/installer/templates/cheqd-cosmovisor.service"
+COSMOVISOR_CONFIG_TEMPLATE = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/installer/templates/cosmovisor-config.toml"
 JOURNAL_TEMPLATE=f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/installer/templates/journald.conf"
 DEFAULT_STANDALONE_SERVICE_NAME = 'cheqd-noded'
 DEFAULT_COSMOVISOR_SERVICE_NAME = 'cheqd-cosmovisor'
 DEFAULT_STANDALONE_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_STANDALONE_SERVICE_NAME}.service"
 DEFAULT_COSMOVISOR_SERVICE_FILE_PATH = f"/lib/systemd/system/{DEFAULT_COSMOVISOR_SERVICE_NAME}.service"
+DEFAULT_COSMOVISOR_CONFIG_FILE_PATH = f"{DEFAULT_CHEQD_HOME_DIR}/.cheqdnode/cosmovisor/config.toml"
 DEFAULT_JOURNAL_CONFIG_FILE= "/etc/systemd/journald.conf"
 DEFAULT_LOGROTATE_FILE = "/etc/logrotate.d/cheqd-node"
 DEFAULT_RSYSLOG_FILE = "/etc/rsyslog.d/cheqd-node.conf"
@@ -96,7 +99,7 @@ CHEQD_NODED_HOME = "/home/cheqd/.cheqdnode"
 CHEQD_NODED_NODE = "tcp://localhost:26657"
 CHEQD_NODED_MONIKER = platform.node()
 CHEQD_NODED_CHAIN_ID = MAINNET_CHAIN_ID
-CHEQD_NODED_MINIMUM_GAS_PRICES = "50ncheq"
+CHEQD_NODED_MINIMUM_GAS_PRICES = "5000ncheq"
 CHEQD_NODED_LOG_LEVEL = "error"
 CHEQD_NODED_LOG_FORMAT = "json"
 CHEQD_NODED_FASTSYNC_VERSION = "v0"
@@ -354,7 +357,9 @@ class Installer():
                                 '{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}': self.interviewer.daemon_restart_after_upgrade,
                                 '{DEFAULT_DAEMON_POLL_INTERVAL}': DEFAULT_DAEMON_POLL_INTERVAL,
                                 '{DEFAULT_UNSAFE_SKIP_BACKUP}': DEFAULT_UNSAFE_SKIP_BACKUP,
-                                '{DEFAULT_DAEMON_RESTART_DELAY}': DEFAULT_DAEMON_RESTART_DELAY}[m.group()],
+                                '{DEFAULT_DAEMON_RESTART_DELAY}': DEFAULT_DAEMON_RESTART_DELAY,
+                                '{DAEMON_DOWNLOAD_MUST_HAVE_CHECKSUM}': DAEMON_DOWNLOAD_MUST_HAVE_CHECKSUM,
+                                '{DAEMON_SHUTDOWN_GRACE}': DAEMON_SHUTDOWN_GRACE}[m.group()],
                         response.read().decode("utf-8").strip()
                     )
 
@@ -364,6 +369,36 @@ class Installer():
                 logging.exception(f"URL is not valid: {COSMOVISOR_SERVICE_TEMPLATE}")
         except Exception as e:
             logging.exception(f"Failed to set up service file from template. Reason: {e}")
+
+    @property
+    def cosmovisor_config_cfg(self):
+        # Modify cosmovisor-config.toml template file to replace values for environment variables
+        # Some of these variables are explicitly asked during the installer process. Others are set to default values.
+        try:
+            # Fetch the template file from GitHub
+            if is_valid_url(COSMOVISOR_CONFIG_TEMPLATE):
+                with request.urlopen(COSMOVISOR_CONFIG_TEMPLATE) as response:
+                    # Replace the values for environment variables in the template file
+                    s = re.sub(
+                        r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY})',
+                        lambda m: {'{CHEQD_ROOT_DIR}': self.cheqd_root_dir,
+                                '{DEFAULT_BINARY_NAME}': DEFAULT_BINARY_NAME,
+                                '{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}':  self.interviewer.daemon_allow_download_binaries,
+                                '{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}': self.interviewer.daemon_restart_after_upgrade,
+                                '{DEFAULT_DAEMON_POLL_INTERVAL}': DEFAULT_DAEMON_POLL_INTERVAL,
+                                '{DEFAULT_UNSAFE_SKIP_BACKUP}': DEFAULT_UNSAFE_SKIP_BACKUP,
+                                '{DEFAULT_DAEMON_RESTART_DELAY}': DEFAULT_DAEMON_RESTART_DELAY,
+                                '{DAEMON_DOWNLOAD_MUST_HAVE_CHECKSUM}': DAEMON_DOWNLOAD_MUST_HAVE_CHECKSUM,
+                                '{DAEMON_SHUTDOWN_GRACE}': DAEMON_SHUTDOWN_GRACE}[m.group()],
+                        response.read().decode("utf-8").strip()
+                    )
+
+                # If the configuration file is successfully created, return the string
+                return s
+            else:
+                logging.exception(f"URL is not valid: {COSMOVISOR_CONFIG_TEMPLATE}")
+        except Exception as e:
+            logging.exception(f"Failed to set up cosmovisor config file from template. Reason: {e}")
 
     @post_process
     def exec(self, cmd, use_stdout=True, suppress_err=False):
@@ -852,6 +887,8 @@ class Installer():
                 self.interviewer.daemon_restart_after_upgrade)
             self.set_environment_variable("DAEMON_POLL_INTERVAL", DEFAULT_DAEMON_POLL_INTERVAL)
             self.set_environment_variable("UNSAFE_SKIP_BACKUP", DEFAULT_UNSAFE_SKIP_BACKUP)
+            self.set_environment_variable("DAEMON_DOWNLOAD_MUST_HAVE_CHECKSUM", DAEMON_DOWNLOAD_MUST_HAVE_CHECKSUM)
+            self.set_environment_variable("DAEMON_SHUTDOWN_GRACE", DAEMON_SHUTDOWN_GRACE)
         except Exception as e:
             logging.exception(f"Failed to set environment variables for Cosmovisor. Reason: {e}")
             raise
@@ -1087,6 +1124,12 @@ class Installer():
 
                 # Enable cheqd-cosmovisor.service
                 self.enable_systemd_service(DEFAULT_COSMOVISOR_SERVICE_NAME)
+
+                # Write cosmovisor-config.toml file
+                if self.interviewer.is_cosmovisor_config_needed:
+                    with open(DEFAULT_COSMOVISOR_CONFIG_FILE_PATH, "w") as fname:
+                        fname.write(self.cosmovisor_config_cfg)
+
                 return True
 
             # Otherwise, setup cheqd-noded.service for standalone install
@@ -2015,6 +2058,20 @@ class Interviewer:
         except Exception as e:
             logging.exception(f"Failed to set whether Cosmovisor should automatically restart after an upgrade. Reason: {e}")
 
+    ## Add parameters for cosmovisor here
+    def ask_for_cosmovisor_config_rewrite(self):
+        try:
+            answer = self.ask("Do you want to overwrite existing configuration (or create a new one) for cosmovisor, with the values you provided? (yes/no)", default="yes")
+            if answer.lower().startswith("y"):
+                self.is_cosmovisor_config_needed = True
+            elif answer.lower().startswith("n"):
+                self.is_cosmovisor_config_needed = False
+            else:
+                logging.error("Please choose either 'yes' or 'no'\n")
+                self.ask_for_cosmovisor_config_rewrite()
+        except Exception as e:
+            logging.exception(f"Failed to set whether overwrite existing cosmovisor configuration. Reason: {e}")
+
     # Ask user for node moniker
     def ask_for_moniker(self):
         try:
@@ -2096,7 +2153,7 @@ class Interviewer:
     def ask_for_gas_price(self):
         try:
             logging.info(
-                "Minimum gas prices is the price you are willing to accept as a validator to process a transaction.\nValues should be entered in format <number>ncheq (e.g., 50ncheq)\n")
+                "Minimum gas prices is the price you are willing to accept as a validator to process a transaction.\nValues should be entered in format <number>ncheq (e.g., 5000ncheq)\n")
             self.gas_price = self.ask("Specify minimum gas price", default=CHEQD_NODED_MINIMUM_GAS_PRICES)
             if self.gas_price.endswith("ncheq"):
                 logging.debug(f"Minimum gas price set to {self.gas_price}")
@@ -2241,6 +2298,7 @@ if __name__ == '__main__':
             if interviewer.is_cosmovisor_needed is True:
                 interviewer.ask_for_daemon_allow_download_binaries()
                 interviewer.ask_for_daemon_restart_after_upgrade()
+                interviewer.ask_for_cosmovisor_config_rewrite()
 
             interviewer.ask_for_config()
 
@@ -2279,6 +2337,7 @@ if __name__ == '__main__':
             if interviewer.is_cosmovisor_needed is True:
                 interviewer.ask_for_daemon_allow_download_binaries()
                 interviewer.ask_for_daemon_restart_after_upgrade()
+                interviewer.ask_for_cosmovisor_config_rewrite()
 
             if interviewer.is_systemd_config_installed(DEFAULT_COSMOVISOR_SERVICE_FILE_PATH) is True or interviewer.is_systemd_config_installed(DEFAULT_STANDALONE_SERVICE_FILE_PATH) is True:
                 interviewer.ask_for_rewrite_node_systemd()
