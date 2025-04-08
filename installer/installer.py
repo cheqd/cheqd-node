@@ -1599,6 +1599,7 @@ class Interviewer:
         self._home_dir = home_dir
         self._is_upgrade = False
         self._is_cosmovisor_needed = True
+        self._is_cosmovisor_config_needed = True
         self._is_cosmovisor_bump_needed = True
         self._is_cosmovisor_installed = False
         self._systemd_service_file = ""
@@ -1664,6 +1665,10 @@ class Interviewer:
     @property
     def is_cosmovisor_needed(self) -> bool:
         return self._is_cosmovisor_needed
+    
+    @property
+    def is_cosmovisor_config_needed(self) -> bool:
+        return self._is_cosmovisor_config_needed
 
     @property
     def is_cosmovisor_bump_needed(self) -> bool:
@@ -1757,6 +1762,10 @@ class Interviewer:
     @is_cosmovisor_needed.setter
     def is_cosmovisor_needed(self, icn):
         self._is_cosmovisor_needed = icn
+    
+    @is_cosmovisor_config_needed.setter
+    def is_cosmovisor_config_needed(self, icn):
+        self._is_cosmovisor_config_needed = icn
 
     @is_cosmovisor_bump_needed.setter
     def is_cosmovisor_bump_needed(self, icbn):
