@@ -1,24 +1,28 @@
 package keeper
 
 import (
+	"context"
+
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/did/utils"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // GetDidNamespace get did namespace
-func (k Keeper) GetDidNamespace(ctx *sdk.Context) string {
-	store := ctx.KVStore(k.storeKey)
+func (k Keeper) GetDidNamespace(ctx *context.Context) (string, error) {
+	store := k.storeService.OpenKVStore(*ctx)
 
 	key := utils.StrBytes(types.DidNamespaceKey)
-	value := store.Get(key)
+	value, err := store.Get(key)
+	if err != nil {
+		return "", err
+	}
 
-	return string(value)
+	return string(value), nil
 }
 
 // SetDidNamespace set did namespace
-func (k Keeper) SetDidNamespace(ctx *sdk.Context, namespace string) {
-	store := ctx.KVStore(k.storeKey)
+func (k Keeper) SetDidNamespace(ctx *context.Context, namespace string) {
+	store := k.storeService.OpenKVStore(*ctx)
 
 	key := utils.StrBytes(types.DidNamespaceKey)
 	value := []byte(namespace)

@@ -5,11 +5,9 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/did/utils"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func (k MsgServer) CreateDidDoc(goCtx context.Context, msg *types.MsgCreateDidDoc) (*types.MsgCreateDidDocResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Get sign bytes before modifying payload
 	signBytes := msg.Payload.GetSignBytes()
@@ -17,21 +15,25 @@ func (k MsgServer) CreateDidDoc(goCtx context.Context, msg *types.MsgCreateDidDo
 	// Normalize UUID identifiers
 	msg.Normalize()
 
+	hasDidDoc, err := k.HasDidDoc(&goCtx, msg.Payload.Id)
 	// Validate DID doesn't exist
-	if k.HasDidDoc(&ctx, msg.Payload.Id) {
+	if hasDidDoc {
 		return nil, types.ErrDidDocExists.Wrap(msg.Payload.Id)
 	}
 
 	// Validate namespaces
-	namespace := k.GetDidNamespace(&ctx)
-	err := msg.Validate([]string{namespace})
+	namespace, err := k.GetDidNamespace(&goCtx)
+	if err != nil {
+		return nil, err
+	}
+	err = msg.Validate([]string{namespace})
 	if err != nil {
 		return nil, types.ErrNamespaceValidation.Wrap(err.Error())
 	}
 
 	// Build metadata and stateValue
 	didDoc := msg.Payload.ToDidDoc()
-	metadata := types.NewMetadataFromContext(ctx, msg.Payload.VersionId)
+	metadata := types.NewMetadataFromContext(goCtx, msg.Payload.VersionId)
 	didDocWithMetadata := types.NewDidDocWithMetadata(&didDoc, &metadata)
 
 	// Consider did that we are going to create during did resolutions
@@ -40,7 +42,7 @@ func (k MsgServer) CreateDidDoc(goCtx context.Context, msg *types.MsgCreateDidDo
 	// Check controllers' existence
 	controllers := didDoc.AllControllerDids()
 	for _, controller := range controllers {
-		_, err := MustFindDidDoc(&k.Keeper, &ctx, inMemoryDids, controller)
+		_, err := MustFindDidDoc(&k.Keeper, &goCtx, inMemoryDids, controller)
 		if err != nil {
 			return nil, err
 		}
@@ -48,13 +50,13 @@ func (k MsgServer) CreateDidDoc(goCtx context.Context, msg *types.MsgCreateDidDo
 
 	// Verify signatures
 	signers := GetSignerDIDsForDIDCreation(didDoc)
-	err = VerifyAllSignersHaveAllValidSignatures(&k.Keeper, &ctx, inMemoryDids, signBytes, signers, msg.Signatures)
+	err = VerifyAllSignersHaveAllValidSignatures(&k.Keeper, &goCtx, inMemoryDids, signBytes, signers, msg.Signatures)
 	if err != nil {
 		return nil, err
 	}
 
 	// Save first DIDDoc version
-	err = k.AddNewDidDocVersion(&ctx, &didDocWithMetadata)
+	err = k.AddNewDidDocVersion(&goCtx, &didDocWithMetadata)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}

@@ -144,6 +144,8 @@ import (
 	cheqdante "github.com/cheqd/cheqd-node/ante"
 	_ "github.com/cheqd/cheqd-node/app/client/docs/statik"
 	upgradeV3 "github.com/cheqd/cheqd-node/app/upgrades/v3"
+
+	"github.com/cosmos/cosmos-sdk/runtime"
 )
 
 var (
@@ -679,7 +681,7 @@ func New(
 	app.EvidenceKeeper = *evidenceKeeper
 
 	app.DidKeeper = *didkeeper.NewKeeper(
-		appCodec, keys[didtypes.StoreKey],
+		appCodec, runtime.NewKVStoreService(keys[didtypes.StoreKey]),
 		app.GetSubspace(didtypes.ModuleName),
 		app.AccountKeeper, app.BankKeeper,
 		app.StakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String(),

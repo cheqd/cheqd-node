@@ -5,11 +5,12 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	"github.com/cheqd/cheqd-node/x/did/types"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func NewHandler(k Keeper) sdk.Handler {
+func NewHandler(k Keeper) baseapp.MsgServiceHandler {
 	msgServer := NewMsgServer(k)
 
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {

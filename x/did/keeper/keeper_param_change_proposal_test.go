@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/stretchr/testify/suite"
 
 	cheqdapp "github.com/cheqd/cheqd-node/app"
@@ -11,6 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 
+	sdkmath "cosmossdk.io/math"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -29,7 +29,7 @@ func (suite *HandlerTestSuite) SetupTest() error {
 	if err != nil {
 		return err
 	}
-	suite.ctx = suite.app.BaseApp.NewContext(false, tmproto.Header{})
+	suite.ctx = suite.app.BaseApp.NewContext(false)
 	suite.govHandler = params.NewParamChangeProposalHandler(suite.app.ParamsKeeper)
 	return nil
 }
@@ -67,10 +67,10 @@ var _ = DescribeTable("Proposal Handler", func(testCase TestCaseKeeperProposal) 
 			}),
 			func(handlerSuite *HandlerTestSuite) {
 				expectedFeeParams := didtypes.FeeParams{
-					CreateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdk.NewInt(10000000000)},
-					UpdateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdk.NewInt(4000000000)},
-					DeactivateDid: sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdk.NewInt(2000000000)},
-					BurnFactor:    sdk.MustNewDecFromStr("0.600000000000000000"),
+					CreateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
+					UpdateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
+					DeactivateDid: sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
+					BurnFactor:    sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"),
 				}
 
 				feeParams := handlerSuite.app.DidKeeper.GetParams(handlerSuite.ctx)

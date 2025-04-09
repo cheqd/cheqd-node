@@ -6,13 +6,11 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/did/utils"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const UpdatedPostfix string = "-updated"
 
 func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDoc) (*types.MsgUpdateDidDocResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Get sign bytes before modifying payload
 	signBytes := msg.Payload.GetSignBytes()
@@ -21,14 +19,17 @@ func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDo
 	msg.Normalize()
 
 	// Validate namespaces
-	namespace := k.GetDidNamespace(&ctx)
-	err := msg.Validate([]string{namespace})
+	namespace, err := k.GetDidNamespace(&goCtx)
+	if err != nil {
+		return nil, err
+	}
+	err = msg.Validate([]string{namespace})
 	if err != nil {
 		return nil, types.ErrNamespaceValidation.Wrap(err.Error())
 	}
 
 	// Check if DID exists and get latest version
-	existingDidDocWithMetadata, err := k.GetLatestDidDoc(&ctx, msg.Payload.Id)
+	existingDidDocWithMetadata, err := k.GetLatestDidDoc(&goCtx, msg.Payload.Id)
 	if err != nil {
 		return nil, types.ErrDidDocNotFound.Wrap(err.Error())
 	}
@@ -46,7 +47,7 @@ func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDo
 	updatedDidDoc.ReplaceDids(updatedDidDoc.Id, updatedDidDoc.Id+UpdatedPostfix)
 
 	updatedMetadata := *existingDidDocWithMetadata.Metadata
-	updatedMetadata.Update(ctx, msg.Payload.VersionId)
+	updatedMetadata.Update(goCtx, msg.Payload.VersionId)
 
 	updatedDidDocWithMetadata := types.NewDidDocWithMetadata(&updatedDidDoc, &updatedMetadata)
 
@@ -56,7 +57,7 @@ func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDo
 	// Check controllers existence
 	controllers := updatedDidDoc.AllControllerDids()
 	for _, controller := range controllers {
-		_, err := MustFindDidDoc(&k.Keeper, &ctx, inMemoryDids, controller)
+		_, err := MustFindDidDoc(&k.Keeper, &goCtx, inMemoryDids, controller)
 		if err != nil {
 			return nil, err
 		}
@@ -69,7 +70,7 @@ func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDo
 	// To eliminate this problem we have to add pubkey to the signInfo in future.
 	signers := GetSignerDIDsForDIDUpdate(*existingDidDoc, updatedDidDoc)
 	extendedSignatures := DuplicateSignatures(msg.Signatures, existingDidDocWithMetadata.DidDoc.Id, updatedDidDoc.Id)
-	err = VerifyAllSignersHaveAtLeastOneValidSignature(&k.Keeper, &ctx, inMemoryDids, signBytes, signers, extendedSignatures, existingDidDoc.Id, updatedDidDoc.Id)
+	err = VerifyAllSignersHaveAtLeastOneValidSignature(&k.Keeper, &goCtx, inMemoryDids, signBytes, signers, extendedSignatures, existingDidDoc.Id, updatedDidDoc.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +79,7 @@ func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDo
 	updatedDidDoc.ReplaceDids(updatedDidDoc.Id, existingDidDoc.Id)
 
 	// Update state
-	err = k.AddNewDidDocVersion(&ctx, &updatedDidDocWithMetadata)
+	err = k.AddNewDidDocVersion(&goCtx, &updatedDidDocWithMetadata)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}

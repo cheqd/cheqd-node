@@ -1,25 +1,30 @@
 package keeper
 
 import (
+	"context"
 	"strconv"
 	"strings"
 
+	storetypes "cosmossdk.io/store/types"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/did/utils"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // GetDidCount get the total number of did
-func (k Keeper) GetDidDocCount(ctx *sdk.Context) uint64 {
-	store := ctx.KVStore(k.storeKey)
+func (k Keeper) GetDidDocCount(ctx *context.Context) (uint64, error) {
+	store := k.storeService.OpenKVStore(*ctx)
 
 	key := utils.StrBytes(types.DidDocCountKey)
-	valueBytes := store.Get(key)
+	valueBytes, err := store.Get(key)
+	if err != nil {
+		return 0, err
+	}
 
 	// Count doesn't exist: no element
 	if valueBytes == nil {
-		return 0
+		return 0, nil
 	}
 
 	// Parse bytes
@@ -29,27 +34,32 @@ func (k Keeper) GetDidDocCount(ctx *sdk.Context) uint64 {
 		panic("cannot decode count")
 	}
 
-	return count
+	return count, nil
 }
 
 // SetDidCount set the total number of did
-func (k Keeper) SetDidDocCount(ctx *sdk.Context, count uint64) {
-	store := ctx.KVStore(k.storeKey)
+func (k Keeper) SetDidDocCount(ctx *context.Context, count uint64) error {
+	store := k.storeService.OpenKVStore(*ctx)
 
 	key := utils.StrBytes(types.DidDocCountKey)
 	valueBytes := []byte(strconv.FormatUint(count, 10))
 
-	store.Set(key, valueBytes)
+	return store.Set(key, valueBytes)
 }
 
-func (k Keeper) AddNewDidDocVersion(ctx *sdk.Context, didDoc *types.DidDocWithMetadata) error {
+func (k Keeper) AddNewDidDocVersion(ctx *context.Context, didDoc *types.DidDocWithMetadata) error {
 	// Check if the diddoc version already exists
-	if k.HasDidDocVersion(ctx, didDoc.DidDoc.Id, didDoc.Metadata.VersionId) {
+	hasDidDocVersion, err := k.HasDidDocVersion(ctx, didDoc.DidDoc.Id, didDoc.Metadata.VersionId)
+	if err != nil {
+		return err
+	}
+	if hasDidDocVersion {
 		return types.ErrDidDocExists.Wrapf("diddoc version already exists for did %s, version %s", didDoc.DidDoc.Id, didDoc.Metadata.VersionId)
 	}
 
 	// Link to the previous version if it exists
-	if k.HasDidDoc(ctx, didDoc.DidDoc.Id) {
+	hasDidDoc, err := k.HasDidDoc(ctx, didDoc.DidDoc.Id)
+	if hasDidDoc {
 		latestVersionID, err := k.GetLatestDidDocVersion(ctx, didDoc.DidDoc.Id)
 		if err != nil {
 			return err
@@ -72,7 +82,7 @@ func (k Keeper) AddNewDidDocVersion(ctx *sdk.Context, didDoc *types.DidDocWithMe
 	}
 
 	// Update latest version
-	err := k.SetLatestDidDocVersion(ctx, didDoc.DidDoc.Id, didDoc.Metadata.VersionId)
+	err = k.SetLatestDidDocVersion(ctx, didDoc.DidDoc.Id, didDoc.Metadata.VersionId)
 	if err != nil {
 		return err
 	}
@@ -81,7 +91,7 @@ func (k Keeper) AddNewDidDocVersion(ctx *sdk.Context, didDoc *types.DidDocWithMe
 	return k.SetDidDocVersion(ctx, didDoc, false)
 }
 
-func (k Keeper) GetLatestDidDoc(ctx *sdk.Context, did string) (types.DidDocWithMetadata, error) {
+func (k Keeper) GetLatestDidDoc(ctx *context.Context, did string) (types.DidDocWithMetadata, error) {
 	latestVersionID, err := k.GetLatestDidDocVersion(ctx, did)
 	if err != nil {
 		return types.DidDocWithMetadata{}, err
@@ -96,13 +106,17 @@ func (k Keeper) GetLatestDidDoc(ctx *sdk.Context, did string) (types.DidDocWithM
 }
 
 // SetDid set a specific did in the store. Updates DID counter if the DID is new.
-func (k Keeper) SetDidDocVersion(ctx *sdk.Context, value *types.DidDocWithMetadata, override bool) error {
-	if !override && k.HasDidDocVersion(ctx, value.DidDoc.Id, value.Metadata.VersionId) {
+func (k Keeper) SetDidDocVersion(ctx *context.Context, value *types.DidDocWithMetadata, override bool) error {
+	hasdidVersion, err := k.HasDidDocVersion(ctx, value.DidDoc.Id, value.Metadata.VersionId)
+	if err != nil {
+		return err
+	}
+	if !override && hasdidVersion {
 		return types.ErrDidDocExists.Wrap("diddoc version already exists")
 	}
 
 	// Create the diddoc version
-	store := ctx.KVStore(k.storeKey)
+	store := k.storeService.OpenKVStore(*ctx)
 
 	key := types.GetDidDocVersionKey(value.DidDoc.Id, value.Metadata.VersionId)
 	valueBytes := k.cdc.MustMarshal(value)
@@ -112,26 +126,32 @@ func (k Keeper) SetDidDocVersion(ctx *sdk.Context, value *types.DidDocWithMetada
 }
 
 // GetDid returns a did from its id
-func (k Keeper) GetDidDocVersion(ctx *sdk.Context, id, version string) (types.DidDocWithMetadata, error) {
-	store := ctx.KVStore(k.storeKey)
-
-	if !k.HasDidDocVersion(ctx, id, version) {
+func (k Keeper) GetDidDocVersion(ctx *context.Context, id, version string) (types.DidDocWithMetadata, error) {
+	store := k.storeService.OpenKVStore(*ctx)
+	hasdidVersion, err := k.HasDidDocVersion(ctx, id, version)
+	if err != nil {
+		return types.DidDocWithMetadata{}, err
+	}
+	if !hasdidVersion {
 		return types.DidDocWithMetadata{}, sdkerrors.ErrNotFound.Wrap("diddoc version not found")
 	}
 
 	var value types.DidDocWithMetadata
-	valueBytes := store.Get(types.GetDidDocVersionKey(id, version))
+	valueBytes, err := store.Get(types.GetDidDocVersionKey(id, version))
+	if err != nil {
+		return types.DidDocWithMetadata{}, err
+	}
 	k.cdc.MustUnmarshal(valueBytes, &value)
 
 	return value, nil
 }
 
-func (k Keeper) GetAllDidDocVersions(ctx *sdk.Context, did string) ([]*types.Metadata, error) {
-	store := ctx.KVStore(k.storeKey)
+func (k Keeper) GetAllDidDocVersions(ctx *context.Context, did string) ([]*types.Metadata, error) {
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(*ctx))
 
 	result := make([]*types.Metadata, 0)
 
-	versionIterator := sdk.KVStorePrefixIterator(store, types.GetDidDocVersionsPrefix(did))
+	versionIterator := storetypes.KVStorePrefixIterator(store, types.GetDidDocVersionsPrefix(did))
 	defer closeIteratorOrPanic(versionIterator)
 
 	for ; versionIterator.Valid(); versionIterator.Next() {
@@ -146,50 +166,57 @@ func (k Keeper) GetAllDidDocVersions(ctx *sdk.Context, did string) ([]*types.Met
 }
 
 // SetLatestDidDocVersion sets the latest version id value for a diddoc
-func (k Keeper) SetLatestDidDocVersion(ctx *sdk.Context, did, version string) error {
+func (k Keeper) SetLatestDidDocVersion(ctx *context.Context, did, version string) error {
 	// Update counter. We use latest version as existence indicator.
-	if !k.HasLatestDidDocVersion(ctx, did) {
-		count := k.GetDidDocCount(ctx)
+	hasVersion, err := k.HasLatestDidDocVersion(ctx, did)
+	if err != nil {
+		return err
+	}
+	if !hasVersion {
+		count, err := k.GetDidDocCount(ctx)
+		if err != nil {
+			return err
+		}
 		k.SetDidDocCount(ctx, count+1)
 	}
 
-	store := ctx.KVStore(k.storeKey)
-
+	store := k.storeService.OpenKVStore(*ctx)
 	key := types.GetLatestDidDocVersionKey(did)
 	valueBytes := utils.StrBytes(version)
-	store.Set(key, valueBytes)
-
-	return nil
+	return store.Set(key, valueBytes)
 }
 
 // GetLatestDidDocVersion returns the latest version id value for a diddoc
-func (k Keeper) GetLatestDidDocVersion(ctx *sdk.Context, id string) (string, error) {
-	store := ctx.KVStore(k.storeKey)
-
-	if !k.HasLatestDidDocVersion(ctx, id) {
+func (k Keeper) GetLatestDidDocVersion(ctx *context.Context, id string) (string, error) {
+	store := k.storeService.OpenKVStore(*ctx)
+	hasVersion, err := k.HasLatestDidDocVersion(ctx, id)
+	if !hasVersion {
 		return "", sdkerrors.ErrNotFound.Wrap(id)
 	}
-
-	return string(store.Get(types.GetLatestDidDocVersionKey(id))), nil
+	value, err := store.Get(types.GetLatestDidDocVersionKey(id))
+	if err != nil {
+		return "", err
+	}
+	return string(value), nil
 }
 
-func (k Keeper) HasDidDoc(ctx *sdk.Context, id string) bool {
+func (k Keeper) HasDidDoc(ctx *context.Context, id string) (bool, error) {
 	return k.HasLatestDidDocVersion(ctx, id)
 }
 
-func (k Keeper) HasLatestDidDocVersion(ctx *sdk.Context, id string) bool {
-	store := ctx.KVStore(k.storeKey)
+func (k Keeper) HasLatestDidDocVersion(ctx *context.Context, id string) (bool, error) {
+	store := k.storeService.OpenKVStore(*ctx)
 	return store.Has(types.GetLatestDidDocVersionKey(id))
 }
 
-func (k Keeper) HasDidDocVersion(ctx *sdk.Context, id, version string) bool {
-	store := ctx.KVStore(k.storeKey)
+func (k Keeper) HasDidDocVersion(ctx *context.Context, id, version string) (bool, error) {
+	store := k.storeService.OpenKVStore(*ctx)
 	return store.Has(types.GetDidDocVersionKey(id, version))
 }
 
-func (k Keeper) IterateDids(ctx *sdk.Context, callback func(did string) (continue_ bool)) {
-	store := ctx.KVStore(k.storeKey)
-	latestVersionIterator := sdk.KVStorePrefixIterator(store, types.GetLatestDidDocVersionPrefix())
+func (k Keeper) IterateDids(ctx *context.Context, callback func(did string) (continue_ bool)) {
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(*ctx))
+	latestVersionIterator := storetypes.KVStorePrefixIterator(store, types.GetLatestDidDocVersionPrefix())
 	defer closeIteratorOrPanic(latestVersionIterator)
 
 	for ; latestVersionIterator.Valid(); latestVersionIterator.Next() {
@@ -203,9 +230,9 @@ func (k Keeper) IterateDids(ctx *sdk.Context, callback func(did string) (continu
 	}
 }
 
-func (k Keeper) IterateDidDocVersions(ctx *sdk.Context, did string, callback func(version types.DidDocWithMetadata) (continue_ bool)) {
-	store := ctx.KVStore(k.storeKey)
-	versionIterator := sdk.KVStorePrefixIterator(store, types.GetDidDocVersionsPrefix(did))
+func (k Keeper) IterateDidDocVersions(ctx *context.Context, did string, callback func(version types.DidDocWithMetadata) (continue_ bool)) {
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(*ctx))
+	versionIterator := storetypes.KVStorePrefixIterator(store, types.GetDidDocVersionsPrefix(did))
 	defer closeIteratorOrPanic(versionIterator)
 
 	for ; versionIterator.Valid(); versionIterator.Next() {
@@ -218,9 +245,9 @@ func (k Keeper) IterateDidDocVersions(ctx *sdk.Context, did string, callback fun
 	}
 }
 
-func (k Keeper) IterateAllDidDocVersions(ctx *sdk.Context, callback func(version types.DidDocWithMetadata) (continue_ bool)) {
-	store := ctx.KVStore(k.storeKey)
-	allVersionsIterator := sdk.KVStorePrefixIterator(store, []byte(types.DidDocVersionKey))
+func (k Keeper) IterateAllDidDocVersions(ctx *context.Context, callback func(version types.DidDocWithMetadata) (continue_ bool)) {
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(*ctx))
+	allVersionsIterator := storetypes.KVStorePrefixIterator(store, []byte(types.DidDocVersionKey))
 	defer closeIteratorOrPanic(allVersionsIterator)
 
 	for ; allVersionsIterator.Valid(); allVersionsIterator.Next() {
@@ -235,7 +262,7 @@ func (k Keeper) IterateAllDidDocVersions(ctx *sdk.Context, callback func(version
 
 // GetAllDidDocs returns all did
 // Loads all DIDs in memory. Use only for genesis export.
-func (k Keeper) GetAllDidDocs(ctx *sdk.Context) ([]*types.DidDocVersionSet, error) {
+func (k Keeper) GetAllDidDocs(ctx *context.Context) ([]*types.DidDocVersionSet, error) {
 	var didDocs []*types.DidDocVersionSet
 	var err error
 
@@ -268,7 +295,7 @@ func (k Keeper) GetAllDidDocs(ctx *sdk.Context) ([]*types.DidDocVersionSet, erro
 	return didDocs, nil
 }
 
-func closeIteratorOrPanic(iterator sdk.Iterator) {
+func closeIteratorOrPanic(iterator storetypes.Iterator) {
 	err := iterator.Close()
 	if err != nil {
 		panic(err.Error())
