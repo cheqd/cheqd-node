@@ -6,7 +6,6 @@ import (
 	"cosmossdk.io/collections"
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cheqd/cheqd-node/x/did/types"
-	"github.com/cosmos/cosmos-sdk/runtime"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
@@ -110,22 +109,20 @@ func (k Keeper) GetDidDocVersion(ctx *context.Context, id, version string) (type
 }
 
 func (k Keeper) GetAllDidDocVersions(ctx *context.Context, did string) ([]*types.Metadata, error) {
-	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(*ctx))
+	var metadataList []*types.Metadata
 
-	result := make([]*types.Metadata, 0)
+	rng := collections.NewPrefixedPairRange[string, string](did)
 
-	versionIterator := storetypes.KVStorePrefixIterator(store, types.GetDidDocVersionsPrefix(did))
-	defer closeIteratorOrPanic(versionIterator)
+	err := k.DidDocuments.Walk(*ctx, rng, func(key collections.Pair[string, string], value types.DidDocWithMetadata) (bool, error) {
+		metadataList = append(metadataList, value.Metadata)
+		return true, nil // continue walking
+	})
 
-	for ; versionIterator.Valid(); versionIterator.Next() {
-		// Get the diddoc
-		var didDoc types.DidDocWithMetadata
-		k.cdc.MustUnmarshal(versionIterator.Value(), &didDoc)
-
-		result = append(result, didDoc.Metadata)
+	if err != nil {
+		return nil, err
 	}
 
-	return result, nil
+	return metadataList, nil
 }
 
 // SetLatestDidDocVersion sets the latest version id value for a diddoc
@@ -173,31 +170,29 @@ func (k Keeper) HasDidDocVersion(ctx *context.Context, id, version string) (bool
 
 func (k Keeper) IterateDids(ctx *context.Context, callback func(did string) (continue_ bool)) {
 	// use latestDid[string,string]
-	k.LatestDidVersion.Walk(*ctx, nil, func(did string, _ string) (stop bool, err error) {
+	err := k.LatestDidVersion.Walk(*ctx, nil, func(did string, _ string) (stop bool, err error) {
 		return callback(did), nil
 	})
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (k Keeper) IterateDidDocVersions(ctx *context.Context, did string, callback func(version types.DidDocWithMetadata) (continue_ bool)) {
 
-	// use diddoc[pair,]
-	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(*ctx))
-	versionIterator := storetypes.KVStorePrefixIterator(store, types.GetDidDocVersionsPrefix(did))
-	defer closeIteratorOrPanic(versionIterator)
+	rng := collections.NewPrefixedPairRange[string, string](did)
 
-	for ; versionIterator.Valid(); versionIterator.Next() {
-		var didDoc types.DidDocWithMetadata
-		k.cdc.MustUnmarshal(versionIterator.Value(), &didDoc)
-
-		if !callback(didDoc) {
-			break
-		}
+	err := k.DidDocuments.Walk(*ctx, rng, func(key collections.Pair[string, string], value types.DidDocWithMetadata) (stop bool, err error) {
+		return callback(value), nil
+	})
+	if err != nil {
+		panic(err)
 	}
 }
 
 func (k Keeper) IterateAllDidDocVersions(ctx *context.Context, callback func(version types.DidDocWithMetadata) (continue_ bool)) {
-	err := k.LatestDidVersion.Walk(*ctx, nil, func(_ string, _ string) (stop bool, err error) {
-		return callback(metadata), nil
+	err := k.DidDocuments.Walk(*ctx, nil, func(key collections.Pair[string, string], value types.DidDocWithMetadata) (stop bool, err error) {
+		return callback(value), nil
 	})
 	if err != nil {
 		panic(err)
