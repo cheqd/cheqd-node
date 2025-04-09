@@ -1,5 +1,9 @@
 package types
 
+import (
+	"cosmossdk.io/collections"
+)
+
 const (
 	// ModuleName defines the module name
 	ModuleName = "cheqd"
@@ -19,25 +23,9 @@ const (
 // did-latest:<did> -> <latest-version>
 // did-version:<did>:<version> -> <did-doc>
 
-const (
-	LatestDidDocVersionKey = "did-latest:"
-	DidDocVersionKey       = "did-version:"
-	DidDocCountKey         = "did-count:"
-	DidNamespaceKey        = "did-namespace:"
+var (
+	DidDocCountKeyPrefix         = collections.NewPrefix("did-count:")
+	DidNamespaceKeyPrefix        = collections.NewPrefix("did-namespace:")
+	LatestDidDocVersionKeyPrefix = collections.NewPrefix("did-latest:")
+	DidDocVersionKeyPrefix       = collections.NewPrefix("did-version:")
 )
-
-func GetLatestDidDocVersionKey(did string) []byte {
-	return []byte(LatestDidDocVersionKey + did)
-}
-
-func GetDidDocVersionKey(did string, version string) []byte {
-	return []byte(DidDocVersionKey + did + ":" + version)
-}
-
-func GetLatestDidDocVersionPrefix() []byte {
-	return []byte(LatestDidDocVersionKey)
-}
-
-func GetDidDocVersionsPrefix(did string) []byte {
-	return []byte(DidDocVersionKey + did + ":")
-}
