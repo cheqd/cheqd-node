@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	didv2 "github.com/cheqd/cheqd-node/x/did/types"
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -15,7 +16,6 @@ import (
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
 // The following structs are overridden from the tendermint codebase.
