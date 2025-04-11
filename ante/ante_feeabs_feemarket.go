@@ -21,14 +21,16 @@ var _ feemarkettypes.DenomResolver = &DenomResolverImpl{}
 // If the denom is the bond denom, convert `coin` to the native denom. return error if coin.Denom is not in the allowed list
 // If the denom is not the bond denom, convert the `coin` to the given denom. return error if denom is not in the allowed list
 func (r *DenomResolverImpl) ConvertToDenom(ctx sdk.Context, coin sdk.DecCoin, denom string) (sdk.DecCoin, error) {
-	bondDenom := r.StakingKeeper.BondDenom(ctx)
+	bondDenom, err := r.StakingKeeper.BondDenom(ctx)
+	if err != nil {
+		return sdk.DecCoin{}, err
+	}
 	if denom != bondDenom && coin.Denom != bondDenom {
 		return sdk.DecCoin{}, ErrNeitherNativeDenom(coin.Denom, denom)
 	}
 	var amount sdk.Coins
 	var hostZoneConfig feeabstypes.HostChainFeeAbsConfig
 	var found bool
-	var err error
 
 	if denom == bondDenom {
 		hostZoneConfig, found = r.FeeabsKeeper.GetHostZoneConfig(ctx, coin.Denom)
