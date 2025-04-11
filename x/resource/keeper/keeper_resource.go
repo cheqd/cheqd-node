@@ -13,24 +13,6 @@ import (
 
 // GetResourceCount get the total number of resource
 func (k Keeper) GetResourceCount(ctx context.Context) (uint64, error) {
-	// store := k.storeService.OpenKVStore(ctx)
-	// byteKey := didutils.StrBytes(types.ResourceCountKey)
-	// bz, err := store.Get(byteKey)
-	// if err != nil {
-	// 	return 0, err
-	// }
-
-	// // Count doesn't exist: no element
-	// if bz == nil {
-	// 	return 0, err
-	// }
-
-	// // Parse bytes
-	// count, err := strconv.ParseUint(string(bz), 10, 64)
-	// if err != nil {
-	// 	// Panic because the count should be always formattable to int64
-	// 	panic("cannot decode count")
-	// }
 	count, err := k.ResourceCount.Get(ctx)
 	if err != nil {
 		if errors.IsOf(err, collections.ErrNotFound) {
@@ -44,12 +26,6 @@ func (k Keeper) GetResourceCount(ctx context.Context) (uint64, error) {
 
 // SetResourceCount set the total number of resource
 func (k Keeper) SetResourceCount(ctx context.Context, count uint64) error {
-	// store := k.storeService.OpenKVStore(ctx)
-	// byteKey := didutils.StrBytes(types.ResourceCountKey)
-
-	// // Set bytes
-	// bz := []byte(strconv.FormatUint(count, 10))
-	// store.Set(byteKey, bz)
 	return k.ResourceCount.Set(ctx, count)
 }
 
@@ -151,21 +127,6 @@ func (k Keeper) HasResource(ctx context.Context, collectionID string, id string)
 }
 
 func (k Keeper) GetResourceCollection(ctx *sdk.Context, collectionID string) ([]*types.Metadata, error) {
-	// store := k.storeService.OpenKVStore(ctx)
-	// iterator := storetypes.KVStorePrefixIterator(runtime.KVStoreAdapter(store), types.GetResourceMetadataCollectionPrefix(collectionID))
-
-	// var resources []*types.Metadata
-
-	// defer closeIteratorOrPanic(iterator)
-
-	// for ; iterator.Valid(); iterator.Next() {
-	// 	var val types.Metadata
-	// 	k.cdc.MustUnmarshal(iterator.Value(), &val)
-	// 	resources = append(resources, &val)
-
-	// }
-
-	// return resources
 	var resources []*types.Metadata
 
 	rng := collections.NewPrefixedPairRange[string, string](collectionID)
@@ -183,21 +144,6 @@ func (k Keeper) GetResourceCollection(ctx *sdk.Context, collectionID string) ([]
 }
 
 func (k Keeper) GetLastResourceVersionMetadata(ctx context.Context, collectionID, name, resourceType string) (types.Metadata, bool, error) {
-	// store := k.storeService.OpenKVStore(ctx)
-	// iterator := storetypes.KVStorePrefixIterator(runtime.KVStoreAdapter(store), types.GetResourceMetadataCollectionPrefix(collectionID))
-
-	// defer closeIteratorOrPanic(iterator)
-
-	// for ; iterator.Valid(); iterator.Next() {
-	// 	var metadata types.Metadata
-	// 	k.cdc.MustUnmarshal(iterator.Value(), &metadata)
-
-	// 	if metadata.Name == name && metadata.ResourceType == resourceType && metadata.NextVersionId == "" {
-	// 		return metadata, true
-	// 	}
-	// }
-
-	// return types.Metadata{}, false
 	var lastVersion types.Metadata
 	found := false
 
@@ -232,20 +178,6 @@ func (k Keeper) UpdateResourceMetadata(ctx context.Context, metadata *types.Meta
 }
 
 func (k Keeper) IterateAllResourceMetadatas(ctx *sdk.Context, callback func(metadata types.Metadata) (continue_ bool)) error {
-	// store := k.storeService.OpenKVStore(ctx)
-	// headerIterator := storetypes.KVStorePrefixIterator(runtime.KVStoreAdapter(store), didutils.StrBytes(types.ResourceMetadataKey))
-	// defer closeIteratorOrPanic(headerIterator)
-
-	// for headerIterator.Valid() {
-	// 	var val types.Metadata
-	// 	k.cdc.MustUnmarshal(headerIterator.Value(), &val)
-
-	// 	if !callback(val) {
-	// 		break
-	// 	}
-
-	// 	headerIterator.Next()
-	// }
 	err := k.ResourceMetadata.Walk(
 		ctx,
 		nil, // nil range means full range in x/collections
@@ -263,18 +195,6 @@ func (k Keeper) IterateAllResourceMetadatas(ctx *sdk.Context, callback func(meta
 // GetAllResources returns all resources as a list
 // Loads everything in memory. Use only for genesis export!
 func (k Keeper) GetAllResources(ctx *sdk.Context) (list []*types.ResourceWithMetadata, iterErr error) {
-	// k.IterateAllResourceMetadatas(ctx, func(metadata types.Metadata) bool {
-	// 	resource, err := k.GetResource(ctx, metadata.CollectionId, metadata.Id)
-	// 	if err != nil {
-	// 		iterErr = err
-	// 		return false
-	// 	}
-
-	// 	list = append(list, &resource)
-	// 	return true
-	// })
-
-	// return
 	var resources []*types.ResourceWithMetadata
 
 	err := k.IterateAllResourceMetadatas(ctx, func(metadata types.Metadata) bool {

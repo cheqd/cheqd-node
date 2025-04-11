@@ -10,27 +10,11 @@ import (
 
 // GetPort returns the portID for the resource module. Used in ExportGenesis
 func (k Keeper) GetPort(ctx context.Context) (string, error) {
-	// store := k.storeService.OpenKVStore(ctx)
-
-	// byteKey := didutils.StrBytes(types.ResourcePortIDKey)
-	// bz, err := store.Get(byteKey)
-	// if err != nil {
-	// 	return "", err
-	// }
-
-	// if len(bz) == 0 {
-	// 	return "", err
-	// }
-	// return string(bz), nil
-
 	return k.Port.Get(ctx)
 }
 
 // SetPort sets the portID for the resource module. Used in InitGenesis
 func (k Keeper) SetPort(ctx sdk.Context, portID string) error {
-	// store := k.storeService.OpenKVStore(ctx)
-	// byteKey := didutils.StrBytes(types.ResourcePortIDKey)
-	// store.Set(byteKey, []byte(portID))
 	return k.Port.Set(ctx, portID)
 }
 
