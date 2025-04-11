@@ -1,8 +1,13 @@
 package keeper
 
 import (
+	"context"
+
+	"cosmossdk.io/errors"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	"github.com/cheqd/cheqd-node/x/resource/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
 type msgServer struct {
@@ -27,3 +32,16 @@ func NewMsgServer(keeper Keeper, cheqdKeeper didkeeper.Keeper) types.MsgServer {
 }
 
 var _ types.MsgServer = msgServer{}
+
+func (ms msgServer) UpdateParams(goCtx context.Context, req *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
+	if ms.authority != req.Authority {
+		return nil, errors.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", ms.authority, req.Authority)
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := ms.SetParams(ctx, req.Params); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateParamsResponse{}, nil
+}

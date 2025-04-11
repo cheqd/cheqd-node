@@ -3,9 +3,8 @@ package keeper
 import (
 	"fmt"
 
-	storetypes "cosmossdk.io/store/types"
+	"cosmossdk.io/log"
 	"github.com/cheqd/cheqd-node/x/did/types"
-	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

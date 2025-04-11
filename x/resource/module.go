@@ -30,11 +30,13 @@ import (
 const ConsensusVersion = 3
 
 var (
-	_ module.BeginBlockAppModule = AppModule{}
-	_ module.EndBlockAppModule   = AppModule{}
-	_ module.AppModuleBasic      = AppModuleBasic{}
-	_ porttypes.IBCModule        = IBCModule{}
-	_ appmodule.AppModule        = AppModule{}
+	// _ module.BeginBlockAppModule = AppModule{}
+	// _ module.EndBlockAppModule   = AppModule{}
+	_ module.AppModuleBasic     = AppModuleBasic{}
+	_ porttypes.IBCModule       = IBCModule{}
+	_ appmodule.AppModule       = AppModule{}
+	_ appmodule.HasBeginBlocker = AppModule{}
+	_ appmodule.HasEndBlocker   = AppModule{}
 )
 
 // IsOnePerModuleType implements the depinject.OnePerModuleType interface.
@@ -167,10 +169,12 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 }
 
 // BeginBlock executes all ABCI BeginBlock logic respective to the resource module.
-func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
+func (am AppModule) BeginBlock(_ context.Context) error {
+	return nil
+}
 
 // EndBlock executes all ABCI EndBlock logic respective to the resource module. It
 // returns no validator updates.
-func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	return []abci.ValidatorUpdate{}
+func (am AppModule) EndBlock(_ context.Context) error {
+	return nil
 }

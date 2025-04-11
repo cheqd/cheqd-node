@@ -50,6 +50,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/grpc/cmtservice"
 	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
+	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/address"
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -681,7 +682,7 @@ func New(
 
 	// x/resource
 	app.ResourceKeeper = *resourcekeeper.NewKeeper(
-		appCodec, keys[resourcetypes.StoreKey],
+		appCodec, runtime.NewKVStoreService(keys[resourcetypes.StoreKey]),
 		app.GetSubspace(resourcetypes.ModuleName),
 		app.IBCKeeper.PortKeeper,
 		scopedResourceKeeper,

@@ -3,26 +3,46 @@ package types
 import (
 	"fmt"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 var ParamStoreKeyFeeParams = []byte("feeparams")
 
-// ParamKeyTable returns the key declaration for parameters
-func ParamKeyTable() paramstypes.KeyTable {
-	return paramstypes.NewKeyTable(
-		paramstypes.NewParamSetPair(ParamStoreKeyFeeParams, FeeParams{}, validateFeeParams),
-	)
+// // ParamKeyTable returns the key declaration for parameters
+// func ParamKeyTable() paramstypes.KeyTable {
+// 	return paramstypes.NewKeyTable(
+// 		paramstypes.NewParamSetPair(ParamStoreKeyFeeParams, FeeParams{}, validateFeeParams),
+// 	)
+// }
+
+// Default parameter values
+// const (
+// 	DefaultCreateResourceImageFee   = 100000 // Example value
+// 	DefaultCreateResourceJSONFee    = 75000  // Example value
+// 	DefaultCreateResourceDefaultFee = 50000  // Example value
+// 	DefaultBurnFactor               = "0.5"  // Example value
+// 	BaseMinimalDenom                = "ncheq" // Example value
+// )
+
+// NewParams creates a new FeeParams object with specified parameters
+func NewParams(image, json, defaultFee sdk.Coin, burnFactor sdkmath.Dec) FeeParams {
+	return FeeParams{
+		Image:      image,
+		Json:       json,
+		Default:    defaultFee,
+		BurnFactor: burnFactor,
+	}
 }
 
 // DefaultFeeParams returns default cheqd module tx fee parameters
 func DefaultFeeParams() *FeeParams {
+	burnfactor, _ := sdkmath.LegacyNewDecFromStr(DefaultBurnFactor)
 	return &FeeParams{
-		Image:      sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceImageFee)),
-		Json:       sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceJSONFee)),
-		Default:    sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceDefaultFee)),
-		BurnFactor: sdk.MustNewDecFromStr(DefaultBurnFactor),
+		Image:      sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceImageFee)),
+		Json:       sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceJSONFee)),
+		Default:    sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceDefaultFee)),
+		BurnFactor: burnfactor,
 	}
 }
 
