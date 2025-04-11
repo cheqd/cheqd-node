@@ -28,7 +28,10 @@ func (q queryServer) CollectionResources(c context.Context, req *types.QueryColl
 	}
 
 	// Get all resources
-	resources := q.GetResourceCollection(&ctx, req.CollectionId)
+	resources, err := q.GetResourceCollection(&ctx, req.CollectionId)
+	if err != nil {
+		return nil, types.ErrResourceNotAvail.Wrap(err.Error())
+	}
 
 	return &types.QueryCollectionResourcesResponse{
 		Resources: resources,
