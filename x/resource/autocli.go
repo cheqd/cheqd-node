@@ -45,7 +45,7 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					},
 				},
 			},
-			EnhanceCustomCommand: true, // Set to true if you have manual commands for the resource module
+			EnhanceCustomCommand: true, // Set to true if we have manual commands for the resource module
 		},
 		Tx: &autocliv1.ServiceCommandDescriptor{
 			Service: resourcev2.Msg_ServiceDesc.ServiceName,
