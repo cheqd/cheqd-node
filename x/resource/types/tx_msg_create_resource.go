@@ -23,15 +23,6 @@ func (msg *MsgCreateResource) Type() string {
 	return "MsgCreateResource"
 }
 
-func (msg *MsgCreateResource) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{}
-}
-
-func (msg *MsgCreateResource) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
-}
-
 func (msg *MsgCreateResource) ValidateBasic() error {
 	err := msg.Validate([]string{})
 	if err != nil {

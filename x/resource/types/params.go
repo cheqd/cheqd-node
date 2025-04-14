@@ -27,7 +27,7 @@ func ParamKeyTable() paramstypes.KeyTable {
 // )
 
 // NewParams creates a new FeeParams object with specified parameters
-func NewParams(image, json, defaultFee sdk.Coin, burnFactor sdkmath.LegacyDec) FeeParams {
+func NewParams(image, json, defaultFee sdk.Coin, burnFactor sdk.DecCoin) FeeParams {
 	return FeeParams{
 		Image:      image,
 		Json:       json,
@@ -38,12 +38,11 @@ func NewParams(image, json, defaultFee sdk.Coin, burnFactor sdkmath.LegacyDec) F
 
 // DefaultFeeParams returns default cheqd module tx fee parameters
 func DefaultFeeParams() *FeeParams {
-	burnfactor, _ := sdkmath.LegacyNewDecFromStr(DefaultBurnFactor)
 	return &FeeParams{
 		Image:      sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceImageFee)),
 		Json:       sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceJSONFee)),
 		Default:    sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceDefaultFee)),
-		BurnFactor: burnfactor,
+		BurnFactor: sdk.NewDecCoin(BaseMinimalDenom, sdkmath.Int(sdkmath.LegacyMustNewDecFromStr(DefaultBurnFactor))),
 	}
 }
 
@@ -61,7 +60,7 @@ func (tfp *FeeParams) ValidateBasic() error {
 		return fmt.Errorf("invalid create resource default tx fee: %s", tfp.Json)
 	}
 
-	if !tfp.BurnFactor.IsPositive() || tfp.BurnFactor.GTE(sdkmath.LegacyOneDec()) {
+	if !tfp.BurnFactor.IsPositive() || tfp.BurnFactor.Amount.GTE(sdkmath.LegacyOneDec()) {
 		return fmt.Errorf("invalid burn factor: %s", tfp.BurnFactor)
 	}
 
