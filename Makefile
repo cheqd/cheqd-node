@@ -16,7 +16,7 @@ ifeq (,$(VERSION))
 endif
 
 SDK_VERSION := $(shell go list -m github.com/cosmos/cosmos-sdk | sed 's:.* ::')
-TM_VERSION := $(shell go list -m github.com/cometbft/cometbft | sed 's:.* ::')
+CMT_VERSION := $(shell go list -m github.com/cometbft/cometbft | sed 's:.* ::')
 
 LEDGER_ENABLED ?= true
 DB_BACKEND ?= goleveldb
@@ -103,7 +103,7 @@ ifeq ($(DB_BACKEND), badgerdb)
   ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=badgerdb
 endif
 
-ldflags += -X github.com/cometbft/cometbft/version.TMCoreSemVer=$(TM_VERSION)
+ldflags += -X github.com/cometbft/cometbft/version.TMCoreSemVer=$(CMT_VERSION)
 
 ifeq ($(NO_STRIP),false)
   ldflags += -w -s
@@ -149,7 +149,7 @@ clean:
 GO_MAJOR_VERSION = $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f1)
 GO_MINOR_VERSION = $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f2)
 MIN_GO_MAJOR_VERSION = 1
-MIN_GO_MINOR_VERSION = 18
+MIN_GO_MINOR_VERSION = 22
 GO_VERSION_ERROR = Golang version $(GO_MAJOR_VERSION).$(GO_MINOR_VERSION) is not supported, \
 please update to at least $(MIN_GO_MAJOR_VERSION).$(MIN_GO_MINOR_VERSION)
 
