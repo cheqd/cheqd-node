@@ -41,7 +41,11 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	}
 
 	// get fee params
-	feeParams := k.GetParams(ctx)
+	feeParams, err := k.GetParams(ctx)
+	if err != nil {
+		panic(fmt.Sprintln("Cannot get fee params: %s", err.Error()))
+
+	}
 
 	return &types.GenesisState{
 		Resources: resourceList,
