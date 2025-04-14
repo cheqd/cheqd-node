@@ -1,6 +1,7 @@
 package tests
 
 import (
+	sdkmath "cosmossdk.io/math"
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cometbft/cometbft/crypto/ed25519"
@@ -20,7 +21,7 @@ var _ = Describe("MsgBurn tests", func() {
 	It("Valid message format", func() {
 		pk1 := ed25519.GenPrivKey().PubKey()
 		addr1 := sdk.AccAddress(pk1.Address())
-		mintAmount := sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(100000)))
+		mintAmount := sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, sdkmath.NewInt(100000)))
 		governanceAddress := setup.AccountKeeper.GetModuleAccount(setup.SdkCtx, govtypes.ModuleName).GetAddress().String()
 
 		baseMsg := types.NewMsgMint(
@@ -37,7 +38,7 @@ var _ = Describe("MsgBurn tests", func() {
 		addr1 := sdk.AccAddress(pk1.Address())
 		pk2 := ed25519.GenPrivKey().PubKey()
 		add2 := sdk.AccAddress(pk2.Address())
-		mintAmount := sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(100000)))
+		mintAmount := sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, sdkmath.NewInt(100000)))
 
 		baseMsg := types.NewMsgMint(
 			add2.String(),

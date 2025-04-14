@@ -171,7 +171,10 @@ func (k MsgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 		return nil, types.ErrBurnFromModuleAccount
 	}
 
-	bondDenom := k.stakingKeeper.BondDenom(sdkCtx)
+	bondDenom, err := k.stakingKeeper.BondDenom(sdkCtx)
+	if err != nil {
+		return nil, err
+	}
 	denoms := msg.Amount.Denoms()
 	if len(denoms) != 0 {
 		err := ValidateDenom(denoms, bondDenom)
@@ -179,7 +182,7 @@ func (k MsgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 			return nil, err
 		}
 	}
-	err := msg.ValidateBasic()
+	err = msg.ValidateBasic()
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,7 @@
 package tests
 
 import (
+	sdkmath "cosmossdk.io/math"
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cometbft/cometbft/crypto/ed25519"
@@ -29,12 +30,12 @@ var _ = Describe("MsgBurn tests", func() {
 		Expect(err).To(BeNil())
 
 		// FundAccount to the account address
-		err = testutil.FundAccount(setup.BankKeeper, setup.SdkCtx, addr1, someCoins)
+		err = testutil.FundAccount(setup.SdkCtx, setup.BankKeeper, addr1, someCoins)
 		Expect(err).To(BeNil())
 
 		balanceBefore := setup.BankKeeper.GetAllBalances(setup.SdkCtx, addr1)
 		// make a proper burn message
-		burnAmount := sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(100000)))
+		burnAmount := sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, sdkmath.NewInt(100000)))
 		baseMsg := types.NewMsgBurn(
 			addr1.String(),
 			burnAmount,
@@ -60,13 +61,13 @@ var _ = Describe("MsgBurn tests", func() {
 		Expect(err).To(BeNil())
 
 		// FundAccount to the account address
-		err = testutil.FundAccount(setup.BankKeeper, setup.SdkCtx, addr1, someCoins)
+		err = testutil.FundAccount(setup.SdkCtx, setup.BankKeeper, addr1, someCoins)
 		Expect(err).To(BeNil())
 
 		// make a proper burn message
 		baseMsg := types.NewMsgBurn(
 			"",
-			sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(100000))),
+			sdk.NewCoins(sdk.NewCoin("stake", sdkmath.NewInt(100000))),
 		)
 
 		// burn the coins
@@ -85,13 +86,13 @@ var _ = Describe("MsgBurn tests", func() {
 		Expect(err).To(BeNil())
 
 		// FundAccount to the account address
-		err = testutil.FundAccount(setup.BankKeeper, setup.SdkCtx, addr1, someCoins)
+		err = testutil.FundAccount(setup.SdkCtx, setup.BankKeeper, addr1, someCoins)
 		Expect(err).To(BeNil())
 
 		// make a proper burn message
 		baseMsg := types.NewMsgBurn(
 			addr1.String(),
-			sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, sdk.ZeroInt())),
+			sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, sdkmath.ZeroInt())),
 		)
 
 		// burn the coins
@@ -110,11 +111,11 @@ var _ = Describe("MsgBurn tests", func() {
 		Expect(err).To(BeNil())
 
 		// FundAccount to the account address
-		err = testutil.FundAccount(setup.BankKeeper, setup.SdkCtx, addr1, someCoins)
+		err = testutil.FundAccount(setup.SdkCtx, setup.BankKeeper, addr1, someCoins)
 		Expect(err).To(BeNil())
 
 		// make a proper burn message
-		burnAmount := sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(100000)))
+		burnAmount := sdk.NewCoins(sdk.NewCoin("stake", sdkmath.NewInt(100000)))
 		baseMsg := types.NewMsgBurn(
 			addr1.String(),
 			burnAmount,
