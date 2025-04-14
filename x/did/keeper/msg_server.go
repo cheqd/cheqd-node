@@ -8,6 +8,7 @@ import (
 	"github.com/cheqd/cheqd-node/x/did/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
 type MsgServer struct {
@@ -159,6 +160,10 @@ func VerifyAllSignersHaveAtLeastOneValidSignature(k *Keeper, ctx *context.Contex
 }
 
 func (k MsgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBurnResponse, error) {
+
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
 	sdkCtx := sdk.UnwrapSDKContext(goCtx)
 	accountI := k.Keeper.accountKeeper.GetAccount(sdkCtx, sdk.AccAddress(msg.FromAddress))
 	_, ok := accountI.(authtypes.ModuleAccountI)
@@ -200,4 +205,18 @@ func ValidateDenom(denom []string, bondDenom string) error {
 		}
 	}
 	return nil
+}
+
+func (k MsgServer) UpdateParams(goCtx context.Context, req *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
+	if k.GetAuthority() != req.Authority {
+		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", k.GetAuthority(), req.Authority)
+	}
+
+	if err := req.Params.ValidateBasic(); err != nil {
+		return nil, err
+	}
+	if err := k.Params.Set(goCtx, req.Params); err != nil {
+		return nil, err
+	}
+	return &types.MsgUpdateParamsResponse{}, nil
 }

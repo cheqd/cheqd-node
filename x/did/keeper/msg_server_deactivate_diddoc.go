@@ -8,6 +8,9 @@ import (
 
 func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactivateDidDoc) (*types.MsgDeactivateDidDocResponse, error) {
 
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
 	// Get sign bytes before modifying payload
 	signBytes := msg.Payload.GetSignBytes()
 

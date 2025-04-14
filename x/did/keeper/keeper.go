@@ -26,6 +26,7 @@ type (
 		DidCount         collections.Item[uint64]
 		LatestDidVersion collections.Map[string, string]
 		DidDocuments     collections.Map[collections.Pair[string, string], types.DidDocWithMetadata]
+		Params           collections.Item[types.FeeParams]
 	}
 )
 
@@ -43,6 +44,7 @@ func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSp
 		DidCount:         collections.NewItem(sb, types.DidDocCountKeyPrefix, "did-count:", collections.Uint64Value),
 		LatestDidVersion: collections.NewMap(sb, types.LatestDidDocVersionKeyPrefix, "latest-did", collections.StringKey, collections.StringValue),
 		DidDocuments:     collections.NewMap(sb, types.DidDocVersionKeyPrefix, "did-version", collections.PairKeyCodec(collections.StringKey, collections.StringKey), codec.CollValue[types.DidDocWithMetadata](cdc)),
+		Params:           collections.NewItem(sb, types.ParamsKey, "params", codec.CollValue[types.FeeParams](cdc)),
 	}
 	schema, err := sb.Build()
 	if err != nil {
@@ -54,4 +56,8 @@ func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSp
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
+}
+
+func (k Keeper) GetAuthority() string {
+	return k.authority
 }

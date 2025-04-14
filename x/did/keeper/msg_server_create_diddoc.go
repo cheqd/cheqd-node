@@ -9,6 +9,10 @@ import (
 
 func (k MsgServer) CreateDidDoc(goCtx context.Context, msg *types.MsgCreateDidDoc) (*types.MsgCreateDidDocResponse, error) {
 
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
 	// Get sign bytes before modifying payload
 	signBytes := msg.Payload.GetSignBytes()
 
@@ -16,6 +20,9 @@ func (k MsgServer) CreateDidDoc(goCtx context.Context, msg *types.MsgCreateDidDo
 	msg.Normalize()
 
 	hasDidDoc, err := k.HasDidDoc(&goCtx, msg.Payload.Id)
+	if err != nil {
+		return nil, err
+	}
 	// Validate DID doesn't exist
 	if hasDidDoc {
 		return nil, types.ErrDidDocExists.Wrap(msg.Payload.Id)

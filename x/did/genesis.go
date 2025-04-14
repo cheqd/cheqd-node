@@ -26,10 +26,13 @@ func InitGenesis(ctx context.Context, k keeper.Keeper, genState *types.GenesisSt
 	}
 
 	// Set did namespace
-	k.SetDidNamespace(&ctx, genState.DidNamespace)
+	err := k.SetDidNamespace(&ctx, genState.DidNamespace)
+	if err != nil {
+		panic(err)
+	}
 
 	// Set fee params
-	k.SetParams(ctx, *genState.FeeParams)
+	k.Params.Set(ctx, *genState.FeeParams)
 }
 
 // ExportGenesis returns the cheqd module's exported genesis.
@@ -38,7 +41,10 @@ func ExportGenesis(ctx context.Context, k keeper.Keeper) *types.GenesisState {
 	if err != nil {
 		panic(err)
 	}
-	feeParams := k.GetParams(ctx)
+	feeParams, err := k.Params.Get(ctx)
+	if err != nil {
+		panic(err)
+	}
 	DidNameSpace, err := k.GetDidNamespace(&ctx)
 	if err != nil {
 		panic(err)

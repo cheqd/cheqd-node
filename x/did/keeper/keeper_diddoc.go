@@ -35,6 +35,9 @@ func (k Keeper) AddNewDidDocVersion(ctx *context.Context, didDoc *types.DidDocWi
 
 	// Link to the previous version if it exists
 	hasDidDoc, err := k.HasDidDoc(ctx, didDoc.DidDoc.Id)
+	if err != nil {
+		return err
+	}
 	if hasDidDoc {
 		latestVersionID, err := k.GetLatestDidDocVersion(ctx, didDoc.DidDoc.Id)
 		if err != nil {
@@ -146,6 +149,9 @@ func (k Keeper) SetLatestDidDocVersion(ctx *context.Context, did, version string
 // GetLatestDidDocVersion returns the latest version id value for a diddoc
 func (k Keeper) GetLatestDidDocVersion(ctx *context.Context, id string) (string, error) {
 	hasVersion, err := k.HasLatestDidDocVersion(ctx, id)
+	if err != nil {
+		return "", err
+	}
 	if !hasVersion {
 		return "", sdkerrors.ErrNotFound.Wrap(id)
 	}
@@ -169,7 +175,6 @@ func (k Keeper) HasDidDocVersion(ctx *context.Context, id, version string) (bool
 }
 
 func (k Keeper) IterateDids(ctx *context.Context, callback func(did string) (continue_ bool)) {
-	// use latestDid[string,string]
 	err := k.LatestDidVersion.Walk(*ctx, nil, func(did string, _ string) (stop bool, err error) {
 		return callback(did), nil
 	})
