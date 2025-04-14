@@ -1,6 +1,7 @@
 syntax = "proto3";
 package cheqd.did.v2;
 
+import "amino/amino.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
@@ -29,8 +30,9 @@ message FeeParams {
   //
   // Default: 0.5 (50%)
   string burn_factor = 4 [
-    (cosmos_proto.scalar) = "cosmossdk.io/math.LegacyDec",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.DecCoin",
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (amino.dont_omitempty) = true,
     (gogoproto.nullable) = false
   ];
 }

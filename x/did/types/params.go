@@ -13,7 +13,7 @@ func DefaultFeeParams() *FeeParams {
 		CreateDid:     sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateDidTxFee)),
 		UpdateDid:     sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultUpdateDidTxFee)),
 		DeactivateDid: sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultDeactivateDidTxFee)),
-		BurnFactor:    sdk.NewDecCoin(BaseMinimalDenom, sdkmath.Int(sdkmath.LegacyMustNewDecFromStr(DefaultBurnFactor))),
+		BurnFactor:    sdkmath.LegacyMustNewDecFromStr(DefaultBurnFactor),
 	}
 
 }
@@ -32,7 +32,7 @@ func (tfp *FeeParams) ValidateBasic() error {
 		return fmt.Errorf("invalid deactivate did tx fee: %s", tfp.DeactivateDid)
 	}
 
-	if !tfp.BurnFactor.IsPositive() || tfp.BurnFactor.Amount.GTE(sdkmath.LegacyOneDec()) {
+	if !tfp.BurnFactor.IsPositive() || tfp.BurnFactor.GTE(sdkmath.LegacyOneDec()) {
 		return fmt.Errorf("invalid burn factor: %s", tfp.BurnFactor)
 	}
 
