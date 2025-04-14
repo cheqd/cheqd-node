@@ -5,16 +5,17 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 var ParamStoreKeyFeeParams = []byte("feeparams")
 
-// // ParamKeyTable returns the key declaration for parameters
-// func ParamKeyTable() paramstypes.KeyTable {
-// 	return paramstypes.NewKeyTable(
-// 		paramstypes.NewParamSetPair(ParamStoreKeyFeeParams, FeeParams{}, validateFeeParams),
-// 	)
-// }
+// ParamKeyTable returns the key declaration for parameters
+func ParamKeyTable() paramstypes.KeyTable {
+	return paramstypes.NewKeyTable(
+		paramstypes.NewParamSetPair(ParamStoreKeyFeeParams, FeeParams{}, validateFeeParams),
+	)
+}
 
 // Default parameter values
 // const (

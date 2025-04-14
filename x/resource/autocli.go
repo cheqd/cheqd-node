@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
-	resourcev2 "github.com/cheqd/cheqd-node/api/cheqd/resource/v2"
+	resourcev2 "github.com/cheqd/cheqd-node/api/v2/cheqd/resource/v2"
 
 	"github.com/cosmos/cosmos-sdk/version"
 )
