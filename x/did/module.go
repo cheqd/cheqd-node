@@ -9,6 +9,7 @@ import (
 	"cosmossdk.io/core/appmodule"
 
 	"github.com/cheqd/cheqd-node/x/did/client/cli"
+	"github.com/cheqd/cheqd-node/x/did/exported"
 	"github.com/cheqd/cheqd-node/x/did/types"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -108,6 +109,8 @@ type AppModule struct {
 	AppModuleBasic
 
 	keeper keeper.Keeper
+	// legacySubspace is used solely for migration of x/params managed parameters
+	legacySubspace exported.Subspace
 }
 
 var _ appmodule.AppModule = AppModule{}
@@ -143,6 +146,12 @@ func (am AppModule) Name() string {
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewQueryServer(am.keeper))
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+
+	m := keeper.NewMigrator(am.keeper, am.legacySubspace)
+
+	if err := cfg.RegisterMigration(types.ModuleName, 4, m.Migrate4to5); err != nil {
+		panic(fmt.Sprintf("failed to migrate x/did from version 4 to 5: %v", err))
+	}
 }
 
 // RegisterInvariants registers the cheqd module's invariants.
