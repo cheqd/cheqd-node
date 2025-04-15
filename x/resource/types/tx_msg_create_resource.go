@@ -15,10 +15,6 @@ func NewMsgCreateResource(payload *MsgCreateResourcePayload, signatures []*didty
 	}
 }
 
-func (msg *MsgCreateResource) Route() string {
-	return RouterKey
-}
-
 func (msg *MsgCreateResource) Type() string {
 	return "MsgCreateResource"
 }
