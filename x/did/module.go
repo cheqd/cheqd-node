@@ -130,7 +130,7 @@ func NewAppModule(cdc codec.Codec, keeper keeper.Keeper) AppModule {
 // introduced by the module. To avoid wrong/empty versions, the initial version
 // should be set to 1.
 func (am AppModule) ConsensusVersion() uint64 {
-	return 4
+	return 5
 }
 
 // Name returns the cheqd module's name.
