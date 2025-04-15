@@ -177,7 +177,7 @@ func (k Keeper) UpdateResourceMetadata(ctx context.Context, metadata *types.Meta
 	return k.ResourceMetadata.Set(ctx, collections.Join(metadata.CollectionId, metadata.Id), *metadata)
 }
 
-func (k Keeper) IterateAllResourceMetadatas(ctx *sdk.Context, callback func(metadata types.Metadata) (continue_ bool)) error {
+func (k Keeper) IterateAllResourceMetadatas(ctx context.Context, callback func(metadata types.Metadata) (continue_ bool)) error {
 	err := k.ResourceMetadata.Walk(
 		ctx,
 		nil, // nil range means full range in x/collections
@@ -194,7 +194,7 @@ func (k Keeper) IterateAllResourceMetadatas(ctx *sdk.Context, callback func(meta
 
 // GetAllResources returns all resources as a list
 // Loads everything in memory. Use only for genesis export!
-func (k Keeper) GetAllResources(ctx *sdk.Context) (list []*types.ResourceWithMetadata, iterErr error) {
+func (k Keeper) GetAllResources(ctx context.Context) (list []*types.ResourceWithMetadata, iterErr error) {
 	var resources []*types.ResourceWithMetadata
 
 	err := k.IterateAllResourceMetadatas(ctx, func(metadata types.Metadata) bool {

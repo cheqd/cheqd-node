@@ -1,6 +1,7 @@
 package resource
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/cheqd/cheqd-node/x/resource/keeper"
@@ -33,15 +34,15 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState *types.GenesisState)
 }
 
 // ExportGenesis returns the cheqd module's exported genesis.
-func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
+func ExportGenesis(ctx context.Context, k keeper.Keeper) *types.GenesisState {
 	// Get all resource
-	resourceList, err := k.GetAllResources(&ctx)
+	resourceList, err := k.GetAllResources(ctx)
 	if err != nil {
 		panic(fmt.Sprintf("Cannot get all resource: %s", err.Error()))
 	}
 
 	// get fee params
-	feeParams, err := k.GetParams(ctx)
+	feeParams, err := k.Params.Get(ctx)
 	if err != nil {
 		panic(fmt.Sprintln("Cannot get fee params: %s", err.Error()))
 

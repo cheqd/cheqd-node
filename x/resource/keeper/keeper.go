@@ -39,7 +39,7 @@ type Keeper struct {
 	Params collections.Item[types.FeeParams]
 }
 
-func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, portKeeper types.PortKeeper, scopedKeeper exported.ScopedKeeper, authority string) *Keeper {
+func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSpace types.ParamSubspace, portKeeper types.PortKeeper, scopedKeeper exported.ScopedKeeper, authority string) *Keeper {
 
 	sb := collections.NewSchemaBuilder(storeService)
 	// Define the port collection
@@ -48,7 +48,7 @@ func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, portKee
 		cdc: cdc,
 		// storeKey:     storeKey,
 		storeService: storeService,
-		// paramSpace:   paramSpace,
+		paramSpace:   paramSpace,
 		portKeeper:   portKeeper,
 		scopedKeeper: scopedKeeper,
 		authority:    authority,
@@ -99,6 +99,10 @@ func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, portKee
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
+}
+
+func (k Keeper) GetAuthority() string {
+	return k.authority
 }
 
 func (k Keeper) SetParams(ctx context.Context, params types.FeeParams) error {

@@ -50,7 +50,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/grpc/cmtservice"
 	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
-	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/address"
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -700,6 +699,7 @@ func New(
 		app.GetSubspace(resourcetypes.ModuleName),
 		app.IBCKeeper.PortKeeper,
 		scopedResourceKeeper,
+		authority,
 	)
 
 	// create the resource IBC stack
