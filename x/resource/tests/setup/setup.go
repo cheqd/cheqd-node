@@ -145,6 +145,7 @@ func Setup() TestSetup {
 
 	scopedResourceKeeper := capabilityKeeper.ScopeToModule(types.ModuleName)
 	resourceKeeper := keeper.NewKeeper(cdc, runtime.NewKVStoreService(keys[types.StoreKey]),
+		getSubspace(types.ModuleName, paramsKeeper),
 		&portKeeper,
 		scopedResourceKeeper, authority)
 
