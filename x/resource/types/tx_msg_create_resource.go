@@ -19,14 +19,14 @@ func (msg *MsgCreateResource) Type() string {
 	return "MsgCreateResource"
 }
 
-func (msg *MsgCreateResource) ValidateBasic() error {
-	err := msg.Validate([]string{})
-	if err != nil {
-		return ErrBasicValidation.Wrap(err.Error())
-	}
+// func (msg *MsgCreateResource) ValidateBasic() error {
+// 	err := msg.Validate([]string{})
+// 	if err != nil {
+// 		return ErrBasicValidation.Wrap(err.Error())
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // Validate
 
