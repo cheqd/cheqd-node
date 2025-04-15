@@ -32,7 +32,10 @@ func InitGenesis(ctx context.Context, k keeper.Keeper, genState *types.GenesisSt
 	}
 
 	// Set fee params
-	k.Params.Set(ctx, *genState.FeeParams)
+	err = k.SetParams(ctx, *genState.FeeParams)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // ExportGenesis returns the cheqd module's exported genesis.

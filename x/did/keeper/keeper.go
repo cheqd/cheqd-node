@@ -68,3 +68,11 @@ func (k Keeper) GetAuthority() string {
 func (k Keeper) GetParams(ctx context.Context) (types.FeeParams, error) {
 	return k.Params.Get(ctx)
 }
+
+func (k Keeper) SetParams(ctx context.Context, params types.FeeParams) error {
+	err := k.Params.Set(ctx, params)
+	if err != nil {
+		return err
+	}
+	return nil
+}

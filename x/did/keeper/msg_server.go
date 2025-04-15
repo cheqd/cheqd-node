@@ -218,7 +218,7 @@ func (k MsgServer) UpdateParams(goCtx context.Context, req *types.MsgUpdateParam
 	if err := req.Params.ValidateBasic(); err != nil {
 		return nil, err
 	}
-	if err := k.Params.Set(goCtx, req.Params); err != nil {
+	if err := k.SetParams(goCtx, req.Params); err != nil {
 		return nil, err
 	}
 	return &types.MsgUpdateParamsResponse{}, nil

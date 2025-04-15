@@ -90,7 +90,10 @@ func createTestApp(isCheckTx bool) (*cheqdapp.TestApp, sdk.Context, error) {
 
 	// cheqd specific params
 	didFeeParams := didtypes.DefaultGenesis().FeeParams
-	app.DidKeeper.Params.Set(ctx, *didFeeParams)
+	err = app.DidKeeper.SetParams(ctx, *didFeeParams)
+	if err != nil {
+		return nil, sdk.Context{}, err
+	}
 	resourceFeeParams := resourcetypes.DefaultGenesis().FeeParams
 	app.ResourceKeeper.SetParams(ctx, *resourceFeeParams)
 	err = app.FeeMarketKeeper.SetParams(ctx, types.NewParams(DefaultWindow, DefaultAlpha, DefaultBeta, DefaultGamma, DefaultDelta,
@@ -217,8 +220,8 @@ func (s *AnteTestSuite) CreateTestTx(privs []cryptotypes.PrivKey, accNums []uint
 }
 
 // SetDidFeeParams is a helper function to set did fee params.
-func (s *AnteTestSuite) SetDidFeeParams(feeParams didtypes.FeeParams) {
-	s.app.DidKeeper.Params.Set(s.ctx, feeParams)
+func (s *AnteTestSuite) SetDidFeeParams(feeParams didtypes.FeeParams) error {
+	return s.app.DidKeeper.SetParams(s.ctx, feeParams)
 }
 
 // SetResourceFeeParams is a helper function to set resource fee params.
