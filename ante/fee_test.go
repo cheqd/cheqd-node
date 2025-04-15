@@ -563,7 +563,6 @@ var _ = Describe("Fee abstraction", func() {
 			OsmosisPoolTokenDenomIn: "osmosis",
 			PoolId:                  1,
 			Status:                  types.HostChainFeeAbsStatus_UPDATED,
-			MinSwapAmount:           0,
 		}
 	})
 
@@ -700,7 +699,6 @@ var _ = Describe("DeductFeeDecorator", func() {
 			OsmosisPoolTokenDenomIn: "osmosis",
 			PoolId:                  1,
 			Status:                  types.HostChainFeeAbsStatus_UPDATED,
-			MinSwapAmount:           0,
 		}
 
 		// Initialize suite for each test case
@@ -719,8 +717,7 @@ var _ = Describe("DeductFeeDecorator", func() {
 		// minFee, _ := minGasPrice.TruncateDecimal()
 
 		params, err := suite.app.StakingKeeper.GetParams(suite.ctx)
-		Expect(err).To(BeNil())
-
+		Expect(err).To(BeNil(), "Error getting staking params")
 		params.BondDenom = didtypes.BaseMinimalDenom
 		err = suite.app.StakingKeeper.SetParams(suite.ctx, params)
 		Expect(err).To(BeNil(), "Error setting the params")
@@ -1248,7 +1245,6 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		OsmosisPoolTokenDenomIn: "osmosis",
 		PoolId:                  1,
 		Status:                  types.HostChainFeeAbsStatus_UPDATED,
-		MinSwapAmount:           0,
 	}
 
 	var feeabsModAcc authtypes.ModuleAccountI
