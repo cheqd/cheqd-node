@@ -15,10 +15,6 @@ const (
 
 var ParamsKey = []byte{0x09}
 
-// MigrateStore migrates the x/distribution module state from the consensus version 2 to
-// version 3. Specifically, it takes the parameters that are currently stored
-// and managed by the x/params module and stores them directly into the x/distribution
-// module state.
 func MigrateStore(ctx sdk.Context, storeService store.KVStoreService, legacySubspace exported.Subspace, cdc codec.BinaryCodec) error {
 	store := storeService.OpenKVStore(ctx)
 	var currParams types.FeeParams
