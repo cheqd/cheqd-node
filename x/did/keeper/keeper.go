@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"context"
 	"fmt"
 
 	"cosmossdk.io/collections"
@@ -54,10 +55,16 @@ func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSp
 	return k
 }
 
-func (k Keeper) Logger(ctx sdk.Context) log.Logger {
-	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
+func (k Keeper) Logger(ctx context.Context) log.Logger {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	return sdkCtx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
 func (k Keeper) GetAuthority() string {
 	return k.authority
+}
+
+// GetParams gets the auth module's parameters.
+func (k Keeper) GetParams(ctx context.Context) (types.FeeParams, error) {
+	return k.Params.Get(ctx)
 }

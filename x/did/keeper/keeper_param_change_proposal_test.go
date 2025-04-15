@@ -73,7 +73,7 @@ var _ = DescribeTable("Proposal Handler", func(testCase TestCaseKeeperProposal) 
 					BurnFactor:    sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"),
 				}
 
-				feeParams, err := handlerSuite.app.DidKeeper.Params.Get(handlerSuite.ctx)
+				feeParams, err := handlerSuite.app.DidKeeper.GetParams(handlerSuite.ctx)
 				Expect(err).To(BeNil())
 				Expect(expectedFeeParams).To(Equal(feeParams))
 			},

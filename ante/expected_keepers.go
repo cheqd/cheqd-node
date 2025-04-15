@@ -12,7 +12,7 @@ import (
 )
 
 type DidKeeper interface {
-	GetParams(ctx sdk.Context) (params didtypes.FeeParams)
+	GetParams(ctx context.Context) (didtypes.FeeParams, error)
 }
 
 type ResourceKeeper interface {

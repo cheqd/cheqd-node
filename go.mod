@@ -8,6 +8,7 @@ require (
 	cosmossdk.io/core v0.11.1
 	cosmossdk.io/errors v1.0.1
 	cosmossdk.io/math v1.4.0
+	cosmossdk.io/tools/confix v0.1.2
 	filippo.io/edwards25519 v1.1.0
 	github.com/cheqd/cheqd-node/api/v2 v2.0.0-00010101000000-000000000000
 	github.com/cometbft/cometbft v0.38.12
@@ -42,6 +43,8 @@ require (
 
 require (
 	github.com/bits-and-blooms/bitset v1.8.0 // indirect
+	github.com/creachadair/atomicfile v0.3.3 // indirect
+	github.com/creachadair/tomledit v0.0.26 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 )
 

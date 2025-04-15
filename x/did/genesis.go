@@ -41,7 +41,7 @@ func ExportGenesis(ctx context.Context, k keeper.Keeper) *types.GenesisState {
 	if err != nil {
 		panic(err)
 	}
-	feeParams, err := k.Params.Get(ctx)
+	feeParams, err := k.GetParams(ctx)
 	if err != nil {
 		panic(err)
 	}

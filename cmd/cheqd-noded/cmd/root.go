@@ -6,10 +6,11 @@ import (
 	"os"
 
 	"cosmossdk.io/log"
+	confixcmd "cosmossdk.io/tools/confix/cmd"
 	"github.com/cheqd/cheqd-node/app"
 	"github.com/cheqd/cheqd-node/app/params"
-	appparams "github.com/cheqd/cheqd-node/app/params"
-	tmcli "github.com/cometbft/cometbft/libs/cli"
+	cmtcfg "github.com/cometbft/cometbft/config"
+	cmtcli "github.com/cometbft/cometbft/libs/cli"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
@@ -20,26 +21,27 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/client/snapshot"
 	"github.com/cosmos/cosmos-sdk/server"
+	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtxconfig "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	vestingcli "github.com/cosmos/cosmos-sdk/x/auth/vesting/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 var ChainID = "cheqd-mainnet-1"
 
 // NewRootCmd creates a new root command for simd. It is called once in the
 // main function.
-func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
+func NewRootCmd() *cobra.Command {
 	tempApp := app.New(log.NewNopLogger(), dbm.NewMemDB(), nil, true, simtestutil.NewAppOptionsWithFlagHome(app.DefaultNodeHome))
 	encodingConfig := params.EncodingConfig{
 		InterfaceRegistry: tempApp.InterfaceRegistry(),
@@ -96,60 +98,74 @@ func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 				return err
 			}
 
-			customAppTemplate, customAppConfig := initAppConfig()
-			customCMTConfig := initCometBFTConfig()
+			// Allows us to overwrite the SDK's default server config.
+			// TODO: Use this instead of extending init command.
+			customAppTemplate := serverconfig.DefaultConfigTemplate
+			customAppConfig := serverconfig.DefaultConfig()
+			customAppCMTConfig := cmtcfg.DefaultConfig()
 
-			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig, customCMTConfig)
+			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig, customAppCMTConfig)
 		},
 	}
 
-	initRootCmd(rootCmd, encodingConfig)
+	initRootCmd(rootCmd, encodingConfig.TxConfig, tempApp.BasicModuleManager)
 	overwriteFlagDefaults(rootCmd, map[string]string{
 		flags.FlagChainID:        ChainID,
 		flags.FlagKeyringBackend: "os",
 	})
 
-	return rootCmd, encodingConfig
+	// add keyring to autocli opts
+	autoCliOpts := tempApp.AutoCliOpts()
+	autoCliOpts.ClientCtx = initClientCtx
+
+	if err := autoCliOpts.EnhanceRootCommand(rootCmd); err != nil {
+		panic(err)
+	}
+
+	return rootCmd
 }
 
-func initRootCmd(rootCmd *cobra.Command, encodingConfig appparams.EncodingConfig) {
-	cfg := sdk.GetConfig()
-	cfg.Seal()
+func initRootCmd(
+	rootCmd *cobra.Command,
+	txConfig client.TxConfig,
+	basicManager module.BasicManager,
+) {
+	app.SetConfig()
 
 	rootCmd.AddCommand(
-		extendInit(genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome)),
-		tmcli.NewCompletionCmd(rootCmd, true),
+		extendInit(genutilcli.InitCmd(basicManager, app.DefaultNodeHome)),
+		cmtcli.NewCompletionCmd(rootCmd, true),
 		extendDebug(debug.Cmd()),
+		confixcmd.ConfigCommand(),
+		pruning.Cmd(newApp, app.DefaultNodeHome),
+		snapshot.Cmd(newApp),
 	)
 
-	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, appExport, addModuleInitFlags)
+	server.AddCommandsWithStartCmdOptions(rootCmd, app.DefaultNodeHome, newApp, appExport, server.StartCmdOptions{
+		AddFlags: func(startCmd *cobra.Command) {
+			crisis.AddModuleInitFlags(startCmd)
+		},
+	})
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
-		rpc.StatusCommand(),
-		genesisCommand(encodingConfig),
+		server.StatusCommand(),
+		genesisCommand(txConfig, basicManager),
 		queryCommand(),
 		txCommand(),
-		keys.Commands(app.DefaultNodeHome),
-		pruning.Cmd(newApp, app.DefaultNodeHome),
-		snapshot.Cmd(newApp),
+		keys.Commands(),
 	)
 }
 
 // genesisCommand builds genesis-related `universus genesis` command.
 // Users may provide application specific commands as a parameter
-func genesisCommand(encodingConfig appparams.EncodingConfig, cmds ...*cobra.Command) *cobra.Command {
-	cmd := genutilcli.GenesisCoreCommand(encodingConfig.TxConfig, app.ModuleBasics, app.DefaultNodeHome)
+func genesisCommand(txConfig client.TxConfig, basicManager module.BasicManager, cmds ...*cobra.Command) *cobra.Command {
+	cmd := genutilcli.GenesisCoreCommand(txConfig, basicManager, app.DefaultNodeHome)
 
 	for _, subCmd := range cmds {
 		cmd.AddCommand(subCmd)
 	}
 	return cmd
-}
-
-func addModuleInitFlags(startCmd *cobra.Command) {
-	crisis.AddModuleInitFlags(startCmd)
-	// this line is used by starport scaffolding # stargate/root/initFlags
 }
 
 func queryCommand() *cobra.Command {
@@ -163,14 +179,14 @@ func queryCommand() *cobra.Command {
 	}
 
 	cmd.AddCommand(
-		authcmd.GetAccountCmd(),
-		rpc.ValidatorCommand(),
-		rpc.BlockCommand(),
+		rpc.WaitTxCmd(),
+		server.QueryBlockCmd(),
 		authcmd.QueryTxsByEventsCmd(),
+		server.QueryBlocksCmd(),
 		authcmd.QueryTxCmd(),
+		server.QueryBlockResultsCmd(),
 	)
 
-	app.ModuleBasics.AddQueryCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "cheqd-mainnet-1", "The network chain ID")
 
 	return cmd
@@ -189,16 +205,14 @@ func txCommand() *cobra.Command {
 		authcmd.GetSignCommand(),
 		authcmd.GetSignBatchCommand(),
 		authcmd.GetMultiSignCommand(),
+		authcmd.GetMultiSignBatchCmd(),
 		authcmd.GetValidateSignaturesCommand(),
-		flags.LineBreak,
 		authcmd.GetBroadcastCommand(),
 		authcmd.GetEncodeCommand(),
 		authcmd.GetDecodeCommand(),
-		flags.LineBreak,
-		vestingcli.GetTxCmd(),
+		authcmd.GetSimulateCmd(),
 	)
 
-	app.ModuleBasics.AddTxCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "cheqd-mainnet-1", "The network chain ID")
 	cmd.PersistentFlags().String(flags.FlagGasPrices, "50ncheq", "Gas prices in decimal format")
 	cmd.PersistentFlags().Float64(flags.FlagGasAdjustment, 1.3, "Gas adjustment factor to be multiplied against estimated gas")
@@ -216,7 +230,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 	)
 }
 
-// appExport creates a new simapp (optionally at a given height)
+// appExport creates a new app (optionally at a given height)
 func appExport(
 	logger log.Logger,
 	db dbm.DB,
@@ -233,6 +247,15 @@ func appExport(
 	if !ok || homePath == "" {
 		return servertypes.ExportedApp{}, errors.New("application home not set")
 	}
+
+	viperAppOpts, ok := appOpts.(*viper.Viper)
+	if !ok {
+		return servertypes.ExportedApp{}, errors.New("appOpts is not viper.Viper")
+	}
+
+	// overwrite the FlagInvCheckPeriod
+	viperAppOpts.Set(server.FlagInvCheckPeriod, 1)
+	appOpts = viperAppOpts
 
 	if height != -1 {
 		anApp = app.New(
