@@ -53,8 +53,8 @@ var _ = Describe("Fee tests on CheckTx", func() {
 
 		// keys and addresses
 		priv1, _, addr1 := testdata.KeyTestPubAddr()
-		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(300000000000)))
-		err := testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(300000000000)))
+		err := testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, coins)
 
 		Expect(err).To(BeNil())
 
@@ -86,8 +86,8 @@ var _ = Describe("Fee tests on CheckTx", func() {
 
 		// keys and addresses
 		priv1, _, addr1 := testdata.KeyTestPubAddr()
-		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(300_000_000_000)))
-		err := testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(300_000_000_000)))
+		err := testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, coins)
 		Expect(err).To(BeNil())
 
 		// msg and signatures
@@ -103,7 +103,7 @@ var _ = Describe("Fee tests on CheckTx", func() {
 		Expect(err).To(BeNil())
 
 		// Set high gas price so standard test fee fails
-		ncheqPrice := sdk.NewDecCoinFromDec(didtypes.BaseMinimalDenom, sdk.NewDec(200_000_000_000))
+		ncheqPrice := sdk.NewDecCoinFromDec(didtypes.BaseMinimalDenom, math.LegacyNewDec(200_000_000_000))
 
 		params, err := s.app.FeeMarketKeeper.GetParams(s.ctx)
 		Expect(err).To(BeNil())
@@ -156,7 +156,7 @@ var _ = Describe("Fee tests on CheckTx", func() {
 		// Set IsCheckTx back to true for testing sufficient mempool fee
 		s.ctx = s.ctx.WithIsCheckTx(true)
 
-		ncheqPrice = sdk.NewDecCoinFromDec(didtypes.BaseMinimalDenom, sdk.NewDec(0).Quo(sdk.NewDec(didtypes.BaseFactor)))
+		ncheqPrice = sdk.NewDecCoinFromDec(didtypes.BaseMinimalDenom, math.LegacyNewDec(0).Quo(math.LegacyNewDec(didtypes.BaseFactor)))
 		lowGasPrice := []sdk.DecCoin{ncheqPrice}
 		s.ctx = s.ctx.WithMinGasPrices(lowGasPrice) // 1 ncheq
 
@@ -173,7 +173,7 @@ var _ = Describe("Fee tests on CheckTx", func() {
 
 		// msg and signatures
 		msg := SandboxDidDoc()
-		feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(5_000_000_000)))
+		feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(5_000_000_000)))
 		gasLimit := testdata.NewTestGasLimit()
 		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
 		s.txBuilder.SetFeeAmount(feeAmount)
@@ -186,7 +186,7 @@ var _ = Describe("Fee tests on CheckTx", func() {
 		// set account with sufficient funds
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(100_000_000_000))))
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(100_000_000_000))))
 		Expect(err).To(BeNil())
 
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
@@ -249,9 +249,9 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		// Set account with insufficient funds
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(10_000_000_000)))
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(10_000_000_000)))
 		//nocheck:errcheck
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, coins)
 		Expect(err).To(BeNil())
 
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
@@ -263,7 +263,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 
 		// Set account with sufficient funds
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(200_000_000_000))))
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(200_000_000_000))))
 		Expect(err).To(BeNil())
 
 		_, err = antehandler(s.ctx, tx, false)
@@ -277,7 +277,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 
 		// msg and signatures
 		msg := SandboxDidDoc()
-		feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(5_000_000_000)))
+		feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(5_000_000_000)))
 		gasLimit := testdata.NewTestGasLimit()
 		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
 		s.txBuilder.SetFeeAmount(feeAmount)
@@ -291,8 +291,8 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		// set account with sufficient funds
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		amount := sdk.NewInt(100_000_000_000)
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
+		amount := math.NewInt(100_000_000_000)
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
@@ -317,7 +317,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
-		Expect(amount.Sub(sdk.NewInt(feeParams.CreateDid.Amount.Int64()))).To(Equal(balance.Amount), "Tax was not subtracted from the fee payer")
+		Expect(amount.Sub(math.NewInt(feeParams.CreateDid.Amount.Int64()))).To(Equal(balance.Amount), "Tax was not subtracted from the fee payer")
 
 		// get supply after tx
 		supplyAfterDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
@@ -355,8 +355,8 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		// set account with sufficient funds
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		amount := sdk.NewInt(300_000_000_000)
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
+		amount := math.NewInt(300_000_000_000)
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
@@ -383,7 +383,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
-		Expect(amount.Sub(sdk.NewInt(feeAmount.AmountOf(didtypes.BaseMinimalDenom).Int64()))).To(Equal(balance.Amount), "Fee amount subtracted was not equal to fee amount required for non-taxable tx")
+		Expect(amount.Sub(math.NewInt(feeAmount.AmountOf(didtypes.BaseMinimalDenom).Int64()))).To(Equal(balance.Amount), "Fee amount subtracted was not equal to fee amount required for non-taxable tx")
 
 		// get supply after tx
 		supplyAfter, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
@@ -419,8 +419,8 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		// set account with sufficient funds
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		amount := sdk.NewInt(300_000_000_000) // 300 CHEQ
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
+		amount := math.NewInt(300_000_000_000) // 300 CHEQ
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
@@ -440,7 +440,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		feemarketParams.MaxBlockUtilization = feemarkettypes.DefaultMaxBlockUtilization
 
 		// set minimum gas prices to realistic value
-		feemarketParams.MinBaseGasPrice = sdk.MustNewDecFromStr("0.5")
+		feemarketParams.MinBaseGasPrice = math.LegacyMustNewDecFromStr("0.5")
 
 		err = s.app.FeeMarketKeeper.SetParams(s.ctx, feemarketParams)
 		Expect(err).To(BeNil())
@@ -450,7 +450,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		Expect(err).To(BeNil())
 
 		// set base gas price to realistic value
-		feemarketState.BaseGasPrice = sdk.MustNewDecFromStr("0.5")
+		feemarketState.BaseGasPrice = math.LegacyMustNewDecFromStr("0.5")
 
 		// set feemarket state
 		err = s.app.FeeMarketKeeper.SetState(s.ctx, feemarketState)
@@ -477,7 +477,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
-		Expect(amount.Sub(sdk.NewInt(feeAmount.AmountOf(didtypes.BaseMinimalDenom).Int64()))).To(Equal(balance.Amount), "Fee amount subtracted was not equal to fee amount required for non-taxable tx")
+		Expect(amount.Sub(math.NewInt(feeAmount.AmountOf(didtypes.BaseMinimalDenom).Int64()))).To(Equal(balance.Amount), "Fee amount subtracted was not equal to fee amount required for non-taxable tx")
 
 		// get supply after tx
 		supplyAfter, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
@@ -510,8 +510,8 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		// set account with sufficient funds
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		amount := sdk.NewInt(100_000_000_000)
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
+		amount := math.NewInt(100_000_000_000)
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
@@ -546,7 +546,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		feeCollector := s.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
 		feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
 
-		Expect(feeCollectorBalance.Amount).To(Equal(sdk.NewInt(0)), "Reward was sent to the fee collector when taxable tx simulation mode")
+		Expect(feeCollectorBalance.Amount).To(Equal(math.NewInt(0)), "Reward was sent to the fee collector when taxable tx simulation mode")
 	})
 })
 
@@ -663,7 +663,7 @@ var _ = Describe("Fee abstraction", func() {
 			// Configure the HostZoneConfig
 			err := suite.app.FeeabsKeeper.SetHostZoneConfig(suite.ctx, mockHostZoneConfig)
 			Expect(err).ToNot(HaveOccurred())
-			suite.app.FeeabsKeeper.SetTwapRate(suite.ctx, "ibcfee", sdk.NewDec(1))
+			suite.app.FeeabsKeeper.SetTwapRate(suite.ctx, "ibcfee", math.LegacyNewDec(1))
 
 			// Construct and run the ante handler
 			tx := suite.txBuilder.GetTx()
@@ -728,7 +728,7 @@ var _ = Describe("DeductFeeDecorator", func() {
 
 	When("native fee is sufficient", func() {
 		It("should pass with sufficient native fee", func() {
-			suite.app.FeeabsKeeper.SetTwapRate(suite.ctx, "ibcfee", sdk.NewDec(1))
+			suite.app.FeeabsKeeper.SetTwapRate(suite.ctx, "ibcfee", math.LegacyNewDec(1))
 
 			// Construct and run the ante handler
 			tx := suite.txBuilder.GetTx()
@@ -745,7 +745,7 @@ var _ = Describe("DeductFeeDecorator", func() {
 		It("should fail due to insufficient ibc fee", func() {
 			err := suite.app.FeeabsKeeper.SetHostZoneConfig(suite.ctx, mockHostZoneConfig)
 			Expect(err).ToNot(HaveOccurred())
-			suite.app.FeeabsKeeper.SetTwapRate(suite.ctx, "ibcfee", sdk.NewDec(1))
+			suite.app.FeeabsKeeper.SetTwapRate(suite.ctx, "ibcfee", math.LegacyNewDec(1))
 
 			suite.txBuilder.SetFeeAmount(ibcFeeAmount)
 
@@ -765,16 +765,16 @@ var _ = Describe("DeductFeeDecorator", func() {
 		It("should pass with sufficient ibc fee", func() {
 			err := suite.app.FeeabsKeeper.SetHostZoneConfig(suite.ctx, mockHostZoneConfig)
 			Expect(err).ToNot(HaveOccurred())
-			suite.app.FeeabsKeeper.SetTwapRate(suite.ctx, "ibcfee", sdk.NewDec(1))
+			suite.app.FeeabsKeeper.SetTwapRate(suite.ctx, "ibcfee", math.LegacyNewDec(1))
 			suite.txBuilder.SetFeeAmount(ibcFeeAmount)
 
 			feeabsAddr := suite.app.FeeabsKeeper.GetFeeAbsModuleAddress()
 
 			// err = suite.mintCoins(feeabsAddr, sdk.NewCoins(feeAmount...))
-			err = testutil.FundAccount(suite.app.BankKeeper, suite.ctx, feeabsAddr, feeAmount)
+			err = testutil.FundAccount(suite.ctx, suite.app.BankKeeper, feeabsAddr, feeAmount)
 			Expect(err).ToNot(HaveOccurred())
 
-			err = testutil.FundAccount(suite.app.BankKeeper, suite.ctx, testAcc.acc.GetAddress(), ibcFeeAmount)
+			err = testutil.FundAccount(suite.ctx, suite.app.BankKeeper, testAcc.acc.GetAddress(), ibcFeeAmount)
 
 			// err = suite.mintCoins(testAcc.acc.GetAddress(), sdk.NewCoins(ibcFeeAmount...))
 			Expect(err).ToNot(HaveOccurred())
@@ -807,10 +807,10 @@ var _ = Describe("Test Deduct Coins", func() {
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)                     // Set the account in the account keeper
 
 		// Define the initial coins for the account
-		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(10_000_000_000)))
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(10_000_000_000)))
 
 		// Fund the account with the defined coins
-		err := testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+		err := testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, coins)
 		Expect(err).To(BeNil(), "Error on funding account")
 
 		// Check whether DeductCoins work for valid coins
@@ -836,11 +836,11 @@ var _ = Describe("Test Deduct Coins", func() {
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
 
 		// Define the initial coins and fee coins for the account
-		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(10_000_000_000)))
-		feeCoin := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(0))) // Zero fee coin
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(10_000_000_000)))
+		feeCoin := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(0))) // Zero fee coin
 
 		// Fund the account with the initial coins
-		err := testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+		err := testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, coins)
 		Expect(err).To(BeNil(), "Error on funding account")
 
 		// === Execute the DeductCoins function with zero fee ===
@@ -867,15 +867,15 @@ var _ = Describe("Test Deduct coins and distribute fees", func() {
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)                     // Set the account in the account keeper
 
 		// Define the initial coins for the account
-		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(10_000_000_000)))
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(10_000_000_000)))
 
 		// Fund the account with the defined coins
-		err := testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+		err := testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, coins)
 		Expect(err).To(BeNil(), "Error on funding account")
 
 		// Define the fee to be deducted and the flag for distributing fees
 		distributeFees := true
-		deductFee := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(5000)))
+		deductFee := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(5000)))
 
 		// Send the coins to the fee collector module
 		// Initially feemarket module has zero funds so we send it module
@@ -902,15 +902,15 @@ var _ = Describe("Test Deduct coins and distribute fees", func() {
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)                     // Set the account in the account keeper
 
 		// Define the initial coins for the account
-		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(10_000_000_000)))
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(10_000_000_000)))
 
 		// Fund the account with the defined coins
-		err := testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+		err := testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, coins)
 		Expect(err).To(BeNil(), "Error on funding account")
 
 		// Define the zero fee to be deducted and the flag for distributing fees
 		distributeFees := true
-		deductFee := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(0))) // Zero fee
+		deductFee := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(0))) // Zero fee
 
 		// Send the zero coins to the fee collector module
 		err = s.app.BankKeeper.SendCoinsFromAccountToModule(s.ctx, addr1, feemarkettypes.FeeCollectorName, deductFee)
@@ -947,15 +947,15 @@ var _ = Describe("Test Send tip", func() {
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)                     // Set the account in the account keeper
 
 		// Define the initial coins for the account
-		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(10_000_000_000)))
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(10_000_000_000)))
 
 		// Fund the account with the defined coins
-		err := testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+		err := testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, coins)
 		Expect(err).To(BeNil(), "Error on funding account")
 
 		// Define the fee to be deducted and the tip amount
-		deductFee := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(5000)))
-		tip := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1000)))
+		deductFee := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(5000)))
+		tip := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(1000)))
 
 		// Generate another test address for the proposer (recipient of the tip)
 		_, _, proposer := testdata.KeyTestPubAddr()
@@ -982,15 +982,15 @@ var _ = Describe("Test Send tip", func() {
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)                     // Set the account in the account keeper
 
 		// Define the initial coins for the account
-		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(10_000_000_000)))
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(10_000_000_000)))
 
 		// Fund the account with the defined coins
-		err := testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+		err := testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, coins)
 		Expect(err).To(BeNil(), "Error on funding account")
 
 		// Define the zero fee to be deducted and the flag for distributing fees
 		distributeFees := true
-		deductFee := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(0))) // Zero fee
+		deductFee := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(0))) // Zero fee
 
 		// Send the zero coins to the fee collector module
 		err = s.app.BankKeeper.SendCoinsFromAccountToModule(s.ctx, addr1, feemarkettypes.FeeCollectorName, deductFee)
@@ -1060,8 +1060,8 @@ var _ = Describe("Test PostHandle", func() {
 		// Set account with zero funds
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(0)))
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(0)))
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, coins)
 		Expect(err).To(BeNil())
 
 		// Create and execute the AnteHandler
@@ -1094,8 +1094,8 @@ var _ = Describe("Test PostHandle", func() {
 		// Set account with zero funds
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(0)))
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(0)))
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, coins)
 		Expect(err).To(BeNil())
 
 		// Create and execute the AnteHandler (in simulation mode)
@@ -1127,8 +1127,8 @@ var _ = Describe("Test PostHandle", func() {
 		// Fund the account with sufficient funds
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1_00_00_00_00_00_00_000)))
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(1_00_00_00_00_00_00_000)))
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, coins)
 		Expect(err).To(BeNil())
 
 		// Create and execute the AnteHandler
@@ -1160,8 +1160,8 @@ var _ = Describe("Test PostHandle", func() {
 		// Fund the account with sufficient funds
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1_00_00_00_00_00_00_000)))
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(1_00_00_00_00_00_00_000)))
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, coins)
 		Expect(err).To(BeNil())
 
 		// Create and execute the AnteHandler (in simulation mode)
@@ -1196,8 +1196,8 @@ var _ = Describe("Test PostHandle", func() {
 
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1000000000000000)))
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, coins)
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(1000000000000000)))
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, coins)
 		Expect(err).To(BeNil())
 
 		// Create and execute the AnteHandler
@@ -1279,7 +1279,8 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		feeabsModAcc = s.app.FeeabsKeeper.GetFeeAbsModuleAccount(s.ctx)
 		s.app.AccountKeeper.SetModuleAccount(s.ctx, feeabsModAcc)
 
-		params := s.app.StakingKeeper.GetParams(s.ctx)
+		params, err := s.app.StakingKeeper.GetParams(s.ctx)
+		Expect(err).To(BeNil(), "Error getting staking params")
 		params.BondDenom = didtypes.BaseMinimalDenom
 		err = s.app.StakingKeeper.SetParams(s.ctx, params)
 		Expect(err).To(BeNil(), "Error setting the params")
@@ -1304,7 +1305,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, feeAmount)
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, feeAmount)
 		Expect(err).To(BeNil())
 
 		_, err = anteHandler(s.ctx, tx, true)
@@ -1314,7 +1315,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 	It("Ensure to convert the IBC Denom to native fee", func() {
 		err := s.app.FeeabsKeeper.SetHostZoneConfig(s.ctx, mockHostZoneConfig)
 		Expect(err).ToNot(HaveOccurred())
-		s.app.FeeabsKeeper.SetTwapRate(s.ctx, "ibcfee", sdk.NewDec(1))
+		s.app.FeeabsKeeper.SetTwapRate(s.ctx, "ibcfee", math.LegacyNewDec(1))
 		minGasPrice := sdk.NewDecCoinsFromCoins(sdk.NewCoins(sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 100))...)
 		s.ctx = s.ctx.WithMinGasPrices(minGasPrice)
 
@@ -1336,9 +1337,9 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, ibcFeeAmount)
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, ibcFeeAmount)
 		Expect(err).To(BeNil())
-		err = testutil.FundModuleAccount(s.app.BankKeeper, s.ctx, types.ModuleName, feeAmount)
+		err = testutil.FundModuleAccount(s.ctx, s.app.BankKeeper, types.ModuleName, feeAmount)
 		Expect(err).To(BeNil())
 
 		_, err = anteHandler(s.ctx, tx, true)
@@ -1349,7 +1350,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		err := s.app.FeeabsKeeper.SetHostZoneConfig(s.ctx, mockHostZoneConfig)
 		Expect(err).ToNot(HaveOccurred())
 		ibcDenom := "ibcfee"
-		s.app.FeeabsKeeper.SetTwapRate(s.ctx, ibcDenom, sdk.NewDec(1))
+		s.app.FeeabsKeeper.SetTwapRate(s.ctx, ibcDenom, math.LegacyNewDec(1))
 
 		anteHandler := sdk.ChainAnteDecorators(decorators...)
 
@@ -1357,7 +1358,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 
 		// msg and signatures
 		msg := SandboxDidDoc()
-		feeAmount := sdk.NewCoins(sdk.NewCoin(ibcDenom, sdk.NewInt(50_000_000_000)))
+		feeAmount := sdk.NewCoins(sdk.NewCoin(ibcDenom, math.NewInt(50_000_000_000)))
 		gasLimit := testdata.NewTestGasLimit()
 		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
 		s.txBuilder.SetFeeAmount(feeAmount)
@@ -1371,11 +1372,11 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		// set account with sufficient funds
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		amount := sdk.NewInt(50_000_000_000)
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(ibcDenom, amount)))
+		amount := math.NewInt(50_000_000_000)
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, sdk.NewCoins(sdk.NewCoin(ibcDenom, amount)))
 		Expect(err).To(BeNil())
 
-		err = testutil.FundModuleAccount(s.app.BankKeeper, s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
+		err = testutil.FundModuleAccount(s.ctx, s.app.BankKeeper, types.ModuleName, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
 		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
@@ -1418,7 +1419,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		err := s.app.FeeabsKeeper.SetHostZoneConfig(s.ctx, mockHostZoneConfig)
 		Expect(err).ToNot(HaveOccurred())
 		ibcDenom := "ibcfee"
-		s.app.FeeabsKeeper.SetTwapRate(s.ctx, ibcDenom, sdk.NewDec(1))
+		s.app.FeeabsKeeper.SetTwapRate(s.ctx, ibcDenom, math.LegacyNewDec(1))
 
 		anteHandler := sdk.ChainAnteDecorators(decorators...)
 
@@ -1426,7 +1427,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 
 		// msg and signatures
 		msg := testdata.NewTestMsg(addr1)
-		feeAmount := sdk.NewCoins(sdk.NewCoin(ibcDenom, sdk.NewInt(50_000_000_000)))
+		feeAmount := sdk.NewCoins(sdk.NewCoin(ibcDenom, math.NewInt(50_000_000_000)))
 		gasLimit := testdata.NewTestGasLimit()
 		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
 		s.txBuilder.SetFeeAmount(feeAmount)
@@ -1440,11 +1441,11 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		// set account with sufficient funds
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		amount := sdk.NewInt(50_000_000_000)
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(ibcDenom, amount)))
+		amount := math.NewInt(50_000_000_000)
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, sdk.NewCoins(sdk.NewCoin(ibcDenom, amount)))
 		Expect(err).To(BeNil())
 
-		err = testutil.FundModuleAccount(s.app.BankKeeper, s.ctx, types.ModuleName, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
+		err = testutil.FundModuleAccount(s.ctx, s.app.BankKeeper, types.ModuleName, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
 		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
@@ -1469,7 +1470,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, ibcDenom)
-		Expect(amount.Sub(sdk.NewInt(feeAmount.AmountOf(ibcDenom).Int64())).Equal(balance.Amount)).To(BeTrue(), "Fee amount subtracted was not equal to fee amount required for non-taxable tx")
+		Expect(amount.Sub(math.NewInt(feeAmount.AmountOf(ibcDenom).Int64())).Equal(balance.Amount)).To(BeTrue(), "Fee amount subtracted was not equal to fee amount required for non-taxable tx")
 
 		// get supply after tx
 		supplyAfter, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
@@ -1492,7 +1493,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 
 		// msg and signatures
 		msg := SandboxDidDoc()
-		feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(50_000_000_000)))
+		feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(50_000_000_000)))
 		gasLimit := testdata.NewTestGasLimit()
 		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
 		s.txBuilder.SetFeeAmount(feeAmount)
@@ -1506,8 +1507,8 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		// set account with sufficient funds
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		amount := sdk.NewInt(50_000_000_000)
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
+		amount := math.NewInt(50_000_000_000)
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
 		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)

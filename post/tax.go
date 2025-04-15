@@ -1,6 +1,7 @@
 package posthandler
 
 import (
+	"bytes"
 	"fmt"
 
 	errorsmod "cosmossdk.io/errors"
@@ -260,7 +261,7 @@ func (td TaxDecorator) getFeePayer(ctx sdk.Context, feeTx sdk.FeeTx, tax sdk.Coi
 		// check if fee grant is supported
 		if td.feegrantKeeper == nil {
 			return nil, sdkerrors.ErrInvalidRequest.Wrap("fee grants are not enabled")
-		} else if !feeGranter.Equals(feePayer) {
+		} else if !bytes.Equal(feeGranter, feePayer) {
 			// check if fee grant exists
 			err := td.feegrantKeeper.UseGrantedFees(ctx, feeGranter, feePayer, tax, msgs)
 			if err != nil {
@@ -284,7 +285,7 @@ func (td TaxDecorator) validateTax(tax sdk.Coins, simulate bool) error {
 		return nil
 	}
 	// check if denom is accepted
-	if !tax.DenomsSubsetOf(sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1)))) {
+	if !tax.DenomsSubsetOf(sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(1)))) {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "invalid denom: %s", tax)
 	}
 	// check if tax is positive
