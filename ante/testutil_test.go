@@ -225,8 +225,8 @@ func (s *AnteTestSuite) SetDidFeeParams(feeParams didtypes.FeeParams) error {
 }
 
 // SetResourceFeeParams is a helper function to set resource fee params.
-func (s *AnteTestSuite) SetResourceFeeParams(feeParams resourcetypes.FeeParams) {
-	s.app.ResourceKeeper.SetParams(s.ctx, feeParams)
+func (s *AnteTestSuite) SetResourceFeeParams(feeParams resourcetypes.FeeParams) error {
+	return s.app.ResourceKeeper.SetParams(s.ctx, feeParams)
 }
 
 func (s *AnteTestSuite) SetFeeMarketFeeDenom() error {

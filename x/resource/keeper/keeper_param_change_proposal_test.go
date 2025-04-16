@@ -1,9 +1,8 @@
 package keeper_test
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"github.com/stretchr/testify/suite"
-
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	cheqdapp "github.com/cheqd/cheqd-node/app"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -30,7 +29,7 @@ func (suite *HandlerTestSuite) SetupTest() error {
 	if err != nil {
 		return err
 	}
-	suite.ctx = suite.app.BaseApp.NewContext(false, tmproto.Header{})
+	suite.ctx = suite.app.BaseApp.NewContext(false)
 	suite.govHandler = params.NewParamChangeProposalHandler(suite.app.ParamsKeeper)
 	return nil
 }
@@ -68,13 +67,14 @@ var _ = DescribeTable("Proposal Handler", func(testcase TestCaseKeeperProposal) 
 			}),
 			func(handlerSuite *HandlerTestSuite) {
 				expectedFeeParams := resourcetypes.FeeParams{
-					Image:      sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdk.NewInt(10000000000)},
-					Json:       sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdk.NewInt(4000000000)},
-					Default:    sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdk.NewInt(2000000000)},
-					BurnFactor: sdk.MustNewDecFromStr("0.600000000000000000"),
+					Image:      sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
+					Json:       sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
+					Default:    sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
+					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"),
 				}
 
-				feeParams := handlerSuite.app.ResourceKeeper.GetParams(handlerSuite.ctx)
+				feeParams, err := handlerSuite.app.ResourceKeeper.GetParams(handlerSuite.ctx)
+				Expect(err).To(BeNil())
 
 				Expect(expectedFeeParams).To(Equal(feeParams))
 			},

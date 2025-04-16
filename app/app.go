@@ -695,10 +695,11 @@ func New(
 
 	// x/resource
 	app.ResourceKeeper = *resourcekeeper.NewKeeper(
-		appCodec, keys[resourcetypes.StoreKey],
+		appCodec, runtime.NewKVStoreService(keys[resourcetypes.StoreKey]),
 		app.GetSubspace(resourcetypes.ModuleName),
 		app.IBCKeeper.PortKeeper,
 		scopedResourceKeeper,
+		authority,
 	)
 
 	// create the resource IBC stack

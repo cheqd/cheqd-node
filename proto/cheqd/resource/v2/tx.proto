@@ -5,6 +5,10 @@ package cheqd.resource.v2;
 import "cheqd/did/v2/tx.proto";
 import "cheqd/resource/v2/resource.proto";
 import "gogoproto/gogo.proto";
+import "cheqd/resource/v2/fee.proto";
+import "cosmos_proto/cosmos.proto";
+import "cosmos/msg/v1/msg.proto";
+import "amino/amino.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
@@ -12,6 +16,7 @@ option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 service Msg {
   // CreateResource defines a method for creating a resource.
   rpc CreateResource(MsgCreateResource) returns (MsgCreateResourceResponse);
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
 }
 
 // MsgCreateResource defines the Msg/CreateResource request type.
@@ -86,3 +91,22 @@ message MsgCreateResourceResponse {
   // Return the created resource metadata.
   Metadata resource = 1 [(gogoproto.jsontag) = "linkedResourceMetadata"];
 }
+
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority is the address of the governance account.
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  option (amino.name) = "/x/did/MsgUpdateParams";
+
+  // params defines the x/mint parameters to update.
+  //
+  // NOTE: All parameters must be supplied.
+  FeeParams params = 2 [(gogoproto.nullable) = false];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+message MsgUpdateParamsResponse {}
