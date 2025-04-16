@@ -14,6 +14,7 @@ option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
 // Msg defines the Cosmos SDK Msg service for the cheqd.resource.v2 module.
 service Msg {
+  option (cosmos.msg.v1.service) = true;
   // CreateResource defines a method for creating a resource.
   rpc CreateResource(MsgCreateResource) returns (MsgCreateResourceResponse);
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);

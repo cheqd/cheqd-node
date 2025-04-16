@@ -14,6 +14,7 @@ option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
 // Msg defines the Cosmos SDK Msg service for the cheqd.did.v2 module.
 service Msg {
+  option (cosmos.msg.v1.service) = true;
   // CreateDidDoc defines a method for creating a new DID document
   rpc CreateDidDoc(MsgCreateDidDoc) returns (MsgCreateDidDocResponse);
 
