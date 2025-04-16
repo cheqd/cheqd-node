@@ -453,7 +453,7 @@ func New(
 		app.AccountKeeper,
 		app.BankKeeper,
 		authority,
-		authcodec.NewBech32Codec(AccountAddressPrefix),
+		authcodec.NewBech32Codec(ValidatorAddressPrefix),
 		authcodec.NewBech32Codec(ConsNodeAddressPrefix),
 	)
 
