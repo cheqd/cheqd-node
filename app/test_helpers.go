@@ -158,33 +158,6 @@ func Setup(isCheckTx bool) (*TestApp, error) {
 	return app, nil
 }
 
-// Setup initializes a new SimApp. A Nop logger is set in SimApp.
-func SetupTest(isCheckTx bool) (*TestApp, error) {
-	privVal := mock.NewPV()
-	pubKey, err := privVal.GetPubKey()
-	if err != nil {
-		return nil, err
-	}
-	// create validator set with single validator
-	validator := cmttypes.NewValidator(pubKey, 1)
-	valSet := cmttypes.NewValidatorSet([]*cmttypes.Validator{validator})
-
-	// generate genesis account
-	senderPrivKey := secp256k1.GenPrivKey()
-	acc := authtypes.NewBaseAccount(senderPrivKey.PubKey().Address().Bytes(), senderPrivKey.PubKey(), 0, 0)
-	balance := banktypes.Balance{
-		Address: acc.GetAddress().String(),
-		Coins:   sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdkmath.NewInt(100000000000000))),
-	}
-
-	app, err := SetupWithGenesisValSet(valSet, []authtypes.GenesisAccount{acc}, balance)
-	if err != nil {
-		return nil, err
-	}
-
-	return app, nil
-}
-
 // func genesisStateWithValSet(
 // 	app *TestApp, genesisState GenesisState,
 // 	valSet *cmttypes.ValidatorSet, genAccs []authtypes.GenesisAccount,
@@ -289,8 +262,6 @@ func SetupWithGenesisValSet(valSet *cmttypes.ValidatorSet, genAccs []authtypes.G
 		return nil, err
 	}
 
-	// commit genesis changes
-	app.Commit()
 	_, err = app.FinalizeBlock(&abci.RequestFinalizeBlock{
 		Height:             app.LastBlockHeight() + 1,
 		Hash:               app.LastCommitID().Hash,
