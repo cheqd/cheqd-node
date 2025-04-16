@@ -590,7 +590,7 @@ func New(
 		app.IBCKeeper.ChannelKeeper,
 		app.IBCKeeper.ChannelKeeper,
 		app.IBCKeeper.PortKeeper,
-		app.ScopedICQKeeper,
+		scopedICQKeeper,
 		bApp.GRPCQueryRouter(),
 		authority,
 	)
