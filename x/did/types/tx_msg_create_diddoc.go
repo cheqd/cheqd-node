@@ -13,24 +13,6 @@ func NewMsgCreateDid(payload *MsgCreateDidDocPayload, signatures []*SignInfo) *M
 		Signatures: signatures,
 	}
 }
-
-func (msg *MsgCreateDidDoc) Route() string {
-	return RouterKey
-}
-
-func (msg *MsgCreateDidDoc) Type() string {
-	return "MsgCreateDidDoc"
-}
-
-func (msg *MsgCreateDidDoc) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{}
-}
-
-func (msg *MsgCreateDidDoc) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
-}
-
 func (msg *MsgCreateDidDoc) ValidateBasic() error {
 	err := msg.Validate(nil)
 	if err != nil {

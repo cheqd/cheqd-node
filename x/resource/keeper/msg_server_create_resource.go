@@ -29,7 +29,10 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	msg.Normalize()
 
 	// Validate corresponding DIDDoc exists
-	namespace := k.didKeeper.GetDidNamespace(&goCtx)
+	namespace, err := k.didKeeper.GetDidNamespace(&goCtx)
+	if err != nil {
+		return nil, err
+	}
 	did := didutils.JoinDID(didtypes.DidMethod, namespace, msg.Payload.CollectionId)
 	didDoc, err := k.didKeeper.GetLatestDidDoc(&goCtx, did)
 	if err != nil {
@@ -54,7 +57,7 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 
 	// We can use the same signers as for DID creation because didDoc stays the same
 	signers := didkeeper.GetSignerDIDsForDIDCreation(*didDoc.DidDoc)
-	err = didkeeper.VerifyAllSignersHaveAllValidSignatures(&k.didKeeper, &ctx, map[string]didtypes.DidDocWithMetadata{},
+	err = didkeeper.VerifyAllSignersHaveAllValidSignatures(&k.didKeeper, &goCtx, map[string]didtypes.DidDocWithMetadata{},
 		signBytes, signers, msg.Signatures)
 	if err != nil {
 		return nil, err

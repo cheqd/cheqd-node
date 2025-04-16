@@ -53,7 +53,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/address"
 	"github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/runtime"
 	runtimeservices "github.com/cosmos/cosmos-sdk/runtime/services"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/server/api"
@@ -158,6 +157,7 @@ import (
 	_ "github.com/cheqd/cheqd-node/app/client/docs/statik"
 	upgradeV3 "github.com/cheqd/cheqd-node/app/upgrades/v3"
 	upgradeV4 "github.com/cheqd/cheqd-node/app/upgrades/v4"
+	"github.com/cosmos/cosmos-sdk/runtime"
 )
 
 var (
@@ -727,7 +727,7 @@ func New(
 	app.EvidenceKeeper = *evidenceKeeper
 
 	app.DidKeeper = *didkeeper.NewKeeper(
-		appCodec, keys[didtypes.StoreKey],
+		appCodec, runtime.NewKVStoreService(keys[didtypes.StoreKey]),
 		app.GetSubspace(didtypes.ModuleName),
 		app.AccountKeeper, app.BankKeeper,
 		app.StakingKeeper, authority,

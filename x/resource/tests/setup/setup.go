@@ -137,7 +137,7 @@ func Setup() TestSetup {
 
 	paramsKeeper := initParamsKeeper(cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
 
-	didKeeper := didkeeper.NewKeeper(cdc, didStoreKey, getSubspace(didtypes.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	didKeeper := didkeeper.NewKeeper(cdc, runtime.NewKVStoreService(didStoreKey), getSubspace(didtypes.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 	capabilityKeeper := capabilitykeeper.NewKeeper(cdc, capabilityStoreKey, memStoreKeys[capabilitytypes.MemStoreKey])
 
 	scopedIBCKeeper := capabilityKeeper.ScopeToModule(ibcexported.ModuleName)
@@ -191,8 +191,8 @@ func Setup() TestSetup {
 		ResourceQueryServer: queryServer,
 		IBCModule:           ibcModule,
 	}
-
-	setup.Keeper.SetDidNamespace(&ctx, didsetup.DidNamespace)
+	goCtx := sdk.WrapSDKContext(ctx)
+	setup.Keeper.SetDidNamespace(&goCtx, didsetup.DidNamespace)
 
 	return setup
 }

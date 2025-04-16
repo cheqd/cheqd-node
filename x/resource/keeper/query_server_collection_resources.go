@@ -20,12 +20,18 @@ func (q queryServer) CollectionResources(ctx context.Context, req *types.QueryCo
 	req.Normalize()
 
 	// Validate corresponding DIDDoc exists
-	namespace := q.didKeeper.GetDidNamespace(&ctx)
+	namespace, err := q.didKeeper.GetDidNamespace(&ctx)
+	if err != nil {
+		return nil, err
+	}
 	did := didutils.JoinDID(didtypes.DidMethod, namespace, req.CollectionId)
-	if !q.didKeeper.HasDidDoc(&ctx, did) {
+	hasDidDoc, err := q.didKeeper.HasDidDoc(&ctx, did)
+	if err != nil {
+		return nil, err
+	}
+	if !hasDidDoc {
 		return nil, didtypes.ErrDidDocNotFound.Wrap(did)
 	}
-
 	// Get all resources
 	resources, err := q.GetResourceCollection(&ctx, req.CollectionId)
 	if err != nil {

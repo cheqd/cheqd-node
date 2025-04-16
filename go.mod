@@ -12,7 +12,6 @@ require (
 	filippo.io/edwards25519 v1.1.0
 	github.com/cheqd/cheqd-node/api/v2 v2.0.0-00010101000000-000000000000
 	github.com/cometbft/cometbft v0.38.12
-	github.com/cometbft/cometbft-db v0.11.0
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/cosmos-sdk v0.50.13
 	github.com/cosmos/gogoproto v1.7.0
@@ -43,6 +42,7 @@ require (
 
 require (
 	github.com/bits-and-blooms/bitset v1.8.0 // indirect
+	github.com/cometbft/cometbft-db v0.11.0 // indirect
 	github.com/creachadair/atomicfile v0.3.3 // indirect
 	github.com/creachadair/tomledit v0.0.26 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect

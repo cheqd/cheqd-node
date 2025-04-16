@@ -313,7 +313,8 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		Expect(err).To(BeNil(), "Tx errored when fee payer had sufficient funds and provided sufficient fee while subtracting tax on deliverTx")
 
 		// get fee params
-		feeParams := s.app.DidKeeper.GetParams(s.ctx)
+		feeParams, err := s.app.DidKeeper.GetParams(s.ctx)
+		Expect(err).To(BeNil())
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
@@ -324,7 +325,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		Expect(err).To(BeNil())
 
 		// check that supply was deflated
-		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor.Amount, sdk.NewCoins(feeParams.CreateDid))
+		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(feeParams.CreateDid))
 		Expect(supplyBeforeDeflation.Sub(supplyAfterDeflation...)).To(Equal(burnt), "Supply was not deflated")
 
 		// check that reward has been sent to the fee collector
@@ -1391,7 +1392,8 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		Expect(err).To(BeNil(), "Tx errored when fee payer had sufficient funds and provided sufficient fee while subtracting tax on deliverTx")
 
 		// get fee params
-		feeParams := s.app.DidKeeper.GetParams(s.ctx)
+		feeParams, err := s.app.DidKeeper.GetParams(s.ctx)
+		Expect(err).To(BeNil())
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
@@ -1402,7 +1404,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		Expect(err).To(BeNil())
 
 		// check that supply was deflated
-		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor.Amount, sdk.NewCoins(feeParams.CreateDid))
+		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(feeParams.CreateDid))
 		Expect(supplyBeforeDeflation.Sub(supplyAfterDeflation...)).To(Equal(burnt), "Supply was not deflated")
 
 		// check that reward has been sent to the fee collector
@@ -1523,7 +1525,8 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		Expect(err).To(BeNil(), "Tx errored when fee payer had sufficient funds and provided sufficient fee while subtracting tax on deliverTx")
 
 		// get fee params
-		feeParams := s.app.DidKeeper.GetParams(s.ctx)
+		feeParams, err := s.app.DidKeeper.GetParams(s.ctx)
+		Expect(err).To(BeNil())
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
@@ -1534,7 +1537,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		Expect(err).To(BeNil())
 
 		// check that supply was deflated
-		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor.Amount, sdk.NewCoins(feeParams.CreateDid))
+		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(feeParams.CreateDid))
 		Expect(supplyBeforeDeflation.Sub(supplyAfterDeflation...)).To(Equal(burnt), "Supply was not deflated")
 
 		// check that reward has been sent to the fee collector

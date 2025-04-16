@@ -15,8 +15,6 @@ func NewMsgBurn(sender string, amount sdk.Coins) *MsgBurn {
 		Amount:      amount,
 	}
 }
-func (m MsgBurn) Route() string { return RouterKey }
-
 func (m MsgBurn) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(m.FromAddress)
 	if err != nil {
@@ -28,13 +26,4 @@ func (m MsgBurn) ValidateBasic() error {
 	}
 
 	return nil
-}
-
-func (m MsgBurn) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&m))
-}
-
-func (m MsgBurn) GetSigners() []sdk.AccAddress {
-	sender, _ := sdk.AccAddressFromBech32(m.FromAddress)
-	return []sdk.AccAddress{sender}
 }
