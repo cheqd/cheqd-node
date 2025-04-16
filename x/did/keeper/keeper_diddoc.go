@@ -11,6 +11,16 @@ import (
 
 // GetDidCount get the total number of did
 func (k Keeper) GetDidDocCount(ctx *context.Context) (uint64, error) {
+	has, err := k.DidCount.Has(*ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	if !has {
+		if setErr := k.DidCount.Set(*ctx, 0); setErr != nil {
+			return 0, setErr
+		}
+	}
 	count, err := k.DidCount.Get(*ctx)
 	if err != nil {
 		return 0, err
@@ -113,18 +123,20 @@ func (k Keeper) GetDidDocVersion(ctx *context.Context, id, version string) (type
 
 func (k Keeper) GetAllDidDocVersions(ctx *context.Context, did string) ([]*types.Metadata, error) {
 	var metadataList []*types.Metadata
-
 	rng := collections.NewPrefixedPairRange[string, string](did)
 
-	err := k.DidDocuments.Walk(*ctx, rng, func(key collections.Pair[string, string], value types.DidDocWithMetadata) (bool, error) {
-		metadataList = append(metadataList, value.Metadata)
-		return true, nil // continue walking
-	})
-
+	iter, err := k.DidDocuments.Iterate(*ctx, rng)
 	if err != nil {
 		return nil, err
 	}
 
+	kvs, err := iter.KeyValues()
+	if err != nil {
+		return nil, err
+	}
+	for _, kv := range kvs {
+		metadataList = append(metadataList, kv.Value.Metadata)
+	}
 	return metadataList, nil
 }
 
@@ -175,34 +187,59 @@ func (k Keeper) HasDidDocVersion(ctx *context.Context, id, version string) (bool
 }
 
 func (k Keeper) IterateDids(ctx *context.Context, callback func(did string) (continue_ bool)) {
-	err := k.LatestDidVersion.Walk(*ctx, nil, func(did string, _ string) (stop bool, err error) {
-		return callback(did), nil
-	})
+	iter, err := k.LatestDidVersion.Iterate(*ctx, nil)
 	if err != nil {
 		panic(err)
+	}
+
+	kvs, err := iter.KeyValues()
+	if err != nil {
+		panic(err)
+	}
+
+	for _, kv := range kvs {
+		if !callback(kv.Key) {
+			break
+		}
 	}
 }
 
 func (k Keeper) IterateDidDocVersions(ctx *context.Context, did string, callback func(version types.DidDocWithMetadata) (continue_ bool)) {
-
 	rng := collections.NewPrefixedPairRange[string, string](did)
 
-	err := k.DidDocuments.Walk(*ctx, rng, func(key collections.Pair[string, string], value types.DidDocWithMetadata) (stop bool, err error) {
-		return callback(value), nil
-	})
+	iter, err := k.DidDocuments.Iterate(*ctx, rng)
 	if err != nil {
 		panic(err)
+	}
+
+	kvs, err := iter.KeyValues()
+	if err != nil {
+		panic(err)
+	}
+
+	for _, kv := range kvs {
+		if !callback(kv.Value) {
+			break
+		}
 	}
 }
 
 func (k Keeper) IterateAllDidDocVersions(ctx *context.Context, callback func(version types.DidDocWithMetadata) (continue_ bool)) {
-	err := k.DidDocuments.Walk(*ctx, nil, func(key collections.Pair[string, string], value types.DidDocWithMetadata) (stop bool, err error) {
-		return callback(value), nil
-	})
+	iter, err := k.DidDocuments.Iterate(*ctx, nil)
 	if err != nil {
 		panic(err)
 	}
 
+	kvs, err := iter.KeyValues()
+	if err != nil {
+		panic(err)
+	}
+
+	for _, kv := range kvs {
+		if !callback(kv.Value) {
+			break
+		}
+	}
 }
 
 // GetAllDidDocs returns all did
