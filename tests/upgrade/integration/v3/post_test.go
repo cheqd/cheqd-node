@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"path/filepath"
 
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	integrationcli "github.com/cheqd/cheqd-node/tests/integration/cli"
 	clihelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/v3/cli"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

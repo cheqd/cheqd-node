@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"cosmossdk.io/math"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/skip-mev/feemarket/x/feemarket/types"
 	"github.com/stretchr/testify/suite"
 
@@ -83,8 +82,8 @@ func createTestApp(isCheckTx bool) (*cheqdapp.TestApp, sdk.Context, error) {
 	if err != nil {
 		return nil, sdk.Context{}, err
 	}
-	ctx := app.BaseApp.NewContext(isCheckTx, tmproto.Header{})
-	err = app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
+	ctx := app.BaseApp.NewContext(isCheckTx)
+	err = app.AccountKeeper.Params.Set(ctx, authtypes.DefaultParams())
 	if err != nil {
 		return nil, sdk.Context{}, err
 	}
@@ -111,14 +110,12 @@ func (s *AnteTestSuite) SetupTest(isCheckTx bool) error {
 		return err
 	}
 	s.ctx = s.ctx.WithBlockHeight(1)
-	// Set up TxConfig.
-	encodingConfig := cheqdapp.MakeTestEncodingConfig()
 	// We're using TestMsg encoding in some tests, so register it here.
-	encodingConfig.Amino.RegisterConcrete(&testdata.TestMsg{}, "testdata.TestMsg", nil)
-	testdata.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	s.app.LegacyAmino().Amino.RegisterConcrete(&testdata.TestMsg{}, "testdata.TestMsg", nil)
+	testdata.RegisterInterfaces(s.app.InterfaceRegistry())
 
 	s.clientCtx = client.Context{}.
-		WithTxConfig(encodingConfig.TxConfig)
+		WithTxConfig(s.app.TxConfig())
 
 	anteHandler, err := cheqdapp.NewAnteHandler(
 		cheqdapp.HandlerOptions{
@@ -127,7 +124,7 @@ func (s *AnteTestSuite) SetupTest(isCheckTx bool) error {
 			FeegrantKeeper:  s.app.FeeGrantKeeper,
 			DidKeeper:       s.app.DidKeeper,
 			ResourceKeeper:  s.app.ResourceKeeper,
-			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
+			SignModeHandler: s.app.TxConfig().SignModeHandler(),
 			SigGasConsumer:  sdkante.DefaultSigVerificationGasConsumer,
 			IBCKeeper:       s.app.IBCKeeper,
 			FeeMarketKeeper: s.app.FeeMarketKeeper,
@@ -182,7 +179,7 @@ func (s *AnteTestSuite) CreateTestTx(privs []cryptotypes.PrivKey, accNums []uint
 		sigV2 := signing.SignatureV2{
 			PubKey: priv.PubKey(),
 			Data: &signing.SingleSignatureData{
-				SignMode:  s.clientCtx.TxConfig.SignModeHandler().DefaultMode(),
+				SignMode:  signing.SignMode(s.clientCtx.TxConfig.SignModeHandler().DefaultMode()),
 				Signature: nil,
 			},
 			Sequence: accSeqs[i],
@@ -203,8 +200,8 @@ func (s *AnteTestSuite) CreateTestTx(privs []cryptotypes.PrivKey, accNums []uint
 			AccountNumber: accNums[i],
 			Sequence:      accSeqs[i],
 		}
-		sigV2, err := tx.SignWithPrivKey(
-			s.clientCtx.TxConfig.SignModeHandler().DefaultMode(), signerData,
+		sigV2, err := tx.SignWithPrivKey(s.ctx,
+			signing.SignMode(s.clientCtx.TxConfig.SignModeHandler().DefaultMode()), signerData,
 			s.txBuilder, priv, s.clientCtx.TxConfig, accSeqs[i])
 		if err != nil {
 			return nil, err

@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -18,7 +19,7 @@ func GenerateFeeGranter(granter string, feeParams []string) []string {
 	}, feeParams...)
 }
 
-func GetBurntPortion(tax sdk.Coin, burnFactor sdk.Dec) sdk.Coin {
+func GetBurntPortion(tax sdk.Coin, burnFactor sdkmath.LegacyDec) sdk.Coin {
 	taxDec := sdk.NewDecCoinFromCoin(tax)
 	taxDec.Amount = taxDec.Amount.Mul(burnFactor)
 	burnt, _ := taxDec.TruncateDecimal()

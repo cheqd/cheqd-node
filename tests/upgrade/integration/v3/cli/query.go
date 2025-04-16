@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"time"
 
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
 func Query(container string, binary string, module, query string, queryArgs ...string) (string, error) {
