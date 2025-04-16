@@ -11,6 +11,17 @@ import (
 
 // GetDidCount get the total number of did
 func (k Keeper) GetDidDocCount(ctx *context.Context) (uint64, error) {
+	has, err := k.DidCount.Has(*ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	if !has {
+		if setErr := k.DidCount.Set(*ctx, 0); setErr != nil {
+			return 0, setErr
+		}
+	}
+
 	count, err := k.DidCount.Get(*ctx)
 	if err != nil {
 		return 0, err
