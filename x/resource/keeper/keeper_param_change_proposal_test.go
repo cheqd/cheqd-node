@@ -4,6 +4,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 	"github.com/stretchr/testify/suite"
 
+	"github.com/cheqd/cheqd-node/app"
 	cheqdapp "github.com/cheqd/cheqd-node/app"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -23,8 +24,13 @@ type HandlerTestSuite struct {
 	govHandler govv1beta1.Handler
 }
 
+func init() {
+	app.SetConfig()
+}
+
 func (suite *HandlerTestSuite) SetupTest() error {
 	var err error
+
 	suite.app, err = cheqdapp.Setup(false)
 	if err != nil {
 		return err
