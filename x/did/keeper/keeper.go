@@ -41,10 +41,10 @@ func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSp
 		bankkeeper:       bk,
 		stakingKeeper:    sk,
 		authority:        authority,
-		DidNamespace:     collections.NewItem(sb, types.DidNamespaceKeyPrefix, "did-namespace:", collections.StringValue),
-		DidCount:         collections.NewItem(sb, types.DidDocCountKeyPrefix, "did-count:", collections.Uint64Value),
-		LatestDidVersion: collections.NewMap(sb, types.LatestDidDocVersionKeyPrefix, "latest-did", collections.StringKey, collections.StringValue),
-		DidDocuments:     collections.NewMap(sb, types.DidDocVersionKeyPrefix, "did-version", collections.PairKeyCodec(collections.StringKey, collections.StringKey), codec.CollValue[types.DidDocWithMetadata](cdc)),
+		DidNamespace:     collections.NewItem(sb, types.DidNamespaceKeyPrefix, "did_namespace", collections.StringValue),
+		DidCount:         collections.NewItem(sb, types.DidDocCountKeyPrefix, "did_count", collections.Uint64Value),
+		LatestDidVersion: collections.NewMap(sb, types.LatestDidDocVersionKeyPrefix, "latest_did", collections.StringKey, collections.StringValue),
+		DidDocuments:     collections.NewMap(sb, types.DidDocVersionKeyPrefix, "did_version", collections.PairKeyCodec(collections.StringKey, collections.StringKey), codec.CollValue[types.DidDocWithMetadata](cdc)),
 		Params:           collections.NewItem(sb, types.ParamsKey, "params", codec.CollValue[types.FeeParams](cdc)),
 	}
 	schema, err := sb.Build()
