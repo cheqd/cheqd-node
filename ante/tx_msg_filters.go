@@ -113,7 +113,10 @@ func checkFeeParamsFromSubspace(ctx sdk.Context, didKeeper DidKeeper, resourceKe
 	TaxableMsgFees[MsgUpdateDidDoc] = sdk.NewCoins(didParams.UpdateDid)
 	TaxableMsgFees[MsgDeactivateDidDoc] = sdk.NewCoins(didParams.DeactivateDid)
 
-	resourceParams := resourceKeeper.GetParams(ctx)
+	resourceParams, err := resourceKeeper.GetParams(ctx)
+	if err != nil {
+		return false
+	}
 	TaxableMsgFees[MsgCreateResourceImage] = sdk.NewCoins(resourceParams.Image)
 	TaxableMsgFees[MsgCreateResourceJSON] = sdk.NewCoins(resourceParams.Json)
 	TaxableMsgFees[MsgCreateResourceDefault] = sdk.NewCoins(resourceParams.Default)

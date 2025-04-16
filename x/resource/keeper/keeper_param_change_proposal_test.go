@@ -70,7 +70,7 @@ var _ = DescribeTable("Proposal Handler", func(testcase TestCaseKeeperProposal) 
 					Image:      sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
 					Json:       sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
 					Default:    sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
-					BurnFactor: sdk.NewDecCoin(resourcetypes.BaseMinimalDenom, sdkmath.Int(sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"))),
+					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"),
 				}
 
 				feeParams, err := handlerSuite.app.ResourceKeeper.GetParams(handlerSuite.ctx)

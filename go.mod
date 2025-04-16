@@ -10,6 +10,7 @@ require (
 	cosmossdk.io/math v1.4.0
 	cosmossdk.io/tools/confix v0.1.2
 	filippo.io/edwards25519 v1.1.0
+	github.com/cheqd/cheqd-node/api/v2 v2.0.0-00010101000000-000000000000
 	github.com/cometbft/cometbft v0.38.12
 	github.com/cometbft/cometbft-db v0.11.0
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
@@ -37,7 +38,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240814211410-ddb44dafa142
 	google.golang.org/grpc v1.67.1
-	google.golang.org/protobuf v1.35.1
+	google.golang.org/protobuf v1.36.5
 )
 
 require (
@@ -54,7 +55,7 @@ require (
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
 	cloud.google.com/go/iam v1.1.9 // indirect
 	cloud.google.com/go/storage v1.41.0 // indirect
-	cosmossdk.io/collections v0.4.0 // indirect
+	cosmossdk.io/collections v0.4.0
 	cosmossdk.io/depinject v1.1.0
 	cosmossdk.io/log v1.4.1
 	cosmossdk.io/store v1.1.1

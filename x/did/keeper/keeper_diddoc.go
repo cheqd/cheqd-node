@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"context"
 	"strconv"
 	"strings"
 
@@ -81,7 +82,7 @@ func (k Keeper) AddNewDidDocVersion(ctx *sdk.Context, didDoc *types.DidDocWithMe
 	return k.SetDidDocVersion(ctx, didDoc, false)
 }
 
-func (k Keeper) GetLatestDidDoc(ctx *sdk.Context, did string) (types.DidDocWithMetadata, error) {
+func (k Keeper) GetLatestDidDoc(ctx *context.Context, did string) (types.DidDocWithMetadata, error) {
 	latestVersionID, err := k.GetLatestDidDocVersion(ctx, did)
 	if err != nil {
 		return types.DidDocWithMetadata{}, err
@@ -173,7 +174,7 @@ func (k Keeper) GetLatestDidDocVersion(ctx *sdk.Context, id string) (string, err
 	return string(store.Get(types.GetLatestDidDocVersionKey(id))), nil
 }
 
-func (k Keeper) HasDidDoc(ctx *sdk.Context, id string) bool {
+func (k Keeper) HasDidDoc(ctx *context.Context, id string) bool {
 	return k.HasLatestDidDocVersion(ctx, id)
 }
 

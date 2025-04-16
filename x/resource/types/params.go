@@ -27,7 +27,7 @@ func ParamKeyTable() paramstypes.KeyTable {
 // )
 
 // NewParams creates a new FeeParams object with specified parameters
-func NewParams(image, json, defaultFee sdk.Coin, burnFactor sdk.DecCoin) FeeParams {
+func NewParams(image, json, defaultFee sdk.Coin, burnFactor sdkmath.LegacyDec) FeeParams {
 	return FeeParams{
 		Image:      image,
 		Json:       json,
@@ -42,7 +42,7 @@ func DefaultFeeParams() *FeeParams {
 		Image:      sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceImageFee)),
 		Json:       sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceJSONFee)),
 		Default:    sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceDefaultFee)),
-		BurnFactor: sdk.NewDecCoin(BaseMinimalDenom, sdkmath.Int(sdkmath.LegacyMustNewDecFromStr(DefaultBurnFactor))),
+		BurnFactor: sdkmath.LegacyMustNewDecFromStr(DefaultBurnFactor),
 	}
 }
 
@@ -60,7 +60,7 @@ func (tfp *FeeParams) ValidateBasic() error {
 		return fmt.Errorf("invalid create resource default tx fee: %s", tfp.Json)
 	}
 
-	if !tfp.BurnFactor.IsPositive() || tfp.BurnFactor.Amount.GTE(sdkmath.LegacyOneDec()) {
+	if !tfp.BurnFactor.IsPositive() || tfp.BurnFactor.GTE(sdkmath.LegacyOneDec()) {
 		return fmt.Errorf("invalid burn factor: %s", tfp.BurnFactor)
 	}
 

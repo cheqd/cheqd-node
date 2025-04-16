@@ -1,13 +1,15 @@
 package keeper
 
 import (
+	"context"
+
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/did/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // GetDidNamespace get did namespace
-func (k Keeper) GetDidNamespace(ctx *sdk.Context) string {
+func (k Keeper) GetDidNamespace(ctx *context.Context) string {
 	store := ctx.KVStore(k.storeKey)
 
 	key := utils.StrBytes(types.DidNamespaceKey)
