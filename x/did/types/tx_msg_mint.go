@@ -16,24 +16,6 @@ func NewMsgMint(authority string, toAddr string, coins sdk.Coins) *MsgMint {
 	}
 }
 
-func (msg *MsgMint) Route() string {
-	return RouterKey
-}
-
-func (msg *MsgMint) Type() string {
-	return "MsgMint"
-}
-
-func (msg *MsgMint) GetSigners() []sdk.AccAddress {
-	authority, _ := sdk.AccAddressFromBech32(msg.Authority)
-	return []sdk.AccAddress{authority}
-}
-
-func (msg *MsgMint) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
-}
-
 func (msg *MsgMint) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Authority); err != nil {
 		return errorsmod.Wrap(err, "invalid authority address")

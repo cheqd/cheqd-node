@@ -15,31 +15,18 @@ func NewMsgCreateResource(payload *MsgCreateResourcePayload, signatures []*didty
 	}
 }
 
-func (msg *MsgCreateResource) Route() string {
-	return RouterKey
-}
-
 func (msg *MsgCreateResource) Type() string {
 	return "MsgCreateResource"
 }
 
-func (msg *MsgCreateResource) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{}
-}
+// func (msg *MsgCreateResource) ValidateBasic() error {
+// 	err := msg.Validate([]string{})
+// 	if err != nil {
+// 		return ErrBasicValidation.Wrap(err.Error())
+// 	}
 
-func (msg *MsgCreateResource) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
-}
-
-func (msg *MsgCreateResource) ValidateBasic() error {
-	err := msg.Validate([]string{})
-	if err != nil {
-		return ErrBasicValidation.Wrap(err.Error())
-	}
-
-	return nil
-}
+// 	return nil
+// }
 
 // Validate
 

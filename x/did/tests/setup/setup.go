@@ -8,15 +8,19 @@ import (
 	"github.com/cheqd/cheqd-node/x/did/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 
+	"cosmossdk.io/log"
 	"cosmossdk.io/store"
-	dbm "github.com/cometbft/cometbft-db"
-	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/codec"
 
+	storemetrics "cosmossdk.io/store/metrics"
 	storetypes "cosmossdk.io/store/types"
+	appparams "github.com/cheqd/cheqd-node/app"
 	"github.com/cheqd/cheqd-node/x/did/keeper"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -55,13 +59,13 @@ func Setup() TestSetup {
 	// Init KVStore
 	db := dbm.NewMemDB()
 
-	keys := sdk.NewKVStoreKeys(
+	keys := storetypes.NewKVStoreKeys(
 		authtypes.StoreKey,
 		banktypes.StoreKey,
 		types.StoreKey,
 		stakingtypes.StoreKey,
 	)
-	dbStore := store.NewCommitMultiStore(db)
+	dbStore := store.NewCommitMultiStore(db, log.NewNopLogger(), storemetrics.NewNoOpMetrics())
 	dbStore.MountStoreWithDB(keys[types.StoreKey], storetypes.StoreTypeIAVL, nil)
 	dbStore.MountStoreWithDB(keys[authtypes.StoreKey], storetypes.StoreTypeIAVL, nil)
 	dbStore.MountStoreWithDB(keys[banktypes.StoreKey], storetypes.StoreTypeIAVL, nil)
@@ -79,20 +83,21 @@ func Setup() TestSetup {
 	}
 
 	// Init ParamsKeeper KVStore
-	paramsStoreKey := sdk.NewKVStoreKey(paramstypes.StoreKey)
-	paramsTStoreKey := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
+	paramsStoreKey := storetypes.NewKVStoreKey(paramstypes.StoreKey)
+	paramsTStoreKey := storetypes.NewTransientStoreKey(paramstypes.TStoreKey)
 
 	paramsKeeper := initParamsKeeper(Cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
-	accountKeeper := authkeeper.NewAccountKeeper(Cdc, keys[authtypes.StoreKey], authtypes.ProtoBaseAccount, maccPerms, "cheqd", authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	accountKeeper := authkeeper.NewAccountKeeper(Cdc, runtime.NewKVStoreService(keys[authtypes.StoreKey]), authtypes.ProtoBaseAccount, maccPerms, authcodec.NewBech32Codec("cheqd"), "cheqd", authtypes.NewModuleAddress(govtypes.ModuleName).String())
 	bankKeeper := bankkeeper.NewBaseKeeper(
 		Cdc,
-		keys[banktypes.StoreKey],
+		runtime.NewKVStoreService(keys[banktypes.StoreKey]),
 		accountKeeper,
 		nil,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		log.NewNopLogger(),
 	)
-	stakingKeeper := stakingkeeper.NewKeeper(Cdc, keys[stakingtypes.StoreKey], accountKeeper, bankKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
-	newKeeper := keeper.NewKeeper(Cdc, keys[types.StoreKey], getSubspace(types.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	stakingKeeper := stakingkeeper.NewKeeper(Cdc, runtime.NewKVStoreService(keys[stakingtypes.StoreKey]), accountKeeper, bankKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String(), authcodec.NewBech32Codec(appparams.ValidatorAddressPrefix), authcodec.NewBech32Codec(appparams.ConsNodeAddressPrefix))
+	newKeeper := keeper.NewKeeper(Cdc, runtime.NewKVStoreService(keys[types.StoreKey]), getSubspace(types.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 
 	// Create Tx
 	txBytes := make([]byte, 28)
@@ -106,10 +111,11 @@ func Setup() TestSetup {
 
 	msgServer := keeper.NewMsgServer(*newKeeper)
 	queryServer := keeper.NewQueryServer(*newKeeper)
+	goCtx := sdk.WrapSDKContext(ctx)
 
 	params := stakingtypes.DefaultParams()
 	params.BondDenom = "ncheq"
-	err := stakingKeeper.SetParams(ctx, params)
+	err := stakingKeeper.SetParams(goCtx, params)
 	if err != nil {
 		panic("error while setting up the params")
 	}
@@ -117,7 +123,7 @@ func Setup() TestSetup {
 		Cdc: Cdc,
 
 		SdkCtx: ctx,
-		StdCtx: sdk.WrapSDKContext(ctx),
+		StdCtx: goCtx,
 
 		Keeper:        *newKeeper,
 		MsgServer:     msgServer,
@@ -125,8 +131,7 @@ func Setup() TestSetup {
 		BankKeeper:    bankKeeper,
 		AccountKeeper: accountKeeper,
 	}
-
-	setup.Keeper.SetDidNamespace(&ctx, DidNamespace)
+	setup.Keeper.SetDidNamespace(&goCtx, DidNamespace)
 	return setup
 }
 

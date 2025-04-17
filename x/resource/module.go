@@ -10,6 +10,7 @@ import (
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 
 	"github.com/cheqd/cheqd-node/x/resource/client/cli"
+	"github.com/cheqd/cheqd-node/x/resource/exported"
 	migrationV3 "github.com/cheqd/cheqd-node/x/resource/migration/v3"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -27,14 +28,18 @@ import (
 	porttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
 )
 
-const ConsensusVersion = 3
+const ConsensusVersion = 4
 
 var (
-	_ module.BeginBlockAppModule = AppModule{}
-	_ module.EndBlockAppModule   = AppModule{}
-	_ module.AppModuleBasic      = AppModuleBasic{}
-	_ porttypes.IBCModule        = IBCModule{}
-	_ appmodule.AppModule        = AppModule{}
+	// _ module.BeginBlockAppModule = AppModule{}
+	// _ module.EndBlockAppModule   = AppModule{}
+	_ module.AppModuleBasic     = AppModuleBasic{}
+	_ porttypes.IBCModule       = IBCModule{}
+	_ appmodule.AppModule       = AppModule{}
+	_ appmodule.HasBeginBlocker = AppModule{}
+	_ appmodule.HasEndBlocker   = AppModule{}
+	_ module.HasServices        = AppModule{}
+	_ module.HasABCIGenesis     = AppModule{}
 )
 
 // IsOnePerModuleType implements the depinject.OnePerModuleType interface.
@@ -112,6 +117,8 @@ type AppModule struct {
 
 	keeper    keeper.Keeper
 	didKeeper didkeeper.Keeper
+	// legacySubspace is used solely for migration of x/params managed parameters
+	legacySubspace exported.Subspace
 }
 
 func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, cheqdKeeper didkeeper.Keeper) AppModule {
@@ -119,6 +126,7 @@ func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, cheqdKeeper didkeeper.K
 		AppModuleBasic: NewAppModuleBasic(cdc),
 		keeper:         keeper,
 		didKeeper:      cheqdKeeper,
+		// legacySubspace: subspace,
 	}
 }
 
@@ -145,6 +153,10 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 	if err := cfg.RegisterMigration(types.ModuleName, 2, migratorV3.Migrate2to3); err != nil {
 		panic(err)
 	}
+	m := keeper.NewMigrator(am.keeper, am.legacySubspace)
+	if err := cfg.RegisterMigration(types.ModuleName, 4, m.Migrate3to4); err != nil {
+		panic(fmt.Sprintf("failed to migrate x/resource from version 4 to 5: %v", err))
+	}
 }
 
 // RegisterInvariants registers the resource module's invariants.
@@ -167,10 +179,12 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 }
 
 // BeginBlock executes all ABCI BeginBlock logic respective to the resource module.
-func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
+func (am AppModule) BeginBlock(_ context.Context) error {
+	return nil
+}
 
 // EndBlock executes all ABCI EndBlock logic respective to the resource module. It
 // returns no validator updates.
-func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	return []abci.ValidatorUpdate{}
+func (am AppModule) EndBlock(_ context.Context) error {
+	return nil
 }

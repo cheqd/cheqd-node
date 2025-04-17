@@ -130,8 +130,6 @@ func initRootCmd(
 	txConfig client.TxConfig,
 	basicManager module.BasicManager,
 ) {
-	app.SetConfig()
-
 	rootCmd.AddCommand(
 		extendInit(genutilcli.InitCmd(basicManager, app.DefaultNodeHome)),
 		cmtcli.NewCompletionCmd(rootCmd, true),

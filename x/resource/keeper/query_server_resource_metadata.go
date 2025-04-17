@@ -5,7 +5,6 @@ import (
 
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -19,16 +18,23 @@ func (q queryServer) ResourceMetadata(c context.Context, req *types.QueryResourc
 
 	req.Normalize()
 
-	ctx := sdk.UnwrapSDKContext(c)
+	// ctx := sdk.UnwrapSDKContext(c)
 
 	// Validate corresponding DIDDoc exists
-	namespace := q.didKeeper.GetDidNamespace(&ctx)
+	namespace, err := q.didKeeper.GetDidNamespace(&c)
+	if err != nil {
+		return nil, err
+	}
 	did := didutils.JoinDID(didtypes.DidMethod, namespace, req.CollectionId)
-	if !q.didKeeper.HasDidDoc(&ctx, did) {
+	hasDidDoc, err := q.didKeeper.HasDidDoc(&c, did)
+	if err != nil {
+		return nil, err
+	}
+	if !hasDidDoc {
 		return nil, didtypes.ErrDidDocNotFound.Wrap(did)
 	}
 
-	metadata, err := q.GetResourceMetadata(&ctx, req.CollectionId, req.Id)
+	metadata, err := q.GetResourceMetadata(&c, req.CollectionId, req.Id)
 	if err != nil {
 		return nil, err
 	}

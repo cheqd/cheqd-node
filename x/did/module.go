@@ -9,6 +9,7 @@ import (
 	"cosmossdk.io/core/appmodule"
 
 	"github.com/cheqd/cheqd-node/x/did/client/cli"
+	"github.com/cheqd/cheqd-node/x/did/exported"
 	"github.com/cheqd/cheqd-node/x/did/types"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -26,8 +27,14 @@ import (
 )
 
 var (
-	_ module.AppModule      = AppModule{}
-	_ module.AppModuleBasic = AppModuleBasic{}
+	_ module.AppModuleBasic  = AppModule{}
+	_ module.HasABCIGenesis  = AppModule{}
+	_ module.HasServices     = AppModule{}
+	_ module.HasInvariants   = AppModule{}
+	_ module.HasABCIEndBlock = AppModule{}
+
+	_ appmodule.AppModule       = AppModule{}
+	_ appmodule.HasBeginBlocker = AppModule{}
 )
 
 // ----------------------------------------------------------------------------
@@ -102,6 +109,8 @@ type AppModule struct {
 	AppModuleBasic
 
 	keeper keeper.Keeper
+	// legacySubspace is used solely for migration of x/params managed parameters
+	legacySubspace exported.Subspace
 }
 
 var _ appmodule.AppModule = AppModule{}
@@ -124,7 +133,7 @@ func NewAppModule(cdc codec.Codec, keeper keeper.Keeper) AppModule {
 // introduced by the module. To avoid wrong/empty versions, the initial version
 // should be set to 1.
 func (am AppModule) ConsensusVersion() uint64 {
-	return 4
+	return 5
 }
 
 // Name returns the cheqd module's name.
@@ -137,6 +146,12 @@ func (am AppModule) Name() string {
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewQueryServer(am.keeper))
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+
+	m := keeper.NewMigrator(am.keeper, am.legacySubspace)
+
+	if err := cfg.RegisterMigration(types.ModuleName, 4, m.Migrate4to5); err != nil {
+		panic(fmt.Sprintf("failed to migrate x/did from version 4 to 5: %v", err))
+	}
 }
 
 // RegisterInvariants registers the cheqd module's invariants.
@@ -159,10 +174,12 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 }
 
 // BeginBlock executes all ABCI BeginBlock logic respective to the cheqd module.
-func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
+func (am AppModule) BeginBlock(_ context.Context) error {
+	return nil
+}
 
 // EndBlock executes all ABCI EndBlock logic respective to the cheqd module. It
 // returns no validator updates.
-func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	return []abci.ValidatorUpdate{}
+func (am AppModule) EndBlock(_ context.Context) ([]abci.ValidatorUpdate, error) {
+	return []abci.ValidatorUpdate{}, nil
 }

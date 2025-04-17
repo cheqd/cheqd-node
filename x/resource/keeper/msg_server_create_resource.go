@@ -7,12 +7,12 @@ import (
 	"fmt"
 
 	"github.com/cheqd/cheqd-node/x/resource/utils"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	didutils "github.com/cheqd/cheqd-node/x/did/utils"
 	"github.com/cheqd/cheqd-node/x/resource/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
@@ -29,9 +29,12 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	msg.Normalize()
 
 	// Validate corresponding DIDDoc exists
-	namespace := k.didKeeper.GetDidNamespace(&ctx)
+	namespace, err := k.didKeeper.GetDidNamespace(&goCtx)
+	if err != nil {
+		return nil, err
+	}
 	did := didutils.JoinDID(didtypes.DidMethod, namespace, msg.Payload.CollectionId)
-	didDoc, err := k.didKeeper.GetLatestDidDoc(&ctx, did)
+	didDoc, err := k.didKeeper.GetLatestDidDoc(&goCtx, did)
 	if err != nil {
 		return nil, err
 	}
@@ -48,13 +51,13 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	}
 
 	// Validate Resource doesn't exist
-	if k.HasResource(&ctx, msg.Payload.CollectionId, msg.Payload.Id) {
+	if k.HasResource(goCtx, msg.Payload.CollectionId, msg.Payload.Id) {
 		return nil, types.ErrResourceExists.Wrap(msg.Payload.Id)
 	}
 
 	// We can use the same signers as for DID creation because didDoc stays the same
 	signers := didkeeper.GetSignerDIDsForDIDCreation(*didDoc.DidDoc)
-	err = didkeeper.VerifyAllSignersHaveAllValidSignatures(&k.didKeeper, &ctx, map[string]didtypes.DidDocWithMetadata{},
+	err = didkeeper.VerifyAllSignersHaveAllValidSignatures(&k.didKeeper, &goCtx, map[string]didtypes.DidDocWithMetadata{},
 		signBytes, signers, msg.Signatures)
 	if err != nil {
 		return nil, err
@@ -75,7 +78,7 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	resource.Metadata.AlsoKnownAs = append(resource.Metadata.AlsoKnownAs, &defaultAlternativeURL)
 
 	// Persist resource
-	err = k.AddNewResourceVersion(&ctx, &resource)
+	err = k.AddNewResourceVersion(goCtx, &resource)
 	if err != nil {
 		return nil, types.ErrInternal.Wrapf(err.Error())
 	}

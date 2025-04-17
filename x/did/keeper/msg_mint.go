@@ -10,6 +10,10 @@ import (
 )
 
 func (k MsgServer) Mint(goCtx context.Context, req *types.MsgMint) (res *types.MsgMintResponse, err error) {
+
+	if err := req.ValidateBasic(); err != nil {
+		return nil, err
+	}
 	if k.authority != req.Authority {
 		return nil, errors.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", k.authority, req.Authority)
 	}
