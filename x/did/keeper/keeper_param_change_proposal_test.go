@@ -63,7 +63,6 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 	err := keeperSuite.SetupTest()
 
 	Expect(err).To(BeNil())
-	// ✅ Only set authority if the test case didn't define one
 	if strings.TrimSpace(testCase.input.Authority) == "" {
 		testCase.input.Authority = keeperSuite.didKeeper.GetAuthority()
 	}
