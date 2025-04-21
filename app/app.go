@@ -154,10 +154,12 @@ import (
 
 	// unnamed import of statik for swagger UI support
 	cheqdante "github.com/cheqd/cheqd-node/ante"
+	didv2 "github.com/cheqd/cheqd-node/api/v2/cheqd/did/v2"
 	_ "github.com/cheqd/cheqd-node/app/client/docs/statik"
 	upgradeV3 "github.com/cheqd/cheqd-node/app/upgrades/v3"
 	upgradeV4 "github.com/cheqd/cheqd-node/app/upgrades/v4"
 	"github.com/cosmos/cosmos-sdk/runtime"
+	protov2 "google.golang.org/protobuf/proto"
 )
 
 var (
@@ -259,6 +261,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+	SetConfig()
 
 	DefaultNodeHome = filepath.Join(userHomeDir, Home)
 }
@@ -268,16 +271,22 @@ func New(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
-	interfaceRegistry, _ := types.NewInterfaceRegistryWithOptions(types.InterfaceRegistryOptions{
-		ProtoFiles: proto.HybridResolver,
-		SigningOptions: signing.Options{
-			AddressCodec: address.Bech32Codec{
-				Bech32Prefix: AccountAddressPrefix,
-			},
-			ValidatorAddressCodec: address.Bech32Codec{
-				Bech32Prefix: ValidatorAddressPrefix,
-			},
+	signopts := signing.Options{
+		AddressCodec: address.Bech32Codec{
+			Bech32Prefix: AccountAddressPrefix,
 		},
+		ValidatorAddressCodec: address.Bech32Codec{
+			Bech32Prefix: ValidatorAddressPrefix,
+		},
+	}
+	//TODO: add customgetSigners for resoure module
+	signopts.DefineCustomGetSigners(protov2.MessageName(&didv2.MsgCreateDidDoc{}), didtypes.CreateGetSigners(&signopts))
+	signopts.DefineCustomGetSigners(protov2.MessageName(&didv2.MsgUpdateDidDoc{}), didtypes.CreateGetSigners(&signopts))
+	signopts.DefineCustomGetSigners(protov2.MessageName(&didv2.MsgDeactivateDidDoc{}), didtypes.CreateGetSigners(&signopts))
+
+	interfaceRegistry, _ := types.NewInterfaceRegistryWithOptions(types.InterfaceRegistryOptions{
+		ProtoFiles:     proto.HybridResolver,
+		SigningOptions: signopts,
 	})
 	appCodec := codec.NewProtoCodec(interfaceRegistry)
 	legacyAmino := codec.NewLegacyAmino()
