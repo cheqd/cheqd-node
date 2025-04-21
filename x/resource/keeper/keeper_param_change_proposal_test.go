@@ -42,11 +42,6 @@ func (suite *KeeperTestSuite) SetupTest() error {
 	}
 
 	suite.msgSvr = resourcekeeper.NewMsgServerImpl(suite.app.ResourceKeeper, suite.app.DidKeeper)
-	// Setup query client
-	// queryHelper := baseapp.NewQueryServerTestHelper(suite.ctx, suite.app.InterfaceRegistry())
-	// resourcetypes.RegisterQueryServer(queryHelper, suite.resourceKeeper)
-	// suite.queryClient = resourcetypes.NewQueryClient(queryHelper)
-
 	return nil
 }
 

@@ -155,6 +155,7 @@ import (
 	// unnamed import of statik for swagger UI support
 	cheqdante "github.com/cheqd/cheqd-node/ante"
 	didv2 "github.com/cheqd/cheqd-node/api/v2/cheqd/did/v2"
+	resourcev2 "github.com/cheqd/cheqd-node/api/v2/cheqd/resource/v2"
 	_ "github.com/cheqd/cheqd-node/app/client/docs/statik"
 	upgradeV3 "github.com/cheqd/cheqd-node/app/upgrades/v3"
 	upgradeV4 "github.com/cheqd/cheqd-node/app/upgrades/v4"
@@ -279,7 +280,7 @@ func New(
 			Bech32Prefix: ValidatorAddressPrefix,
 		},
 	}
-	//TODO: add customgetSigners for resoure module
+	signopts.DefineCustomGetSigners(protov2.MessageName(&resourcev2.MsgCreateResource{}), resourcetypes.CreateGetSigners(&signopts))
 	signopts.DefineCustomGetSigners(protov2.MessageName(&didv2.MsgCreateDidDoc{}), didtypes.CreateGetSigners(&signopts))
 	signopts.DefineCustomGetSigners(protov2.MessageName(&didv2.MsgUpdateDidDoc{}), didtypes.CreateGetSigners(&signopts))
 	signopts.DefineCustomGetSigners(protov2.MessageName(&didv2.MsgDeactivateDidDoc{}), didtypes.CreateGetSigners(&signopts))
