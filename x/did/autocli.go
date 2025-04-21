@@ -41,6 +41,11 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 						{ProtoField: "id"},
 					},
 				},
+				{
+					RpcMethod: "Params",
+					Use:       "params",
+					Short:     "Query the current did parameters",
+				},
 			},
 		},
 		Tx: &autocliv1.ServiceCommandDescriptor{
