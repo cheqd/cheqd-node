@@ -13,7 +13,7 @@ const (
 	ModuleName = "did"
 )
 
-var ParamsKey = []byte{0x09}
+var ParamsKey = []byte("feeparams")
 
 func MigrateStore(ctx sdk.Context, storeService store.KVStoreService, legacySubspace exported.Subspace, cdc codec.BinaryCodec) error {
 	store := storeService.OpenKVStore(ctx)

@@ -280,6 +280,7 @@ func New(
 		},
 	}
 	//TODO: add customgetSigners for resoure module
+	signopts.DefineCustomGetSigners("cheqd.resource.v2.MsgCreateResource", nil)
 	signopts.DefineCustomGetSigners(protov2.MessageName(&didv2.MsgCreateDidDoc{}), didtypes.CreateGetSigners(&signopts))
 	signopts.DefineCustomGetSigners(protov2.MessageName(&didv2.MsgUpdateDidDoc{}), didtypes.CreateGetSigners(&signopts))
 	signopts.DefineCustomGetSigners(protov2.MessageName(&didv2.MsgDeactivateDidDoc{}), didtypes.CreateGetSigners(&signopts))

@@ -964,7 +964,7 @@ var xxx_messageInfo_MsgMintResponse proto.InternalMessageInfo
 type MsgUpdateParams struct {
 	// authority is the address that controls the module (defaults to x/gov unless overwritten).
 	Authority string `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
-	// params defines the x/bank parameters to update.
+	// params defines the x/did parameters to update.
 	//
 	// NOTE: All parameters must be supplied.
 	Params FeeParams `protobuf:"bytes,2,opt,name=params,proto3" json:"params"`
