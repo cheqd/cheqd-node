@@ -27,7 +27,7 @@ type (
 		DidCount         collections.Item[uint64]
 		LatestDidVersion collections.Map[string, string]
 		DidDocuments     collections.Map[collections.Pair[string, string], types.DidDocWithMetadata]
-		Params           collections.Item[types.FeeParams]
+		Paramstore       collections.Item[types.FeeParams]
 	}
 )
 
@@ -45,7 +45,7 @@ func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSp
 		DidCount:         collections.NewItem(sb, types.DidDocCountKeyPrefix, "did_count", collections.Uint64Value),
 		LatestDidVersion: collections.NewMap(sb, types.LatestDidDocVersionKeyPrefix, "latest_did", collections.StringKey, collections.StringValue),
 		DidDocuments:     collections.NewMap(sb, types.DidDocVersionKeyPrefix, "did_version", collections.PairKeyCodec(collections.StringKey, collections.StringKey), codec.CollValue[types.DidDocWithMetadata](cdc)),
-		Params:           collections.NewItem(sb, types.ParamsKey, "params", codec.CollValue[types.FeeParams](cdc)),
+		Paramstore:       collections.NewItem(sb, types.ParamsKey, "params", codec.CollValue[types.FeeParams](cdc)),
 	}
 	schema, err := sb.Build()
 	if err != nil {
@@ -66,11 +66,11 @@ func (k Keeper) GetAuthority() string {
 
 // GetParams gets the auth module's parameters.
 func (k Keeper) GetParams(ctx context.Context) (types.FeeParams, error) {
-	return k.Params.Get(ctx)
+	return k.Paramstore.Get(ctx)
 }
 
 func (k Keeper) SetParams(ctx context.Context, params types.FeeParams) error {
-	err := k.Params.Set(ctx, params)
+	err := k.Paramstore.Set(ctx, params)
 	if err != nil {
 		return err
 	}
