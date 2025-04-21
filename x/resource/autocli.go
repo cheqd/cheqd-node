@@ -26,22 +26,22 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					},
 				},
 				{
-					RpcMethod: "CollectionMetadata",
+					RpcMethod: "CollectionResources",
 					Use:       "collection-metadata [collection-id]",
 					Short:     "Query metadata for an entire Collection",
-					Example:   fmt.Sprintf("%s query resource collection-metadata c82f2b02-bdab-4dd7-b833-3e143745d612 wGHEXrZvJxR8vw5P3UWH1j", version.AppName),
+					Example:   fmt.Sprintf("%s query resource collection-metadata c82f2b02-bdab-4dd7-b833-3e143745d612", version.AppName),
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
 						{ProtoField: "collection_id"},
 					},
 				},
 				{
 					RpcMethod: "ResourceMetadata",
-					Use:       "metadata [collection-id] [resource-id]",
+					Use:       "metadata [collection-id] [id]",
 					Short:     "Query metadata for a specific resource",
 					Example:   fmt.Sprintf("%s query resource metadata c82f2b02-bdab-4dd7-b833-3e143745d612 wGHEXrZvJxR8vw5P3UWH1j", version.AppName),
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
 						{ProtoField: "collection_id"},
-						{ProtoField: "resource-id"},
+						{ProtoField: "id"},
 					},
 				},
 			},
