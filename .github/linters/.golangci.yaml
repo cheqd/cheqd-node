@@ -48,7 +48,7 @@ linters-settings:
       - badCall # Remove this after CI workflow PR
 
   gofumpt:
-    lang-version: "1.21"
+    lang-version: "1.23.0"
 
   misspell:
     ignore-words:
@@ -58,7 +58,7 @@ linters-settings:
 
   stylecheck:
     # Select the Go version to target.
-    go: "1.21"
+    go: "1.23"
     # STxxxx checks in https://staticcheck.io/docs/configuration/options/#checks
     # Default: ["*"]
     checks: ["all"]
