@@ -8,7 +8,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/version"
 )
-a
 
 // AutoCLIOptions implements the autocli.HasAutoCLIConfig interface.
 func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
