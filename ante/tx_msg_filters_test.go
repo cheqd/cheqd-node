@@ -13,7 +13,7 @@ import (
 )
 
 var _ = Describe("TxMsgFilters", func() {
-	var rounds = 1_000_000
+	rounds := 1_000_000
 
 	BeforeEach(func() {
 		ante.TaxableMsgFees = ante.TaxableMsgFee{
