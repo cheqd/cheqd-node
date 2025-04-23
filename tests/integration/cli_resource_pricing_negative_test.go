@@ -43,7 +43,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		tmpDir = GinkgoT().TempDir()
 
 		// Query did fee params
-		res, err := cli.QueryParams(didtypes.ModuleName, string(didtypes.ParamsKey))
+		res, err := cli.QueryParams(didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
 		Expect(err).To(BeNil())
 		err = helpers.Codec.UnmarshalJSON([]byte(res.Value), &didFeeParams)
 		Expect(err).To(BeNil())

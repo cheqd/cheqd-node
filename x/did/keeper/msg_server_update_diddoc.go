@@ -11,7 +11,6 @@ import (
 const UpdatedPostfix string = "-updated"
 
 func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDoc) (*types.MsgUpdateDidDocResponse, error) {
-
 	if err := msg.ValidateBasic(); err != nil {
 		return nil, err
 	}

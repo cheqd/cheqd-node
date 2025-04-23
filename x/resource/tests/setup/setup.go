@@ -192,7 +192,10 @@ func Setup() TestSetup {
 		IBCModule:           ibcModule,
 	}
 	goCtx := sdk.WrapSDKContext(ctx)
-	setup.Keeper.SetDidNamespace(&goCtx, didsetup.DidNamespace)
+	err = setup.Keeper.SetDidNamespace(&goCtx, didsetup.DidNamespace)
+	if err != nil {
+		panic(err)
+	}
 
 	return setup
 }

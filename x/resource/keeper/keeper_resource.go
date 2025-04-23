@@ -134,7 +134,6 @@ func (k Keeper) GetResourceCollection(ctx *context.Context, collectionID string)
 		resources = append(resources, &metadataCopy)
 		return false, nil
 	})
-
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +154,6 @@ func (k Keeper) GetLastResourceVersionMetadata(ctx *context.Context, collectionI
 		}
 		return false, nil // Continue iteration
 	})
-
 	if err != nil {
 		return types.Metadata{}, false, err
 	}
@@ -206,7 +204,6 @@ func (k Keeper) GetAllResources(ctx context.Context) (list []*types.ResourceWith
 		resources = append(resources, &resource)
 		return true
 	})
-
 	if err != nil {
 		return nil, err
 	}

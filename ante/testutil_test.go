@@ -61,7 +61,7 @@ var (
 
 // TestAccount represents an account used in the tests in x/auth/ante.
 type TestAccount struct {
-	acc  authtypes.AccountI
+	acc  sdk.AccountI
 	priv cryptotypes.PrivKey
 }
 
@@ -95,7 +95,7 @@ func createTestApp(isCheckTx bool) (*cheqdapp.TestApp, sdk.Context, error) {
 		return nil, sdk.Context{}, err
 	}
 	resourceFeeParams := resourcetypes.DefaultGenesis().FeeParams
-	app.ResourceKeeper.SetParams(ctx, *resourceFeeParams)
+	_ = app.ResourceKeeper.SetParams(ctx, *resourceFeeParams)
 	err = app.FeeMarketKeeper.SetParams(ctx, types.NewParams(DefaultWindow, DefaultAlpha, DefaultBeta, DefaultGamma, DefaultDelta,
 		DefaultMaxBlockUtilization, DefaultMinBaseGasPrice, DefaultMinLearningRate, DefaultMaxLearningRate, DefaultFeeDenom, true,
 	))

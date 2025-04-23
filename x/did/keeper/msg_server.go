@@ -7,7 +7,6 @@ import (
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/did/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 )
 
@@ -160,13 +159,12 @@ func VerifyAllSignersHaveAtLeastOneValidSignature(k *Keeper, ctx *context.Contex
 }
 
 func (k MsgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBurnResponse, error) {
-
 	if err := msg.ValidateBasic(); err != nil {
 		return nil, err
 	}
 	sdkCtx := sdk.UnwrapSDKContext(goCtx)
 	accountI := k.Keeper.accountKeeper.GetAccount(sdkCtx, sdk.AccAddress(msg.FromAddress))
-	_, ok := accountI.(authtypes.ModuleAccountI)
+	_, ok := accountI.(sdk.ModuleAccountI)
 	if ok {
 		return nil, types.ErrBurnFromModuleAccount
 	}

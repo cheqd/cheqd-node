@@ -45,7 +45,7 @@ func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSp
 		DidCount:         collections.NewItem(sb, types.DidDocCountKeyPrefix, "did_count", collections.Uint64Value),
 		LatestDidVersion: collections.NewMap(sb, types.LatestDidDocVersionKeyPrefix, "latest_did", collections.StringKey, collections.StringValue),
 		DidDocuments:     collections.NewMap(sb, types.DidDocVersionKeyPrefix, "did_version", collections.PairKeyCodec(collections.StringKey, collections.StringKey), codec.CollValue[types.DidDocWithMetadata](cdc)),
-		Paramstore:       collections.NewItem(sb, types.ParamsKey, "params", codec.CollValue[types.FeeParams](cdc)),
+		Paramstore:       collections.NewItem(sb, types.ParamStoreKeyFeeParams, "params", codec.CollValue[types.FeeParams](cdc)),
 	}
 	schema, err := sb.Build()
 	if err != nil {

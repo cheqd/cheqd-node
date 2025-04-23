@@ -122,8 +122,8 @@ func TestRunMigrations(t *testing.T) {
 	}
 
 	// Initialize the chain
-	app.InitChain(&abci.RequestInitChain{})
-	app.Commit()
+	_, _ = app.InitChain(&abci.RequestInitChain{})
+	_, _ = app.Commit()
 
 	testCases := []struct {
 		name         string

@@ -15,6 +15,7 @@ func NewMsgBurn(sender string, amount sdk.Coins) *MsgBurn {
 		Amount:      amount,
 	}
 }
+
 func (m MsgBurn) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(m.FromAddress)
 	if err != nil {

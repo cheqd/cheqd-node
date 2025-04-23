@@ -131,7 +131,10 @@ func Setup() TestSetup {
 		BankKeeper:    bankKeeper,
 		AccountKeeper: accountKeeper,
 	}
-	setup.Keeper.SetDidNamespace(&goCtx, DidNamespace)
+	err = setup.Keeper.SetDidNamespace(&goCtx, DidNamespace)
+	if err != nil {
+		panic(err)
+	}
 	return setup
 }
 

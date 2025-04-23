@@ -40,7 +40,6 @@ type Keeper struct {
 }
 
 func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSpace types.ParamSubspace, portKeeper types.PortKeeper, scopedKeeper exported.ScopedKeeper, authority string) *Keeper {
-
 	sb := collections.NewSchemaBuilder(storeService)
 	// Define the port collection
 

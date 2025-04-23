@@ -21,7 +21,6 @@ type KeeperTestSuite struct {
 	app            *cheqdapp.TestApp
 	ctx            sdk.Context
 	resourceKeeper resourcekeeper.Keeper
-	queryClient    resourcetypes.QueryClient
 	msgSvr         resourcetypes.MsgServer
 }
 

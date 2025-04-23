@@ -8,7 +8,6 @@ import (
 )
 
 func (k MsgServer) CreateDidDoc(goCtx context.Context, msg *types.MsgCreateDidDoc) (*types.MsgCreateDidDocResponse, error) {
-
 	if err := msg.ValidateBasic(); err != nil {
 		return nil, err
 	}

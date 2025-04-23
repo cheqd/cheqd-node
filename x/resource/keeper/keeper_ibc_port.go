@@ -33,7 +33,6 @@ func (k Keeper) BindPort(ctx context.Context, portID string) error {
 
 // ClaimCapability allows the resource module to claim a capability that IBC module passes to it
 func (k Keeper) ClaimCapability(ctx context.Context, cap *capabilitytypes.Capability, name string) error {
-
 	return k.scopedKeeper.ClaimCapability(sdktypes.UnwrapSDKContext(ctx), cap, name)
 }
 

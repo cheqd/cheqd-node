@@ -12,12 +12,11 @@ var (
 )
 
 // NewParams creates a new FeeParams object with specified parameters
-func (p *FeeParams) ParamSetPairs() paramtypes.ParamSetPairs {
+func (tfp *FeeParams) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
-
-		paramtypes.NewParamSetPair(KeyResourceImageFee, p.Image, validateImage),
-		paramtypes.NewParamSetPair(KeyCreateResourceJSONFee, p.Json, validateJSON),
-		paramtypes.NewParamSetPair(KeyCreateResourceKeyFee, p.Default, validateDefault),
-		paramtypes.NewParamSetPair(KeyBurnFactor, p.BurnFactor, validateBurnFactor),
+		paramtypes.NewParamSetPair(KeyResourceImageFee, tfp.Image, validateImage),
+		paramtypes.NewParamSetPair(KeyCreateResourceJSONFee, tfp.Json, validateJSON),
+		paramtypes.NewParamSetPair(KeyCreateResourceKeyFee, tfp.Default, validateDefault),
+		paramtypes.NewParamSetPair(KeyBurnFactor, tfp.BurnFactor, validateBurnFactor),
 	}
 }

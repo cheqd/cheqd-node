@@ -10,7 +10,6 @@ import (
 )
 
 func (k MsgServer) Mint(goCtx context.Context, req *types.MsgMint) (res *types.MsgMintResponse, err error) {
-
 	if err := req.ValidateBasic(); err != nil {
 		return nil, err
 	}

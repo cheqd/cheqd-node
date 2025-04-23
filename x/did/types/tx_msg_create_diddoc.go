@@ -13,6 +13,7 @@ func NewMsgCreateDid(payload *MsgCreateDidDocPayload, signatures []*SignInfo) *M
 		Signatures: signatures,
 	}
 }
+
 func (msg *MsgCreateDidDoc) ValidateBasic() error {
 	err := msg.Validate(nil)
 	if err != nil {

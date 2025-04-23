@@ -3,7 +3,6 @@ package types
 import (
 	context "context"
 
-	"github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
@@ -15,8 +14,8 @@ type ParamSubspace interface {
 }
 
 type AccountKeeper interface {
-	GetAccount(context.Context, sdk.AccAddress) types.AccountI
-	GetModuleAccount(ctx context.Context, moduleName string) types.ModuleAccountI
+	GetAccount(context.Context, sdk.AccAddress) sdk.AccountI
+	GetModuleAccount(ctx context.Context, moduleName string) sdk.ModuleAccountI
 }
 
 type BankKeeper interface {

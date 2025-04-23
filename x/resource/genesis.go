@@ -18,10 +18,14 @@ func InitGenesis(ctx context.Context, k keeper.Keeper, genState *types.GenesisSt
 	}
 
 	// set fee params
-	k.SetParams(ctx, *genState.FeeParams)
+	if err := k.SetParams(ctx, *genState.FeeParams); err != nil {
+		panic(err)
+	}
 
 	// set ibc port binding
-	k.SetPort(ctx, types.ResourcePortID)
+	if err := k.SetPort(ctx, types.ResourcePortID); err != nil {
+		panic(err)
+	}
 
 	// Bind Port claims the capability over the ResourcePortID
 	if !k.IsBound(ctx, types.ResourcePortID) {
@@ -44,7 +48,6 @@ func ExportGenesis(ctx context.Context, k keeper.Keeper) *types.GenesisState {
 	feeParams, err := k.GetParams(ctx)
 	if err != nil {
 		panic(fmt.Sprintln("Cannot get fee params: %s", err.Error()))
-
 	}
 
 	return &types.GenesisState{

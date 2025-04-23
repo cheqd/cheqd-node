@@ -15,11 +15,11 @@ import (
 //go:generate mockery --name AccountKeeper --filename mock_account_keeper.go
 type AccountKeeper interface {
 	GetParams(ctx context.Context) (params authtypes.Params)
-	GetAccount(ctx context.Context, addr sdk.AccAddress) authtypes.AccountI
-	SetAccount(ctx context.Context, acc authtypes.AccountI)
+	GetAccount(ctx context.Context, addr sdk.AccAddress) sdk.AccountI
+	SetAccount(ctx context.Context, acc sdk.AccountI)
 	GetModuleAddress(moduleName string) sdk.AccAddress
-	GetModuleAccount(ctx context.Context, name string) authtypes.ModuleAccountI
-	NewAccountWithAddress(ctx context.Context, addr sdk.AccAddress) authtypes.AccountI
+	GetModuleAccount(ctx context.Context, name string) sdk.ModuleAccountI
+	NewAccountWithAddress(ctx context.Context, addr sdk.AccAddress) sdk.AccountI
 }
 
 // BankKeeper defines the contract needed for supply related APIs.

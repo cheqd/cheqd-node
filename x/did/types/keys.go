@@ -28,5 +28,5 @@ var (
 	DidNamespaceKeyPrefix        = collections.NewPrefix("did-namespace:")
 	LatestDidDocVersionKeyPrefix = collections.NewPrefix("did-latest:")
 	DidDocVersionKeyPrefix       = collections.NewPrefix("did-version:")
-	ParamsKey                    = collections.NewPrefix("feeparams")
+	ParamStoreKeyFeeParams       = collections.NewPrefix("feeparams")
 )

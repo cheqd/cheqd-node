@@ -152,7 +152,10 @@ func (k Keeper) SetLatestDidDocVersion(ctx *context.Context, did, version string
 		if err != nil {
 			return err
 		}
-		k.SetDidDocCount(ctx, count+1)
+		err = k.SetDidDocCount(ctx, count+1)
+		if err != nil {
+			return err
+		}
 	}
 
 	return k.LatestDidVersion.Set(*ctx, did, version)
