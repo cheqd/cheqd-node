@@ -2,7 +2,7 @@
 ###        STAGE 1: Build node binary pre-requisites        ###
 ###############################################################
 
-FROM golang:1.22-alpine AS builder
+FROM golang:1.23-alpine AS builder
 
 # Install minimum necessary dependencies
 ENV PACKAGES="curl make git libc-dev bash gcc linux-headers findutils"

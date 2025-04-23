@@ -203,7 +203,7 @@ generate:
 ###############################################################################
 
 
-golangci_version=v1.56.2
+golangci_version=v1.60.3
 
 lint:
 	@echo "--> Running linter"
