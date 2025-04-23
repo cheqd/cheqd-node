@@ -1,5 +1,3 @@
-//go:build integration
-
 package integration
 
 import (
@@ -28,7 +26,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		tmpDir = GinkgoT().TempDir()
 
 		// Query did fee params
-		res, err := cli.QueryParams(didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
+		res, err := cli.QueryParams(didtypes.ModuleName, string(didtypes.ParamsKey))
 		Expect(err).To(BeNil())
 		err = helpers.Codec.UnmarshalJSON([]byte(res.Value), &didFeeParams)
 		Expect(err).To(BeNil())

@@ -1,10 +1,9 @@
-//go:build integration
-
 package integration
 
 import (
 	"crypto/ed25519"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
@@ -44,7 +43,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		tmpDir = GinkgoT().TempDir()
 
 		// Query did fee params
-		res, err := cli.QueryParams(didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
+		res, err := cli.QueryParams(didtypes.ModuleName, string(didtypes.ParamsKey))
 		Expect(err).To(BeNil())
 		err = helpers.Codec.UnmarshalJSON([]byte(res.Value), &didFeeParams)
 		Expect(err).To(BeNil())
@@ -101,7 +100,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the json resource message with invalid denom")
-		invalidTax := sdk.NewCoin("invalid", sdk.NewInt(resourceFeeParams.Json.Amount.Int64()))
+		invalidTax := sdk.NewCoin("invalid", sdkmath.NewInt(resourceFeeParams.Json.Amount.Int64()))
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -123,7 +122,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the image resource message with invalid denom")
-		invalidTax := sdk.NewCoin("invalid", sdk.NewInt(resourceFeeParams.Image.Amount.Int64()))
+		invalidTax := sdk.NewCoin("invalid", sdkmath.NewInt(resourceFeeParams.Image.Amount.Int64()))
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -145,7 +144,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the default resource message with invalid denom")
-		invalidTax := sdk.NewCoin("invalid", sdk.NewInt(resourceFeeParams.Default.Amount.Int64()))
+		invalidTax := sdk.NewCoin("invalid", sdkmath.NewInt(resourceFeeParams.Default.Amount.Int64()))
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -167,7 +166,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the json resource message with lower amount than required")
-		lowerTax := sdk.NewCoin(resourceFeeParams.Json.Denom, sdk.NewInt(resourceFeeParams.Json.Amount.Int64()-1))
+		lowerTax := sdk.NewCoin(resourceFeeParams.Json.Denom, sdkmath.NewInt(resourceFeeParams.Json.Amount.Int64()-1))
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -189,7 +188,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the image resource message with lower amount than required")
-		lowerTax := sdk.NewCoin(resourceFeeParams.Image.Denom, sdk.NewInt(resourceFeeParams.Image.Amount.Int64()-1))
+		lowerTax := sdk.NewCoin(resourceFeeParams.Image.Denom, sdkmath.NewInt(resourceFeeParams.Image.Amount.Int64()-1))
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -211,7 +210,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the default resource message with lower amount than required")
-		lowerTax := sdk.NewCoin(resourceFeeParams.Default.Denom, sdk.NewInt(resourceFeeParams.Default.Amount.Int64()-1))
+		lowerTax := sdk.NewCoin(resourceFeeParams.Default.Denom, sdkmath.NewInt(resourceFeeParams.Default.Amount.Int64()-1))
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -304,7 +303,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("submitting the json resource message with double the tax")
 		tax := resourceFeeParams.Json
-		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.Amount.Mul(sdk.NewInt(2)))
+		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.Amount.Mul(sdkmath.NewInt(2)))
 		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -338,7 +337,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("submitting the image resource message with double the tax")
 		tax := resourceFeeParams.Image
-		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.Amount.Mul(sdk.NewInt(2)))
+		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.Amount.Mul(sdkmath.NewInt(2)))
 		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -372,7 +371,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("submitting the default resource message with double the tax")
 		tax := resourceFeeParams.Default
-		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.Amount.Mul(sdk.NewInt(2)))
+		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.Amount.Mul(sdkmath.NewInt(2)))
 		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
