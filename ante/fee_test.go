@@ -342,13 +342,13 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 
 		// msg and signatures
 		msg := SandboxResource()
-		feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(2_500_000_000)))
+		feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(2_500_000_000)))
 		gasLimit := uint64(2_000_000)
 		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
 		s.txBuilder.SetFeeAmount(feeAmount)
 		s.txBuilder.SetGasLimit(gasLimit)
 		s.txBuilder.SetFeePayer(addr1)
-		s.ctx = s.ctx.WithMinGasPrices(sdk.NewDecCoins(sdk.NewDecCoinFromDec(didtypes.BaseMinimalDenom, sdk.MustNewDecFromStr("5000"))))
+		s.ctx = s.ctx.WithMinGasPrices(sdk.NewDecCoins(sdk.NewDecCoinFromDec(didtypes.BaseMinimalDenom, math.LegacyMustNewDecFromStr("5000"))))
 
 		privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
 		tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
@@ -357,8 +357,8 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		// set account with sufficient funds
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		amount := sdk.NewInt(100_000_000_000)
-		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
+		amount := math.NewInt(100_000_000_000)
+		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
@@ -383,7 +383,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
-		Expect(amount.Sub(sdk.NewInt(feeParams.Json.Amount.Int64()))).To(Equal(balance.Amount), "Tax was not subtracted from the fee payer")
+		Expect(amount.Sub(math.NewInt(feeParams.Json.Amount.Int64()))).To(Equal(balance.Amount), "Tax was not subtracted from the fee payer")
 
 		// get supply after tx
 		supplyAfterDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
