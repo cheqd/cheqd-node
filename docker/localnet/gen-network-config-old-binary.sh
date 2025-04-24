@@ -25,8 +25,8 @@ function init_node() {
   echo "[${NODE_MONIKER}] Initializing"
 
   cheqd-noded init "${NODE_MONIKER}" --chain-id "${CHAIN_ID}" --home "${NODE_HOME}" 2> /dev/null
-  cheqd-noded tendermint show-node-id --home "${NODE_HOME}" > "${NODE_HOME}/node_id.txt"
-  cheqd-noded tendermint show-validator --home "${NODE_HOME}" > "${NODE_HOME}/node_val_pubkey.txt"
+  cheqd-noded tendermint show-node-id --home "${NODE_HOME}" 2>&1 > "${NODE_HOME}/node_id.txt" 2>&1
+  cheqd-noded tendermint show-validator --home "${NODE_HOME}" 2>&1 > "${NODE_HOME}/node_val_pubkey.txt" 2>&1
 }
 
 function configure_node() {
@@ -64,6 +64,7 @@ function configure_genesis() {
 
   # Short voting period
   sed -i $SED_EXT 's/"voting_period": "172800s"/"voting_period": "12s"/' "${GENESIS}"
+  sed -i $SED_EXT 's/"expedited_voting_period": "86400s"/"expedited_voting_period": "10s"/' "${GENESIS}"
 
   # Test accounts
   BASE_ACCOUNT_1="cheqd1rnr5jrt4exl0samwj0yegv99jeskl0hsxmcz96"
@@ -205,8 +206,8 @@ do
   cheqd-noded keys list --keyring-backend "test" --home "${NODE_HOME}"
   cheqd-noded genesis add-genesis-account "operator-$i" 20000000000000000ncheq --keyring-backend "test" --home "${NODE_HOME}"
 
-  NODE_ID=$(cheqd-noded tendermint show-node-id --home "${NODE_HOME}")
-  NODE_VAL_PUBKEY=$(cheqd-noded tendermint show-validator --home "${NODE_HOME}")
+  NODE_ID=$(cheqd-noded tendermint show-node-id --home "${NODE_HOME}" 2>&1)
+  NODE_VAL_PUBKEY=$(cheqd-noded tendermint show-validator --home "${NODE_HOME}" 2>&1)
   cheqd-noded genesis gentx "operator-$i" 1000000000000000ncheq --chain-id "${CHAIN_ID}" --node-id "${NODE_ID}" \
     --pubkey "${NODE_VAL_PUBKEY}" --keyring-backend "test"  --home "${NODE_HOME}"
 

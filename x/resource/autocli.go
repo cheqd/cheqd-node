@@ -22,7 +22,7 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Example:   fmt.Sprintf("%s query resource pecific-resource c82f2b02-bdab-4dd7-b833-3e143745d612 wGHEXrZvJxR8vw5P3UWH1j", version.AppName),
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
 						{ProtoField: "collection_id"},
-						{ProtoField: "resource-id"},
+						{ProtoField: "id"},
 					},
 				},
 				{
