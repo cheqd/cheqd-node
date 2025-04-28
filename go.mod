@@ -56,7 +56,7 @@ require (
 	cloud.google.com/go/iam v1.1.9 // indirect
 	cloud.google.com/go/storage v1.41.0 // indirect
 	cosmossdk.io/collections v0.4.0
-	cosmossdk.io/depinject v1.1.0
+	cosmossdk.io/depinject v1.1.0 // indirect
 	cosmossdk.io/log v1.4.1
 	cosmossdk.io/store v1.1.1
 	cosmossdk.io/x/circuit v0.1.1

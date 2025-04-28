@@ -11,21 +11,21 @@ import (
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/gogoproto/proto"
+	icq "github.com/cosmos/ibc-apps/modules/async-icq/v8"
+	"github.com/cosmos/ibc-go/modules/capability"
 	"github.com/golang/mock/gomock"
+	"github.com/osmosis-labs/fee-abstraction/v8/x/feeabs"
+	"github.com/skip-mev/feemarket/x/feemarket"
 	"github.com/stretchr/testify/require"
 
-	"cosmossdk.io/core/address"
 	"cosmossdk.io/core/appmodule"
-	"cosmossdk.io/depinject"
 	"cosmossdk.io/log"
 	"cosmossdk.io/x/evidence"
 	feegrantmodule "cosmossdk.io/x/feegrant/module"
 	"cosmossdk.io/x/upgrade"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/testutil/mock"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -44,6 +44,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
+	ica "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts"
+	"github.com/cosmos/ibc-go/v8/modules/apps/transfer"
+	ibc "github.com/cosmos/ibc-go/v8/modules/core"
 )
 
 func TestAppExportAndBlockedAddrs(t *testing.T) {
@@ -198,24 +201,31 @@ func TestRunMigrations(t *testing.T) {
 			_, err = app.ModuleManager.RunMigrations(
 				app.NewContextLegacy(true, cmtproto.Header{Height: app.LastBlockHeight()}), configurator,
 				module.VersionMap{
-					"bank":         1,
-					"auth":         auth.AppModule{}.ConsensusVersion(),
-					"authz":        authzmodule.AppModule{}.ConsensusVersion(),
-					"staking":      staking.AppModule{}.ConsensusVersion(),
-					"mint":         mint.AppModule{}.ConsensusVersion(),
-					"distribution": distribution.AppModule{}.ConsensusVersion(),
-					"slashing":     slashing.AppModule{}.ConsensusVersion(),
-					"gov":          gov.AppModule{}.ConsensusVersion(),
-					"group":        group.AppModule{}.ConsensusVersion(),
-					"params":       params.AppModule{}.ConsensusVersion(),
-					"upgrade":      upgrade.AppModule{}.ConsensusVersion(),
-					"vesting":      vesting.AppModule{}.ConsensusVersion(),
-					"feegrant":     feegrantmodule.AppModule{}.ConsensusVersion(),
-					"evidence":     evidence.AppModule{}.ConsensusVersion(),
-					"crisis":       crisis.AppModule{}.ConsensusVersion(),
-					"genutil":      genutil.AppModule{}.ConsensusVersion(),
-					"did":          did.AppModule{}.ConsensusVersion(),
-					"resource":     resource.AppModule{}.ConsensusVersion(),
+					"bank":               1,
+					"auth":               auth.AppModule{}.ConsensusVersion(),
+					"authz":              authzmodule.AppModule{}.ConsensusVersion(),
+					"staking":            staking.AppModule{}.ConsensusVersion(),
+					"mint":               mint.AppModule{}.ConsensusVersion(),
+					"distribution":       distribution.AppModule{}.ConsensusVersion(),
+					"slashing":           slashing.AppModule{}.ConsensusVersion(),
+					"gov":                gov.AppModule{}.ConsensusVersion(),
+					"group":              group.AppModule{}.ConsensusVersion(),
+					"params":             params.AppModule{}.ConsensusVersion(),
+					"upgrade":            upgrade.AppModule{}.ConsensusVersion(),
+					"vesting":            vesting.AppModule{}.ConsensusVersion(),
+					"feegrant":           feegrantmodule.AppModule{}.ConsensusVersion(),
+					"evidence":           evidence.AppModule{}.ConsensusVersion(),
+					"crisis":             crisis.AppModule{}.ConsensusVersion(),
+					"genutil":            genutil.AppModule{}.ConsensusVersion(),
+					"cheqd":              did.AppModule{}.ConsensusVersion(),
+					"resource":           resource.AppModule{}.ConsensusVersion(),
+					"feeabs":             feeabs.AppModule{}.ConsensusVersion(),
+					"feemarket":          feemarket.AppModule{}.ConsensusVersion(),
+					"capability":         capability.AppModule{}.ConsensusVersion(),
+					"ibc":                ibc.AppModule{}.ConsensusVersion(),
+					"interchainaccounts": ica.AppModule{}.ConsensusVersion(),
+					"interchainquery":    icq.AppModule{}.ConsensusVersion(),
+					"transfer":           transfer.AppModule{}.ConsensusVersion(),
 				},
 			)
 			if tc.expRunErr {
@@ -265,8 +275,9 @@ func TestInitGenesisOnMigration(t *testing.T) {
 			"evidence":     evidence.AppModule{}.ConsensusVersion(),
 			"crisis":       crisis.AppModule{}.ConsensusVersion(),
 			"genutil":      genutil.AppModule{}.ConsensusVersion(),
-			"did":          did.AppModule{}.ConsensusVersion(),
+			"cheqd":        did.AppModule{}.ConsensusVersion(),
 			"resource":     resource.AppModule{}.ConsensusVersion(),
+			"capability":   capability.AppModule{}.ConsensusVersion(),
 		},
 	)
 	require.NoError(t, err)
@@ -307,62 +318,4 @@ func TestProtoAnnotations(t *testing.T) {
 	require.NoError(t, err)
 	err = msgservice.ValidateProtoAnnotations(r)
 	require.NoError(t, err)
-}
-
-var _ address.Codec = (*customAddressCodec)(nil)
-
-type customAddressCodec struct{}
-
-func (c customAddressCodec) StringToBytes(text string) ([]byte, error) {
-	return []byte(text), nil
-}
-
-func (c customAddressCodec) BytesToString(bz []byte) (string, error) {
-	return string(bz), nil
-}
-
-func TestAddressCodecFactory(t *testing.T) {
-	var addrCodec address.Codec
-	var valAddressCodec runtime.ValidatorAddressCodec
-	var consAddressCodec runtime.ConsensusAddressCodec
-
-	err := depinject.Inject(
-		depinject.Configs(
-			network.MinimumAppConfig(),
-			depinject.Supply(log.NewNopLogger()),
-		),
-		&addrCodec, &valAddressCodec, &consAddressCodec)
-	require.NoError(t, err)
-	require.NotNil(t, addrCodec)
-	_, ok := addrCodec.(customAddressCodec)
-	require.False(t, ok)
-	require.NotNil(t, valAddressCodec)
-	_, ok = valAddressCodec.(customAddressCodec)
-	require.False(t, ok)
-	require.NotNil(t, consAddressCodec)
-	_, ok = consAddressCodec.(customAddressCodec)
-	require.False(t, ok)
-
-	// Set the address codec to the custom one
-	err = depinject.Inject(
-		depinject.Configs(
-			network.MinimumAppConfig(),
-			depinject.Supply(
-				log.NewNopLogger(),
-				func() address.Codec { return customAddressCodec{} },
-				func() runtime.ValidatorAddressCodec { return customAddressCodec{} },
-				func() runtime.ConsensusAddressCodec { return customAddressCodec{} },
-			),
-		),
-		&addrCodec, &valAddressCodec, &consAddressCodec)
-	require.NoError(t, err)
-	require.NotNil(t, addrCodec)
-	_, ok = addrCodec.(customAddressCodec)
-	require.True(t, ok)
-	require.NotNil(t, valAddressCodec)
-	_, ok = valAddressCodec.(customAddressCodec)
-	require.True(t, ok)
-	require.NotNil(t, consAddressCodec)
-	_, ok = consAddressCodec.(customAddressCodec)
-	require.True(t, ok)
 }

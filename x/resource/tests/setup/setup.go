@@ -13,17 +13,15 @@ import (
 	"github.com/cosmos/cosmos-sdk/runtime"
 
 	"cosmossdk.io/log"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/codec"
 
-	"cosmossdk.io/store/metrics"
 	"github.com/cheqd/cheqd-node/x/resource"
 	"github.com/cheqd/cheqd-node/x/resource/keeper"
 
 	// sdk "github.com/cosmos/cosmos-sdk/types"
-	"cosmossdk.io/store"
+
 	storetypes "cosmossdk.io/store/types"
+	sdktestutil "github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -67,16 +65,25 @@ func Setup() TestSetup {
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName).String()
 
 	// Init KVStore
-	db := dbm.NewMemDB()
-
-	dbStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
-
 	keys := storetypes.NewKVStoreKeys(
 		capabilitytypes.StoreKey,
 		authtypes.StoreKey,
 		banktypes.StoreKey,
 		stakingtypes.StoreKey,
+		paramstypes.StoreKey,
+		types.StoreKey,
+		didtypes.StoreKey,
 	)
+
+	transientKeys := storetypes.NewTransientStoreKeys(
+		paramstypes.TStoreKey,
+	)
+
+	memKeys := storetypes.NewMemoryStoreKeys(
+		capabilitytypes.MemStoreKey,
+	)
+
+	ctx := sdktestutil.DefaultContextWithKeys(keys, transientKeys, memKeys)
 
 	maccPerms := map[string][]string{
 		minttypes.ModuleName:           {authtypes.Minter},
@@ -84,31 +91,6 @@ func Setup() TestSetup {
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 	}
-	// Mount did store
-	didStoreKey := storetypes.NewKVStoreKey(didtypes.StoreKey)
-	dbStore.MountStoreWithDB(didStoreKey, storetypes.StoreTypeIAVL, nil)
-
-	dbStore.MountStoreWithDB(keys[authtypes.StoreKey], storetypes.StoreTypeIAVL, nil)
-	dbStore.MountStoreWithDB(keys[banktypes.StoreKey], storetypes.StoreTypeIAVL, nil)
-	dbStore.MountStoreWithDB(keys[stakingtypes.StoreKey], storetypes.StoreTypeIAVL, nil)
-
-	// Mount resource store
-	resourceStoreKey := storetypes.NewKVStoreKey(types.StoreKey)
-	dbStore.MountStoreWithDB(resourceStoreKey, storetypes.StoreTypeIAVL, nil)
-
-	// Mount capability store - required for ibc port tests
-	capabilityStoreKey := storetypes.NewKVStoreKey(capabilitytypes.StoreKey)
-	dbStore.MountStoreWithDB(capabilityStoreKey, storetypes.StoreTypeIAVL, nil)
-	memStoreKeys := storetypes.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
-	dbStore.MountStoreWithDB(memStoreKeys[capabilitytypes.MemStoreKey], storetypes.StoreTypeMemory, nil)
-
-	// Mount param store - required for ibc port tests with default genesis
-	paramsStoreKey := storetypes.NewKVStoreKey(paramstypes.StoreKey)
-	dbStore.MountStoreWithDB(paramsStoreKey, storetypes.StoreTypeIAVL, nil)
-	paramsTStoreKey := storetypes.NewTransientStoreKey(paramstypes.TStoreKey)
-	dbStore.MountStoreWithDB(paramsTStoreKey, storetypes.StoreTypeTransient, nil)
-
-	_ = dbStore.LoadLatestVersion()
 
 	accountKeeper := authkeeper.NewAccountKeeper(
 		cdc,
@@ -135,10 +117,10 @@ func Setup() TestSetup {
 		authcodec.NewBech32Codec(app.AccountAddressPrefix),
 		authcodec.NewBech32Codec(app.ConsNodeAddressPrefix))
 
-	paramsKeeper := initParamsKeeper(cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
+	paramsKeeper := initParamsKeeper(cdc, aminoCdc, keys[paramstypes.StoreKey], transientKeys[paramstypes.StoreKey])
 
-	didKeeper := didkeeper.NewKeeper(cdc, runtime.NewKVStoreService(didStoreKey), getSubspace(didtypes.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
-	capabilityKeeper := capabilitykeeper.NewKeeper(cdc, capabilityStoreKey, memStoreKeys[capabilitytypes.MemStoreKey])
+	didKeeper := didkeeper.NewKeeper(cdc, runtime.NewKVStoreService(keys[didtypes.StoreKey]), getSubspace(didtypes.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	capabilityKeeper := capabilitykeeper.NewKeeper(cdc, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 
 	scopedIBCKeeper := capabilityKeeper.ScopeToModule(ibcexported.ModuleName)
 	portKeeper := portkeeper.NewKeeper(scopedIBCKeeper)
@@ -157,9 +139,7 @@ func Setup() TestSetup {
 
 	// Create context
 	blockTime, _ := time.Parse(time.RFC3339, "2021-01-01T00:00:00.000Z")
-	ctx := sdk.NewContext(dbStore,
-		tmproto.Header{ChainID: "test", Time: blockTime},
-		false, log.NewNopLogger()).WithTxBytes(txBytes)
+	ctx = ctx.WithBlockTime(blockTime).WithTxBytes(txBytes)
 
 	// Init servers
 	didMsgServer := didkeeper.NewMsgServer(*didKeeper)

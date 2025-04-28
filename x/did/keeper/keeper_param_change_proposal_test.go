@@ -14,10 +14,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func init() {
-	cheqdapp.SetConfig()
-}
-
 type KeeperTestSuite struct {
 	app         *cheqdapp.TestApp
 	ctx         sdk.Context
