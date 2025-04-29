@@ -18,7 +18,7 @@ func (k MsgServer) CreateDidDoc(goCtx context.Context, msg *types.MsgCreateDidDo
 	// Normalize UUID identifiers
 	msg.Normalize()
 
-	hasDidDoc, err := k.HasDidDoc(&goCtx, msg.Payload.Id)
+	hasDidDoc, err := k.HasDidDoc(goCtx, msg.Payload.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func (k MsgServer) CreateDidDoc(goCtx context.Context, msg *types.MsgCreateDidDo
 	}
 
 	// Validate namespaces
-	namespace, err := k.GetDidNamespace(&goCtx)
+	namespace, err := k.GetDidNamespace(goCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (k MsgServer) CreateDidDoc(goCtx context.Context, msg *types.MsgCreateDidDo
 	// Check controllers' existence
 	controllers := didDoc.AllControllerDids()
 	for _, controller := range controllers {
-		_, err := MustFindDidDoc(&k.Keeper, &goCtx, inMemoryDids, controller)
+		_, err := MustFindDidDoc(&k.Keeper, goCtx, inMemoryDids, controller)
 		if err != nil {
 			return nil, err
 		}
@@ -56,15 +56,15 @@ func (k MsgServer) CreateDidDoc(goCtx context.Context, msg *types.MsgCreateDidDo
 
 	// Verify signatures
 	signers := GetSignerDIDsForDIDCreation(didDoc)
-	err = VerifyAllSignersHaveAllValidSignatures(&k.Keeper, &goCtx, inMemoryDids, signBytes, signers, msg.Signatures)
+	err = VerifyAllSignersHaveAllValidSignatures(&k.Keeper, goCtx, inMemoryDids, signBytes, signers, msg.Signatures)
 	if err != nil {
 		return nil, err
 	}
 
 	// Save first DIDDoc version
-	err = k.AddNewDidDocVersion(&goCtx, &didDocWithMetadata)
+	err = k.AddNewDidDocVersion(goCtx, &didDocWithMetadata)
 	if err != nil {
-		return nil, types.ErrInternal.Wrapf(err.Error())
+		return nil, types.ErrInternal.Wrap(err.Error())
 	}
 
 	// Build and return response

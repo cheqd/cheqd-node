@@ -19,15 +19,6 @@ func (msg *MsgCreateResource) Type() string {
 	return "MsgCreateResource"
 }
 
-// func (msg *MsgCreateResource) ValidateBasic() error {
-// 	err := msg.Validate([]string{})
-// 	if err != nil {
-// 		return ErrBasicValidation.Wrap(err.Error())
-// 	}
-
-// 	return nil
-// }
-
 // Validate
 
 func (msg MsgCreateResource) Validate(allowedNamespaces []string) error {

@@ -5,26 +5,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
-
-var ParamStoreKeyFeeParams = []byte("feeparams")
-
-// ParamKeyTable returns the key declaration for parameters
-func ParamKeyTable() paramstypes.KeyTable {
-	return paramstypes.NewKeyTable(
-		paramstypes.NewParamSetPair(ParamStoreKeyFeeParams, FeeParams{}, validateFeeParams),
-	)
-}
-
-// Default parameter values
-// const (
-// 	DefaultCreateResourceImageFee   = 100000 // Example value
-// 	DefaultCreateResourceJSONFee    = 75000  // Example value
-// 	DefaultCreateResourceDefaultFee = 50000  // Example value
-// 	DefaultBurnFactor               = "0.5"  // Example value
-// 	BaseMinimalDenom                = "ncheq" // Example value
-// )
 
 // NewParams creates a new FeeParams object with specified parameters
 func NewParams(image, json, defaultFee sdk.Coin, burnFactor sdkmath.LegacyDec) FeeParams {

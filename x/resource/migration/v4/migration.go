@@ -1,4 +1,4 @@
-package v5
+package v4
 
 import (
 	"cosmossdk.io/core/store"
@@ -8,12 +8,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
-
-const (
-	ModuleName = "resource"
-)
-
-var ParamsKey = []byte("feeparams")
 
 func MigrateStore(ctx sdk.Context, storeService store.KVStoreService, legacySubspace exported.Subspace, cdc codec.BinaryCodec) error {
 	store := storeService.OpenKVStore(ctx)
@@ -29,5 +23,5 @@ func MigrateStore(ctx sdk.Context, storeService store.KVStoreService, legacySubs
 		return err
 	}
 
-	return store.Set(ParamsKey, bz)
+	return store.Set(types.ParamStoreKeyFeeParams, bz)
 }

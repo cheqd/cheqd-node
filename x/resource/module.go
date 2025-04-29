@@ -31,15 +31,11 @@ import (
 const ConsensusVersion = 4
 
 var (
-	// _ module.BeginBlockAppModule = AppModule{}
-	// _ module.EndBlockAppModule   = AppModule{}
-	_ module.AppModuleBasic     = AppModuleBasic{}
-	_ porttypes.IBCModule       = IBCModule{}
-	_ appmodule.AppModule       = AppModule{}
-	_ appmodule.HasBeginBlocker = AppModule{}
-	_ appmodule.HasEndBlocker   = AppModule{}
-	_ module.HasServices        = AppModule{}
-	_ module.HasABCIGenesis     = AppModule{}
+	_ module.AppModuleBasic = AppModuleBasic{}
+	_ porttypes.IBCModule   = IBCModule{}
+	_ appmodule.AppModule   = AppModule{}
+	_ module.HasServices    = AppModule{}
+	_ module.HasABCIGenesis = AppModule{}
 )
 
 // IsOnePerModuleType implements the depinject.OnePerModuleType interface.
@@ -121,12 +117,12 @@ type AppModule struct {
 	legacySubspace exported.Subspace
 }
 
-func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, cheqdKeeper didkeeper.Keeper) AppModule {
+func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, cheqdKeeper didkeeper.Keeper, subspace exported.Subspace) AppModule {
 	return AppModule{
 		AppModuleBasic: NewAppModuleBasic(cdc),
 		keeper:         keeper,
 		didKeeper:      cheqdKeeper,
-		// legacySubspace: subspace,
+		legacySubspace: subspace,
 	}
 }
 
@@ -176,15 +172,4 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.Ra
 func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.RawMessage {
 	genState := ExportGenesis(ctx, am.keeper)
 	return cdc.MustMarshalJSON(genState)
-}
-
-// BeginBlock executes all ABCI BeginBlock logic respective to the resource module.
-func (am AppModule) BeginBlock(_ context.Context) error {
-	return nil
-}
-
-// EndBlock executes all ABCI EndBlock logic respective to the resource module. It
-// returns no validator updates.
-func (am AppModule) EndBlock(_ context.Context) error {
-	return nil
 }

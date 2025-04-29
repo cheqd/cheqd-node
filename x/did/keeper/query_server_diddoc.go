@@ -15,7 +15,7 @@ func (k Keeper) DidDoc(ctx context.Context, req *types.QueryDidDocRequest) (*typ
 
 	req.Normalize()
 
-	didDoc, err := k.GetLatestDidDoc(&ctx, req.Id)
+	didDoc, err := k.GetLatestDidDoc(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}

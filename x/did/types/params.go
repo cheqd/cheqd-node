@@ -110,7 +110,6 @@ func validateBurnFactor(i interface{}) error {
 	return nil
 }
 
-//nolint:unused
 func validateFeeParams(i interface{}) error {
 	v, ok := i.(FeeParams)
 	if !ok {

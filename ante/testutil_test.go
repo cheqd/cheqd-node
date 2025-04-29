@@ -149,12 +149,15 @@ func (s *AnteTestSuite) CreateTestAccounts(numAccs int) ([]TestAccount, error) {
 	for i := 0; i < numAccs; i++ {
 		priv, _, addr := testdata.KeyTestPubAddr()
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr)
-		acc.SetAccountNumber(uint64(i + 1000))
+		err := acc.SetAccountNumber(uint64(i + 1000))
+		if err != nil {
+			return nil, err
+		}
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
 		someCoins := sdk.Coins{
 			sdk.NewInt64Coin(didtypes.BaseMinimalDenom, 1000000*1e9), // 1mn CHEQ
 		}
-		err := s.app.BankKeeper.MintCoins(s.ctx, minttypes.ModuleName, someCoins)
+		err = s.app.BankKeeper.MintCoins(s.ctx, minttypes.ModuleName, someCoins)
 		if err != nil {
 			return nil, err
 		}

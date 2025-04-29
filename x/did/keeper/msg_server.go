@@ -28,7 +28,7 @@ func NewMsgServer(keeper Keeper) types.MsgServer {
 
 var _ types.MsgServer = MsgServer{}
 
-func FindDidDoc(k *Keeper, ctx *context.Context, inMemoryDIDs map[string]types.DidDocWithMetadata, did string) (res types.DidDocWithMetadata, found bool, err error) {
+func FindDidDoc(k *Keeper, ctx context.Context, inMemoryDIDs map[string]types.DidDocWithMetadata, did string) (res types.DidDocWithMetadata, found bool, err error) {
 	// Look in inMemory dict
 	value, found := inMemoryDIDs[did]
 	if found {
@@ -52,7 +52,7 @@ func FindDidDoc(k *Keeper, ctx *context.Context, inMemoryDIDs map[string]types.D
 	return types.DidDocWithMetadata{}, false, nil
 }
 
-func MustFindDidDoc(k *Keeper, ctx *context.Context, inMemoryDIDDocs map[string]types.DidDocWithMetadata, did string) (res types.DidDocWithMetadata, err error) {
+func MustFindDidDoc(k *Keeper, ctx context.Context, inMemoryDIDDocs map[string]types.DidDocWithMetadata, did string) (res types.DidDocWithMetadata, err error) {
 	res, found, err := FindDidDoc(k, ctx, inMemoryDIDDocs, did)
 	if err != nil {
 		return types.DidDocWithMetadata{}, err
@@ -65,7 +65,7 @@ func MustFindDidDoc(k *Keeper, ctx *context.Context, inMemoryDIDDocs map[string]
 	return res, nil
 }
 
-func FindVerificationMethod(k *Keeper, ctx *context.Context, inMemoryDIDs map[string]types.DidDocWithMetadata, didURL string) (res types.VerificationMethod, found bool, err error) {
+func FindVerificationMethod(k *Keeper, ctx context.Context, inMemoryDIDs map[string]types.DidDocWithMetadata, didURL string) (res types.VerificationMethod, found bool, err error) {
 	did, _, _, _ := utils.MustSplitDIDUrl(didURL)
 
 	didDoc, found, err := FindDidDoc(k, ctx, inMemoryDIDs, did)
@@ -82,7 +82,7 @@ func FindVerificationMethod(k *Keeper, ctx *context.Context, inMemoryDIDs map[st
 	return types.VerificationMethod{}, false, nil
 }
 
-func MustFindVerificationMethod(k *Keeper, ctx *context.Context, inMemoryDIDs map[string]types.DidDocWithMetadata, didURL string) (res types.VerificationMethod, err error) {
+func MustFindVerificationMethod(k *Keeper, ctx context.Context, inMemoryDIDs map[string]types.DidDocWithMetadata, didURL string) (res types.VerificationMethod, err error) {
 	res, found, err := FindVerificationMethod(k, ctx, inMemoryDIDs, didURL)
 	if err != nil {
 		return types.VerificationMethod{}, err
@@ -95,7 +95,7 @@ func MustFindVerificationMethod(k *Keeper, ctx *context.Context, inMemoryDIDs ma
 	return res, nil
 }
 
-func VerifySignature(k *Keeper, ctx *context.Context, inMemoryDIDs map[string]types.DidDocWithMetadata, message []byte, signature types.SignInfo) error {
+func VerifySignature(k *Keeper, ctx context.Context, inMemoryDIDs map[string]types.DidDocWithMetadata, message []byte, signature types.SignInfo) error {
 	verificationMethod, err := MustFindVerificationMethod(k, ctx, inMemoryDIDs, signature.VerificationMethodId)
 	if err != nil {
 		return err
@@ -109,7 +109,7 @@ func VerifySignature(k *Keeper, ctx *context.Context, inMemoryDIDs map[string]ty
 	return nil
 }
 
-func VerifyAllSignersHaveAllValidSignatures(k *Keeper, ctx *context.Context, inMemoryDIDs map[string]types.DidDocWithMetadata, message []byte, signers []string, signatures []*types.SignInfo) error {
+func VerifyAllSignersHaveAllValidSignatures(k *Keeper, ctx context.Context, inMemoryDIDs map[string]types.DidDocWithMetadata, message []byte, signers []string, signatures []*types.SignInfo) error {
 	for _, signer := range signers {
 		signatures := types.FindSignInfosBySigner(signatures, signer)
 
@@ -130,7 +130,7 @@ func VerifyAllSignersHaveAllValidSignatures(k *Keeper, ctx *context.Context, inM
 
 // VerifyAllSignersHaveAtLeastOneValidSignature verifies that all signers have at least one valid signature.
 // Omit didToBeUpdated and updatedDID if not updating a DID. Otherwise those values will be used to better format error messages.
-func VerifyAllSignersHaveAtLeastOneValidSignature(k *Keeper, ctx *context.Context, inMemoryDIDs map[string]types.DidDocWithMetadata,
+func VerifyAllSignersHaveAtLeastOneValidSignature(k *Keeper, ctx context.Context, inMemoryDIDs map[string]types.DidDocWithMetadata,
 	message []byte, signers []string, signatures []*types.SignInfo, didToBeUpdated string, updatedDID string,
 ) error {
 	for _, signer := range signers {

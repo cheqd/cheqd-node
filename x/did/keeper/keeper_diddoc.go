@@ -4,24 +4,23 @@ import (
 	"context"
 
 	"cosmossdk.io/collections"
-	storetypes "cosmossdk.io/store/types"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // GetDidCount get the total number of did
-func (k Keeper) GetDidDocCount(ctx *context.Context) (uint64, error) {
-	has, err := k.DidCount.Has(*ctx)
+func (k Keeper) GetDidDocCount(ctx context.Context) (uint64, error) {
+	has, err := k.DidCount.Has(ctx)
 	if err != nil {
 		return 0, err
 	}
 
 	if !has {
-		if setErr := k.DidCount.Set(*ctx, 0); setErr != nil {
+		if setErr := k.DidCount.Set(ctx, 0); setErr != nil {
 			return 0, setErr
 		}
 	}
-	count, err := k.DidCount.Get(*ctx)
+	count, err := k.DidCount.Get(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -29,11 +28,11 @@ func (k Keeper) GetDidDocCount(ctx *context.Context) (uint64, error) {
 }
 
 // SetDidCount set the total number of did
-func (k Keeper) SetDidDocCount(ctx *context.Context, count uint64) error {
-	return k.DidCount.Set(*ctx, count)
+func (k Keeper) SetDidDocCount(ctx context.Context, count uint64) error {
+	return k.DidCount.Set(ctx, count)
 }
 
-func (k Keeper) AddNewDidDocVersion(ctx *context.Context, didDoc *types.DidDocWithMetadata) error {
+func (k Keeper) AddNewDidDocVersion(ctx context.Context, didDoc *types.DidDocWithMetadata) error {
 	// Check if the diddoc version already exists
 	hasDidDocVersion, err := k.HasDidDocVersion(ctx, didDoc.DidDoc.Id, didDoc.Metadata.VersionId)
 	if err != nil {
@@ -80,7 +79,7 @@ func (k Keeper) AddNewDidDocVersion(ctx *context.Context, didDoc *types.DidDocWi
 	return k.SetDidDocVersion(ctx, didDoc, false)
 }
 
-func (k Keeper) GetLatestDidDoc(ctx *context.Context, did string) (types.DidDocWithMetadata, error) {
+func (k Keeper) GetLatestDidDoc(ctx context.Context, did string) (types.DidDocWithMetadata, error) {
 	latestVersionID, err := k.GetLatestDidDocVersion(ctx, did)
 	if err != nil {
 		return types.DidDocWithMetadata{}, err
@@ -95,7 +94,7 @@ func (k Keeper) GetLatestDidDoc(ctx *context.Context, did string) (types.DidDocW
 }
 
 // SetDid set a specific did in the store. Updates DID counter if the DID is new.
-func (k Keeper) SetDidDocVersion(ctx *context.Context, value *types.DidDocWithMetadata, override bool) error {
+func (k Keeper) SetDidDocVersion(ctx context.Context, value *types.DidDocWithMetadata, override bool) error {
 	hasdidVersion, err := k.HasDidDocVersion(ctx, value.DidDoc.Id, value.Metadata.VersionId)
 	if err != nil {
 		return err
@@ -105,11 +104,11 @@ func (k Keeper) SetDidDocVersion(ctx *context.Context, value *types.DidDocWithMe
 	}
 
 	// Create the diddoc version
-	return k.DidDocuments.Set(*ctx, collections.Join(value.DidDoc.Id, value.Metadata.VersionId), *value)
+	return k.DidDocuments.Set(ctx, collections.Join(value.DidDoc.Id, value.Metadata.VersionId), *value)
 }
 
 // GetDid returns a did from its id
-func (k Keeper) GetDidDocVersion(ctx *context.Context, id, version string) (types.DidDocWithMetadata, error) {
+func (k Keeper) GetDidDocVersion(ctx context.Context, id, version string) (types.DidDocWithMetadata, error) {
 	hasdidVersion, err := k.HasDidDocVersion(ctx, id, version)
 	if err != nil {
 		return types.DidDocWithMetadata{}, err
@@ -118,14 +117,14 @@ func (k Keeper) GetDidDocVersion(ctx *context.Context, id, version string) (type
 		return types.DidDocWithMetadata{}, sdkerrors.ErrNotFound.Wrap("diddoc version not found")
 	}
 
-	return k.DidDocuments.Get(*ctx, collections.Join(id, version))
+	return k.DidDocuments.Get(ctx, collections.Join(id, version))
 }
 
-func (k Keeper) GetAllDidDocVersions(ctx *context.Context, did string) ([]*types.Metadata, error) {
+func (k Keeper) GetAllDidDocVersions(ctx context.Context, did string) ([]*types.Metadata, error) {
 	var metadataList []*types.Metadata
 	rng := collections.NewPrefixedPairRange[string, string](did)
 
-	iter, err := k.DidDocuments.Iterate(*ctx, rng)
+	iter, err := k.DidDocuments.Iterate(ctx, rng)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +140,7 @@ func (k Keeper) GetAllDidDocVersions(ctx *context.Context, did string) ([]*types
 }
 
 // SetLatestDidDocVersion sets the latest version id value for a diddoc
-func (k Keeper) SetLatestDidDocVersion(ctx *context.Context, did, version string) error {
+func (k Keeper) SetLatestDidDocVersion(ctx context.Context, did, version string) error {
 	// Update counter. We use latest version as existence indicator.
 	hasVersion, err := k.HasLatestDidDocVersion(ctx, did)
 	if err != nil {
@@ -158,11 +157,11 @@ func (k Keeper) SetLatestDidDocVersion(ctx *context.Context, did, version string
 		}
 	}
 
-	return k.LatestDidVersion.Set(*ctx, did, version)
+	return k.LatestDidVersion.Set(ctx, did, version)
 }
 
 // GetLatestDidDocVersion returns the latest version id value for a diddoc
-func (k Keeper) GetLatestDidDocVersion(ctx *context.Context, id string) (string, error) {
+func (k Keeper) GetLatestDidDocVersion(ctx context.Context, id string) (string, error) {
 	hasVersion, err := k.HasLatestDidDocVersion(ctx, id)
 	if err != nil {
 		return "", err
@@ -170,27 +169,27 @@ func (k Keeper) GetLatestDidDocVersion(ctx *context.Context, id string) (string,
 	if !hasVersion {
 		return "", sdkerrors.ErrNotFound.Wrap(id)
 	}
-	value, err := k.LatestDidVersion.Get(*ctx, id)
+	value, err := k.LatestDidVersion.Get(ctx, id)
 	if err != nil {
 		return "", err
 	}
 	return value, nil
 }
 
-func (k Keeper) HasDidDoc(ctx *context.Context, id string) (bool, error) {
+func (k Keeper) HasDidDoc(ctx context.Context, id string) (bool, error) {
 	return k.HasLatestDidDocVersion(ctx, id)
 }
 
-func (k Keeper) HasLatestDidDocVersion(ctx *context.Context, id string) (bool, error) {
-	return k.LatestDidVersion.Has(*ctx, id)
+func (k Keeper) HasLatestDidDocVersion(ctx context.Context, id string) (bool, error) {
+	return k.LatestDidVersion.Has(ctx, id)
 }
 
-func (k Keeper) HasDidDocVersion(ctx *context.Context, id, version string) (bool, error) {
-	return k.DidDocuments.Has(*ctx, collections.Join(id, version))
+func (k Keeper) HasDidDocVersion(ctx context.Context, id, version string) (bool, error) {
+	return k.DidDocuments.Has(ctx, collections.Join(id, version))
 }
 
-func (k Keeper) IterateDids(ctx *context.Context, callback func(did string) (continue_ bool)) {
-	iter, err := k.LatestDidVersion.Iterate(*ctx, nil)
+func (k Keeper) IterateDids(ctx context.Context, callback func(did string) (continue_ bool)) {
+	iter, err := k.LatestDidVersion.Iterate(ctx, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -207,10 +206,10 @@ func (k Keeper) IterateDids(ctx *context.Context, callback func(did string) (con
 	}
 }
 
-func (k Keeper) IterateDidDocVersions(ctx *context.Context, did string, callback func(version types.DidDocWithMetadata) (continue_ bool)) {
+func (k Keeper) IterateDidDocVersions(ctx context.Context, did string, callback func(version types.DidDocWithMetadata) (continue_ bool)) {
 	rng := collections.NewPrefixedPairRange[string, string](did)
 
-	iter, err := k.DidDocuments.Iterate(*ctx, rng)
+	iter, err := k.DidDocuments.Iterate(ctx, rng)
 	if err != nil {
 		panic(err)
 	}
@@ -227,8 +226,8 @@ func (k Keeper) IterateDidDocVersions(ctx *context.Context, did string, callback
 	}
 }
 
-func (k Keeper) IterateAllDidDocVersions(ctx *context.Context, callback func(version types.DidDocWithMetadata) (continue_ bool)) {
-	iter, err := k.DidDocuments.Iterate(*ctx, nil)
+func (k Keeper) IterateAllDidDocVersions(ctx context.Context, callback func(version types.DidDocWithMetadata) (continue_ bool)) {
+	iter, err := k.DidDocuments.Iterate(ctx, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -247,7 +246,7 @@ func (k Keeper) IterateAllDidDocVersions(ctx *context.Context, callback func(ver
 
 // GetAllDidDocs returns all did
 // Loads all DIDs in memory. Use only for genesis export.
-func (k Keeper) GetAllDidDocs(ctx *context.Context) ([]*types.DidDocVersionSet, error) {
+func (k Keeper) GetAllDidDocs(ctx context.Context) ([]*types.DidDocVersionSet, error) {
 	var didDocs []*types.DidDocVersionSet
 	var err error
 
@@ -278,11 +277,4 @@ func (k Keeper) GetAllDidDocs(ctx *context.Context) ([]*types.DidDocVersionSet, 
 	}
 
 	return didDocs, nil
-}
-
-func closeIteratorOrPanic(iterator storetypes.Iterator) {
-	err := iterator.Close()
-	if err != nil {
-		panic(err.Error())
-	}
 }

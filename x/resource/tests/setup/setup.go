@@ -18,11 +18,8 @@ import (
 	"github.com/cheqd/cheqd-node/x/resource"
 	"github.com/cheqd/cheqd-node/x/resource/keeper"
 
-	// sdk "github.com/cosmos/cosmos-sdk/types"
-
 	storetypes "cosmossdk.io/store/types"
 	sdktestutil "github.com/cosmos/cosmos-sdk/testutil"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -47,7 +44,6 @@ type TestSetup struct {
 	ResourceMsgServer   types.MsgServer
 	ResourceQueryServer types.QueryServer
 	IBCModule           resource.IBCModule
-	// storeService        store.KVStoreService
 }
 
 func Setup() TestSetup {
@@ -159,7 +155,7 @@ func Setup() TestSetup {
 			Cdc: cdc,
 
 			SdkCtx: ctx,
-			StdCtx: sdk.WrapSDKContext(ctx),
+			StdCtx: ctx,
 
 			Keeper:      *didKeeper,
 			MsgServer:   didMsgServer,
@@ -171,8 +167,7 @@ func Setup() TestSetup {
 		ResourceQueryServer: queryServer,
 		IBCModule:           ibcModule,
 	}
-	goCtx := sdk.WrapSDKContext(ctx)
-	err = setup.Keeper.SetDidNamespace(&goCtx, didsetup.DidNamespace)
+	err = setup.Keeper.SetDidNamespace(ctx, didsetup.DidNamespace)
 	if err != nil {
 		panic(err)
 	}

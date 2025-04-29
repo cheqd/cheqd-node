@@ -652,7 +652,7 @@ func New(
 	govRouter := govv1beta1.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)). //nolint
 		AddRoute(feeabstypes.RouterKey, feeabsmodule.NewHostZoneProposal(app.FeeabsKeeper))
 	govConfig := govtypes.DefaultConfig()
 	/*
@@ -783,8 +783,8 @@ func New(
 
 		// cheqd modules
 		feemarketmodule.NewAppModule(appCodec, *app.FeeMarketKeeper),
-		did.NewAppModule(appCodec, app.DidKeeper),
-		resource.NewAppModule(appCodec, app.ResourceKeeper, app.DidKeeper),
+		did.NewAppModule(appCodec, app.DidKeeper, app.GetSubspace(didtypes.ModuleName)),
+		resource.NewAppModule(appCodec, app.ResourceKeeper, app.DidKeeper, app.GetSubspace(resourcetypes.ModuleName)),
 		feeabsModule,
 	)
 

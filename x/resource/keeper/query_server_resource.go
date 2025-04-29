@@ -18,15 +18,13 @@ func (q queryServer) Resource(c context.Context, req *types.QueryResourceRequest
 
 	req.Normalize()
 
-	// ctx := sdk.UnwrapSDKContext(c)
-
 	// Validate corresponding DIDDoc exists
-	namespace, err := q.didKeeper.GetDidNamespace(&c)
+	namespace, err := q.didKeeper.GetDidNamespace(c)
 	if err != nil {
 		return nil, err
 	}
 	did := didutils.JoinDID(didtypes.DidMethod, namespace, req.CollectionId)
-	hasDidDoc, err := q.didKeeper.HasDidDoc(&c, did)
+	hasDidDoc, err := q.didKeeper.HasDidDoc(c, did)
 	if err != nil {
 		return nil, err
 	}

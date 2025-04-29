@@ -21,7 +21,7 @@ func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDo
 	msg.Normalize()
 
 	// Validate namespaces
-	namespace, err := k.GetDidNamespace(&goCtx)
+	namespace, err := k.GetDidNamespace(goCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDo
 	}
 
 	// Check if DID exists and get latest version
-	existingDidDocWithMetadata, err := k.GetLatestDidDoc(&goCtx, msg.Payload.Id)
+	existingDidDocWithMetadata, err := k.GetLatestDidDoc(goCtx, msg.Payload.Id)
 	if err != nil {
 		return nil, types.ErrDidDocNotFound.Wrap(err.Error())
 	}
@@ -59,7 +59,7 @@ func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDo
 	// Check controllers existence
 	controllers := updatedDidDoc.AllControllerDids()
 	for _, controller := range controllers {
-		_, err := MustFindDidDoc(&k.Keeper, &goCtx, inMemoryDids, controller)
+		_, err := MustFindDidDoc(&k.Keeper, goCtx, inMemoryDids, controller)
 		if err != nil {
 			return nil, err
 		}
@@ -72,7 +72,7 @@ func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDo
 	// To eliminate this problem we have to add pubkey to the signInfo in future.
 	signers := GetSignerDIDsForDIDUpdate(*existingDidDoc, updatedDidDoc)
 	extendedSignatures := DuplicateSignatures(msg.Signatures, existingDidDocWithMetadata.DidDoc.Id, updatedDidDoc.Id)
-	err = VerifyAllSignersHaveAtLeastOneValidSignature(&k.Keeper, &goCtx, inMemoryDids, signBytes, signers, extendedSignatures, existingDidDoc.Id, updatedDidDoc.Id)
+	err = VerifyAllSignersHaveAtLeastOneValidSignature(&k.Keeper, goCtx, inMemoryDids, signBytes, signers, extendedSignatures, existingDidDoc.Id, updatedDidDoc.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -81,9 +81,9 @@ func (k MsgServer) UpdateDidDoc(goCtx context.Context, msg *types.MsgUpdateDidDo
 	updatedDidDoc.ReplaceDids(updatedDidDoc.Id, existingDidDoc.Id)
 
 	// Update state
-	err = k.AddNewDidDocVersion(&goCtx, &updatedDidDocWithMetadata)
+	err = k.AddNewDidDocVersion(goCtx, &updatedDidDocWithMetadata)
 	if err != nil {
-		return nil, types.ErrInternal.Wrapf(err.Error())
+		return nil, types.ErrInternal.Wrap(err.Error())
 	}
 
 	// Build and return response

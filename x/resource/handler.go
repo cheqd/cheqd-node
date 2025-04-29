@@ -21,7 +21,7 @@ func NewHandler(k keeper.Keeper, cheqdKeeper didkeeper.Keeper) baseapp.MsgServic
 
 		switch msg := msg.(type) {
 		case *types.MsgCreateResource:
-			res, err := msgServer.CreateResource(sdk.WrapSDKContext(ctx), msg)
+			res, err := msgServer.CreateResource(ctx, msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		default:

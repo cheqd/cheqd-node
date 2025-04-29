@@ -18,15 +18,15 @@ func NewHandler(k Keeper) baseapp.MsgServiceHandler {
 
 		switch msg := msg.(type) {
 		case *types.MsgCreateDidDoc:
-			res, err := msgServer.CreateDidDoc(sdk.WrapSDKContext(ctx), msg)
+			res, err := msgServer.CreateDidDoc(ctx, msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgUpdateDidDoc:
-			res, err := msgServer.UpdateDidDoc(sdk.WrapSDKContext(ctx), msg)
+			res, err := msgServer.UpdateDidDoc(ctx, msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		case *types.MsgDeactivateDidDoc:
-			res, err := msgServer.DeactivateDidDoc(sdk.WrapSDKContext(ctx), msg)
+			res, err := msgServer.DeactivateDidDoc(ctx, msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		default:

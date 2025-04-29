@@ -13,20 +13,20 @@ func InitGenesis(ctx context.Context, k keeper.Keeper, genState *types.GenesisSt
 	// Set didocs
 	for _, versionSet := range genState.VersionSets {
 		for _, didDoc := range versionSet.DidDocs {
-			err := k.SetDidDocVersion(&ctx, didDoc, false)
+			err := k.SetDidDocVersion(ctx, didDoc, false)
 			if err != nil {
 				panic(err)
 			}
 		}
 
-		err := k.SetLatestDidDocVersion(&ctx, versionSet.DidDocs[0].DidDoc.Id, versionSet.LatestVersion)
+		err := k.SetLatestDidDocVersion(ctx, versionSet.DidDocs[0].DidDoc.Id, versionSet.LatestVersion)
 		if err != nil {
 			panic(err)
 		}
 	}
 
 	// Set did namespace
-	err := k.SetDidNamespace(&ctx, genState.DidNamespace)
+	err := k.SetDidNamespace(ctx, genState.DidNamespace)
 	if err != nil {
 		panic(err)
 	}
@@ -40,7 +40,7 @@ func InitGenesis(ctx context.Context, k keeper.Keeper, genState *types.GenesisSt
 
 // ExportGenesis returns the cheqd module's exported genesis.
 func ExportGenesis(ctx context.Context, k keeper.Keeper) *types.GenesisState {
-	didDocs, err := k.GetAllDidDocs(&ctx)
+	didDocs, err := k.GetAllDidDocs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -48,7 +48,7 @@ func ExportGenesis(ctx context.Context, k keeper.Keeper) *types.GenesisState {
 	if err != nil {
 		panic(err)
 	}
-	DidNameSpace, err := k.GetDidNamespace(&ctx)
+	DidNameSpace, err := k.GetDidNamespace(ctx)
 	if err != nil {
 		panic(err)
 	}

@@ -15,7 +15,7 @@ func (k Keeper) DidDocVersion(ctx context.Context, req *types.QueryDidDocVersion
 
 	req.Normalize()
 
-	didDoc, err := k.GetDidDocVersion(&ctx, req.Id, req.Version)
+	didDoc, err := k.GetDidDocVersion(ctx, req.Id, req.Version)
 	if err != nil {
 		return nil, err
 	}

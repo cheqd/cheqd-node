@@ -17,7 +17,7 @@ func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactiv
 	msg.Normalize()
 
 	// Validate DID does exist
-	hasDidDoc, err := k.HasDidDoc(&goCtx, msg.Payload.Id)
+	hasDidDoc, err := k.HasDidDoc(goCtx, msg.Payload.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactiv
 	}
 
 	// Validate namespaces
-	namespace, err := k.GetDidNamespace(&goCtx)
+	namespace, err := k.GetDidNamespace(goCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactiv
 	}
 
 	// Retrieve didDoc state value and did
-	didDoc, err := k.GetLatestDidDoc(&goCtx, msg.Payload.Id)
+	didDoc, err := k.GetLatestDidDoc(goCtx, msg.Payload.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactiv
 
 	// Verify signatures
 	signers := GetSignerDIDsForDIDCreation(*didDoc.DidDoc)
-	err = VerifyAllSignersHaveAllValidSignatures(&k.Keeper, &goCtx, inMemoryDids, signBytes, signers, msg.Signatures)
+	err = VerifyAllSignersHaveAllValidSignatures(&k.Keeper, goCtx, inMemoryDids, signBytes, signers, msg.Signatures)
 	if err != nil {
 		return nil, err
 	}
@@ -61,17 +61,17 @@ func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactiv
 	didDoc.Metadata.Update(goCtx, msg.Payload.VersionId)
 
 	// Apply changes. We create a new version on deactivation to track deactivation time
-	err = k.AddNewDidDocVersion(&goCtx, &didDoc)
+	err = k.AddNewDidDocVersion(goCtx, &didDoc)
 	if err != nil {
-		return nil, types.ErrInternal.Wrapf(err.Error())
+		return nil, types.ErrInternal.Wrap(err.Error())
 	}
 
 	// Deactivate all previous versions
 	var iterationErr error
-	k.IterateDidDocVersions(&goCtx, msg.Payload.Id, func(didDocWithMetadata types.DidDocWithMetadata) bool {
+	k.IterateDidDocVersions(goCtx, msg.Payload.Id, func(didDocWithMetadata types.DidDocWithMetadata) bool {
 		didDocWithMetadata.Metadata.Deactivated = true
 
-		err := k.SetDidDocVersion(&goCtx, &didDocWithMetadata, true)
+		err := k.SetDidDocVersion(goCtx, &didDocWithMetadata, true)
 		if err != nil {
 			iterationErr = err
 			return false
@@ -81,7 +81,7 @@ func (k MsgServer) DeactivateDidDoc(goCtx context.Context, msg *types.MsgDeactiv
 	})
 
 	if iterationErr != nil {
-		return nil, types.ErrInternal.Wrapf(iterationErr.Error())
+		return nil, types.ErrInternal.Wrap(iterationErr.Error())
 	}
 
 	// Build and return response

@@ -15,7 +15,7 @@ func (k Keeper) AllDidDocVersionsMetadata(ctx context.Context, req *types.QueryA
 
 	req.Normalize()
 
-	versions, err := k.GetAllDidDocVersions(&ctx, req.Id)
+	versions, err := k.GetAllDidDocVersions(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}

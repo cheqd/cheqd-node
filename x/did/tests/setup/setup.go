@@ -111,7 +111,7 @@ func Setup() TestSetup {
 
 	msgServer := keeper.NewMsgServer(*newKeeper)
 	queryServer := keeper.NewQueryServer(*newKeeper)
-	goCtx := sdk.WrapSDKContext(ctx)
+	goCtx := ctx
 
 	params := stakingtypes.DefaultParams()
 	params.BondDenom = "ncheq"
@@ -131,7 +131,7 @@ func Setup() TestSetup {
 		BankKeeper:    bankKeeper,
 		AccountKeeper: accountKeeper,
 	}
-	err = setup.Keeper.SetDidNamespace(&goCtx, DidNamespace)
+	err = setup.Keeper.SetDidNamespace(goCtx, DidNamespace)
 	if err != nil {
 		panic(err)
 	}

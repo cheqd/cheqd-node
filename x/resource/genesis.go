@@ -12,7 +12,7 @@ import (
 // state.
 func InitGenesis(ctx context.Context, k keeper.Keeper, genState *types.GenesisState) {
 	for _, resource := range genState.Resources {
-		if err := k.SetResource(&ctx, resource); err != nil {
+		if err := k.SetResource(ctx, resource); err != nil {
 			panic(fmt.Sprintf("Cannot set resource case: %s", err.Error()))
 		}
 	}
@@ -47,7 +47,7 @@ func ExportGenesis(ctx context.Context, k keeper.Keeper) *types.GenesisState {
 	// get fee params
 	feeParams, err := k.GetParams(ctx)
 	if err != nil {
-		panic(fmt.Sprintln("Cannot get fee params: %s", err.Error()))
+		panic(fmt.Sprintf("Cannot get fee params: %s", err.Error()))
 	}
 
 	return &types.GenesisState{

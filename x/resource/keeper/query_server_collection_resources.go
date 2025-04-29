@@ -15,17 +15,15 @@ func (q queryServer) CollectionResources(ctx context.Context, req *types.QueryCo
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	// ctx := sdk.UnwrapSDKContext(c)
-
 	req.Normalize()
 
 	// Validate corresponding DIDDoc exists
-	namespace, err := q.didKeeper.GetDidNamespace(&ctx)
+	namespace, err := q.didKeeper.GetDidNamespace(ctx)
 	if err != nil {
 		return nil, err
 	}
 	did := didutils.JoinDID(didtypes.DidMethod, namespace, req.CollectionId)
-	hasDidDoc, err := q.didKeeper.HasDidDoc(&ctx, did)
+	hasDidDoc, err := q.didKeeper.HasDidDoc(ctx, did)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +31,7 @@ func (q queryServer) CollectionResources(ctx context.Context, req *types.QueryCo
 		return nil, didtypes.ErrDidDocNotFound.Wrap(did)
 	}
 	// Get all resources
-	resources, err := q.GetResourceCollection(&ctx, req.CollectionId)
+	resources, err := q.GetResourceCollection(ctx, req.CollectionId)
 	if err != nil {
 		return nil, types.ErrResourceNotAvail.Wrap(err.Error())
 	}
