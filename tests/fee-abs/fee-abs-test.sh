@@ -86,7 +86,7 @@ sleep 20
 
 info "Checking statuses"
 CHEQD_STATUS=$(docker compose exec cheqd cheqd-noded status 2>&1)
-assert_network_running "${CHEQD_STATUS}"
+assert_network_running_comet_v38_or_above "${CHEQD_STATUS}"
 
 OSMOSIS_STATUS=$(docker compose exec osmosis osmosisd status 2>&1)
 assert_network_running_comet_v38_or_above "${OSMOSIS_STATUS}"
