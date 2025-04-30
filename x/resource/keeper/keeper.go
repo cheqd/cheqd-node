@@ -36,7 +36,7 @@ type Keeper struct {
 	// should be the x/resource module account.
 	authority string
 
-	Params collections.Item[types.FeeParams]
+	ParamsStore collections.Item[types.FeeParams]
 }
 
 func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSpace types.ParamSubspace, portKeeper types.PortKeeper, scopedKeeper exported.ScopedKeeper, authority string) *Keeper {
@@ -79,7 +79,7 @@ func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSp
 			collections.PairKeyCodec(collections.StringKey, collections.StringKey),
 			collections.BytesValue,
 		),
-		Params: collections.NewItem(
+		ParamsStore: collections.NewItem(
 			sb,
 			collections.NewPrefix(types.ParamStoreKeyFeeParams),
 			"params",
@@ -105,7 +105,7 @@ func (k Keeper) GetAuthority() string {
 }
 
 func (k Keeper) SetParams(ctx context.Context, params types.FeeParams) error {
-	err := k.Params.Set(ctx, params)
+	err := k.ParamsStore.Set(ctx, params)
 	if err != nil {
 		return err
 	}
@@ -114,5 +114,5 @@ func (k Keeper) SetParams(ctx context.Context, params types.FeeParams) error {
 
 // GetParams gets the x/resource module parameters.
 func (k Keeper) GetParams(ctx context.Context) (params types.FeeParams, err error) {
-	return k.Params.Get(ctx)
+	return k.ParamsStore.Get(ctx)
 }

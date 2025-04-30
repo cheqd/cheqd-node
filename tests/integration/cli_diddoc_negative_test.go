@@ -26,9 +26,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 		tmpDir = GinkgoT().TempDir()
 
 		// Query fee params
-		res, err := cli.QueryParams(didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
-		Expect(err).To(BeNil())
-		err = helpers.Codec.UnmarshalJSON([]byte(res.Value), &feeParams)
+		_, err := cli.QueryDidParams()
 		Expect(err).To(BeNil())
 	})
 

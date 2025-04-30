@@ -14,7 +14,7 @@ CHAIN_ID="cheqd"
 
 # Node
 cheqd-noded init node0 --chain-id "$CHAIN_ID"
-NODE_0_VAL_PUBKEY=$(cheqd-noded tendermint show-validator 2>&1)
+NODE_0_VAL_PUBKEY=$(cheqd-noded tendermint show-validator)
 
 # User
 echo 'success claw flock lecture soul photo jump pause sadness enter uncle stage cherry teach inside now fun fuel oval angry unveil horn tobacco penalty' | cheqd-noded keys add cheqd-user --keyring-backend test --recover

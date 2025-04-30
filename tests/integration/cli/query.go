@@ -12,7 +12,6 @@ import (
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
-	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
@@ -53,21 +52,6 @@ func QueryBalance(address, denom string) (sdk.Coin, error) {
 	return resp, nil
 }
 
-func QueryParams(subspace, key string) (paramproposal.ParamChange, error) {
-	res, err := Query("params", "subspace", subspace, key)
-	if err != nil {
-		return paramproposal.ParamChange{}, err
-	}
-
-	var resp paramproposal.ParamChange
-	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
-	if err != nil {
-		return paramproposal.ParamChange{}, err
-	}
-
-	return resp, nil
-}
-
 func QueryDidDoc(did string) (didtypes.QueryDidDocResponse, error) {
 	res, err := Query("cheqd", "did-document", did)
 	if err != nil {
@@ -78,6 +62,21 @@ func QueryDidDoc(did string) (didtypes.QueryDidDocResponse, error) {
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
 		return didtypes.QueryDidDocResponse{}, err
+	}
+
+	return resp, nil
+}
+
+func QueryDidParams() (didtypes.QueryParamsResponse, error) {
+	res, err := Query("cheqd", "params")
+	if err != nil {
+		return didtypes.QueryParamsResponse{}, err
+	}
+
+	var resp didtypes.QueryParamsResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return didtypes.QueryParamsResponse{}, err
 	}
 
 	return resp, nil
@@ -123,6 +122,21 @@ func QueryResourceCollection(collectionID string) (resourcetypes.QueryCollection
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
 		return resourcetypes.QueryCollectionResourcesResponse{}, err
+	}
+
+	return resp, nil
+}
+
+func QueryResourceParams() (resourcetypes.QueryParamsResponse, error) {
+	res, err := Query("resource", "params")
+	if err != nil {
+		return resourcetypes.QueryParamsResponse{}, err
+	}
+
+	var resp resourcetypes.QueryParamsResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return resourcetypes.QueryParamsResponse{}, err
 	}
 
 	return resp, nil

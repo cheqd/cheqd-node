@@ -45,9 +45,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		tmpDir = GinkgoT().TempDir()
 
 		// Query fee params
-		res, err := cli.QueryParams(types.ModuleName, string(types.ParamStoreKeyFeeParams))
-		Expect(err).To(BeNil())
-		err = helpers.Codec.UnmarshalJSON([]byte(res.Value), &feeParams)
+		_, err := cli.QueryDidParams()
 		Expect(err).To(BeNil())
 
 		// Create a new DID Doc
