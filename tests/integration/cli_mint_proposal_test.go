@@ -43,7 +43,7 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		res, err = cli.QueryTxn(res.TxHash)
 		Expect(err).To(BeNil())
 
-		proposal_id, err := cli.GetProposalID(res.RawLog)
+		proposal_id, err := cli.GetProposalID(res.Events)
 		Proposal_id = proposal_id
 		Expect(err).To(BeNil())
 

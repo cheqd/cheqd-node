@@ -45,8 +45,10 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		tmpDir = GinkgoT().TempDir()
 
 		// Query fee params
-		_, err := cli.QueryDidParams()
+		res, err := cli.QueryDidParams()
 		Expect(err).To(BeNil())
+
+		feeParams = res.Params
 
 		// Create a new DID Doc
 		did := "did:cheqd:" + network.DidNamespace + ":" + uuid.NewString()

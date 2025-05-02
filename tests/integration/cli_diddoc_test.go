@@ -29,8 +29,10 @@ var _ = Describe("cheqd cli - positive did", func() {
 		tmpDir = GinkgoT().TempDir()
 
 		// Query fee params
-		_, err := cli.QueryDidParams()
+		res, err := cli.QueryDidParams()
 		Expect(err).To(BeNil())
+
+		feeParams = res.Params
 	})
 
 	It("can create diddoc, update it and query the result (Ed25519VerificationKey2020)", func() {

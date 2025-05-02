@@ -24,7 +24,7 @@ import (
 // Also, ValidatorInfo.PubKey is replaced with cosmos-sdk crypto.PubKey, hence it needs
 // to be parsed accordingly.
 type NodeStatus struct {
-	SyncInfo SyncInfo `json:"SyncInfo"`
+	SyncInfo SyncInfo `json:"sync_info"`
 }
 
 type SyncInfo struct {

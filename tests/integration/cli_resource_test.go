@@ -28,12 +28,16 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		tmpDir = GinkgoT().TempDir()
 
 		// Query did fee params
-		_, err := cli.QueryDidParams()
+		didRes, err := cli.QueryDidParams()
 		Expect(err).To(BeNil())
 
+		didFeeParams = didRes.Params
+
 		// Query resource fee params
-		_, err = cli.QueryResourceParams()
+		resourceRes, err := cli.QueryResourceParams()
 		Expect(err).To(BeNil())
+
+		resourceFeeParams = resourceRes.Params
 	})
 
 	It("can create diddoc, create resource, query it, query all resource versions of the same resource name, query resource collection", func() {

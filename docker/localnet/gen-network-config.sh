@@ -219,6 +219,9 @@ echo "Collecting gentxs"
 cheqd-noded genesis collect-gentxs --home "${TMP_NODE_HOME}"
 cheqd-noded genesis validate-genesis --home "${TMP_NODE_HOME}"
 
+# set default output format to json
+cheqd-noded config set client output json --home "${TMP_NODE_HOME}"
+
 # Distribute final genesis
 for ((i=0 ; i<VALIDATORS_COUNT ; i++))
 do
