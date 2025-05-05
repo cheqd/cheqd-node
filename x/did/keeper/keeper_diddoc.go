@@ -95,12 +95,15 @@ func (k Keeper) GetLatestDidDoc(ctx context.Context, did string) (types.DidDocWi
 
 // SetDid set a specific did in the store. Updates DID counter if the DID is new.
 func (k Keeper) SetDidDocVersion(ctx context.Context, value *types.DidDocWithMetadata, override bool) error {
-	hasdidVersion, err := k.HasDidDocVersion(ctx, value.DidDoc.Id, value.Metadata.VersionId)
-	if err != nil {
-		return err
-	}
-	if !override && hasdidVersion {
-		return types.ErrDidDocExists.Wrap("diddoc version already exists")
+	if !override {
+		hasdidVersion, err := k.HasDidDocVersion(ctx, value.DidDoc.Id, value.Metadata.VersionId)
+		if err != nil {
+			return err
+		}
+
+		if hasdidVersion {
+			return types.ErrDidDocExists.Wrap("diddoc version already exists")
+		}
 	}
 
 	// Create the diddoc version

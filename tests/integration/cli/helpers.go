@@ -183,3 +183,26 @@ func MakeCodecWithExtendedRegistry() codec.Codec {
 
 	return codec.NewProtoCodec(interfaceRegistry)
 }
+
+// Recursively rename "type" → "@type" in any JSON-like structure
+func renameTypeKeys(data any) any {
+	switch v := data.(type) {
+	case map[string]any:
+		newMap := make(map[string]any)
+		for key, val := range v {
+			newKey := key
+			if key == "type" {
+				newKey = "@type"
+			}
+			newMap[newKey] = renameTypeKeys(val)
+		}
+		return newMap
+	case []any:
+		for i, item := range v {
+			v[i] = renameTypeKeys(item)
+		}
+		return v
+	default:
+		return v
+	}
+}

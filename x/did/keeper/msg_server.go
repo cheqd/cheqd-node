@@ -180,10 +180,6 @@ func (k MsgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBu
 			return nil, err
 		}
 	}
-	err = msg.ValidateBasic()
-	if err != nil {
-		return nil, err
-	}
 	err = k.Keeper.burnFrom(sdkCtx, msg.Amount, msg.FromAddress)
 	if err != nil {
 		return nil, err
