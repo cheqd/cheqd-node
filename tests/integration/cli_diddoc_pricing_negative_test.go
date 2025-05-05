@@ -16,6 +16,7 @@ import (
 	"github.com/google/uuid"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -286,7 +287,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		tax := feeParams.CreateDid
 		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_6, helpers.GenerateFees(tax.String()))
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(5))
+		Expect(res.RawLog).To(ContainSubstring(sdkerrors.ErrInsufficientFunds.Error()))
 	})
 
 	It("should not succeed in update diddoc message - case: fixed fee, insufficient funds", func() {
@@ -314,7 +315,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		tax := feeParams.UpdateDid
 		res, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_6, helpers.GenerateFees(tax.String()))
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(5))
+		Expect(res.RawLog).To(ContainSubstring(sdkerrors.ErrInsufficientFunds.Error()))
 	})
 
 	It("should not succeed in deactivate diddoc message - case: fixed fee, insufficient funds", func() {
@@ -332,6 +333,6 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		tax := feeParams.DeactivateDid
 		res, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_6, helpers.GenerateFees(tax.String()))
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(5))
+		Expect(res.RawLog).To(ContainSubstring(sdkerrors.ErrInsufficientFunds.Error()))
 	})
 })

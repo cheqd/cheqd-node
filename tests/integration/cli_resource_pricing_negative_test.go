@@ -15,6 +15,7 @@ import (
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -243,7 +244,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType: resourceType,
 		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_3, helpers.GenerateFees(tax.String()))
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(5))
+		Expect(res.RawLog).To(ContainSubstring(sdkerrors.ErrInsufficientFunds.Error()))
 	})
 
 	It("should not succeed in create resource image message - case: fixed fee, insufficient funds", func() {
@@ -265,7 +266,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType: resourceType,
 		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_3, helpers.GenerateFees(tax.String()))
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(5))
+		Expect(res.RawLog).To(ContainSubstring(sdkerrors.ErrInsufficientFunds.Error()))
 	})
 
 	It("should not succeed in create resource default message - case: fixed fee, insufficient funds", func() {
@@ -287,7 +288,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType: resourceType,
 		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_3, helpers.GenerateFees(tax.String()))
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(5))
+		Expect(res.RawLog).To(ContainSubstring(sdkerrors.ErrInsufficientFunds.Error()))
 	})
 
 	It("should not charge more than tax in create resource json message - case: fixed fee", func() {
