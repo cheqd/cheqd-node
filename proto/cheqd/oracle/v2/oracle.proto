@@ -1,0 +1,194 @@
+syntax = "proto3";
+package cheqd.oracle.v2;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/cheqd/cheqd-node/x/oracle/types";
+option (gogoproto.goproto_getters_all) = false;
+
+// Params defines the parameters for the oracle module.
+message Params {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_stringer) = false;
+
+  uint64 vote_period = 1 [(gogoproto.moretags) = "yaml:\"vote_period\""];
+  string vote_threshold = 2 [
+    (gogoproto.moretags) = "yaml:\"vote_threshold\"",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+  repeated RewardBand reward_bands = 3 [
+    (gogoproto.moretags) = "yaml:\"reward_bands\"",
+    (gogoproto.castrepeated) = "RewardBandList",
+    (gogoproto.nullable) = false
+  ];
+  uint64 reward_distribution_window = 4 [(gogoproto.moretags) = "yaml:\"reward_distribution_window\""];
+  repeated Denom accept_list = 5 [
+    (gogoproto.moretags) = "yaml:\"accept_list\"",
+    (gogoproto.castrepeated) = "DenomList",
+    (gogoproto.nullable) = false
+  ];
+  string slash_fraction = 6 [
+    (gogoproto.moretags) = "yaml:\"slash_fraction\"",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+  uint64 slash_window = 7 [(gogoproto.moretags) = "yaml:\"slash_window\""];
+  string min_valid_per_window = 8 [
+    (gogoproto.moretags) = "yaml:\"min_valid_per_window\"",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+  repeated Denom mandatory_list = 9 [
+    (gogoproto.moretags) = "yaml:\"mandatory_list\"",
+    (gogoproto.castrepeated) = "DenomList",
+    (gogoproto.nullable) = false
+  ];
+  // Historic Stamp Period represents the amount of blocks the oracle
+  // module waits before recording a new historic price.
+  uint64 historic_stamp_period = 10;
+  // Median Stamp Period represents the amount blocks the oracle module
+  // waits between calculating and stamping a new median and standard
+  // deviation of that median.
+  uint64 median_stamp_period = 11;
+  // Maximum Price Stamps represents the maximum amount of historic prices
+  // the oracle module will store before pruning via FIFO.
+  uint64 maximum_price_stamps = 12;
+  // Maximum Median Stamps represents the maximum amount of medians the
+  // oracle module will store before pruning via FIFO.
+  uint64 maximum_median_stamps = 13;
+  // Currency Pair Providers defines the currency provider pairs the
+  // price feeder uses upon start up for pricing data.
+  repeated CurrencyPairProviders currency_pair_providers = 14 [
+    (gogoproto.moretags) = "yaml:\"currency_pair_providers\"",
+    (gogoproto.castrepeated) = "CurrencyPairProvidersList",
+    (gogoproto.nullable) = false
+  ];
+  // Currency Deviation Thresholds defines the deviation thresholds
+  // for each base currency the price feeder uses upon start up.
+  repeated CurrencyDeviationThreshold currency_deviation_thresholds = 15 [
+    (gogoproto.moretags) = "yaml:\"currency_deviation_thresholds\"",
+    (gogoproto.castrepeated) = "CurrencyDeviationThresholdList",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// Denom - the object to hold configurations of each denom
+message Denom {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  string base_denom = 1 [(gogoproto.moretags) = "yaml:\"base_denom\""];
+  string symbol_denom = 2 [(gogoproto.moretags) = "yaml:\"symbol_denom\""];
+  uint32 exponent = 3 [(gogoproto.moretags) = "yaml:\"exponent\""];
+}
+
+// RewardBand - the object to hold the reward band configuration for a given denom.
+message RewardBand {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+  string symbol_denom = 1 [(gogoproto.moretags) = "yaml:\"symbol_denom\""];
+  string reward_band = 2 [
+    (gogoproto.moretags) = "yaml:\"reward_band\"",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// AggregateExchangeRatePrevote -
+// struct for aggregate prevoting on the ExchangeRateVote.
+// The purpose of aggregate prevote is to hide vote exchange rates with hash
+// which is formatted as hex string in SHA256("{salt}:{exchange
+// rate}{denom},...,{exchange rate}{denom}:{voter}")
+message AggregateExchangeRatePrevote {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  string hash = 1 [(gogoproto.moretags) = "yaml:\"hash\""];
+  string voter = 2 [(gogoproto.moretags) = "yaml:\"voter\""];
+  uint64 submit_block = 3 [(gogoproto.moretags) = "yaml:\"submit_block\""];
+}
+
+// AggregateExchangeRateVote - struct for voting on
+// the exchange rates of USD denominated in various assets.
+message AggregateExchangeRateVote {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  repeated cosmos.base.v1beta1.DecCoin exchange_rates = 1 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins",
+    (gogoproto.nullable) = false
+  ];
+
+  string voter = 2 [(gogoproto.moretags) = "yaml:\"voter\""];
+}
+
+// PriceStamp defines a stamp of a denom's exchange rate
+// at the block number it was calculated in.
+message PriceStamp {
+  cosmos.base.v1beta1.DecCoin exchange_rate = 1;
+  uint64 block_num = 2;
+}
+
+// ValidatorRewardSet is the set of validators that is earning
+// rewards for voting on exchange rates based on their misscounter
+// in a given Slash Window. This set gets updated every Slash Window.
+message ValidatorRewardSet {
+  repeated string validator_set = 1 [(gogoproto.moretags) = "yaml:\"validator_set\""];
+}
+
+// CurrencyPairProviders defines a list of currency providers for the
+// currency pair defined by base and quote.
+message CurrencyPairProviders {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  string base_denom = 1 [(gogoproto.moretags) = "yaml:\"base_denom\""];
+  string quote_denom = 2 [(gogoproto.moretags) = "yaml:\"quote_denom\""];
+  repeated PairAddressProvider pair_address = 3 [
+    (gogoproto.moretags) = "yaml:\"pair_address\"",
+    (gogoproto.nullable) = false
+  ];
+  repeated string providers = 4 [(gogoproto.moretags) = "yaml:\"providers\""];
+}
+
+// PairAddressProvider defines the uniswap pair address and provider
+// for uniswap currency pair.
+message PairAddressProvider {
+  string address = 1 [(gogoproto.moretags) = "yaml:\"address\""];
+  string address_provider = 2 [(gogoproto.moretags) = "yaml:\"address_provider\""];
+}
+
+// CurrencyDeviationThreshold defines a deviation theshold for a
+// base denom.
+message CurrencyDeviationThreshold {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  string base_denom = 1 [(gogoproto.moretags) = "yaml:\"base_denom\""];
+  string threshold = 2 [(gogoproto.moretags) = "yaml:\"threshold\""];
+}
+
+// ParamUpdatePlan specifies updates to the Oracle module parameters
+// and at which block height they should occur.
+message ParamUpdatePlan {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  // Store keys of the Oracle params getting updated.
+  repeated string keys = 1;
+
+  // The height at which the param update must be performed.
+  int64 height = 2;
+
+  // Changes to the oracle parameters.
+  Params changes = 3 [(gogoproto.nullable) = false];
+}

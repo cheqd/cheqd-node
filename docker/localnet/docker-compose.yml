@@ -3,17 +3,19 @@ services:
     image: ${BUILD_IMAGE}
     ports:
       - target: 26656
-        published: 26656    # Tendermint peer-to-peer (P2P) port
+        published: 26656 # Tendermint peer-to-peer (P2P) port
       - target: 26657
-        published: 26657    # Tendermint RPC port
+        published: 26657 # Tendermint RPC port
       - target: 1317
-        published: 1317     # Cosmos REST API port
+        published: 1317 # Cosmos REST API port
       - target: 9090
-        published: 9090     # gRPC port
+        published: 9090 # gRPC port
       - target: 9091
-        published: 9091     # gRPC-Gateway port
+        published: 9091 # gRPC-Gateway port
       - target: 26660
-        published: 26660    # Prometheus metrics port
+        published: 26660 # Prometheus metrics port
+      - target: 7171
+        published: 7171
     entrypoint: [ "node-start" ]
     healthcheck:
       test: curl -s http://localhost:26657/status | grep -c true
@@ -41,17 +43,19 @@ services:
     image: ${BUILD_IMAGE}
     ports:
       - target: 26656
-        published: 26756    # Tendermint peer-to-peer (P2P) port
+        published: 26756 # Tendermint peer-to-peer (P2P) port
       - target: 26657
-        published: 26757    # Tendermint RPC port
+        published: 26757 # Tendermint RPC port
       - target: 1317
-        published: 1417     # Cosmos REST API port
+        published: 1417 # Cosmos REST API port
       - target: 9090
-        published: 9190     # gRPC port
+        published: 9190 # gRPC port
       - target: 9091
-        published: 9191     # gRPC-Gateway port
+        published: 9191 # gRPC-Gateway port
       - target: 26660
-        published: 26760    # Prometheus metrics port
+        published: 26760 # Prometheus metrics port
+      - target: 7171
+        published: 7171
     entrypoint: [ "node-start" ]
     healthcheck:
       test: curl -s http://localhost:26757/status | grep -c true
@@ -79,17 +83,19 @@ services:
     image: ${BUILD_IMAGE}
     ports:
       - target: 26656
-        published: 26856    # Tendermint peer-to-peer (P2P) port
+        published: 26856 # Tendermint peer-to-peer (P2P) port
       - target: 26657
-        published: 26857    # Tendermint RPC port
+        published: 26857 # Tendermint RPC port
       - target: 1317
-        published: 1517     # Cosmos REST API port
+        published: 1517 # Cosmos REST API port
       - target: 9090
-        published: 9290     # gRPC port
+        published: 9290 # gRPC port
       - target: 9091
-        published: 9291     # gRPC-Gateway port
+        published: 9291 # gRPC-Gateway port
       - target: 26660
-        published: 26860    # Prometheus metrics port
+        published: 26860 # Prometheus metrics port
+      - target: 7171
+        published: 7171
     entrypoint: [ "node-start" ]
     healthcheck:
       test: curl -s http://localhost:26857/status | grep -c true
@@ -117,17 +123,19 @@ services:
     image: ${BUILD_IMAGE}
     ports:
       - target: 26656
-        published: 26956    # Tendermint peer-to-peer (P2P) port
+        published: 26956 # Tendermint peer-to-peer (P2P) port
       - target: 26657
-        published: 26957    # Tendermint RPC port
+        published: 26957 # Tendermint RPC port
       - target: 1317
-        published: 1617     # Cosmos REST API port
+        published: 1617 # Cosmos REST API port
       - target: 9090
-        published: 9390     # gRPC port
+        published: 9390 # gRPC port
       - target: 9091
-        published: 9391     # gRPC-Gateway port
+        published: 9391 # gRPC-Gateway port
       - target: 26660
-        published: 26960    # Prometheus metrics port
+        published: 26960 # Prometheus metrics port
+      - target: 7171
+        published: 7171
     entrypoint: [ "node-start" ]
     healthcheck:
       test: curl -s http://localhost:26957/status | grep -c true
@@ -155,17 +163,17 @@ services:
     image: ${BUILD_IMAGE}
     ports:
       - target: 26656
-        published: 27056    # Tendermint peer-to-peer (P2P) port
+        published: 27056 # Tendermint peer-to-peer (P2P) port
       - target: 26657
-        published: 27057    # Tendermint RPC port
+        published: 27057 # Tendermint RPC port
       - target: 1317
-        published: 1717     # Cosmos REST API port
+        published: 1717 # Cosmos REST API port
       - target: 9090
-        published: 9490     # gRPC port
+        published: 9490 # gRPC port
       - target: 9091
-        published: 9491     # gRPC-Gateway port
+        published: 9491 # gRPC-Gateway port
       - target: 26660
-        published: 27060    # Prometheus metrics port
+        published: 27060 # Prometheus metrics port
     entrypoint: [ "node-start" ]
     healthcheck:
       test: curl -s http://localhost:27057/status | grep -c true
@@ -193,17 +201,17 @@ services:
     image: ${BUILD_IMAGE}
     ports:
       - target: 26656
-        published: 27156    # Tendermint peer-to-peer (P2P) port
+        published: 27156 # Tendermint peer-to-peer (P2P) port
       - target: 26657
-        published: 27157    # Tendermint RPC port
+        published: 27157 # Tendermint RPC port
       - target: 1317
-        published: 1817     # Cosmos REST API port
+        published: 1817 # Cosmos REST API port
       - target: 9090
-        published: 9590     # gRPC port
+        published: 9590 # gRPC port
       - target: 9091
-        published: 9591     # gRPC-Gateway port
+        published: 9591 # gRPC-Gateway port
       - target: 26660
-        published: 27160    # Prometheus metrics port
+        published: 27160 # Prometheus metrics port
     volumes:
       - type: volume
         source: observer-0-data

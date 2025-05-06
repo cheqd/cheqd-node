@@ -36,6 +36,8 @@ ARG GROUP=${USER}
 ARG UID=1000
 ARG GID=${UID}
 
+COPY docker/localnet/price-feeder.toml.template /etc/price-feeder/price-feeder.toml.template
+
 # Add cheqd user to use in the container
 RUN addgroup --system ${GROUP} --gid ${GID} \
     && adduser ${USER} --uid ${UID} -G ${GROUP} --system --home ${HOME_DIR} --shell /bin/bash
