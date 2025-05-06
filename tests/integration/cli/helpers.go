@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"strings"
 	"sync"
 	"time"
@@ -184,25 +185,46 @@ func MakeCodecWithExtendedRegistry() codec.Codec {
 	return codec.NewProtoCodec(interfaceRegistry)
 }
 
-// Recursively rename "type" → "@type" in any JSON-like structure
-func renameTypeKeys(data any) any {
-	switch v := data.(type) {
-	case map[string]any:
-		newMap := make(map[string]any)
-		for key, val := range v {
-			newKey := key
-			if key == "type" {
-				newKey = "@type"
-			}
-			newMap[newKey] = renameTypeKeys(val)
-		}
-		return newMap
-	case []any:
-		for i, item := range v {
-			v[i] = renameTypeKeys(item)
-		}
-		return v
-	default:
-		return v
+// issue with type in proposal messages struct, fix it
+func convertProposalJSON(input string) ([]byte, error) {
+	var data map[string]any
+	if err := json.Unmarshal([]byte(input), &data); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal input: %w", err)
 	}
+
+	proposal, ok := data["proposal"].(map[string]any)
+	if !ok {
+		return nil, fmt.Errorf("proposal not found or invalid")
+	}
+
+	rawMessages, ok := proposal["messages"].([]any)
+	if !ok {
+		return nil, fmt.Errorf("messages not found or invalid")
+	}
+
+	var newMessages []any
+	for _, msg := range rawMessages {
+		msgMap, ok := msg.(map[string]any)
+		if !ok {
+			continue
+		}
+
+		newMsg := make(map[string]any)
+		newMsg["@type"] = msgMap["type"]
+
+		if valueMap, ok := msgMap["value"].(map[string]any); ok {
+			maps.Copy(newMsg, valueMap)
+		}
+
+		newMessages = append(newMessages, newMsg)
+	}
+	proposal["messages"] = newMessages
+
+	// Marshal to []byte
+	output, err := json.Marshal(data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal output: %w", err)
+	}
+
+	return output, nil
 }
