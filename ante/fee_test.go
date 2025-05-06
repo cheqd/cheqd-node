@@ -271,7 +271,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		Expect(err).To(BeNil(), "Tx errored after account has been set with sufficient funds")
 	})
 
-	It("TaxableTx Lifecycle", func() {
+	It("TaxableTx Lifecycle - DID: MsgCreateDidDoc", func() {
 		// keys and addresses
 		priv1, _, addr1 := testdata.KeyTestPubAddr()
 
@@ -329,6 +329,71 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 
 		// check that reward has been sent to the fee collector
 		reward := cheqdante.GetRewardPortion(sdk.NewCoins(feeParams.CreateDid), burnt)
+		feeCollector := s.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
+		feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
+
+		Expect(feeCollectorBalance.Amount).To(Equal(reward.AmountOf(didtypes.BaseMinimalDenom)), "Reward was not sent to the fee collector")
+	})
+
+	It("TaxableTx Lifecycle - DLR: MsgCreateResource JSON", func() {
+		// keys and addresses
+		priv1, _, addr1 := testdata.KeyTestPubAddr()
+
+		// msg and signatures
+		msg := SandboxResource()
+		feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(2_500_000_000)))
+		gasLimit := uint64(2_000_000)
+		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
+		s.txBuilder.SetFeeAmount(feeAmount)
+		s.txBuilder.SetGasLimit(gasLimit)
+		s.txBuilder.SetFeePayer(addr1)
+		s.ctx = s.ctx.WithMinGasPrices(sdk.NewDecCoins(sdk.NewDecCoinFromDec(didtypes.BaseMinimalDenom, sdk.MustNewDecFromStr("5000"))))
+
+		privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
+		tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+		Expect(err).To(BeNil())
+
+		// set account with sufficient funds
+		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
+		s.app.AccountKeeper.SetAccount(s.ctx, acc)
+		amount := sdk.NewInt(100_000_000_000)
+		err = testutil.FundAccount(s.app.BankKeeper, s.ctx, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
+		Expect(err).To(BeNil())
+
+		dfd := cheqdante.NewOverAllDecorator(decorators...)
+		antehandler := sdk.ChainAnteDecorators(dfd)
+
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
+		posthandler := sdk.ChainPostDecorators(taxDecorator)
+
+		// get supply before tx
+		supplyBeforeDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
+		Expect(err).To(BeNil())
+
+		// antehandler should not error to replay in mempool or deliverTx
+		_, err = antehandler(s.ctx, tx, false)
+		Expect(err).To(BeNil(), "Tx errored when taxable on deliverTx")
+
+		_, err = posthandler(s.ctx, tx, false, true)
+		Expect(err).To(BeNil(), "Tx errored when fee payer had sufficient funds and provided sufficient fee while subtracting tax on deliverTx")
+
+		// get fee params
+		feeParams := s.app.ResourceKeeper.GetParams(s.ctx)
+
+		// check balance of fee payer
+		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
+		Expect(amount.Sub(sdk.NewInt(feeParams.Json.Amount.Int64()))).To(Equal(balance.Amount), "Tax was not subtracted from the fee payer")
+
+		// get supply after tx
+		supplyAfterDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
+		Expect(err).To(BeNil())
+
+		// check that supply was deflated
+		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(feeParams.Json))
+		Expect(supplyBeforeDeflation.Sub(supplyAfterDeflation...)).To(Equal(burnt), "Supply was not deflated")
+
+		// check that reward has been sent to the fee collector
+		reward := cheqdante.GetRewardPortion(sdk.NewCoins(feeParams.Json), burnt)
 		feeCollector := s.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
 		feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
 
