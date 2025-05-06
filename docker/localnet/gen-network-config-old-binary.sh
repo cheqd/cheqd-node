@@ -64,7 +64,6 @@ function configure_genesis() {
 
   # Short voting period
   sed -i $SED_EXT 's/"voting_period": "172800s"/"voting_period": "12s"/' "${GENESIS}"
-  sed -i $SED_EXT 's/"expedited_voting_period": "86400s"/"expedited_voting_period": "10s"/' "${GENESIS}"
 
   # Test accounts
   BASE_ACCOUNT_1="cheqd1rnr5jrt4exl0samwj0yegv99jeskl0hsxmcz96"
