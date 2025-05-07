@@ -1,0 +1,17 @@
+daemon_home = '{CHEQD_ROOT_DIR}'
+daemon_name = '{DEFAULT_BINARY_NAME}'
+daemon_allow_download_binaries = {COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}
+daemon_download_must_have_checksum = {DAEMON_DOWNLOAD_MUST_HAVE_CHECKSUM}
+daemon_restart_after_upgrade = {COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}
+daemon_restart_delay = {DEFAULT_DAEMON_RESTART_DELAY}
+daemon_shutdown_grace = {DAEMON_SHUTDOWN_GRACE}
+daemon_poll_interval = {DEFAULT_DAEMON_POLL_INTERVAL}
+unsafe_skip_backup = {DEFAULT_UNSAFE_SKIP_BACKUP}
+daemon_data_backup_dir = '{CHEQD_ROOT_DIR}'
+daemon_preupgrade_max_retries = 0
+daemon_grpc_address = 'localhost:9090'
+cosmovisor_disable_logs = false
+cosmovisor_color_logs = true
+cosmovisor_timeformat_logs = 'kitchen'
+cosmovisor_custom_preupgrade = ''
+cosmovisor_disable_recase = false
