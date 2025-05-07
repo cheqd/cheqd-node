@@ -3,6 +3,7 @@ package ante_test
 import (
 	"encoding/base64"
 
+	"cosmossdk.io/math"
 	"github.com/cheqd/cheqd-node/ante"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -17,17 +18,17 @@ var _ = Describe("TxMsgFilters", func() {
 
 	BeforeEach(func() {
 		ante.TaxableMsgFees = ante.TaxableMsgFee{
-			ante.MsgCreateDidDoc:          sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(didtypes.DefaultCreateDidTxFee))),
-			ante.MsgUpdateDidDoc:          sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(didtypes.DefaultUpdateDidTxFee))),
-			ante.MsgDeactivateDidDoc:      sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(didtypes.DefaultDeactivateDidTxFee))),
-			ante.MsgCreateResourceDefault: sdk.NewCoins(sdk.NewCoin(resourcetypes.BaseMinimalDenom, sdk.NewInt(resourcetypes.DefaultCreateResourceDefaultFee))),
-			ante.MsgCreateResourceImage:   sdk.NewCoins(sdk.NewCoin(resourcetypes.BaseMinimalDenom, sdk.NewInt(resourcetypes.DefaultCreateResourceImageFee))),
-			ante.MsgCreateResourceJSON:    sdk.NewCoins(sdk.NewCoin(resourcetypes.BaseMinimalDenom, sdk.NewInt(resourcetypes.DefaultCreateResourceJSONFee))),
+			ante.MsgCreateDidDoc:          sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(didtypes.DefaultCreateDidTxFee))),
+			ante.MsgUpdateDidDoc:          sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(didtypes.DefaultUpdateDidTxFee))),
+			ante.MsgDeactivateDidDoc:      sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(didtypes.DefaultDeactivateDidTxFee))),
+			ante.MsgCreateResourceDefault: sdk.NewCoins(sdk.NewCoin(resourcetypes.BaseMinimalDenom, math.NewInt(resourcetypes.DefaultCreateResourceDefaultFee))),
+			ante.MsgCreateResourceImage:   sdk.NewCoins(sdk.NewCoin(resourcetypes.BaseMinimalDenom, math.NewInt(resourcetypes.DefaultCreateResourceImageFee))),
+			ante.MsgCreateResourceJSON:    sdk.NewCoins(sdk.NewCoin(resourcetypes.BaseMinimalDenom, math.NewInt(resourcetypes.DefaultCreateResourceJSONFee))),
 		}
 
 		ante.BurnFactors = ante.BurnFactor{
-			ante.BurnFactorDid:      sdk.MustNewDecFromStr("0.990000000000000000"),
-			ante.BurnFactorResource: sdk.MustNewDecFromStr("0.990000000000000000"),
+			ante.BurnFactorDid:      math.LegacyMustNewDecFromStr("0.990000000000000000"),
+			ante.BurnFactorResource: math.LegacyMustNewDecFromStr("0.990000000000000000"),
 		}
 	})
 

@@ -44,7 +44,7 @@ func ValidateDistributionFee(fee sdk.Coins, distrFeeAlloc DistributionFeeAllocat
 		return errorsmod.Wrap(sdkerrors.ErrInsufficientFee, "fee cannot be zero")
 	}
 
-	if !fee.IsEqual(SumDistributionFee(distrFeeAlloc)) {
+	if !fee.Equal(SumDistributionFee(distrFeeAlloc)) {
 		return errorsmod.Wrap(sdkerrors.ErrLogic, "fee distribution is invalid")
 	}
 
