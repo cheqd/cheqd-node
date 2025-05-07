@@ -7,6 +7,7 @@ yes
 yes
 yes
 yes
+yes
 test-install
 1.1.1.1
 27657
