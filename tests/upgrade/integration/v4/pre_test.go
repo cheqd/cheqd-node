@@ -24,13 +24,13 @@ var _ = Describe("Upgrade - Pre", func() {
 
 	BeforeEach(func() {
 		// query fee params - case: did
-		res, err := cli.QueryParams(cli.Validator0, didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
+		res, err := cliv3.QueryParams(cli.Validator0, didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
 		Expect(err).To(BeNil())
 		err = clihelpers.Codec.UnmarshalJSON([]byte(res.Value), &didFeeParams)
 		Expect(err).To(BeNil())
 
 		// query fee params - case: resource
-		res, err = cli.QueryParams(cli.Validator0, resourcetypes.ModuleName, string(resourcetypes.ParamStoreKeyFeeParams))
+		res, err = cliv3.QueryParams(cli.Validator0, resourcetypes.ModuleName, string(resourcetypes.ParamStoreKeyFeeParams))
 		Expect(err).To(BeNil())
 		err = clihelpers.Codec.UnmarshalJSON([]byte(res.Value), &resourceFeeParams)
 		Expect(err).To(BeNil())
@@ -60,7 +60,7 @@ var _ = Describe("Upgrade - Pre", func() {
 				DidDocCreateSignInput, err = Loader(payload, &DidDocCreatePayload)
 				Expect(err).To(BeNil())
 
-				res, err := cliv3.CreateDid(DidDocCreatePayload, DidDocCreateSignInput, cli.Validator0, "", didFeeParams.CreateDid.String())
+				res, err := cli.CreateDid(DidDocCreatePayload, DidDocCreateSignInput, cli.Validator0, "", didFeeParams.CreateDid.String())
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -94,7 +94,7 @@ var _ = Describe("Upgrade - Pre", func() {
 				_, err = cli.LocalnetExecCopyAbsoluteWithPermissions(ResourceFile, cli.DockerHome, cli.Validator0)
 				Expect(err).To(BeNil())
 
-				res, err := cliv3.CreateResource(
+				res, err := cli.CreateResource(
 					ResourceCreatePayload,
 					filepath.Base(ResourceFile),
 					ResourceCreateSignInput,

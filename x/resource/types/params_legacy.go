@@ -14,6 +14,6 @@ func ParamKeyTable() paramtypes.KeyTable {
 // NewParams creates a new FeeParams object with specified parameters
 func (tfp *FeeParams) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
-		paramtypes.NewParamSetPair(ParamStoreKeyFeeParams, FeeParams{}, validateFeeParams),
+		paramtypes.NewParamSetPair(ParamStoreKeyFeeParams, &FeeParams{}, validateFeeParams),
 	}
 }
