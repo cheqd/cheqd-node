@@ -44,37 +44,6 @@ func Tx(container string, binary string, module, tx, from string, txArgs ...stri
 	return resp, nil
 }
 
-func SubmitParamChangeProposal(container string, pathToDir ...string) (sdk.TxResponse, error) {
-	fmt.Println("Submitting param change proposal from", container)
-	args := append([]string{
-		CliBinaryName,
-		"tx", "gov", "submit-legacy-proposal", "param-change", filepath.Join(pathToDir...),
-		"--from", OperatorAccounts[container],
-	}, TXParams...)
-
-	args = append(args, GasParams...)
-
-	out, err := LocalnetExecExec(container, args...)
-	if err != nil {
-		fmt.Println("Error on submitting ParamChangeProposal", err)
-		fmt.Println("Output:", out)
-		return sdk.TxResponse{}, err
-	}
-
-	// Skip 'gas estimate: xxx' string, trim 'Successfully migrated key' string
-	out = integrationhelpers.TrimImportedStdout(out)
-
-	fmt.Println("Output:", out)
-
-	var resp sdk.TxResponse
-
-	err = integrationhelpers.Codec.UnmarshalJSON([]byte(out), &resp)
-	if err != nil {
-		return sdk.TxResponse{}, err
-	}
-	return resp, nil
-}
-
 func SubmitUpgradeProposalLegacy(upgradeHeight int64, container string) (sdk.TxResponse, error) {
 	fmt.Println("Submitting upgrade proposal from", container)
 	args := append([]string{

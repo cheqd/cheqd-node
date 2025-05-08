@@ -1170,7 +1170,7 @@ var _ = Describe("Test PostHandle", func() {
 
 		// Expect no error in simulation
 		_, err = antehandler(s.ctx, tx, true)
-		Expect(err).To(BeNil(), "signer has no funds")
+		Expect(err).To(BeNil(), "errored while in simulation when signer has no funds")
 	})
 
 	It("0 gas given should fail", func() {

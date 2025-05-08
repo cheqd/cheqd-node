@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -9,9 +8,9 @@ import (
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	abcitypes "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
-	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 )
 
 func Query(container string, binary string, module, query string, queryArgs ...string) (string, error) {
@@ -52,60 +51,34 @@ func QueryModuleVersionMap(container string) (upgradetypes.QueryModuleVersionsRe
 	return resp, nil
 }
 
-func QueryParams(container, subspace, key string) (paramproposal.ParamChange, error) {
-	fmt.Println("Querying params from", container)
-	args := append([]string{
-		CliBinaryName,
-		"query", "params", "subspace", subspace, key,
-	}, QueryParamsConst...)
-
-	out, err := LocalnetExecExec(container, args...)
+func QueryDidFeeParams(container string) (didtypes.QueryParamsResponse, error) {
+	res, err := Query(container, CliBinaryName, "cheqd", "params")
 	if err != nil {
-		return paramproposal.ParamChange{}, err
+		return didtypes.QueryParamsResponse{}, err
 	}
 
-	fmt.Println("Params", out)
-
-	var resp paramproposal.ParamChange
-
-	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(out), &resp)
+	var resp didtypes.QueryParamsResponse
+	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return paramproposal.ParamChange{}, err
+		return didtypes.QueryParamsResponse{}, err
 	}
 
 	return resp, nil
 }
 
-func QueryDidFeeParams(container, subspace, key string) (didtypes.FeeParams, error) {
-	params, err := QueryParams(container, subspace, key)
+func QueryResourceFeeParams(container string) (resourcetypes.QueryParamsResponse, error) {
+	res, err := Query(container, CliBinaryName, "resource", "params")
 	if err != nil {
-		return didtypes.FeeParams{}, err
+		return resourcetypes.QueryParamsResponse{}, err
 	}
 
-	var feeParams didtypes.FeeParams
-
-	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(params.Value), &feeParams)
+	var resp resourcetypes.QueryParamsResponse
+	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
-		return didtypes.FeeParams{}, err
+		return resourcetypes.QueryParamsResponse{}, err
 	}
 
-	return feeParams, nil
-}
-
-func QueryResourceFeeParams(container, subspace, key string) (resourcetypes.FeeParams, error) {
-	params, err := QueryParams(container, subspace, key)
-	if err != nil {
-		return resourcetypes.FeeParams{}, err
-	}
-
-	var feeParams resourcetypes.FeeParams
-
-	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(params.Value), &feeParams)
-	if err != nil {
-		return resourcetypes.FeeParams{}, err
-	}
-
-	return feeParams, nil
+	return resp, nil
 }
 
 func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
@@ -120,39 +93,33 @@ func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 		return govtypesv1.Proposal{}, err
 	}
 
-	fmt.Println("Proposal", out)
-
-	var resp govtypesv1.Proposal
-
-	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(out), &resp)
+	// FIX: getting type instead of @type in messages struct when querying proposal via cli
+	convertedJSON, err := convertProposalJSON(out)
 	if err != nil {
 		return govtypesv1.Proposal{}, err
 	}
-	return resp, nil
+
+	var resp govtypesv1.QueryProposalResponse
+	err = MakeCodecWithExtendedRegistry().UnmarshalJSON(convertedJSON, &resp)
+	if err != nil {
+		return govtypesv1.Proposal{}, err
+	}
+	return *resp.Proposal, nil
 }
 
-func GetProposalID(rawLog string) (string, error) {
-	var logs []sdk.ABCIMessageLog
-	err := json.Unmarshal([]byte(rawLog), &logs)
-	if err != nil {
-		return "", err
-	}
-
-	// Iterate over logs and their events
-	for _, log := range logs {
-		for _, event := range log.Events {
-			// Look for the "submit_proposal" event type
-			if event.Type == "submit_proposal" {
-				for _, attr := range event.Attributes {
-					// Look for the "proposal_id" attribute
-					if attr.Key == "proposal_id" {
-						return attr.Value, nil
-					}
+func GetProposalID(events []abcitypes.Event) (string, error) {
+	// Iterate over events
+	for _, event := range events {
+		// Look for the "submit_proposal" event type
+		if event.Type == "submit_proposal" {
+			for _, attr := range event.Attributes {
+				// Look for the "proposal_id" attribute
+				if attr.Key == "proposal_id" {
+					return attr.Value, nil
 				}
 			}
 		}
 	}
-
 	return "", fmt.Errorf("proposal_id not found")
 }
 

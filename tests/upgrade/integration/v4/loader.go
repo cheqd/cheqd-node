@@ -8,6 +8,7 @@ import (
 	"github.com/cheqd/cheqd-node/x/did/client/cli"
 	didtypesv2 "github.com/cheqd/cheqd-node/x/did/types"
 
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	resourcetypesv2 "github.com/cheqd/cheqd-node/x/resource/types"
 )
 
@@ -49,6 +50,8 @@ func Loader(path string, ptrPayload interface{}) ([]cli.SignInput, error) {
 	case *resourcetypesv2.Metadata:
 		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
 	case *resourcetypesv2.ResourceWithMetadata:
+		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
+	case *upgradetypes.QueryModuleVersionsResponse:
 		err = integrationhelpers.Codec.UnmarshalJSON(tc.Payload, ptrPayload)
 	default:
 		err = json.Unmarshal(tc.Payload, ptrPayload)

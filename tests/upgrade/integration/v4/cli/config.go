@@ -34,6 +34,7 @@ var (
 	TXParams = []string{
 		"--keyring-backend", KeyringBackend,
 		"--chain-id", integrationnetwork.ChainID,
+		"--output", OutputFormat,
 		"-y",
 	}
 	GasParams = []string{

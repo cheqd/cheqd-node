@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"strings"
 	"sync"
 	"time"
@@ -25,9 +26,9 @@ import (
 // Also, ValidatorInfo.PubKey is replaced with cosmos-sdk crypto.PubKey, hence it needs
 // to be parsed accordingly.
 type NodeStatus struct {
-	NodeInfo      DefaultNodeInfo `json:"NodeInfo"`
-	SyncInfo      SyncInfo        `json:"SyncInfo"`
-	ValidatorInfo ValidatorInfo   `json:"ValidatorInfo"`
+	NodeInfo      DefaultNodeInfo `json:"node_info"`
+	SyncInfo      SyncInfo        `json:"sync_info"`
+	ValidatorInfo ValidatorInfo   `json:"validator_info"`
 }
 
 type DefaultNodeInfo struct {
@@ -222,4 +223,48 @@ func MakeCodecWithExtendedRegistry() codec.Codec {
 	)
 
 	return codec.NewProtoCodec(interfaceRegistry)
+}
+
+// issue with type in proposal messages struct, fix it
+func convertProposalJSON(input string) ([]byte, error) {
+	var data map[string]any
+	if err := json.Unmarshal([]byte(input), &data); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal input: %w", err)
+	}
+
+	proposal, ok := data["proposal"].(map[string]any)
+	if !ok {
+		return nil, fmt.Errorf("proposal not found or invalid")
+	}
+
+	rawMessages, ok := proposal["messages"].([]any)
+	if !ok {
+		return nil, fmt.Errorf("messages not found or invalid")
+	}
+
+	var newMessages []any
+	for _, msg := range rawMessages {
+		msgMap, ok := msg.(map[string]any)
+		if !ok {
+			continue
+		}
+
+		newMsg := make(map[string]any)
+		newMsg["@type"] = msgMap["type"]
+
+		if valueMap, ok := msgMap["value"].(map[string]any); ok {
+			maps.Copy(newMsg, valueMap)
+		}
+
+		newMessages = append(newMessages, newMsg)
+	}
+	proposal["messages"] = newMessages
+
+	// Marshal to []byte
+	output, err := json.Marshal(data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal output: %w", err)
+	}
+
+	return output, nil
 }

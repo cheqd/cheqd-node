@@ -2,7 +2,7 @@
     "module_versions": [
         {
             "name": "auth",
-            "version": "3"
+            "version": "4"
         },
         {
             "name": "authz",
@@ -10,7 +10,7 @@
         },
         {
             "name": "bank",
-            "version": "3"
+            "version": "4"
         },
         {
             "name": "capability",
@@ -21,15 +21,23 @@
             "version": "4"
         },
         {
-            "name": "crisis",
+            "name": "consensus",
             "version": "1"
         },
         {
-            "name": "distribution",
+            "name": "crisis",
             "version": "2"
         },
         {
+            "name": "distribution",
+            "version": "3"
+        },
+        {
             "name": "evidence",
+            "version": "1"
+        },
+        {
+            "name": "feeabs",
             "version": "1"
         },
         {
@@ -41,20 +49,24 @@
             "version": "1"
         },
         {
+            "name": "feemarket",
+            "version": "1"
+        },
+        {
             "name": "genutil",
             "version": "1"
         },
         {
             "name": "gov",
-            "version": "3"
+            "version": "4"
         },
         {
             "name": "group",
-            "version": "1"
+            "version": "2"
         },
         {
             "name": "ibc",
-            "version": "2"
+            "version": "4"
         },
         {
             "name": "interchainaccounts",
@@ -62,7 +74,7 @@
         },
         {
             "name": "mint",
-            "version": "1"
+            "version": "2"
         },
         {
             "name": "params",
@@ -70,19 +82,19 @@
         },
         {
             "name": "resource",
-            "version": "2"
-        },
-        {
-            "name": "slashing",
-            "version": "2"
-        },
-        {
-            "name": "staking",
             "version": "3"
         },
         {
+            "name": "slashing",
+            "version": "3"
+        },
+        {
+            "name": "staking",
+            "version": "4"
+        },
+        {
             "name": "transfer",
-            "version": "2"
+            "version": "3"
         },
         {
             "name": "upgrade",

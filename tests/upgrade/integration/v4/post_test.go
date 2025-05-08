@@ -8,7 +8,6 @@ import (
 
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	integrationcli "github.com/cheqd/cheqd-node/tests/integration/cli"
-	clihelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/v4/cli"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -25,16 +24,16 @@ var _ = Describe("Upgrade - Post", func() {
 
 	BeforeEach(func() {
 		// query fee params - case: did
-		res, err := cli.QueryParams(cli.Validator0, didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
+		didRes, err := cli.QueryDidFeeParams(cli.Validator0)
 		Expect(err).To(BeNil())
-		err = clihelpers.Codec.UnmarshalJSON([]byte(res.Value), &feeParams)
-		Expect(err).To(BeNil())
+		feeParams = didRes.Params
+		Expect(feeParams).NotTo(BeNil())
 
 		// query fee params - case: resource
-		res, err = cli.QueryParams(cli.Validator0, resourcetypes.ModuleName, string(resourcetypes.ParamStoreKeyFeeParams))
+		resourceRes, err := cli.QueryResourceFeeParams(cli.Validator0)
 		Expect(err).To(BeNil())
-		err = clihelpers.Codec.UnmarshalJSON([]byte(res.Value), &resourceFeeParams)
-		Expect(err).To(BeNil())
+		resourceFeeParams = resourceRes.Params
+		Expect(resourceFeeParams).NotTo(BeNil())
 	})
 
 	Context("After a software upgrade execution has concluded", func() {
