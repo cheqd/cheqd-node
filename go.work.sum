@@ -186,8 +186,8 @@ github.com/charithe/durationcheck v0.0.10/go.mod h1:bCWXb7gYRysD1CU3C+u4ceO49LoG
 github.com/chavacava/garif v0.1.0/go.mod h1:XMyYCkEL58DF0oyW4qDjjnPWONs2HBqYKI+UIPD+Gww=
 github.com/cheqd/price-feeder v0.2.1-rc1.0.20250508084820-45339e37010c h1:pVL0MWkoEhGUG1bauXfi4w+1mABm4T+bEhuJYBv/ht4=
 github.com/cheqd/price-feeder v0.2.1-rc1.0.20250508084820-45339e37010c/go.mod h1:lj75OOAZrzOL6s8gTYM0CPNJm9aM9whF0ZUG5qHEXfE=
-github.com/cheqd/price-feeder v0.2.1-rc1.0.20250508095945-5ca741fa23df h1:e3rE+bdRuYbjV59Nv3nwOvrA51/dsSVegWO5CfQN/gQ=
-github.com/cheqd/price-feeder v0.2.1-rc1.0.20250508095945-5ca741fa23df/go.mod h1:NUx7UsPEhtV/lbpGJ0V/zEomiakFNpXRcVrHP3RRYyA=
+github.com/cheqd/price-feeder v0.2.1-rc1.0.20250508101226-320b95563cd9 h1:qRcK71+ooPg9n+D4ILYWFLp0xBnSxF9eHwZtaH1vSI0=
+github.com/cheqd/price-feeder v0.2.1-rc1.0.20250508101226-320b95563cd9/go.mod h1:MpUgd05tGqPl/mJV8JJ2v4OLokT0fBOj3H8WF9lsk9Y=
 github.com/chigopher/pathlib v0.19.1/go.mod h1:tzC1dZLW8o33UQpWkNkhvPwL5n4yyFRFm/jL1YGWFvY=
 github.com/ckaznocha/intrange v0.1.2/go.mod h1:RWffCw/vKBwHeOEwWdCikAtY0q4gGt8VhJZEEA5n+RE=
 github.com/clbanning/mxj v1.8.4/go.mod h1:BVjHeAH+rl9rs6f+QIpeRl0tfu10SXn1pUSa5PVGJng=
