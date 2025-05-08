@@ -113,22 +113,20 @@ var (
 		// 		"coinbase",
 		// 	},
 		// },
-		// CurrencyPairProviders{
-		// 	BaseDenom:  USDTSymbol,
-		// 	QuoteDenom: USDSymbol,
-		// 	Providers: []string{
-		// 		"kraken",
-		// 		"coinbase",
-		// 		"crypto",
-		// 	},
-		// },
 		CurrencyPairProviders{
-			BaseDenom:  AtomSymbol,
+			BaseDenom:  USDTSymbol,
 			QuoteDenom: USDSymbol,
 			Providers: []string{
-				"coinbase",
+				"mexc",
 			},
 		},
+		// CurrencyPairProviders{
+		// 	BaseDenom:  AtomSymbol,
+		// 	QuoteDenom: USDSymbol,
+		// 	Providers: []string{
+		// 		"coinbase",
+		// 	},
+		// },
 		CurrencyPairProviders{
 			BaseDenom:  CheqdSymbol,
 			QuoteDenom: USDTSymbol,
