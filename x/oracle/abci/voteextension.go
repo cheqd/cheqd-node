@@ -10,8 +10,7 @@ import (
 	"github.com/cheqd/cheqd-node/x/oracle/keeper"
 	"github.com/cheqd/cheqd-node/x/oracle/types"
 
-	// relayerClient "github.com/cheqd/cheqd-node/-evm/relayer/relayer/client"
-	"github.com/cheqd/cheqd-node/price-feeder/oracle"
+	"github.com/ojo-network/price-feeder/oracle"
 )
 
 type VoteExtensionHandler struct {

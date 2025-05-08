@@ -19,10 +19,10 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/oracle/types"
 
-	"github.com/cheqd/cheqd-node/price-feeder/config"
-	"github.com/cheqd/cheqd-node/price-feeder/oracle"
-	"github.com/cheqd/cheqd-node/price-feeder/oracle/client"
-	v1 "github.com/cheqd/cheqd-node/price-feeder/router/v1"
+	"github.com/ojo-network/price-feeder/config"
+	"github.com/ojo-network/price-feeder/oracle"
+	"github.com/ojo-network/price-feeder/oracle/client"
+	v1 "github.com/ojo-network/price-feeder/router/v1"
 )
 
 type PriceFeeder struct {

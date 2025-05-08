@@ -11,7 +11,8 @@ RUN apk update && apk add --no-cache $PACKAGES
 # Set working directory for the build
 WORKDIR /go/src/github.com/cheqd/cheqd-node
 
-COPY ../price-feeder /go/src/github.com/cheqd/price-feeder
+RUN git clone https://github.com/cheqd/price-feeder
+
 
 # # Add source files
 COPY . .
