@@ -56,8 +56,6 @@ func (app *App) PreBlocker(ctx sdk.Context, req *cometabci.RequestFinalizeBlock)
 				app.Logger().Error("failed to get voter address", "err", err)
 				continue
 			}
-
-			fmt.Println("ExchangeRateVote<<<<<<<<<<<<<<<, and validator<<<<<<<<<<<<<<,", exchangeRateVote, valAddr)
 			app.OracleKeeper.SetAggregateExchangeRateVote(ctx, valAddr, exchangeRateVote)
 		}
 	}
