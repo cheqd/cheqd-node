@@ -12,6 +12,6 @@ func ParamKeyTable() paramtypes.KeyTable {
 
 func (tfp *FeeParams) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
-		paramtypes.NewParamSetPair(ParamStoreKey, FeeParams{}, validateFeeParams),
+		paramtypes.NewParamSetPair(ParamStoreKey, &FeeParams{}, validateFeeParams),
 	}
 }

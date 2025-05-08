@@ -172,23 +172,13 @@ func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 	}
 
 	// FIX: getting type instead of @type in messages struct when querying proposal via cli
-	var data any
-	if err := json.Unmarshal([]byte(out), &data); err != nil {
-		panic(err)
-	}
-
-	// Transform "type" → "@type"
-	updated := renameTypeKeys(data)
-
-	// Marshal back to JSON
-	outputJSON, err := json.Marshal(updated)
+	convertedJSON, err := convertProposalJSON(out)
 	if err != nil {
-		panic(err)
+		return govtypesv1.Proposal{}, err
 	}
 
 	var resp govtypesv1.QueryProposalResponse
-
-	err = MakeCodecWithExtendedRegistry().UnmarshalJSON(outputJSON, &resp)
+	err = MakeCodecWithExtendedRegistry().UnmarshalJSON(convertedJSON, &resp)
 	if err != nil {
 		return govtypesv1.Proposal{}, err
 	}

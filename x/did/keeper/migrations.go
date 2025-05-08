@@ -1,9 +1,9 @@
 package keeper
 
 import (
+	"github.com/cheqd/cheqd-node/x/did/exported"
 	v5 "github.com/cheqd/cheqd-node/x/did/migrations/v5"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/distribution/exported"
 )
 
 // Migrator is a struct for handling in-place store migrations.

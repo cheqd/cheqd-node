@@ -10,6 +10,7 @@ import (
 
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	didv2 "github.com/cheqd/cheqd-node/x/did/types"
+	tmbytes "github.com/cometbft/cometbft/libs/bytes"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -25,12 +26,51 @@ import (
 // Also, ValidatorInfo.PubKey is replaced with cosmos-sdk crypto.PubKey, hence it needs
 // to be parsed accordingly.
 type NodeStatus struct {
-	SyncInfo SyncInfo `json:"sync_info"`
+	NodeInfo      DefaultNodeInfo `json:"node_info"`
+	SyncInfo      SyncInfo        `json:"sync_info"`
+	ValidatorInfo ValidatorInfo   `json:"validator_info"`
+}
+
+type DefaultNodeInfo struct {
+	ProtocolVersion ProtocolVersion      `json:"protocol_version"`
+	ID              string               `json:"id"`
+	ListenAddr      string               `json:"listen_addr"`
+	Network         string               `json:"network"`
+	Version         string               `json:"version"`
+	Channels        tmbytes.HexBytes     `json:"channels"`
+	Moniker         string               `json:"moniker"`
+	Other           DefaultNodeInfoOther `json:"other"`
+}
+
+type ProtocolVersion struct {
+	P2P   uint64 `json:"p2p,string"`
+	Block uint64 `json:"block,string"`
+	App   uint64 `json:"app,string"`
+}
+
+type DefaultNodeInfoOther struct {
+	TxIndex    string `json:"tx_index"`
+	RPCAddress string `json:"rpc_address"`
 }
 
 type SyncInfo struct {
-	LatestBlockHeight int64 `json:"latest_block_height,string"`
-	CatchingUp        bool  `json:"catching_up"`
+	LatestBlockHash   tmbytes.HexBytes `json:"latest_block_hash"`
+	LatestAppHash     tmbytes.HexBytes `json:"latest_app_hash"`
+	LatestBlockHeight int64            `json:"latest_block_height,string"`
+	LatestBlockTime   time.Time        `json:"latest_block_time"`
+
+	EarliestBlockHash   tmbytes.HexBytes `json:"earliest_block_hash"`
+	EarliestAppHash     tmbytes.HexBytes `json:"earliest_app_hash"`
+	EarliestBlockHeight int64            `json:"earliest_block_height,string"`
+	EarliestBlockTime   time.Time        `json:"earliest_block_time"`
+
+	CatchingUp bool `json:"catching_up"`
+}
+
+type ValidatorInfo struct {
+	Address     tmbytes.HexBytes `json:"Address"`
+	PubKey      interface{}      `json:"PubKey"`
+	VotingPower int64            `json:"VotingPower,string"`
 }
 
 func GetNodeStatus(container string, binary string) (NodeStatus, error) {
@@ -67,7 +107,7 @@ func CalculateUpgradeHeight(container string, binary string) (int64, int64, erro
 	if err != nil {
 		return 0, 0, err
 	}
-	return currentHeight + VotingPeriod/ExpectedBlockSeconds + ExtraBlocks*2, votingEndHeight, nil
+	return currentHeight + VotingPeriod/ExpectedBlockSeconds + ExtraBlocks*2, votingEndHeight + 100, nil
 }
 
 // Added to wait for the upgrade to be applied.

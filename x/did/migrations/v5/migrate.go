@@ -12,7 +12,7 @@ import (
 func MigrateStore(ctx sdk.Context, storeService store.KVStoreService, legacySubspace exported.Subspace, cdc codec.BinaryCodec) error {
 	store := storeService.OpenKVStore(ctx)
 	var currParams types.FeeParams
-	legacySubspace.GetParamSet(ctx, &currParams)
+	legacySubspace.Get(ctx, types.ParamStoreKey, &currParams)
 
 	if err := currParams.ValidateBasic(); err != nil {
 		return err

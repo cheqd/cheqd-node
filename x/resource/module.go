@@ -11,7 +11,6 @@ import (
 
 	"github.com/cheqd/cheqd-node/x/resource/client/cli"
 	"github.com/cheqd/cheqd-node/x/resource/exported"
-	migrationV3 "github.com/cheqd/cheqd-node/x/resource/migration/v3"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/runtime"
 
@@ -144,14 +143,10 @@ func (am AppModule) Name() string {
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewQueryServer(am.keeper, am.didKeeper))
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper, am.didKeeper))
-	// Register for migration from consensus version 2 -> 3
-	migratorV3 := migrationV3.NewMigrator(am.keeper)
-	if err := cfg.RegisterMigration(types.ModuleName, 2, migratorV3.Migrate2to3); err != nil {
-		panic(err)
-	}
+
 	m := keeper.NewMigrator(am.keeper, am.legacySubspace)
-	if err := cfg.RegisterMigration(types.ModuleName, 4, m.Migrate3to4); err != nil {
-		panic(fmt.Sprintf("failed to migrate x/resource from version 4 to 5: %v", err))
+	if err := cfg.RegisterMigration(types.ModuleName, 3, m.Migrate3to4); err != nil {
+		panic(fmt.Sprintf("failed to migrate x/resource from version 3 to 4: %v", err))
 	}
 }
 

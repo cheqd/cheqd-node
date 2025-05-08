@@ -29,6 +29,10 @@ func (ms mockSubspace) GetParamSet(ctx sdk.Context, ps exported.ParamSet) {
 	*ps.(*types.FeeParams) = ms.ps
 }
 
+func (ms mockSubspace) Get(ctx sdk.Context, key []byte, ps interface{}) {
+	*ps.(*types.FeeParams) = ms.ps
+}
+
 func TestMigrate(t *testing.T) {
 	encCfg := moduletestutil.MakeTestEncodingConfig(did.AppModuleBasic{})
 	cdc := encCfg.Codec

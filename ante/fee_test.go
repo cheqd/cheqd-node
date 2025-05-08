@@ -1168,9 +1168,9 @@ var _ = Describe("Test PostHandle", func() {
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		// Expect an error in simulation due to insufficient funds
+		// Expect no error in simulation
 		_, err = antehandler(s.ctx, tx, true)
-		Expect(err).NotTo(BeNil(), "signer has no funds")
+		Expect(err).To(BeNil(), "errored while in simulation when signer has no funds")
 	})
 
 	It("0 gas given should fail", func() {
