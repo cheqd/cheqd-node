@@ -40,23 +40,15 @@ func NewProposalHandler(
 // available on the next height at which vote extensions were enabled.
 func (h *ProposalHandler) PrepareProposalHandler() sdk.PrepareProposalHandler {
 	return func(ctx sdk.Context, req *cometabci.RequestPrepareProposal) (*cometabci.ResponsePrepareProposal, error) {
-		fmt.Println("PrepareProposalHandler>>>>>>>>>>>>>>>>>>>1====================")
-
 		if req == nil {
 			err := fmt.Errorf("prepare proposal received a nil request")
 			h.logger.Error(err.Error())
 			return nil, err
 		}
-
-		fmt.Println("PrepareProposalHandler>>>>>>>>>>>>>>>>>>>2", req.LocalLastCommit.Votes)
-
 		err := baseapp.ValidateVoteExtensions(ctx, h.stakingKeeper, req.Height, ctx.ChainID(), req.LocalLastCommit)
 		if err != nil {
 			return &cometabci.ResponsePrepareProposal{Txs: make([][]byte, 0)}, err
 		}
-
-		fmt.Println("PrepareProposalHandler>>>>>>>>>>>>>>>>>>>3")
-
 		if req.Txs == nil {
 			err := fmt.Errorf("prepare proposal received a request with nil Txs")
 			h.logger.Error(
@@ -65,9 +57,6 @@ func (h *ProposalHandler) PrepareProposalHandler() sdk.PrepareProposalHandler {
 			)
 			return &cometabci.ResponsePrepareProposal{Txs: make([][]byte, 0)}, err
 		}
-
-		fmt.Println("PrepareProposalHandler>>>>>>>>>>>>>>>>>>>4")
-
 		proposalTxs := req.Txs
 
 		voteExtensionsEnabled := VoteExtensionsEnabled(ctx)
@@ -115,7 +104,6 @@ func (h *ProposalHandler) PrepareProposalHandler() sdk.PrepareProposalHandler {
 func (h *ProposalHandler) ProcessProposalHandler() sdk.ProcessProposalHandler {
 	return func(ctx sdk.Context, req *cometabci.RequestProcessProposal) (*cometabci.ResponseProcessProposal, error) {
 
-		fmt.Println("func (h *ProposalHandler)ProcessProposalHandler() sdk.ProcessProposalHandler")
 		if req == nil {
 			err := fmt.Errorf("process proposal received a nil request")
 			h.logger.Error(err.Error())

@@ -60,6 +60,6 @@ sed -i '/^\[api\]/,/^\[/{s/^enable *= *.*/enable = true/; s/^swagger *= *.*/swag
 cheqd-noded start \
 --home "$CHEQD_ROOT_DIR" \
 --pricefeeder.enable=true \
---pricefeeder.config_path="$HOME/pricefeeder/price-feeder.toml" \
+--pricefeeder.config_path="$HOME/price-feeder.toml" \
 --pricefeeder.log_level="INFO"
 

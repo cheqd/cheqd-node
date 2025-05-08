@@ -238,7 +238,9 @@ replace (
 
 	// cheqd-node/api module replacement
 	github.com/cheqd/cheqd-node/api/v2 => ./api
-	github.com/cheqd/cheqd-node/price-feeder => .././price-feeder
+
+	// This is for testing purposes only. Replace with the actual price-feeder repository path.
+	github.com/cheqd/cheqd-node/price-feeder => ./price-feeder
 
 	// replace cosmos-sdk v0.50.13
 	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.50.13-height-mismatch-patched

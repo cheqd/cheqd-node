@@ -16,7 +16,7 @@ validator = "${VALIDATOR_ADDRESS}"
 
 [keyring]
 backend = "test"
-dir = "/home/vitwit/.cheqdnode"
+dir = "${NODE_HOME}"
 
 [rpc]
 grpc_endpoint = "localhost:9090"

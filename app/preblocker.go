@@ -15,8 +15,6 @@ import (
 // entire block execution (from BeginBlock). It will execute the preblockers of the other modules set in
 // SetOrderPreBlockers as well.
 func (app *App) PreBlocker(ctx sdk.Context, req *cometabci.RequestFinalizeBlock) (*sdk.ResponsePreBlock, error) {
-
-	fmt.Println("PreBlocker Executed>>>>>>>>>>>>>>>>>>>>>>>")
 	if req == nil {
 		err := fmt.Errorf("preblocker received a nil request")
 		app.Logger().Error(err.Error())
@@ -59,7 +57,7 @@ func (app *App) PreBlocker(ctx sdk.Context, req *cometabci.RequestFinalizeBlock)
 				continue
 			}
 
-			fmt.Println("SetAggregateExchangeRateVote>>>>>>>>>>>>", exchangeRateVote)
+			fmt.Println("ExchangeRateVote<<<<<<<<<<<<<<<, and validator<<<<<<<<<<<<<<,", exchangeRateVote, valAddr)
 			app.OracleKeeper.SetAggregateExchangeRateVote(ctx, valAddr, exchangeRateVote)
 		}
 	}

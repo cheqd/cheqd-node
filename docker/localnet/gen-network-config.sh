@@ -65,6 +65,7 @@ function configure_genesis() {
     # Short voting period
     sed -i $SED_EXT 's/"voting_period": "172800s"/"voting_period": "12s"/' "${GENESIS}"
     sed -i $SED_EXT 's/"expedited_voting_period": "86400s"/"expedited_voting_period": "10s"/' "${GENESIS}"
+    sed -i $SED_EXT 's/"vote_extensions_enable_height"[[:space:]]*:[[:space:]]*"0"/"vote_extensions_enable_height": "2"/' "${GENESIS}"
     
     # Test accounts
     BASE_ACCOUNT_1="cheqd1rnr5jrt4exl0samwj0yegv99jeskl0hsxmcz96"
@@ -212,13 +213,11 @@ do
     
     
     export ACCOUNT_ADDRESS=$(cheqd-noded keys show  "operator-$i"  --keyring-backend test  --home "${NODE_HOME}" -a)
-    export VALIDATOR_ADDRESS=$(cheqd-noded keys show f "operator-$i"  --keyring-backend test  --home "${NODE_HOME}" --bech val -a)
+    export VALIDATOR_ADDRESS=$(cheqd-noded keys show  "operator-$i"  --keyring-backend test  --home "${NODE_HOME}" --bech val -a)
+    export NODE_HOME
     
-    echo  "<<<<<<<<<<<<<<" $ACCOUNT_ADDRESS
-    echo  "<<<<<<<<<<<<<<" $VALIDATOR_ADDRESS
     
-    envsubst < "$(dirname "$0")/price-feeder.toml.template" > "${NODE_HOME}/config/price-feeder.toml"
-    
+    envsubst < "$(dirname "$0")/price-feeder.toml.template" > "${NODE_HOME}/price-feeder.toml"
     cp "${NODE_HOME}/config/genesis.json" "${TMP_NODE_HOME}/config/genesis.json"
     cp -R "${NODE_HOME}/config/gentx/." "${TMP_NODE_HOME}/config/gentx"
 done

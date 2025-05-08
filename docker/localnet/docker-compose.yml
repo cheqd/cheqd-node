@@ -55,7 +55,7 @@ services:
       - target: 26660
         published: 26760 # Prometheus metrics port
       - target: 7171
-        published: 7171
+        published: 7172
     entrypoint: [ "node-start" ]
     healthcheck:
       test: curl -s http://localhost:26757/status | grep -c true
@@ -95,7 +95,7 @@ services:
       - target: 26660
         published: 26860 # Prometheus metrics port
       - target: 7171
-        published: 7171
+        published: 7173
     entrypoint: [ "node-start" ]
     healthcheck:
       test: curl -s http://localhost:26857/status | grep -c true
@@ -135,7 +135,7 @@ services:
       - target: 26660
         published: 26960 # Prometheus metrics port
       - target: 7171
-        published: 7171
+        published: 7174
     entrypoint: [ "node-start" ]
     healthcheck:
       test: curl -s http://localhost:26957/status | grep -c true

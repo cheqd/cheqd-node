@@ -102,7 +102,6 @@ func (h *VoteExtensionHandler) ExtendVoteHandler() sdk.ExtendVoteHandler {
 			"created vote extension",
 			"height", req.Height,
 		)
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>.InjectedVotes>>>>>>>>>.", voteExt)
 		return &cometabci.ResponseExtendVote{VoteExtension: bz}, nil
 	}
 }

@@ -55,7 +55,6 @@ func (pf *PriceFeeder) Start(currentBlockHeight int64, oracleParams types.Params
 	}
 
 	providers := oracle.CreatePairProvidersFromCurrencyPairProvidersList(oracleParams.CurrencyPairProviders)
-	fmt.Println("providers>>>>>>>>>>>..", providers)
 	deviations, err := oracle.CreateDeviationsFromCurrencyDeviationThresholdList(oracleParams.CurrencyDeviationThresholds)
 	if err != nil {
 		return err

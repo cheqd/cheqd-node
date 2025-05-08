@@ -11,7 +11,9 @@ RUN apk update && apk add --no-cache $PACKAGES
 # Set working directory for the build
 WORKDIR /go/src/github.com/cheqd/cheqd-node
 
-# Add source files
+COPY ../price-feeder /go/src/github.com/cheqd/price-feeder
+
+# # Add source files
 COPY . .
 
 # Make node binary
@@ -51,7 +53,7 @@ WORKDIR ${HOME_DIR}
 USER ${USER}
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
-EXPOSE 26656 26657 26660 1317 9090 9091
+EXPOSE 26656 26657 26660 1317 9090 9091 7171
 
 # Set plain vanilla default entrypoint/command
 CMD [ "cheqd-noded" ]
