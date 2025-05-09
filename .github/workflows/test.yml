@@ -244,6 +244,16 @@ jobs:
         working-directory: ./tests/upgrade/integration
         run: |
           docker ps -a
+      
+      - name: Download binary artifact (build-latest)
+        uses: actions/download-artifact@v4
+        id: download
+        with:
+          name: cheqd-noded
+          path: ${{ env.RUNNER_BIN_DIR }}
+
+      - name: Restore binary permissions
+        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
 
       - name: Run post-upgrade tests
         working-directory: ./tests/upgrade/integration/v4
@@ -255,16 +265,6 @@ jobs:
         with:
           name: report-post-upgrade.xml
           path: report-post-upgrade.xml
-
-      - name: Download binary artifact (build-latest)
-        uses: actions/download-artifact@v4
-        id: download
-        with:
-          name: cheqd-noded
-          path: ${{ env.RUNNER_BIN_DIR }}
-
-      - name: Restore binary permissions
-        run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
 
       - name: Run integration tests on upgraded network
         working-directory: ./tests/integration
