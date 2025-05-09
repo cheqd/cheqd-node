@@ -19,11 +19,20 @@ bash import-keys.sh
 # TODO: Get rid of this sleep.
 sleep 5
 
+
+# Copy price-feeder cofig.toml
+docker compose --env-file mainnet-latest.env cp network-config/validator-0/price-feeder.toml validator-0:/home/cheqd
+docker compose --env-file mainnet-latest.env cp network-config/validator-1/price-feeder.toml validator-1:/home/cheqd
+docker compose --env-file mainnet-latest.env cp network-config/validator-2/price-feeder.toml validator-2:/home/cheqd
+docker compose --env-file mainnet-latest.env cp network-config/validator-3/price-feeder.toml validator-3:/home/cheqd
+
+
 # Copy keys
 sudo docker compose --env-file mainnet-latest.env cp network-config/validator-0/keyring-test validator-0:/home/cheqd/.cheqdnode
 sudo docker compose --env-file mainnet-latest.env cp network-config/validator-1/keyring-test validator-1:/home/cheqd/.cheqdnode
 sudo docker compose --env-file mainnet-latest.env cp network-config/validator-2/keyring-test validator-2:/home/cheqd/.cheqdnode
 sudo docker compose --env-file mainnet-latest.env cp network-config/validator-3/keyring-test validator-3:/home/cheqd/.cheqdnode
+
 
 # Restore permissions
 sudo docker compose --env-file mainnet-latest.env exec --user root validator-0 chown -R cheqd:cheqd /home/cheqd
