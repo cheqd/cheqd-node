@@ -62,11 +62,11 @@ var (
 			SymbolDenom: AtomSymbol,
 			Exponent:    AtomExponent,
 		},
-		// {
-		// 	BaseDenom:   USDTDenom,
-		// 	SymbolDenom: USDTSymbol,
-		// 	Exponent:    USDTExponent,
-		// },
+		{
+			BaseDenom:   USDTDenom,
+			SymbolDenom: USDTSymbol,
+			Exponent:    USDTExponent,
+		},
 		// {
 		// 	BaseDenom:   BitcoinDenom,
 		// 	SymbolDenom: BitcoinSymbol,
@@ -89,16 +89,16 @@ var (
 			SymbolDenom: USDTSymbol,
 			Exponent:    USDTExponent,
 		},
-		{
-			BaseDenom:   BitcoinDenom,
-			SymbolDenom: BitcoinSymbol,
-			Exponent:    BitcoinExponent,
-		},
-		{
-			BaseDenom:   EthereumDenom,
-			SymbolDenom: EthereumSymbol,
-			Exponent:    EthereumExponent,
-		},
+		// {
+		// 	BaseDenom:   BitcoinDenom,
+		// 	SymbolDenom: BitcoinSymbol,
+		// 	Exponent:    BitcoinExponent,
+		// },
+		// {
+		// 	BaseDenom:   EthereumDenom,
+		// 	SymbolDenom: EthereumSymbol,
+		// 	Exponent:    EthereumExponent,
+		// },
 	}
 	DefaultSlashFraction     = math.LegacyNewDecWithPrec(1, 4) // 0.01%
 	DefaultMinValidPerWindow = math.LegacyNewDecWithPrec(5, 2) // 5%
