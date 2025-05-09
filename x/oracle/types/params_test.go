@@ -304,7 +304,7 @@ func TestAddDefaultRB(t *testing.T) {
 	p := DefaultRewardBands()
 	p.AddDefault("foo")
 	require.Equal(t, p.String(),
-		"symbol_denom: OJO\nreward_band: \"0.020000000000000000\"\n\n"+
+		"symbol_denom: CHEQ\nreward_band: \"0.020000000000000000\"\n\n"+
 			"symbol_denom: ATOM\nreward_band: \"0.020000000000000000\"\n\n"+
 			"symbol_denom: USDT\nreward_band: \"0.020000000000000000\"\n\n"+
 			"symbol_denom: BTC\nreward_band: \"0.020000000000000000\"\n\n"+

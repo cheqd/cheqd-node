@@ -17,7 +17,7 @@ func TestGetExchangeRateKey(t *testing.T) {
 	}{
 		{
 			denom:       "ncheq",
-			expectedKey: []byte{0x1, 0x75, 0x6f, 0x6a, 0x6f, 0x0},
+			expectedKey: []byte{0x1, 0x6e, 0x63, 0x68, 0x65, 0x71, 0x0},
 		},
 		{
 			denom:       types.IbcDenomLuna,
