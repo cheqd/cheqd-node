@@ -15,8 +15,11 @@ func NewMigrator(k keeper.Keeper) Migrator {
 }
 
 func (m Migrator) Migrate2to3(ctx sdk.Context) error {
-	m.k.SetPort(ctx, types.ResourcePortID)
-	err := m.k.BindPort(ctx, types.ResourcePortID)
+	err := m.k.SetPort(ctx, types.ResourcePortID)
+	if err != nil {
+		return err
+	}
+	err = m.k.BindPort(ctx, types.ResourcePortID)
 	if err != nil {
 		return err
 	}

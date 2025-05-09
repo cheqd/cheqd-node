@@ -14,23 +14,6 @@ func NewMsgDeactivateDid(payload *MsgDeactivateDidDocPayload, signatures []*Sign
 	}
 }
 
-func (msg *MsgDeactivateDidDoc) Route() string {
-	return RouterKey
-}
-
-func (msg *MsgDeactivateDidDoc) Type() string {
-	return "MsgDeactivateDidDoc"
-}
-
-func (msg *MsgDeactivateDidDoc) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{}
-}
-
-func (msg *MsgDeactivateDidDoc) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshal(msg)
-	return sdk.MustSortJSON(bz)
-}
-
 func (msg *MsgDeactivateDidDoc) ValidateBasic() error {
 	err := msg.Validate(nil)
 	if err != nil {

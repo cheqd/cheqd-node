@@ -21,7 +21,7 @@ func TestInitCmd(t *testing.T) {
 		fmt.Sprintf("--%s=%s", cli.FlagOverwrite, "true"), // Overwrite genesis.json, in case it already exists
 	})
 
-	require.NoError(t, svrcmd.Execute(rootCmd, "", app.DefaultNodeHome))
+	require.NoError(t, svrcmd.Execute(rootCmd, app.Name, app.DefaultNodeHome))
 }
 
 func TestHomeFlagRegistration(t *testing.T) {
@@ -30,11 +30,10 @@ func TestHomeFlagRegistration(t *testing.T) {
 	rootCmd := cmd.NewRootCmd()
 	rootCmd.SetArgs([]string{
 		"query",
-		fmt.Sprintf("--%s", flags.FlagHome),
-		homeDir,
+		fmt.Sprintf("--%s=%s", flags.FlagHome, homeDir),
 	})
 
-	require.NoError(t, svrcmd.Execute(rootCmd, "", app.DefaultNodeHome))
+	require.NoError(t, svrcmd.Execute(rootCmd, app.Name, app.DefaultNodeHome))
 
 	result, err := rootCmd.Flags().GetString(flags.FlagHome)
 	require.NoError(t, err)

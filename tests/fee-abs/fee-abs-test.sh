@@ -86,7 +86,7 @@ sleep 20
 
 info "Checking statuses"
 CHEQD_STATUS=$(docker compose exec cheqd cheqd-noded status 2>&1)
-assert_network_running "${CHEQD_STATUS}"
+assert_network_running_comet_v38_or_above "${CHEQD_STATUS}"
 
 OSMOSIS_STATUS=$(docker compose exec osmosis osmosisd status 2>&1)
 assert_network_running_comet_v38_or_above "${OSMOSIS_STATUS}"
@@ -184,7 +184,7 @@ POOL_ID=$(docker compose exec osmosis osmosisd q tx $TX_HASH --output json | jq 
 echo "pool id: $POOL_ID"
 
 info "enable fee abs"
-RES=$(docker compose exec cheqd cheqd-noded tx gov submit-legacy-proposal param-change /cheqd/proposal.json --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
+RES=$(docker compose exec cheqd cheqd-noded tx gov submit-proposal /cheqd/proposal.json --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
 assert_tx_successful "${RES}"
 sleep 5
 
@@ -194,7 +194,7 @@ assert_tx_successful "${RES}"
 sleep 5
 
 info "add host zone config"
-RES=$(docker compose exec cheqd cheqd-noded tx gov submit-legacy-proposal add-hostzone-config /cheqd/host_zone.json --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
+RES=$(docker compose exec cheqd cheqd-noded tx gov submit-proposal /cheqd/host_zone.json --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
 assert_tx_successful "${RES}"
 sleep 5
 RES=$(docker compose exec cheqd cheqd-noded tx gov vote 2 yes --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)

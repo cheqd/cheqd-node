@@ -3,26 +3,27 @@ package types
 import (
 	"fmt"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
-var ParamStoreKeyFeeParams = []byte("feeparams")
-
-// ParamKeyTable returns the key declaration for parameters
-func ParamKeyTable() paramstypes.KeyTable {
-	return paramstypes.NewKeyTable(
-		paramstypes.NewParamSetPair(ParamStoreKeyFeeParams, FeeParams{}, validateFeeParams),
-	)
+// NewParams creates a new FeeParams object with specified parameters
+func NewParams(image, json, defaultFee sdk.Coin, burnFactor sdkmath.LegacyDec) FeeParams {
+	return FeeParams{
+		Image:      image,
+		Json:       json,
+		Default:    defaultFee,
+		BurnFactor: burnFactor,
+	}
 }
 
 // DefaultFeeParams returns default cheqd module tx fee parameters
 func DefaultFeeParams() *FeeParams {
 	return &FeeParams{
-		Image:      sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceImageFee)),
-		Json:       sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceJSONFee)),
-		Default:    sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateResourceDefaultFee)),
-		BurnFactor: sdk.MustNewDecFromStr(DefaultBurnFactor),
+		Image:      sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceImageFee)),
+		Json:       sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceJSONFee)),
+		Default:    sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceDefaultFee)),
+		BurnFactor: sdkmath.LegacyMustNewDecFromStr(DefaultBurnFactor),
 	}
 }
 
@@ -40,7 +41,7 @@ func (tfp *FeeParams) ValidateBasic() error {
 		return fmt.Errorf("invalid create resource default tx fee: %s", tfp.Json)
 	}
 
-	if !tfp.BurnFactor.IsPositive() || tfp.BurnFactor.GTE(sdk.OneDec()) {
+	if !tfp.BurnFactor.IsPositive() || tfp.BurnFactor.GTE(sdkmath.LegacyOneDec()) {
 		return fmt.Errorf("invalid burn factor: %s", tfp.BurnFactor)
 	}
 
@@ -99,7 +100,7 @@ func validateDefault(i interface{}) error {
 }
 
 func validateBurnFactor(i interface{}) error {
-	v, ok := i.(sdk.Dec)
+	v, ok := i.(sdkmath.LegacyDec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
@@ -112,7 +113,7 @@ func validateBurnFactor(i interface{}) error {
 		return fmt.Errorf("burn factor must not be negative: %s", v)
 	}
 
-	if v.GTE(sdk.OneDec()) {
+	if v.GTE(sdkmath.LegacyOneDec()) {
 		return fmt.Errorf("burn factor must be less than 1: %s", v)
 	}
 

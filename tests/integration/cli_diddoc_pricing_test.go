@@ -28,10 +28,10 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		tmpDir = GinkgoT().TempDir()
 
 		// Query fee params
-		res, err := cli.QueryParams(types.ModuleName, string(types.ParamStoreKeyFeeParams))
+		res, err := cli.QueryDidParams()
 		Expect(err).To(BeNil())
-		err = helpers.Codec.UnmarshalJSON([]byte(res.Value), &feeParams)
-		Expect(err).To(BeNil())
+
+		feeParams = res.Params
 
 		// Create a new DID Doc
 		did := "did:cheqd:" + network.DidNamespace + ":" + uuid.NewString()

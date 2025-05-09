@@ -1,0 +1,14 @@
+{
+  "messages": [
+    {
+      "@type": "/cheqd.did.v2.MsgMint",
+      "authority": "cheqd10d07y265gmmuvt4z0w9aw880jnsr700j5ql9az",
+      "to_address": "cheqd1lhl9g4rgldadgtz7v6rt50u45uhhj8hhv8d8uf",
+      "amount": [{ "denom": "ncheq", "amount": "9000" }]
+    }
+  ],
+
+  "deposit": "10000000000ncheq",
+  "title": "Mint proposal",
+  "summary": "Proposal to mint the coins using gov authority address"
+}

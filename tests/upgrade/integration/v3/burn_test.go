@@ -3,6 +3,7 @@
 package integration
 
 import (
+	sdkmath "cosmossdk.io/math"
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/v3/cli"
 
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
@@ -19,7 +20,7 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 	})
 
 	It("should burn the coins from the given address (here container/validator)", func() {
-		coins := sdk.NewCoins(sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdk.NewInt(1000)})
+		coins := sdk.NewCoins(sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(1000)})
 		res, err := cli.BurnMsg(cli.Validator0, coins.String())
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))

@@ -24,6 +24,81 @@ externalDocs:
   description: cheqd Network Documentation
   url: https://docs.cheqd.io/node
 paths:
+  /cheqd/did/v2/params:
+    get:
+      summary: Params queries params of the did module.
+      operationId: DidFeeParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params defines the parameters of the module.
+                type: object
+                properties:
+                  createDid:
+                    description: 'Default: 50 CHEQ or 50000000000ncheq'
+                    title: Fixed fee for creating a DID
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                  updateDid:
+                    description: 'Default: 25 CHEQ or 25000000000ncheq'
+                    title: Fixed fee for updating a DID
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                  deactivateDid:
+                    description: 'Default: 10 CHEQ or 10000000000ncheq'
+                    title: Fixed fee for deactivating a DID
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                  burnFactor:
+                    type: string
+                    description: 'Default: 0.5 (50%)'
+                    title: Percentage of the fixed fee that will be burned
+                title: >-
+                  FeeParams defines the parameters for the cheqd DID module
+                  fixed fee
+            description: >-
+              QueryParamsResponse is the response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    typeUrl:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      tags:
+        - DID module queries
   /cheqd/did/v2/{id}:
     get:
       summary: Fetch latest version of a DID Document for a given DID
@@ -811,6 +886,84 @@ paths:
           type: boolean
       tags:
         - DID module queries
+  /cheqd/resource/v2/params:
+    get:
+      summary: Params queries params of the resource module.
+      operationId: ResourceFeeParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params defines the parameters of the module.
+                type: object
+                properties:
+                  image:
+                    description: 'Default: 10 CHEQ or 10000000000ncheq'
+                    title: >-
+                      Fixed fee for creating a resource with media type
+                      'image/*'
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                  json:
+                    description: 'Default: 2.5 CHEQ or 2500000000ncheq'
+                    title: >-
+                      Fixed fee for creating a resource with media type
+                      'application/json'
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                  default:
+                    description: 'Default: 5 CHEQ or 5000000000ncheq'
+                    title: >-
+                      Fixed fee for creating a resource with all other media
+                      types
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                  burnFactor:
+                    type: string
+                    description: 'Default: 0.5 (50%)'
+                    title: Percentage of the fixed fee that will be burned
+            description: >-
+              QueryParamsResponse is the response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    typeUrl:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      tags:
+        - Resource module queries
   /cheqd/resource/v2/{collectionId}/metadata:
     get:
       summary: Fetch metadata for all resources in a collection

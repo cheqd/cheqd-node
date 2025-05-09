@@ -10,17 +10,17 @@ import (
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
 
-	"cosmossdk.io/store"
-	dbm "github.com/cometbft/cometbft-db"
-	"github.com/cometbft/cometbft/libs/log"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	"cosmossdk.io/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 
-	storetypes "cosmossdk.io/store/types"
 	"github.com/cheqd/cheqd-node/x/resource"
 	"github.com/cheqd/cheqd-node/x/resource/keeper"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	storetypes "cosmossdk.io/store/types"
+	sdktestutil "github.com/cosmos/cosmos-sdk/testutil"
+	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -58,17 +58,28 @@ func Setup() TestSetup {
 	cdc := codec.NewProtoCodec(ir)
 	aminoCdc := codec.NewLegacyAmino()
 
+	authority := authtypes.NewModuleAddress(govtypes.ModuleName).String()
+
 	// Init KVStore
-	db := dbm.NewMemDB()
-
-	dbStore := store.NewCommitMultiStore(db)
-
-	keys := sdk.NewKVStoreKeys(
+	keys := storetypes.NewKVStoreKeys(
 		capabilitytypes.StoreKey,
 		authtypes.StoreKey,
 		banktypes.StoreKey,
 		stakingtypes.StoreKey,
+		paramstypes.StoreKey,
+		types.StoreKey,
+		didtypes.StoreKey,
 	)
+
+	transientKeys := storetypes.NewTransientStoreKeys(
+		paramstypes.TStoreKey,
+	)
+
+	memKeys := storetypes.NewMemoryStoreKeys(
+		capabilitytypes.MemStoreKey,
+	)
+
+	ctx := sdktestutil.DefaultContextWithKeys(keys, transientKeys, memKeys)
 
 	maccPerms := map[string][]string{
 		minttypes.ModuleName:           {authtypes.Minter},
@@ -76,60 +87,45 @@ func Setup() TestSetup {
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 	}
-	// Mount did store
-	didStoreKey := sdk.NewKVStoreKey(didtypes.StoreKey)
-	dbStore.MountStoreWithDB(didStoreKey, storetypes.StoreTypeIAVL, nil)
-
-	dbStore.MountStoreWithDB(keys[authtypes.StoreKey], storetypes.StoreTypeIAVL, nil)
-	dbStore.MountStoreWithDB(keys[banktypes.StoreKey], storetypes.StoreTypeIAVL, nil)
-	dbStore.MountStoreWithDB(keys[stakingtypes.StoreKey], storetypes.StoreTypeIAVL, nil)
-
-	// Mount resource store
-	resourceStoreKey := sdk.NewKVStoreKey(types.StoreKey)
-	dbStore.MountStoreWithDB(resourceStoreKey, storetypes.StoreTypeIAVL, nil)
-
-	// Mount capability store - required for ibc port tests
-	capabilityStoreKey := sdk.NewKVStoreKey(capabilitytypes.StoreKey)
-	dbStore.MountStoreWithDB(capabilityStoreKey, storetypes.StoreTypeIAVL, nil)
-	memStoreKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
-	dbStore.MountStoreWithDB(memStoreKeys[capabilitytypes.MemStoreKey], storetypes.StoreTypeMemory, nil)
-
-	// Mount param store - required for ibc port tests with default genesis
-	paramsStoreKey := sdk.NewKVStoreKey(paramstypes.StoreKey)
-	dbStore.MountStoreWithDB(paramsStoreKey, storetypes.StoreTypeIAVL, nil)
-	paramsTStoreKey := sdk.NewTransientStoreKey(paramstypes.TStoreKey)
-	dbStore.MountStoreWithDB(paramsTStoreKey, storetypes.StoreTypeTransient, nil)
-
-	_ = dbStore.LoadLatestVersion()
 
 	accountKeeper := authkeeper.NewAccountKeeper(
 		cdc,
-		keys[authtypes.StoreKey],
+		runtime.NewKVStoreService(keys[authtypes.StoreKey]),
 		authtypes.ProtoBaseAccount,
 		maccPerms,
-		app.AccountAddressPrefix,
+		authcodec.NewBech32Codec(app.AccountAddressPrefix),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		authority,
 	)
 
 	bankKeeper := bankkeeper.NewBaseKeeper(
 		cdc,
-		keys[banktypes.StoreKey],
+		runtime.NewKVStoreService(keys[banktypes.StoreKey]),
 		accountKeeper,
 		nil,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		log.NewNopLogger(),
 	)
-	stakingKeeper := stakingkeeper.NewKeeper(cdc, keys[stakingtypes.StoreKey], accountKeeper, bankKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	stakingKeeper := stakingkeeper.NewKeeper(cdc, runtime.NewKVStoreService(keys[stakingtypes.StoreKey]),
+		accountKeeper,
+		bankKeeper,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		authcodec.NewBech32Codec(app.AccountAddressPrefix),
+		authcodec.NewBech32Codec(app.ConsNodeAddressPrefix))
 
-	paramsKeeper := initParamsKeeper(cdc, aminoCdc, paramsStoreKey, paramsTStoreKey)
+	paramsKeeper := initParamsKeeper(cdc, aminoCdc, keys[paramstypes.StoreKey], transientKeys[paramstypes.StoreKey])
 
-	didKeeper := didkeeper.NewKeeper(cdc, didStoreKey, getSubspace(didtypes.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
-	capabilityKeeper := capabilitykeeper.NewKeeper(cdc, capabilityStoreKey, memStoreKeys[capabilitytypes.MemStoreKey])
+	didKeeper := didkeeper.NewKeeper(cdc, runtime.NewKVStoreService(keys[didtypes.StoreKey]), getSubspace(didtypes.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	capabilityKeeper := capabilitykeeper.NewKeeper(cdc, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 
 	scopedIBCKeeper := capabilityKeeper.ScopeToModule(ibcexported.ModuleName)
 	portKeeper := portkeeper.NewKeeper(scopedIBCKeeper)
 
 	scopedResourceKeeper := capabilityKeeper.ScopeToModule(types.ModuleName)
-	resourceKeeper := keeper.NewKeeper(cdc, resourceStoreKey, getSubspace(types.ModuleName, paramsKeeper), &portKeeper, scopedResourceKeeper)
+	resourceKeeper := keeper.NewKeeper(cdc, runtime.NewKVStoreService(keys[types.StoreKey]),
+		getSubspace(types.ModuleName, paramsKeeper),
+		&portKeeper,
+		scopedResourceKeeper, authority)
 
 	ibcModule := resource.NewIBCModule(*resourceKeeper)
 
@@ -139,9 +135,7 @@ func Setup() TestSetup {
 
 	// Create context
 	blockTime, _ := time.Parse(time.RFC3339, "2021-01-01T00:00:00.000Z")
-	ctx := sdk.NewContext(dbStore,
-		tmproto.Header{ChainID: "test", Time: blockTime},
-		false, log.NewNopLogger()).WithTxBytes(txBytes)
+	ctx = ctx.WithBlockTime(blockTime).WithTxBytes(txBytes)
 
 	// Init servers
 	didMsgServer := didkeeper.NewMsgServer(*didKeeper)
@@ -161,7 +155,7 @@ func Setup() TestSetup {
 			Cdc: cdc,
 
 			SdkCtx: ctx,
-			StdCtx: sdk.WrapSDKContext(ctx),
+			StdCtx: ctx,
 
 			Keeper:      *didKeeper,
 			MsgServer:   didMsgServer,
@@ -173,8 +167,10 @@ func Setup() TestSetup {
 		ResourceQueryServer: queryServer,
 		IBCModule:           ibcModule,
 	}
-
-	setup.Keeper.SetDidNamespace(&ctx, didsetup.DidNamespace)
+	err = setup.Keeper.SetDidNamespace(ctx, didsetup.DidNamespace)
+	if err != nil {
+		panic(err)
+	}
 
 	return setup
 }

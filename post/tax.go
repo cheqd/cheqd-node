@@ -253,7 +253,7 @@ func (td TaxDecorator) isTaxable(ctx sdk.Context, sdkTx sdk.Tx) (rewards sdk.Coi
 }
 
 // getFeePayer returns the fee payer and checks if a fee grant exists
-func (td TaxDecorator) getFeePayer(ctx sdk.Context, feeTx sdk.FeeTx, tax sdk.Coins, msgs []sdk.Msg) (types.AccountI, error) {
+func (td TaxDecorator) getFeePayer(ctx sdk.Context, feeTx sdk.FeeTx, tax sdk.Coins, msgs []sdk.Msg) (sdk.AccountI, error) {
 	feePayer := feeTx.FeePayer()
 	feeGranter := feeTx.FeeGranter()
 	deductFrom := feePayer
@@ -296,7 +296,7 @@ func (td TaxDecorator) validateTax(tax sdk.Coins, simulate bool) error {
 }
 
 // deductTaxFromFeePayer deducts fees from the account
-func (td TaxDecorator) deductTaxFromFeePayer(ctx sdk.Context, acc types.AccountI, fees sdk.Coins) error {
+func (td TaxDecorator) deductTaxFromFeePayer(ctx sdk.Context, acc sdk.AccountI, fees sdk.Coins) error {
 	// ensure module account has been set
 	if addr := td.accountKeeper.GetModuleAddress(didtypes.ModuleName); addr == nil {
 		return fmt.Errorf("cheqd fee collector module account (%s) has not been set", didtypes.ModuleName)

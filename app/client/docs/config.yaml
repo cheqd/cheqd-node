@@ -32,8 +32,14 @@ apis:
     tags:
       rename:
         cheqd.did.v2.Query: DID module queries
+    operationIds:
+      rename:
+        Params: DidFeeParams
 
   - url: ./app/client/docs/cheqd/resource/v2/query.swagger.json
     tags:
       rename:
         cheqd.resource.v2.Query: Resource module queries
+    operationIds:
+      rename:
+        Params: ResourceFeeParams

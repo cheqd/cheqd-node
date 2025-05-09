@@ -10,9 +10,10 @@ import (
 
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	abcitypes "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
-	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
@@ -39,33 +40,18 @@ func Query(module, query string, queryArgs ...string) (string, error) {
 }
 
 func QueryBalance(address, denom string) (sdk.Coin, error) {
-	res, err := Query("bank", "balances", address, "--denom", denom)
+	res, err := Query("bank", "balance", address, denom)
 	if err != nil {
 		return sdk.Coin{}, err
 	}
 
-	var resp sdk.Coin
+	var resp banktypes.QueryBalanceResponse
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
 		return sdk.Coin{}, err
 	}
 
-	return resp, nil
-}
-
-func QueryParams(subspace, key string) (paramproposal.ParamChange, error) {
-	res, err := Query("params", "subspace", subspace, key)
-	if err != nil {
-		return paramproposal.ParamChange{}, err
-	}
-
-	var resp paramproposal.ParamChange
-	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
-	if err != nil {
-		return paramproposal.ParamChange{}, err
-	}
-
-	return resp, nil
+	return *resp.Balance, nil
 }
 
 func QueryDidDoc(did string) (didtypes.QueryDidDocResponse, error) {
@@ -78,6 +64,21 @@ func QueryDidDoc(did string) (didtypes.QueryDidDocResponse, error) {
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
 		return didtypes.QueryDidDocResponse{}, err
+	}
+
+	return resp, nil
+}
+
+func QueryDidParams() (didtypes.QueryParamsResponse, error) {
+	res, err := Query("cheqd", "params")
+	if err != nil {
+		return didtypes.QueryParamsResponse{}, err
+	}
+
+	var resp didtypes.QueryParamsResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return didtypes.QueryParamsResponse{}, err
 	}
 
 	return resp, nil
@@ -128,6 +129,21 @@ func QueryResourceCollection(collectionID string) (resourcetypes.QueryCollection
 	return resp, nil
 }
 
+func QueryResourceParams() (resourcetypes.QueryParamsResponse, error) {
+	res, err := Query("resource", "params")
+	if err != nil {
+		return resourcetypes.QueryParamsResponse{}, err
+	}
+
+	var resp resourcetypes.QueryParamsResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return resourcetypes.QueryParamsResponse{}, err
+	}
+
+	return resp, nil
+}
+
 func QueryTxn(hash string) (sdk.TxResponse, error) {
 	res, err := Query("tx", hash)
 	if err != nil {
@@ -155,15 +171,18 @@ func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 		return govtypesv1.Proposal{}, err
 	}
 
-	fmt.Println("Proposal", out)
-
-	var resp govtypesv1.Proposal
-
-	err = MakeCodecWithExtendedRegistry().UnmarshalJSON([]byte(out), &resp)
+	// FIX: getting type instead of @type in messages struct when querying proposal via cli
+	convertedJSON, err := convertProposalJSON(out)
 	if err != nil {
 		return govtypesv1.Proposal{}, err
 	}
-	return resp, nil
+
+	var resp govtypesv1.QueryProposalResponse
+	err = MakeCodecWithExtendedRegistry().UnmarshalJSON(convertedJSON, &resp)
+	if err != nil {
+		return govtypesv1.Proposal{}, err
+	}
+	return *resp.Proposal, nil
 }
 
 func QueryFeemarketGasPrice(denom string) (feemarkettypes.GasPriceResponse, error) {
@@ -211,23 +230,15 @@ func QueryFeemarketParams() (feemarkettypes.Params, error) {
 	return resp, nil
 }
 
-func GetProposalID(rawLog string) (string, error) {
-	var logs []sdk.ABCIMessageLog
-	err := json.Unmarshal([]byte(rawLog), &logs)
-	if err != nil {
-		return "", err
-	}
-
-	// Iterate over logs and their events
-	for _, log := range logs {
-		for _, event := range log.Events {
-			// Look for the "submit_proposal" event type
-			if event.Type == "submit_proposal" {
-				for _, attr := range event.Attributes {
-					// Look for the "proposal_id" attribute
-					if attr.Key == "proposal_id" {
-						return attr.Value, nil
-					}
+func GetProposalID(events []abcitypes.Event) (string, error) {
+	// Iterate over events
+	for _, event := range events {
+		// Look for the "submit_proposal" event type
+		if event.Type == "submit_proposal" {
+			for _, attr := range event.Attributes {
+				// Look for the "proposal_id" attribute
+				if attr.Key == "proposal_id" {
+					return attr.Value, nil
 				}
 			}
 		}

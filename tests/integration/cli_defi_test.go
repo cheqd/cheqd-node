@@ -17,7 +17,7 @@ import (
 var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 	It("should burn the coins from the given address", func() {
 		// define the coins to burn, in which case 1,000,000 ncheq or 0.01 cheq
-		burnCoins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1_000_000))
+		burnCoins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdkmath.NewInt(1_000_000))
 
 		// get the balance of the account before burning the coins
 		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, didtypes.BaseMinimalDenom)
@@ -47,7 +47,7 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 		diff := balanceBefore.Sub(balanceAfter)
 
 		// assert the difference is equal to the coins burnt
-		total := burnCoins.Add(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(3_500_000_000)))
+		total := burnCoins.Add(sdk.NewCoin(didtypes.BaseMinimalDenom, sdkmath.NewInt(3_500_000_000)))
 
 		// assert the difference is equal to the coins burnt
 		Expect(diff).To(Equal(total))
@@ -55,7 +55,7 @@ var _ = Describe("Upgrade - Burn coins from relevant message signer", func() {
 
 	It("shouldn't burn if sender has insufficient funds", func() {
 		// define the coins to burn, in which case 1,000,000 ncheq or 0.01 cheq
-		coins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1_000_000))
+		coins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdkmath.NewInt(1_000_000))
 
 		// get the balance of the account before burning the coins
 		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_3_ADDR, didtypes.BaseMinimalDenom)
@@ -98,7 +98,7 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions)", func() {
 		Expect(err).To(BeNil())
 
 		// define the coins to send, in which case 1,000,000,000 ncheq or 1 cheq
-		coins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1_000_000_000))
+		coins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdkmath.NewInt(1_000_000_000))
 
 		// compute gas price, using offset
 		gasPrice.Price.Amount = gasPrice.Price.Amount.Mul(sdkmath.LegacyNewDec(didtypes.FeeOffset))
@@ -131,7 +131,7 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions)", func() {
 		Expect(err).To(BeNil())
 
 		// define the coins to send, in which case 1,000,000,000 ncheq or 1 cheq
-		coins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1_000_000_000))
+		coins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdkmath.NewInt(1_000_000_000))
 
 		// define static fees, in which case gas price is multiplied by roughly 3 or greater, times the minimal base denom
 		// consider multiplying in the range of [1.5, 3] times the gas price

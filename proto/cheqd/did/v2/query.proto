@@ -2,8 +2,11 @@ syntax = "proto3";
 
 package cheqd.did.v2;
 
+import "amino/amino.proto";
 import "cheqd/did/v2/diddoc.proto";
+import "cheqd/did/v2/fee.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
+import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
@@ -23,6 +26,10 @@ service Query {
   // Fetch list of all versions of DID Documents for a given DID
   rpc AllDidDocVersionsMetadata(QueryAllDidDocVersionsMetadataRequest) returns (QueryAllDidDocVersionsMetadataResponse) {
     option (google.api.http) = {get: "/cheqd/did/v2/{id}/versions"};
+  }
+  // Params queries params of the did module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/cheqd/did/v2/params";
   }
 }
 
@@ -99,4 +106,16 @@ message QueryAllDidDocVersionsMetadataResponse {
 
   // pagination defines the pagination in the response.
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryParamsRequest is the request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is the response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params defines the parameters of the module.
+  FeeParams params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
 }

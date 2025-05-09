@@ -1,33 +1,21 @@
 {
-    "title": "Enable Fee Abstraction",
-    "description": "Change params for enable fee abstraction",
-    "changes": [
-      {
-        "subspace": "feeabs",
-        "key": "ChainName",
-        "value": "cheqd"
-      },
-      {
-        "subspace": "feeabs",
-        "key": "NativeIbcedInOsmosis",
-        "value": "ibc/19D515BB82FEAFCEC357D04C1B75DBF123DB5479041A9BAE38BFCF295477404D"
-      },
-      {
-        "subspace": "feeabs",
-        "key": "IbcTransferChannel",
-        "value": "channel-0"
-      },
-      {
-        "subspace": "feeabs",
-        "key": "IbcQueryIcqChannel",
-        "value": "channel-1"
-      },
-      {
-        "subspace": "feeabs",
-        "key": "OsmosisCrosschainSwapAddress",
-        "value": "osmo17p9rzwnnfxcjp32un9ug7yhhzgtkhvl9jfksztgw5uh69wac2pgs5yczr8"
+  "messages": [
+    {
+      "@type": "/feeabstraction.feeabs.v1beta1.MsgUpdateParams",
+      "authority": "cheqd10d07y265gmmuvt4z0w9aw880jnsr700j5ql9az",
+      "params": {
+        "native_ibced_in_osmosis": "ibc/19D515BB82FEAFCEC357D04C1B75DBF123DB5479041A9BAE38BFCF295477404D",
+        "osmosis_query_twap_path": "/osmosis.twap.v1beta1.Query/ArithmeticTwapToNow",
+        "chain_name": "cheqd",
+        "ibc_transfer_channel": "channel-0",
+        "ibc_query_icq_channel": "channel-1",
+        "osmosis_crosschain_swap_address": "osmo17p9rzwnnfxcjp32un9ug7yhhzgtkhvl9jfksztgw5uh69wac2pgs5yczr8"
       }
-    ],
-    "deposit": "10000000000ncheq"
-  }
-  
+    }
+  ],
+  "metadata": "",
+  "deposit": "10000000000ncheq",
+  "title": "Enable Fee Abstraction",
+  "summary": "Change params for enable fee abstraction",
+  "expedited": false
+}

@@ -78,7 +78,10 @@ func (im IBCModule) OnChanOpenTry(
 	counterpartyVersion string,
 ) (string, error) {
 	// Require portID is the portID module is bound to
-	boundPort := im.keeper.GetPort(ctx)
+	boundPort, err := im.keeper.GetPort(ctx)
+	if err != nil {
+		return "", err
+	}
 	if boundPort != portID {
 		return "", errorsmod.Wrapf(porttypes.ErrInvalidPort, "invalid port: %s, expected %s", portID, boundPort)
 	}

@@ -1,0 +1,15 @@
+{
+    "payload": {
+        "collectionId": "L7d4i5DiFkBMUfKgAav5tC",
+        "id": "b1c9406d-568c-4a41-9ed3-133fdf3e4974",
+        "name": "Indy Ed25519VerificationKey2018",
+        "resourceType": "TestResourceType",
+        "data": "eyAibWVzc2FnZSI6ICJoZWxsbyB3b3JsZCJ9"
+    },
+    "signInputs": [
+        {
+            "verificationMethodId": "did:cheqd:testnet:L7d4i5DiFkBMUfKgAav5tC#key-1",
+            "privKey": "tlzCpWJE+U1C+R1xddH8RMwzhIlGJI4qkbmJatHuJk07ibufCgot0M+/jPA90gLw5L+EbV/Zls4hL2Uyu6J6Ow=="
+        }
+    ]
+}

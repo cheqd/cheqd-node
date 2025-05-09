@@ -61,7 +61,7 @@ var (
 
 // TestAccount represents an account used in the tests in x/auth/ante.
 type TestAccount struct {
-	acc  authtypes.AccountI
+	acc  sdk.AccountI
 	priv cryptotypes.PrivKey
 }
 
@@ -90,9 +90,12 @@ func createTestApp(isCheckTx bool) (*cheqdapp.TestApp, sdk.Context, error) {
 
 	// cheqd specific params
 	didFeeParams := didtypes.DefaultGenesis().FeeParams
-	app.DidKeeper.SetParams(ctx, *didFeeParams)
+	err = app.DidKeeper.SetParams(ctx, *didFeeParams)
+	if err != nil {
+		return nil, sdk.Context{}, err
+	}
 	resourceFeeParams := resourcetypes.DefaultGenesis().FeeParams
-	app.ResourceKeeper.SetParams(ctx, *resourceFeeParams)
+	_ = app.ResourceKeeper.SetParams(ctx, *resourceFeeParams)
 	err = app.FeeMarketKeeper.SetParams(ctx, types.NewParams(DefaultWindow, DefaultAlpha, DefaultBeta, DefaultGamma, DefaultDelta,
 		DefaultMaxBlockUtilization, DefaultMinBaseGasPrice, DefaultMinLearningRate, DefaultMaxLearningRate, DefaultFeeDenom, true,
 	))
@@ -146,7 +149,7 @@ func (s *AnteTestSuite) CreateTestAccounts(numAccs int) ([]TestAccount, error) {
 	for i := 0; i < numAccs; i++ {
 		priv, _, addr := testdata.KeyTestPubAddr()
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr)
-		err := acc.SetAccountNumber(uint64(i))
+		err := acc.SetAccountNumber(uint64(i + 1000))
 		if err != nil {
 			return nil, err
 		}
@@ -217,13 +220,13 @@ func (s *AnteTestSuite) CreateTestTx(privs []cryptotypes.PrivKey, accNums []uint
 }
 
 // SetDidFeeParams is a helper function to set did fee params.
-func (s *AnteTestSuite) SetDidFeeParams(feeParams didtypes.FeeParams) {
-	s.app.DidKeeper.SetParams(s.ctx, feeParams)
+func (s *AnteTestSuite) SetDidFeeParams(feeParams didtypes.FeeParams) error {
+	return s.app.DidKeeper.SetParams(s.ctx, feeParams)
 }
 
 // SetResourceFeeParams is a helper function to set resource fee params.
-func (s *AnteTestSuite) SetResourceFeeParams(feeParams resourcetypes.FeeParams) {
-	s.app.ResourceKeeper.SetParams(s.ctx, feeParams)
+func (s *AnteTestSuite) SetResourceFeeParams(feeParams resourcetypes.FeeParams) error {
+	return s.app.ResourceKeeper.SetParams(s.ctx, feeParams)
 }
 
 func (s *AnteTestSuite) SetFeeMarketFeeDenom() error {

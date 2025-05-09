@@ -5,6 +5,7 @@ package integration
 import (
 	"path/filepath"
 
+	sdkmath "cosmossdk.io/math"
 	cli "github.com/cheqd/cheqd-node/tests/integration/cli"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -42,7 +43,7 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		res, err = cli.QueryTxn(res.TxHash)
 		Expect(err).To(BeNil())
 
-		proposal_id, err := cli.GetProposalID(res.RawLog)
+		proposal_id, err := cli.GetProposalID(res.Events)
 		Proposal_id = proposal_id
 		Expect(err).To(BeNil())
 
@@ -112,7 +113,7 @@ var _ = Describe("Integration - Mint coins to given address", func() {
 		Expect(err).To(BeNil())
 
 		// Calculate expected balance by adding 9000 to the balance before
-		expectedBalance := balanceBefore.Add(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(9000)))
+		expectedBalance := balanceBefore.Add(sdk.NewCoin(didtypes.BaseMinimalDenom, sdkmath.NewInt(9000)))
 
 		// Check if the balance after minting matches the expected balance
 		Expect(balanceAfter.Amount.Int64()).To(Equal(expectedBalance.Amount.Int64()))

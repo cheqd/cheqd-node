@@ -29,16 +29,16 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		tmpDir = GinkgoT().TempDir()
 
 		// Query did fee params
-		res, err := cli.QueryParams(didtypes.ModuleName, string(didtypes.ParamStoreKeyFeeParams))
-		Expect(err).To(BeNil())
-		err = helpers.Codec.UnmarshalJSON([]byte(res.Value), &didFeeParams)
+		didRes, err := cli.QueryDidParams()
 		Expect(err).To(BeNil())
 
+		didFeeParams = didRes.Params
+
 		// Query resource fee params
-		res, err = cli.QueryParams(resourcetypes.ModuleName, string(resourcetypes.ParamStoreKeyFeeParams))
+		resourceRes, err := cli.QueryResourceParams()
 		Expect(err).To(BeNil())
-		err = helpers.Codec.UnmarshalJSON([]byte(res.Value), &resourceFeeParams)
-		Expect(err).To(BeNil())
+
+		resourceFeeParams = resourceRes.Params
 
 		// Create a new DID Doc
 		collectionID = uuid.NewString()

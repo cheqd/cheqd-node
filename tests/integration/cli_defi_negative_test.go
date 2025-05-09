@@ -26,7 +26,7 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions) negative",
 		Expect(err).To(BeNil())
 
 		// define the coins to send, in which case 1,000,000,000 ncheq or 1 cheq
-		coins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1_000_000_000))
+		coins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdkmath.NewInt(1_000_000_000))
 
 		// compute gas price, using offset
 		gasPrice.Price.Amount = gasPrice.Price.Amount.Mul(sdkmath.LegacyNewDec(didtypes.FeeOffset))
@@ -59,7 +59,7 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions) negative",
 		Expect(err).To(BeNil())
 
 		// define the coins to send, in which case 1,000,000,000 ncheq or 1 cheq
-		coins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1_000_000_000))
+		coins := sdk.NewCoin(didtypes.BaseMinimalDenom, sdkmath.NewInt(1_000_000_000))
 
 		// define static fees, in which case gas price is multiplied by roughly 3 or greater, times the minimal base denom
 		// consider multiplying in the range of [1.5, 3] times the gas price

@@ -54,5 +54,7 @@ else
     echo "No private validator key file passed. Skipping and retaining existing key."
 fi
 
+sed -i '/^\[api\]/,/^\[/{s/^enable *= *.*/enable = true/; s/^swagger *= *.*/swagger = true/; s/^enabled-unsafe-cors *= *.*/enabled-unsafe-cors = true/; s/^address *= *.*/address = "tcp:\/\/0.0.0.0:1317"/}' "${CHEQD_ROOT_DIR}/config/app.toml"
+
 # Run node
 cheqd-noded start
