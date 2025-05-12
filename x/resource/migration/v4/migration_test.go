@@ -50,7 +50,7 @@ func TestMigrate(t *testing.T) {
 
 	// set count key in old store
 	var countValue uint64 = 5
-	store.Set([]byte(types.ResourceCountKey), []byte(strconv.FormatUint(countValue, 10)))
+	require.NoError(t, store.Set([]byte(types.ResourceCountKey), []byte(strconv.FormatUint(countValue, 10))))
 
 	legacySubspace := newMockSubspace(*types.DefaultFeeParams())
 	require.NoError(t, v4.MigrateStore(ctx, runtime.NewKVStoreService(storeKey), legacySubspace, cdc, countCollection))
