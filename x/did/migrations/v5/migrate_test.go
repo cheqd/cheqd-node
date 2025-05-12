@@ -1,10 +1,12 @@
 package v5_test
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
+	"cosmossdk.io/collections"
 	storetypes "cosmossdk.io/store/types"
 
 	did "github.com/cheqd/cheqd-node/x/did"
@@ -42,13 +44,25 @@ func TestMigrate(t *testing.T) {
 	ctx := sdktestutil.DefaultContext(storeKey, tKey)
 	kvStoreService := runtime.NewKVStoreService(storeKey)
 	store := kvStoreService.OpenKVStore(ctx)
+	sb := collections.NewSchemaBuilder(kvStoreService)
+	countCollection := collections.NewItem(sb, collections.Prefix(types.DidDocCountKey),
+		"did_count", collections.Uint64Value)
+
+	// set count key in old store
+	var countValue uint64 = 5
+	store.Set([]byte(types.DidDocCountKey), []byte(strconv.FormatUint(countValue, 10)))
 
 	legacySubspace := newMockSubspace(*types.DefaultFeeParams())
-	require.NoError(t, v5.MigrateStore(ctx, runtime.NewKVStoreService(storeKey), legacySubspace, cdc))
+	require.NoError(t, v5.MigrateStore(ctx, kvStoreService, legacySubspace, cdc, countCollection))
 
 	var res types.FeeParams
 	bz, err := store.Get(types.ParamStoreKey)
 	require.NoError(t, err)
 	require.NoError(t, cdc.Unmarshal(bz, &res))
 	require.Equal(t, legacySubspace.ps, res)
+
+	// check set count value
+	actualCount, err := countCollection.Get(ctx)
+	require.NoError(t, err)
+	require.Equal(t, countValue, actualCount)
 }

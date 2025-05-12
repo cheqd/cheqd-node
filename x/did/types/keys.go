@@ -15,6 +15,8 @@ const (
 	RouterKey = ModuleName
 
 	DidMethod = ModuleName
+
+	DidDocCountKey = "did-count:"
 )
 
 // State:
@@ -24,7 +26,7 @@ const (
 // did-version:<did>:<version> -> <did-doc>
 
 var (
-	DidDocCountKeyPrefix         = collections.NewPrefix("did-count:")
+	DidDocCountKeyPrefix         = collections.NewPrefix(DidDocCountKey)
 	DidNamespaceKeyPrefix        = collections.NewPrefix("did-namespace:")
 	LatestDidDocVersionKeyPrefix = collections.NewPrefix("did-latest:")
 	DidDocVersionKeyPrefix       = collections.NewPrefix("did-version:")

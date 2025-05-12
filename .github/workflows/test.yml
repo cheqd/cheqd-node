@@ -283,7 +283,7 @@ jobs:
         run: docker compose --env-file build-latest.env logs --tail --follow
 
       - name: Submit governance fee parameter change proposals
-        working-directory: ./tests/upgrade/integration/v2
+        working-directory: ./tests/upgrade/integration/v4
         run: |
           ginkgo -r --race --tags upgrade_integration --focus-file param_change_proposal_test.go --keep-going --trace --junit-report ../../../../report-pricing-proposal.xml
 
