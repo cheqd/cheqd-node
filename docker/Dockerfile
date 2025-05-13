@@ -11,7 +11,10 @@ RUN apk update && apk add --no-cache $PACKAGES
 # Set working directory for the build
 WORKDIR /go/src/github.com/cheqd/cheqd-node
 
-# Add source files
+RUN git clone https://github.com/cheqd/price-feeder
+
+
+# # Add source files
 COPY . .
 
 # Make node binary
@@ -36,6 +39,8 @@ ARG GROUP=${USER}
 ARG UID=1000
 ARG GID=${UID}
 
+COPY docker/localnet/price-feeder.toml.template /etc/price-feeder/price-feeder.toml.template
+
 # Add cheqd user to use in the container
 RUN addgroup --system ${GROUP} --gid ${GID} \
     && adduser ${USER} --uid ${UID} -G ${GROUP} --system --home ${HOME_DIR} --shell /bin/bash
@@ -49,7 +54,7 @@ WORKDIR ${HOME_DIR}
 USER ${USER}
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
-EXPOSE 26656 26657 26660 1317 9090 9091
+EXPOSE 26656 26657 26660 1317 9090 9091 7171
 
 # Set plain vanilla default entrypoint/command
 CMD [ "cheqd-noded" ]

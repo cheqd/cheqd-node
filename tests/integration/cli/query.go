@@ -9,6 +9,7 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -268,4 +269,131 @@ func QueryKeys(name string) (string, error) {
 	}
 
 	return result.Address, nil
+}
+
+func QueryOracleParams() (oracletypes.QueryParamsResponse, error) {
+	res, err := Query("oracle", "params")
+	if err != nil {
+		return oracletypes.QueryParamsResponse{}, err
+	}
+
+	var resp oracletypes.QueryParamsResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return oracletypes.QueryParamsResponse{}, err
+	}
+
+	return resp, nil
+}
+
+// QueryAggregateVote queries the aggregate vote for a validator
+func QueryAggregateVote(validatorAddr string) (*oracletypes.QueryAggregateVoteResponse, error) {
+	res, err := Query("oracle", "aggregate-votes", validatorAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp oracletypes.QueryAggregateVoteResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling aggregate vote response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+// QueryAggregatePrevote queries the aggregate prevote for a validator
+func QueryAggregatePrevote(validatorAddr string) (*oracletypes.QueryAggregatePrevoteResponse, error) {
+	res, err := Query("oracle", "aggregate-prevotes", validatorAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp oracletypes.QueryAggregatePrevoteResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling aggregate prevote response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+// QueryExchangeRates queries all exchange rates
+func QueryExchangeRates() (*oracletypes.QueryExchangeRatesResponse, error) {
+	res, err := Query("oracle", "exchange-rates")
+	if err != nil {
+		return nil, err
+	}
+
+	var resp oracletypes.QueryExchangeRatesResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling exchange rates response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+// QueryExchangeRate queries the exchange rate for a specific denom
+func QueryExchangeRate(denom string) (*oracletypes.QueryExchangeRatesResponse, error) {
+	res, err := Query("oracle", "exchange-rate", denom)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp oracletypes.QueryExchangeRatesResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling exchange rate response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+// QueryFeederDelegation queries the feeder delegation for a validator
+func QueryFeederDelegation(validatorAddr string) (*oracletypes.QueryFeederDelegationResponse, error) {
+	res, err := Query("oracle", "feeder-delegation", validatorAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp oracletypes.QueryFeederDelegationResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling feeder delegation response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+// QueryMissCounter queries the miss counter for a validator
+func QueryMissCounter(validatorAddr string) (*oracletypes.QueryMissCounterResponse, error) {
+	res, err := Query("oracle", "miss-counter", validatorAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp oracletypes.QueryMissCounterResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling miss counter response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+// QuerySlashWindow queries the current slash window progress
+func QuerySlashWindow() (*oracletypes.QuerySlashWindowResponse, error) {
+	res, err := Query("oracle", "slash-window")
+	if err != nil {
+		return nil, err
+	}
+
+	var resp oracletypes.QuerySlashWindowResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling slash window response: %w", err)
+	}
+
+	return &resp, nil
 }

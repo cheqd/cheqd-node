@@ -3,6 +3,8 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"os/exec"
+	"strings"
 
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
@@ -182,4 +184,62 @@ func VoteProposalTx(from, option, id string, feeParams []string) (sdk.TxResponse
 
 func SendTokensTx(from, to, amount string, feeParams []string) (sdk.TxResponse, error) {
 	return Tx("bank", "send", from, feeParams, from, to, amount)
+}
+
+// DelegateFeederAddress delegates a feeder address for a validator
+func DelegateFeederAddress(validatorAddr, feederAddr, account string, fees []string) (*sdk.TxResponse, error) {
+	resp, err := Tx("oracle", "delegate-feed-consent", account, fees, validatorAddr, feederAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	txResp := sdk.TxResponse{
+		Height:    resp.Height,
+		TxHash:    resp.TxHash,
+		Codespace: resp.Codespace,
+		Code:      resp.Code,
+		RawLog:    resp.RawLog,
+		Logs:      resp.Logs,
+		GasWanted: resp.GasWanted,
+		GasUsed:   resp.GasUsed,
+	}
+
+	return &txResp, nil
+}
+
+// SubmitExchangeRateVote submits an exchange rate vote
+func SubmitExchangeRateVote(exchangeRates, salt, validatorAddr, feederAddr, account string, fees []string) (*sdk.TxResponse, error) {
+	cmd := fmt.Sprintf(
+		"%s tx oracle exchange-rate-vote %s %s %s --from %s %s -o json",
+		"cheqd",
+		salt,
+		exchangeRates,
+		validatorAddr,
+		account,
+		fees,
+	)
+	out, err := ExecuteWithInput(cmd, "")
+	if err != nil {
+		return nil, fmt.Errorf("error executing command: %s, error: %w, output: %s", cmd, err, string(out))
+	}
+
+	var response sdk.TxResponse
+	err = json.Unmarshal(out, &response)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling response: %w, output: %s", err, string(out))
+	}
+
+	return &response, nil
+}
+
+// ExecuteWithInput executes a command with the given input
+func ExecuteWithInput(command, input string) ([]byte, error) {
+	fmt.Printf("Executing command: %s\n", command)
+	cmd := exec.Command("sh", "-c", command)
+
+	if input != "" {
+		cmd.Stdin = strings.NewReader(input)
+	}
+
+	return cmd.CombinedOutput()
 }
