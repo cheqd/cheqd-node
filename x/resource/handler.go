@@ -8,11 +8,12 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	"github.com/cheqd/cheqd-node/x/resource/keeper"
 	"github.com/cheqd/cheqd-node/x/resource/types"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func NewHandler(k keeper.Keeper, cheqdKeeper didkeeper.Keeper) sdk.Handler {
+func NewHandler(k keeper.Keeper, cheqdKeeper didkeeper.Keeper) baseapp.MsgServiceHandler {
 	msgServer := keeper.NewMsgServer(k, cheqdKeeper)
 
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
@@ -20,7 +21,7 @@ func NewHandler(k keeper.Keeper, cheqdKeeper didkeeper.Keeper) sdk.Handler {
 
 		switch msg := msg.(type) {
 		case *types.MsgCreateResource:
-			res, err := msgServer.CreateResource(sdk.WrapSDKContext(ctx), msg)
+			res, err := msgServer.CreateResource(ctx, msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 
 		default:

@@ -2,17 +2,20 @@ package app
 
 import (
 	errorsmod "cosmossdk.io/errors"
+	storetypes "cosmossdk.io/store/types"
+	circuitante "cosmossdk.io/x/circuit/ante"
+	txsigning "cosmossdk.io/x/tx/signing"
 	cheqdante "github.com/cheqd/cheqd-node/ante"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	ibcante "github.com/cosmos/ibc-go/v7/modules/core/ante"
-	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
-	feeabsante "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/ante"
-	feeabskeeper "github.com/osmosis-labs/fee-abstraction/v7/x/feeabs/keeper"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	ibcante "github.com/cosmos/ibc-go/v8/modules/core/ante"
+	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
+	feeabsante "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/ante"
+	feeabskeeper "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/keeper"
 	feemarketante "github.com/skip-mev/feemarket/x/feemarket/ante"
 	feemarketkeeper "github.com/skip-mev/feemarket/x/feemarket/keeper"
 )
@@ -21,17 +24,18 @@ import (
 // Here we add the cheqd ante decorators, which extend default SDK AnteHandler.
 type HandlerOptions struct {
 	AccountKeeper          cheqdante.AccountKeeper
-	BankKeeper             cheqdante.BankKeeper
+	BankKeeper             bankkeeper.Keeper
 	ExtensionOptionChecker ante.ExtensionOptionChecker
 	FeegrantKeeper         ante.FeegrantKeeper
-	SignModeHandler        authsigning.SignModeHandler
-	SigGasConsumer         func(meter sdk.GasMeter, sig signing.SignatureV2, params types.Params) error
+	SignModeHandler        *txsigning.HandlerMap
+	SigGasConsumer         func(meter storetypes.GasMeter, sig signing.SignatureV2, params types.Params) error
 	TxFeeChecker           ante.TxFeeChecker
 	IBCKeeper              *ibckeeper.Keeper
 	DidKeeper              cheqdante.DidKeeper
 	ResourceKeeper         cheqdante.ResourceKeeper
 	FeeAbskeeper           feeabskeeper.Keeper
 	FeeMarketKeeper        *feemarketkeeper.Keeper
+	CircuitKeeper          circuitante.CircuitBreaker
 }
 
 // NewAnteHandler returns an AnteHandler that checks and increments sequence
@@ -56,6 +60,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 
 	anteDecorators := []sdk.AnteDecorator{
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
+		circuitante.NewCircuitBreakerDecorator(options.CircuitKeeper),
 		ante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
 		feeabsante.NewFeeAbstrationMempoolFeeDecorator(options.FeeAbskeeper),
 		ante.NewValidateBasicDecorator(),

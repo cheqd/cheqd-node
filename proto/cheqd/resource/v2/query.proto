@@ -3,9 +3,11 @@ syntax = "proto3";
 package cheqd.resource.v2;
 
 import "cheqd/resource/v2/resource.proto";
+import "cheqd/resource/v2/fee.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
+import "amino/amino.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
@@ -24,6 +26,11 @@ service Query {
   // Fetch metadata for all resources in a collection
   rpc CollectionResources(QueryCollectionResourcesRequest) returns (QueryCollectionResourcesResponse) {
     option (google.api.http).get = "/cheqd/resource/v2/{collection_id}/metadata";
+  }
+
+   // Params queries params of the resource module.
+   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/cheqd/resource/v2/params";
   }
 }
 
@@ -92,4 +99,16 @@ message QueryCollectionResourcesResponse {
 
   // pagination defines the pagination in the response.
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryParamsRequest is the request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is the response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params defines the parameters of the module.
+  FeeParams params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
 }

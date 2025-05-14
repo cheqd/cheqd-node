@@ -6,14 +6,15 @@ import (
 	"fmt"
 	"path/filepath"
 
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	integrationcli "github.com/cheqd/cheqd-node/tests/integration/cli"
 	clihelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/v3/cli"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
+	sdkmath "cosmossdk.io/math"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -153,7 +154,7 @@ var _ = Describe("Upgrade - Post", func() {
 			Expect(balanceBefore.Denom).To(Equal(didtypes.BaseMinimalDenom))
 
 			By("burning the coins")
-			coins := sdk.NewCoins(sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdk.NewInt(1000)})
+			coins := sdk.NewCoins(sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(1000)})
 			res, err := cli.BurnMsg(cli.Validator0, coins.String())
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
@@ -164,9 +165,9 @@ var _ = Describe("Upgrade - Post", func() {
 			Expect(balanceAfter.Denom).To(Equal(didtypes.BaseMinimalDenom))
 
 			By("checking if the balance has been reduced by the expected amount")
-			expectedBalance := balanceBefore.Sub(sdk.NewCoin(didtypes.BaseMinimalDenom, sdk.NewInt(1000)))
+			expectedBalance := balanceBefore.Sub(sdk.NewCoin(didtypes.BaseMinimalDenom, sdkmath.NewInt(1000)))
 			diff := balanceAfter.Amount.Sub(expectedBalance.Amount)
-			Expect(diff).To(Equal(sdk.NewInt(1000)))
+			Expect(diff).To(Equal(sdkmath.NewInt(1000)))
 		})
 	})
 })

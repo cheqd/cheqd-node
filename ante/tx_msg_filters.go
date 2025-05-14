@@ -3,6 +3,7 @@ package ante
 import (
 	"strings"
 
+	sdkmath "cosmossdk.io/math"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	resourceutils "github.com/cheqd/cheqd-node/x/resource/utils"
@@ -29,7 +30,7 @@ const (
 
 type TaxableMsgFee = [TaxableMsgFeeCount]sdk.Coins
 
-type BurnFactor = [BurnFactorCount]sdk.Dec
+type BurnFactor = [BurnFactorCount]sdkmath.LegacyDec
 
 var TaxableMsgFees = TaxableMsgFee{
 	MsgCreateDidDoc:          (sdk.Coins)(nil),
@@ -41,8 +42,8 @@ var TaxableMsgFees = TaxableMsgFee{
 }
 
 var BurnFactors = BurnFactor{
-	BurnFactorDid:      sdk.NewDec(0),
-	BurnFactorResource: sdk.NewDec(0),
+	BurnFactorDid:      sdkmath.LegacyNewDec(0),
+	BurnFactorResource: sdkmath.LegacyNewDec(0),
 }
 
 func GetTaxableMsg(msg interface{}) bool {
@@ -107,12 +108,18 @@ func GetResourceTaxableMsgFee(ctx sdk.Context, msg *resourcetypes.MsgCreateResou
 }
 
 func checkFeeParamsFromSubspace(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKeeper) bool {
-	didParams := didKeeper.GetParams(ctx)
+	didParams, err := didKeeper.GetParams(ctx)
+	if err != nil {
+		return false
+	}
 	TaxableMsgFees[MsgCreateDidDoc] = sdk.NewCoins(didParams.CreateDid)
 	TaxableMsgFees[MsgUpdateDidDoc] = sdk.NewCoins(didParams.UpdateDid)
 	TaxableMsgFees[MsgDeactivateDidDoc] = sdk.NewCoins(didParams.DeactivateDid)
 
-	resourceParams := resourceKeeper.GetParams(ctx)
+	resourceParams, err := resourceKeeper.GetParams(ctx)
+	if err != nil {
+		return false
+	}
 	TaxableMsgFees[MsgCreateResourceImage] = sdk.NewCoins(resourceParams.Image)
 	TaxableMsgFees[MsgCreateResourceJSON] = sdk.NewCoins(resourceParams.Json)
 	TaxableMsgFees[MsgCreateResourceDefault] = sdk.NewCoins(resourceParams.Default)

@@ -30,6 +30,7 @@ sed -i $SED_EXT 's/timeout_precommit = "1s"/timeout_precommit = "500ms"/g' "${CO
 sed -i $SED_EXT 's/timeout_commit = "5s"/timeout_commit = "2s"/g' "${CONFIG_TOML}"
 sed -i $SED_EXT 's/log_level = "info"/log_level = "debug"/g' "${CONFIG_TOML}"
 sed -i $SED_EXT 's/"voting_period": "172800s"/"voting_period": "12s"/' "$HOME/.cheqdnode/config/genesis.json"
+sed -i $SED_EXT 's/"expedited_voting_period": "86400s"/"expedited_voting_period": "10s"/' "$HOME/.cheqdnode/config/genesis.json"
 
 # shellcheck disable=SC2086
 sed -i $SED_EXT 's|laddr = "tcp://127.0.0.1:26657"|laddr = "tcp://0.0.0.0:26657"|g' "$HOME/.cheqdnode/config/config.toml"
@@ -45,3 +46,6 @@ cheqd-noded genesis gentx cheqd-user 10000000000000000ncheq --chain-id $CHAIN_ID
 
 cheqd-noded genesis collect-gentxs
 cheqd-noded genesis validate-genesis
+
+# set default output format to json
+cheqd-noded config set client output json

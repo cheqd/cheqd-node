@@ -1,8 +1,12 @@
 package keeper
 
 import (
+	"context"
+
 	"github.com/cheqd/cheqd-node/x/did/types"
 )
+
+var _ types.QueryServer = QueryServer{}
 
 type QueryServer struct {
 	Keeper
@@ -13,4 +17,11 @@ func NewQueryServer(keeper Keeper) types.QueryServer {
 	return &QueryServer{Keeper: keeper}
 }
 
-var _ types.QueryServer = QueryServer{}
+func (k Keeper) Params(ctx context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+	params, err := k.Paramstore.Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryParamsResponse{Params: params}, nil
+}

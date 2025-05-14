@@ -447,6 +447,7 @@ var _ = Describe("Create DID tests", func() {
 					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(alice.KeyPair.Public),
 				},
 			},
+			VersionId: uuid.NewString(),
 		}
 
 		signatures := []testsetup.SignInput{alice.SignInput}
