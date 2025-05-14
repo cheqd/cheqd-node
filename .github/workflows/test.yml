@@ -193,7 +193,7 @@ jobs:
           tar -xvf cheqd-noded-"${LEGACY_VERSION}"-linux-amd64.tar.gz -C ${{ env.RUNNER_BIN_DIR }}
           sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
         env:
-          LEGACY_VERSION: 3.0.1
+          LEGACY_VERSION: 3.2.0
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -225,7 +225,7 @@ jobs:
           bash scripts/old_binary_setup.sh
 
       - name: Run pre-upgrade tests
-        working-directory: ./tests/upgrade/integration/v3
+        working-directory: ./tests/upgrade/integration/v4
         run: |
           ginkgo -r --race --tags upgrade_integration --focus-file pre_test.go --keep-going --trace --junit-report ../../../../report-pre-upgrade.xml
 
@@ -244,18 +244,7 @@ jobs:
         working-directory: ./tests/upgrade/integration
         run: |
           docker ps -a
-
-      - name: Run post-upgrade tests
-        working-directory: ./tests/upgrade/integration/v3
-        run: |
-          ginkgo -r --race --tags upgrade_integration --focus-file post_test.go --keep-going --trace --junit-report ../../../../report-post-upgrade.xml
-
-      - name: Upload post-upgrade tests result
-        uses: actions/upload-artifact@v4
-        with:
-          name: report-post-upgrade.xml
-          path: report-post-upgrade.xml
-
+      
       - name: Download binary artifact (build-latest)
         uses: actions/download-artifact@v4
         id: download
@@ -265,6 +254,17 @@ jobs:
 
       - name: Restore binary permissions
         run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
+
+      - name: Run post-upgrade tests
+        working-directory: ./tests/upgrade/integration/v4
+        run: |
+          ginkgo -r --race --tags upgrade_integration --focus-file post_test.go --keep-going --trace --junit-report ../../../../report-post-upgrade.xml
+
+      - name: Upload post-upgrade tests result
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-post-upgrade.xml
+          path: report-post-upgrade.xml
 
       - name: Run integration tests on upgraded network
         working-directory: ./tests/integration
@@ -283,7 +283,7 @@ jobs:
         run: docker compose --env-file build-latest.env logs --tail --follow
 
       - name: Submit governance fee parameter change proposals
-        working-directory: ./tests/upgrade/integration/v2
+        working-directory: ./tests/upgrade/integration/v4
         run: |
           ginkgo -r --race --tags upgrade_integration --focus-file param_change_proposal_test.go --keep-going --trace --junit-report ../../../../report-pricing-proposal.xml
 

@@ -53,7 +53,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/address"
 	"github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/runtime"
 	runtimeservices "github.com/cosmos/cosmos-sdk/runtime/services"
 	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/cosmos/cosmos-sdk/server/api"
@@ -70,7 +69,6 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
-	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	txmodule "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
@@ -155,9 +153,13 @@ import (
 
 	// unnamed import of statik for swagger UI support
 	cheqdante "github.com/cheqd/cheqd-node/ante"
+	didv2 "github.com/cheqd/cheqd-node/api/v2/cheqd/did/v2"
+	resourcev2 "github.com/cheqd/cheqd-node/api/v2/cheqd/resource/v2"
 	_ "github.com/cheqd/cheqd-node/app/client/docs/statik"
 	upgradeV3 "github.com/cheqd/cheqd-node/app/upgrades/v3"
 	upgradeV4 "github.com/cheqd/cheqd-node/app/upgrades/v4"
+	"github.com/cosmos/cosmos-sdk/runtime"
+	protov2 "google.golang.org/protobuf/proto"
 )
 
 var (
@@ -259,6 +261,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+	SetConfig()
 
 	DefaultNodeHome = filepath.Join(userHomeDir, Home)
 }
@@ -268,16 +271,22 @@ func New(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
-	interfaceRegistry, _ := types.NewInterfaceRegistryWithOptions(types.InterfaceRegistryOptions{
-		ProtoFiles: proto.HybridResolver,
-		SigningOptions: signing.Options{
-			AddressCodec: address.Bech32Codec{
-				Bech32Prefix: AccountAddressPrefix,
-			},
-			ValidatorAddressCodec: address.Bech32Codec{
-				Bech32Prefix: ValidatorAddressPrefix,
-			},
+	signopts := signing.Options{
+		AddressCodec: address.Bech32Codec{
+			Bech32Prefix: AccountAddressPrefix,
 		},
+		ValidatorAddressCodec: address.Bech32Codec{
+			Bech32Prefix: ValidatorAddressPrefix,
+		},
+	}
+	signopts.DefineCustomGetSigners(protov2.MessageName(&resourcev2.MsgCreateResource{}), resourcetypes.CreateGetSigners(&signopts))
+	signopts.DefineCustomGetSigners(protov2.MessageName(&didv2.MsgCreateDidDoc{}), didtypes.CreateGetSigners(&signopts))
+	signopts.DefineCustomGetSigners(protov2.MessageName(&didv2.MsgUpdateDidDoc{}), didtypes.CreateGetSigners(&signopts))
+	signopts.DefineCustomGetSigners(protov2.MessageName(&didv2.MsgDeactivateDidDoc{}), didtypes.CreateGetSigners(&signopts))
+
+	interfaceRegistry, _ := types.NewInterfaceRegistryWithOptions(types.InterfaceRegistryOptions{
+		ProtoFiles:     proto.HybridResolver,
+		SigningOptions: signopts,
 	})
 	appCodec := codec.NewProtoCodec(interfaceRegistry)
 	legacyAmino := codec.NewLegacyAmino()
@@ -318,6 +327,7 @@ func New(
 
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName).String()
 
+	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
 	bApp := baseapp.NewBaseApp(Name, logger, db, txConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetVersion(version.Version)
@@ -413,7 +423,8 @@ func New(
 	)
 
 	// optional: enable sign mode textual by overwriting the default tx config (after setting the bank keeper)
-	enabledSignModes := append(tx.DefaultSignModes, sigtypes.SignMode_SIGN_MODE_TEXTUAL)
+	enabledSignModes := tx.DefaultSignModes
+	enabledSignModes = append(enabledSignModes, sigtypes.SignMode_SIGN_MODE_TEXTUAL)
 	txConfigOpts := tx.ConfigOptions{
 		EnabledSignModes:           enabledSignModes,
 		TextualCoinMetadataQueryFn: txmodule.NewBankKeeperCoinMetadataQueryFn(app.BankKeeper),
@@ -642,7 +653,7 @@ func New(
 	govRouter := govv1beta1.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)).
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper)). //nolint
 		AddRoute(feeabstypes.RouterKey, feeabsmodule.NewHostZoneProposal(app.FeeabsKeeper))
 	govConfig := govtypes.DefaultConfig()
 	/*
@@ -695,10 +706,11 @@ func New(
 
 	// x/resource
 	app.ResourceKeeper = *resourcekeeper.NewKeeper(
-		appCodec, keys[resourcetypes.StoreKey],
+		appCodec, runtime.NewKVStoreService(keys[resourcetypes.StoreKey]),
 		app.GetSubspace(resourcetypes.ModuleName),
 		app.IBCKeeper.PortKeeper,
 		scopedResourceKeeper,
+		authority,
 	)
 
 	// create the resource IBC stack
@@ -726,7 +738,7 @@ func New(
 	app.EvidenceKeeper = *evidenceKeeper
 
 	app.DidKeeper = *didkeeper.NewKeeper(
-		appCodec, keys[didtypes.StoreKey],
+		appCodec, runtime.NewKVStoreService(keys[didtypes.StoreKey]),
 		app.GetSubspace(didtypes.ModuleName),
 		app.AccountKeeper, app.BankKeeper,
 		app.StakingKeeper, authority,
@@ -772,8 +784,8 @@ func New(
 
 		// cheqd modules
 		feemarketmodule.NewAppModule(appCodec, *app.FeeMarketKeeper),
-		did.NewAppModule(appCodec, app.DidKeeper),
-		resource.NewAppModule(appCodec, app.ResourceKeeper, app.DidKeeper),
+		did.NewAppModule(appCodec, app.DidKeeper, app.GetSubspace(didtypes.ModuleName)),
+		resource.NewAppModule(appCodec, app.ResourceKeeper, app.DidKeeper, app.GetSubspace(resourcetypes.ModuleName)),
 		feeabsModule,
 	)
 
@@ -1166,7 +1178,7 @@ func (app *App) SimulationManager() *module.SimulationManager {
 func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig) {
 	clientCtx := apiSvr.ClientCtx
 	// Register new tx routes from grpc-gateway.
-	authtx.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
+	tx.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
 	// Register new tendermint queries routes from grpc-gateway.
 	cmtservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
@@ -1177,7 +1189,7 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	// Register grpc-gateway routes for all modules.
 	app.BasicModuleManager.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
-	// register swagger API from root so that other applications can override easily
+	// register swagger API from root so that oticqher applications can override easily
 	if apiConfig.Swagger {
 		RegisterSwaggerAPI(apiSvr.Router)
 	}
@@ -1196,7 +1208,7 @@ func RegisterSwaggerAPI(rtr *mux.Router) {
 
 // RegisterTxService implements the Application.RegisterTxService method.
 func (app *App) RegisterTxService(clientCtx client.Context) {
-	authtx.RegisterTxService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.BaseApp.Simulate, app.interfaceRegistry)
+	tx.RegisterTxService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.BaseApp.Simulate, app.interfaceRegistry)
 }
 
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
@@ -1289,7 +1301,10 @@ func (app *App) RegisterUpgradeHandlers() {
 			app.IBCKeeper.ClientKeeper.SetParams(sdkCtx, params)
 
 			// this should be before updating the version in consensus params
-			baseapp.MigrateParams(sdkCtx, baseAppLegacySS, &app.ConsensusParamsKeeper.ParamsStore)
+			err = baseapp.MigrateParams(sdkCtx, baseAppLegacySS, &app.ConsensusParamsKeeper.ParamsStore)
+			if err != nil {
+				return nil, err
+			}
 			consensusParams, err := app.ConsensusParamsKeeper.ParamsStore.Get(sdkCtx)
 			if err != nil {
 				return nil, err
@@ -1303,7 +1318,9 @@ func (app *App) RegisterUpgradeHandlers() {
 			// dedicated x/consensus module.
 
 			migrations, err := app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
-			app.ConsensusParamsKeeper.ParamsStore.Set(sdkCtx, consensusParams)
+			if err := app.ConsensusParamsKeeper.ParamsStore.Set(sdkCtx, consensusParams); err != nil {
+				return nil, err
+			}
 			return migrations, err
 		},
 	)

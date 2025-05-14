@@ -23,18 +23,3 @@ const (
 	ResourceCountKey    = "resource-count:"
 	ResourcePortIDKey   = "resource-port-id:"
 )
-
-// GetResourceDataKey returns the byte representation of resource key
-func GetResourceDataKey(collectionID string, id string) []byte {
-	return []byte(ResourceDataKey + collectionID + ":" + id)
-}
-
-// GetResourceMetadataKey returns the byte representation of resource key
-func GetResourceMetadataKey(collectionID string, id string) []byte {
-	return []byte(ResourceMetadataKey + collectionID + ":" + id)
-}
-
-// GetResourceMetadataCollectionPrefix used to iterate over all resource metadatas in a collection
-func GetResourceMetadataCollectionPrefix(collectionID string) []byte {
-	return []byte(ResourceMetadataKey + collectionID + ":")
-}

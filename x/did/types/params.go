@@ -3,28 +3,17 @@ package types
 import (
 	"fmt"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
-
-// Parameter store key
-var (
-	ParamStoreKeyFeeParams = []byte("feeparams")
-)
-
-func ParamKeyTable() paramtypes.KeyTable {
-	return paramtypes.NewKeyTable(
-		paramtypes.NewParamSetPair(ParamStoreKeyFeeParams, FeeParams{}, validateFeeParams),
-	)
-}
 
 // DefaultFeeParams returns default cheqd module tx fee parameters
 func DefaultFeeParams() *FeeParams {
 	return &FeeParams{
-		CreateDid:     sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultCreateDidTxFee)),
-		UpdateDid:     sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultUpdateDidTxFee)),
-		DeactivateDid: sdk.NewCoin(BaseMinimalDenom, sdk.NewInt(DefaultDeactivateDidTxFee)),
-		BurnFactor:    sdk.MustNewDecFromStr(DefaultBurnFactor),
+		CreateDid:     sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateDidTxFee)),
+		UpdateDid:     sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultUpdateDidTxFee)),
+		DeactivateDid: sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultDeactivateDidTxFee)),
+		BurnFactor:    sdkmath.LegacyMustNewDecFromStr(DefaultBurnFactor),
 	}
 }
 
@@ -42,7 +31,7 @@ func (tfp *FeeParams) ValidateBasic() error {
 		return fmt.Errorf("invalid deactivate did tx fee: %s", tfp.DeactivateDid)
 	}
 
-	if !tfp.BurnFactor.IsPositive() || tfp.BurnFactor.GTE(sdk.OneDec()) {
+	if !tfp.BurnFactor.IsPositive() || tfp.BurnFactor.GTE(sdkmath.LegacyOneDec()) {
 		return fmt.Errorf("invalid burn factor: %s", tfp.BurnFactor)
 	}
 
@@ -101,12 +90,12 @@ func validateDeactivateDid(i interface{}) error {
 }
 
 func validateBurnFactor(i interface{}) error {
-	v, ok := i.(sdk.Dec)
+	v, ok := i.(sdk.DecCoin)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	if v.IsNil() {
+	if v.Amount.IsNil() {
 		return fmt.Errorf("burn factor must not be nil")
 	}
 
@@ -114,7 +103,7 @@ func validateBurnFactor(i interface{}) error {
 		return fmt.Errorf("burn factor must not be negative: %s", v)
 	}
 
-	if v.GTE(sdk.OneDec()) {
+	if v.Amount.GTE(sdkmath.LegacyOneDec()) {
 		return fmt.Errorf("burn factor must be less than 1: %s", v)
 	}
 

@@ -14,6 +14,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgDeactivateDidDoc{}, "did/DeleteDidDoc", nil)
 	cdc.RegisterConcrete(&MsgBurn{}, "did/MsgBurn", nil)
 	cdc.RegisterConcrete(&MsgMint{}, "did/MsgMint", nil)
+	cdc.RegisterConcrete(&MsgUpdateParams{}, "did/MsgUpdateParams", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
@@ -24,12 +25,8 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgDeactivateDidDoc{},
 		&MsgBurn{},
 		&MsgMint{},
+		&MsgUpdateParams{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
-
-var (
-	amino     = codec.NewLegacyAmino()
-	ModuleCdc = codec.NewAminoCodec(amino)
-)

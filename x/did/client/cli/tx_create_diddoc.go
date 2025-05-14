@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/did/utils"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -149,7 +150,7 @@ Example payload file:
 
 	// add custom / override flags
 	cmd.Flags().String(FlagVersionID, "", "Version ID of the DID Document")
-	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdk.NewInt(types.DefaultCreateDidTxFee)).String(), "Fixed fee for DID creation, e.g., 50000000000ncheq. Please check what the current fees are by running 'cheqd-noded query params subspace cheqd feeparams'")
+	cmd.Flags().String(flags.FlagFees, sdk.NewCoin(types.BaseMinimalDenom, sdkmath.NewInt(types.DefaultCreateDidTxFee)).String(), "Fixed fee for DID creation, e.g., 50000000000ncheq. Please check what the current fees are by running 'cheqd-noded query params subspace cheqd feeparams'")
 
 	_ = cmd.MarkFlagRequired(flags.FlagFees)
 	_ = cmd.MarkFlagRequired(flags.FlagGas)

@@ -2,18 +2,19 @@ syntax = "proto3";
 
 package cheqd.did.v2;
 
-import "cheqd/did/v2/diddoc.proto";
-import "cosmos/msg/v1/msg.proto";
 import "amino/amino.proto";
+import "cheqd/did/v2/diddoc.proto";
+import "cheqd/did/v2/fee.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
-
 
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 
 // Msg defines the Cosmos SDK Msg service for the cheqd.did.v2 module.
 service Msg {
+  option (cosmos.msg.v1.service) = true;
   // CreateDidDoc defines a method for creating a new DID document
   rpc CreateDidDoc(MsgCreateDidDoc) returns (MsgCreateDidDocResponse);
 
@@ -25,9 +26,10 @@ service Msg {
 
   rpc Burn(MsgBurn) returns (MsgBurnResponse);
 
-
   // Mint defines a method to mint tokens to the given address.
   rpc Mint(MsgMint) returns (MsgMintResponse);
+
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
 }
 
 // MsgCreateDidDoc defines the Msg/CreateDidDoc request type.
@@ -224,13 +226,13 @@ message MsgDeactivateDidDocResponse {
 // MsgBurn represents a message to burn coins from the message signer account
 message MsgBurn {
   option (cosmos.msg.v1.signer) = "from_address";
-  
-  option (gogoproto.equal)           = false;
+
+  option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
-  string   from_address              = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string from_address = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   repeated cosmos.base.v1beta1.Coin amount = 2 [
-    (gogoproto.nullable)     = false,
-    (amino.dont_omitempty)   = true,
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
 }
@@ -243,13 +245,35 @@ message MsgBurnResponse {}
 message MsgMint {
   option (cosmos.msg.v1.signer) = "authority";
 
-  string   authority = 1 [ (gogoproto.moretags) = "yaml:\"authority\"" ];
-  string   to_address              = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string authority = 1 [(gogoproto.moretags) = "yaml:\"authority\""];
+  string to_address = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   repeated cosmos.base.v1beta1.Coin amount = 3 [
-    (gogoproto.nullable)     = false,
-    (amino.dont_omitempty)   = true,
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
 }
 
 message MsgMintResponse {}
+
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  option (amino.name) = "/x/did/MsgUpdateParams";
+
+  // params defines the x/did parameters to update.
+  //
+  // NOTE: All parameters must be supplied.
+  FeeParams params = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+//
+// Since: cosmos-sdk 0.47
+message MsgUpdateParamsResponse {}

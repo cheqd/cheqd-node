@@ -313,7 +313,8 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		Expect(err).To(BeNil(), "Tx errored when fee payer had sufficient funds and provided sufficient fee while subtracting tax on deliverTx")
 
 		// get fee params
-		feeParams := s.app.DidKeeper.GetParams(s.ctx)
+		feeParams, err := s.app.DidKeeper.GetParams(s.ctx)
+		Expect(err).To(BeNil())
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
@@ -378,7 +379,8 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		Expect(err).To(BeNil(), "Tx errored when fee payer had sufficient funds and provided sufficient fee while subtracting tax on deliverTx")
 
 		// get fee params
-		feeParams := s.app.ResourceKeeper.GetParams(s.ctx)
+		feeParams, err := s.app.ResourceKeeper.GetParams(s.ctx)
+		Expect(err).To(BeNil())
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
@@ -1166,9 +1168,9 @@ var _ = Describe("Test PostHandle", func() {
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		// Expect an error in simulation due to insufficient funds
+		// Expect no error in simulation
 		_, err = antehandler(s.ctx, tx, true)
-		Expect(err).NotTo(BeNil(), "signer has no funds")
+		Expect(err).To(BeNil(), "errored while in simulation when signer has no funds")
 	})
 
 	It("0 gas given should fail", func() {
@@ -1311,7 +1313,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		Status:                  types.HostChainFeeAbsStatus_UPDATED,
 	}
 
-	var feeabsModAcc authtypes.ModuleAccountI
+	var feeabsModAcc sdk.ModuleAccountI
 
 	var decorators []sdk.AnteDecorator
 	BeforeEach(func() {
@@ -1456,7 +1458,8 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		Expect(err).To(BeNil(), "Tx errored when fee payer had sufficient funds and provided sufficient fee while subtracting tax on deliverTx")
 
 		// get fee params
-		feeParams := s.app.DidKeeper.GetParams(s.ctx)
+		feeParams, err := s.app.DidKeeper.GetParams(s.ctx)
+		Expect(err).To(BeNil())
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
@@ -1588,7 +1591,8 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		Expect(err).To(BeNil(), "Tx errored when fee payer had sufficient funds and provided sufficient fee while subtracting tax on deliverTx")
 
 		// get fee params
-		feeParams := s.app.DidKeeper.GetParams(s.ctx)
+		feeParams, err := s.app.DidKeeper.GetParams(s.ctx)
+		Expect(err).To(BeNil())
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)

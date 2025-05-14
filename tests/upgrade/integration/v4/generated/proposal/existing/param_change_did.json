@@ -1,0 +1,28 @@
+{
+    "messages": [
+        {
+            "@type": "/cheqd.did.v2.MsgUpdateParams",
+            "authority": "cheqd10d07y265gmmuvt4z0w9aw880jnsr700j5ql9az",
+            "params": {
+                "create_did": {
+                    "denom": "ncheq",
+                    "amount": "100000000000"
+                },
+                "update_did": {
+                    "denom": "ncheq",
+                    "amount": "50000000000"
+                },
+                "deactivate_did": {
+                    "denom": "ncheq",
+                    "amount": "20000000000"
+                },
+                "burn_factor": "0.990000000000000000"
+            }
+        }
+    ],
+    "metadata": "",
+    "deposit": "10000000000ncheq",
+    "title": "Did Param Change",
+    "summary": "This is a simple example of a param change - double the values, 99% burn factor",
+    "expedited": false
+}
