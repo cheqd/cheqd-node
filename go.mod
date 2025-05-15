@@ -10,7 +10,7 @@ require (
 	cosmossdk.io/math v1.5.3
 	cosmossdk.io/tools/confix v0.1.2
 	filippo.io/edwards25519 v1.1.0
-	github.com/cheqd/cheqd-node/api/v2 v2.0.0-00010101000000-000000000000
+	github.com/cheqd/cheqd-node/api/v2 v2.3.5-0.20250514151055-c7d12358336f
 	github.com/cometbft/cometbft v0.38.12
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/cosmos-sdk v0.50.13
@@ -257,7 +257,7 @@ replace (
 	github.com/osmosis-labs/fee-abstraction/v8 => github.com/cheqd/fee-abstraction/v8 v8.0.3-0.20250415073134-32bfc4118457
 
 	// https://github.com/cheqd/feemarket/tree/cheqd/v0.50.x
-	github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.5-0.20250415072337-dc43e8876c3a
+	github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.5-0.20250515091338-b2d79e0d3595
 
 	// replace broken goleveldb
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7

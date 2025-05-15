@@ -307,8 +307,8 @@ github.com/cheqd/cosmos-sdk v0.50.13-height-mismatch-patched h1:Bakt/tLtxobTXCCH
 github.com/cheqd/cosmos-sdk v0.50.13-height-mismatch-patched/go.mod h1:hrWEFMU1eoXqLJeE6VVESpJDQH67FS1nnMrQIjO2daw=
 github.com/cheqd/fee-abstraction/v8 v8.0.3-0.20250415073134-32bfc4118457 h1:YSbckFNzSYOzQltfya3KsyxdvfbpyfgYwwvPpg3rGMo=
 github.com/cheqd/fee-abstraction/v8 v8.0.3-0.20250415073134-32bfc4118457/go.mod h1:9Q+I4KZJT9OVDaweM6/97/UlNgoA8xdLbqfvMtw9HqU=
-github.com/cheqd/feemarket v1.0.5-0.20250415072337-dc43e8876c3a h1:Z1elmp21v8RwNvcD7qB5H+v/TmkJQBsabaNXbJlTKSg=
-github.com/cheqd/feemarket v1.0.5-0.20250415072337-dc43e8876c3a/go.mod h1:OG9KVRiIGv4oW6uQoHmQMoSvZgbpDeWNawB3oBdKw+Y=
+github.com/cheqd/feemarket v1.0.5-0.20250515091338-b2d79e0d3595 h1:jQni4hA31eQdCjU1nPDIQlLIhX16TEZAkaQHO9ze8QQ=
+github.com/cheqd/feemarket v1.0.5-0.20250515091338-b2d79e0d3595/go.mod h1:ypViL3yKw6aM8/yxwUwwqEJKIAPpT8KrvIOxIL+llXU=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
 github.com/chzyer/logex v1.2.1 h1:XHDu3E6q+gdHgsdTPH6ImJMIp436vR6MPtH8gP05QzM=
 github.com/chzyer/logex v1.2.1/go.mod h1:JLbx6lG2kDbNRFnfkgvh4eRJRPX1QCoOIWomwysCBrQ=
