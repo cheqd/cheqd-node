@@ -10,7 +10,7 @@ require (
 	cosmossdk.io/math v1.5.3
 	cosmossdk.io/tools/confix v0.1.2
 	filippo.io/edwards25519 v1.1.0
-	github.com/cheqd/cheqd-node/api/v2 v2.0.0-00010101000000-000000000000
+	github.com/cheqd/cheqd-node/api/v2 v2.3.5-0.20250514151055-c7d12358336f
 	github.com/cometbft/cometbft v0.38.12
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/cosmos-sdk v0.50.13
@@ -242,8 +242,9 @@ replace (
 	// replace cosmos-sdk v0.50.13
 	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.50.13-height-mismatch-patched
 
-	// replace iavl v0.20.1
-	// github.com/cosmos/iavl => github.com/cheqd/iavl v0.20.1-uneven-heights
+	// replace iavl v1.2.2
+	// https://github.com/cheqd/iavl/tree/cheqd-v1.2.2-uneven-heights
+	github.com/cosmos/iavl => github.com/cheqd/iavl v0.19.2-0.20250417102206-84370d5811fb
 
 	// dgrijalva/jwt-go is deprecated and doesn't receive security updates.
 	// TODO: remove it: https://github.com/cosmos/cosmos-sdk/issues/13134
@@ -254,10 +255,10 @@ replace (
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.1
 
 	// https://github.com/cheqd/fee-abstraction/tree/cheqd/v0.50.x
-	github.com/osmosis-labs/fee-abstraction/v8 => github.com/cheqd/fee-abstraction/v8 v8.0.3-0.20250415073134-32bfc4118457
+	github.com/osmosis-labs/fee-abstraction/v8 => github.com/cheqd/fee-abstraction/v8 v8.0.3-0.20250515095052-ea7c07e5df2d
 
 	// https://github.com/cheqd/feemarket/tree/cheqd/v0.50.x
-	github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.5-0.20250415072337-dc43e8876c3a
+	github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.5-0.20250515091338-b2d79e0d3595
 
 	// replace broken goleveldb
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7

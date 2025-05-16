@@ -23,5 +23,5 @@ require (
 replace (
 	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.50.13-height-mismatch-patched
 
-// github.com/cosmos/iavl => github.com/cheqd/iavl v0.20.1-uneven-heights
+	github.com/cosmos/iavl => github.com/cheqd/iavl v0.19.2-0.20250417102206-84370d5811fb
 )
