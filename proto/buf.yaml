@@ -5,9 +5,9 @@ version: v1
 name: buf.build/cheqd/proto
 
 deps:
-  - buf.build/cosmos/cosmos-sdk # Cosmos SDK v0.46.7
-  - buf.build/cosmos/cosmos-proto # 29th November 2022
-  - buf.build/cosmos/gogo-proto # 29th August 2022
+  - buf.build/cosmos/cosmos-sdk
+  - buf.build/cosmos/cosmos-proto
+  - buf.build/cosmos/gogo-proto
   - buf.build/googleapis/googleapis
 breaking:
   use:
