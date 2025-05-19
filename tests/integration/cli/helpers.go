@@ -1,9 +1,12 @@
 package cli
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"maps"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -227,4 +230,82 @@ func convertProposalJSON(input string) ([]byte, error) {
 	}
 
 	return output, nil
+}
+
+// CalculateVoteHash calculates the hash for an exchange rate vote using the same algorithm
+// that the Oracle module uses. This simulates the hash calculation that happens in the price feeder.
+func CalculateVoteHash(salt string, exchangeRates string, voter string) string {
+	// Parse the exchange rates string (e.g. "CHEQ:1.2,BTC:30000.0")
+	rateMap := parseExchangeRates(exchangeRates)
+
+	// Create a sorted slice of denoms for deterministic ordering
+	denoms := make([]string, 0, len(rateMap))
+	for denom := range rateMap {
+		denoms = append(denoms, denom)
+	}
+	sort.Strings(denoms)
+
+	// Build the vote message as salt:denom1:rate1,denom2:rate2,...
+	// This is the format required by the Oracle module
+	voteMsg := salt
+	for _, denom := range denoms {
+		voteMsg += ":" + denom + ":" + rateMap[denom]
+	}
+
+	// Calculate SHA256 hash
+	hash := sha256.Sum256([]byte(voteMsg))
+
+	// Return hex-encoded hash string
+	return hex.EncodeToString(hash[:])[:40] // Oracle module uses first 20 bytes
+}
+
+// ParseSalt generates a random salt string for use in voting
+// In a real scenario, the price feeder would generate this randomly
+func GenerateSalt() string {
+	// For testing, we use a deterministic "random" string
+	// In a real price feeder, this would be a random hex string
+	return "2d1a938d791590770571807dc584e4f4ec5641dd3ec66f0c68d3b2c8a7522a63"
+}
+
+// parseExchangeRates converts a comma-separated exchange rate string like "CHEQ:1.2,BTC:30000.0"
+// into a map of denom -> rate strings
+func parseExchangeRates(exchangeRates string) map[string]string {
+	rates := make(map[string]string)
+	pairs := strings.Split(exchangeRates, ",")
+
+	for _, pair := range pairs {
+		parts := strings.Split(pair, ":")
+		if len(parts) == 2 {
+			denom := parts[0]
+			rate := parts[1]
+			rates[denom] = rate
+		}
+	}
+
+	return rates
+}
+
+// ValidatePrevoteHash verifies that a hash matches what would be generated from the salt and rates
+func ValidatePrevoteHash(hash string, salt string, exchangeRates string, voter string) bool {
+	calculatedHash := CalculateVoteHash(salt, exchangeRates, voter)
+	return hash == calculatedHash
+}
+
+// ConstructAggregateVoteMsg creates a properly formatted exchange rate string for voting
+// This ensures rates are consistently ordered by denom
+func ConstructAggregateVoteMsg(rates map[string]string) string {
+	// Create a sorted slice of denoms for deterministic ordering
+	denoms := make([]string, 0, len(rates))
+	for denom := range rates {
+		denoms = append(denoms, denom)
+	}
+	sort.Strings(denoms)
+
+	// Build the formatted string
+	pairs := make([]string, 0, len(rates))
+	for _, denom := range denoms {
+		pairs = append(pairs, denom+":"+rates[denom])
+	}
+
+	return strings.Join(pairs, ",")
 }

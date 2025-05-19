@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"cosmossdk.io/errors"
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
@@ -396,4 +397,71 @@ func QuerySlashWindow() (*oracletypes.QuerySlashWindowResponse, error) {
 	}
 
 	return &resp, nil
+}
+
+// FundAccount sends tokens to the specified account address to allow it to pay for transaction fees
+func FundAccount(recipientAddr, fromAddr string, amount string, feeParams []string) (sdk.TxResponse, error) {
+	// Execute a bank send transaction to fund the account
+	return Tx("bank", "send", fromAddr, feeParams, fromAddr, recipientAddr, amount)
+}
+
+// EnsureAccountFunded checks if an account has sufficient funds and funds it if needed
+func EnsureAccountFunded(accountAddr, funderAddr string, minAmount string, feeParams []string) error {
+	// First check the account balance
+	balance, err := QueryBankBalance(accountAddr, "ncheq")
+	if err != nil {
+		// If we can't query the balance, try funding anyway
+		fundingAmount := "5000000000ncheq" // 5000 CHEQ in ncheq
+		_, err = FundAccount(accountAddr, funderAddr, fundingAmount, feeParams)
+		return err
+	}
+
+	// Parse the minimum required amount
+	requiredAmount, err := parseAmount(minAmount)
+	if err != nil {
+		return err
+	}
+
+	// If balance is less than required, fund the account
+	if balance < requiredAmount {
+		fundingAmount := fmt.Sprintf("%dncheq", requiredAmount*2) // Fund with twice the minimum needed
+		_, err = FundAccount(accountAddr, funderAddr, fundingAmount, feeParams)
+		return err
+	}
+
+	// Account has sufficient funds
+	return nil
+}
+
+// QueryBankBalance queries the balance of an account for a specific denom
+func QueryBankBalance(accountAddr, denom string) (int64, error) {
+	// Construct the command to query the balance
+	output, err := Exec("query", "bank", "balances", accountAddr, "--denom", denom, "--output", "json")
+	if err != nil {
+		return 0, err
+	}
+
+	// Parse the output to extract the balance
+	// This is a simplified example - the actual parsing would depend on the JSON structure
+	if strings.Contains(output, "amount") {
+		var amount int64
+		_, err := fmt.Sscanf(output, `{"amount":"%d"`, &amount)
+		if err != nil {
+			return 0, err
+		}
+		return amount, nil
+	}
+
+	// If no balance found, return 0
+	return 0, nil
+}
+
+// parseAmount parses an amount string like "1000000ncheq" into a numeric value
+func parseAmount(amount string) (int64, error) {
+	var value int64
+	_, err := fmt.Sscanf(amount, "%d", &value)
+	if err != nil {
+		return 0, err
+	}
+	return value, nil
 }
