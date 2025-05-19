@@ -5,7 +5,6 @@ version: v1
 name: buf.build/cheqd/proto
 
 deps:
-  # Update these dependencies when our chain goes to Cosmos SDK v0.47.x
   - buf.build/cosmos/cosmos-sdk # Cosmos SDK v0.46.7
   - buf.build/cosmos/cosmos-proto # 29th November 2022
   - buf.build/cosmos/gogo-proto # 29th August 2022
