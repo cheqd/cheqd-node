@@ -4,7 +4,7 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cheqd/cheqd-node/x/oracle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	gogotypes "github.com/gogo/protobuf/types"
+	gogotypes "github.com/cosmos/gogoproto/types"
 )
 
 // GetMissCounter retrieves the # of vote periods missed in this oracle slash

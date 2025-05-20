@@ -2,7 +2,7 @@ package cli
 
 import (
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/gogo/protobuf/proto"
+	"github.com/golang/protobuf/proto"
 )
 
 // PrintOrErr formats and print proto message to the standard output, unless the error

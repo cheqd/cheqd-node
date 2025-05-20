@@ -33,7 +33,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -232,18 +231,10 @@ func txCommand() *cobra.Command {
 
 // newApp is an AppCreator
 func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
-
-	skipUpgradeHeights := make(map[int64]bool)
-	for _, h := range cast.ToIntSlice(appOpts.Get(server.FlagUnsafeSkipUpgrades)) {
-		skipUpgradeHeights[int64(h)] = true
-	}
-
-	baseappOptions := server.DefaultBaseappOptions(appOpts)
-
 	app := app.New(
 		logger, db, traceStore, true,
 		appOpts,
-		baseappOptions...,
+		server.DefaultBaseappOptions(appOpts)...,
 	)
 
 	// load app config into oracle keeper price feeder
