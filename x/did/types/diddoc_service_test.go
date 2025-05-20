@@ -66,5 +66,23 @@ var _ = Describe("Service tests", func() {
 				isValid:  false,
 				errorMsg: "id: must have prefix: did:cheqd:zABCDEFG987654321abcd",
 			}),
+
+		Entry(
+			"Valid service entry with recipient and routing keys",
+			TestCaseServiceStruct{
+				service: &Service{
+					Id:              "did:cheqd:aABCDEFG123456789abcd#service1",
+					ServiceType:     "DIDCommMessagingV2",
+					ServiceEndpoint: []string{"endpoint1", "endpoint2"},
+					RecipientKeys:   []string{"did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK", "did:cheqd:aABCDEFG123456789abcd#key1"},
+					RoutingKeys:     []string{"did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp"},
+					Accept:          []string{"didcomm/aip2;env=rfc19"},
+					Priority:        1,
+				},
+				baseDid:           "did:cheqd:aABCDEFG123456789abcd",
+				allowedNamespaces: []string{""},
+				isValid:           true,
+				errorMsg:          "",
+			}),
 	)
 })

@@ -58,7 +58,13 @@ Example payload file:
                 "type": "<service-type>",
                 "serviceEndpoint": [
                     "<service-endpoint>"
-                ]
+                ],
+				"recipientKeys": [
+					"did:cheqd:<namespace>:<unique-identifier>#<service-id>",
+					"did:key:<unique-identifier"
+				],
+				"accept": [ "<IANA-type>" ],
+				"priority": 1
             }
 		]
     },

@@ -259,6 +259,43 @@ paths:
                               title: |-
                                 serviceEndpoint is the endpoint of the service.
                                 Example: https://example.com/endpoint
+                            recipientKeys:
+                              type: array
+                              items:
+                                type: string
+                              title: >-
+                                recipient key identify the recipient’s public
+                                encryption keys
+
+                                Format:
+                                did:cheqd:<namespace>:<unique-identifier>#<key-id>
+                                or did:key:<identifier>
+                            routingKeys:
+                              type: array
+                              items:
+                                type: string
+                              title: >-
+                                routing keys contain a list of mediator or relay
+                                keys
+
+                                Format:
+                                did:cheqd:<namespace>:<unique-identifier>#<key-id>
+                                or did:key:<identifier>
+                            accept:
+                              type: array
+                              items:
+                                type: string
+                              title: >-
+                                accept: list of MIME types or protocol formats
+                                the service supports.
+
+                                format: ["didcomm/v2", "didcomm/v1"]
+                            priority:
+                              type: integer
+                              format: int64
+                              description: >-
+                                priority: An integer defining the priority of
+                                this service entry.
                           title: >-
                             Service defines a service, as defined in the DID
                             Core specification.
@@ -550,6 +587,43 @@ paths:
                               title: |-
                                 serviceEndpoint is the endpoint of the service.
                                 Example: https://example.com/endpoint
+                            recipientKeys:
+                              type: array
+                              items:
+                                type: string
+                              title: >-
+                                recipient key identify the recipient’s public
+                                encryption keys
+
+                                Format:
+                                did:cheqd:<namespace>:<unique-identifier>#<key-id>
+                                or did:key:<identifier>
+                            routingKeys:
+                              type: array
+                              items:
+                                type: string
+                              title: >-
+                                routing keys contain a list of mediator or relay
+                                keys
+
+                                Format:
+                                did:cheqd:<namespace>:<unique-identifier>#<key-id>
+                                or did:key:<identifier>
+                            accept:
+                              type: array
+                              items:
+                                type: string
+                              title: >-
+                                accept: list of MIME types or protocol formats
+                                the service supports.
+
+                                format: ["didcomm/v2", "didcomm/v1"]
+                            priority:
+                              type: integer
+                              format: int64
+                              description: >-
+                                priority: An integer defining the priority of
+                                this service entry.
                           title: >-
                             Service defines a service, as defined in the DID
                             Core specification.
