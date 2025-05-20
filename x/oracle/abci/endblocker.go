@@ -65,6 +65,14 @@ func EndBlocker(ctx context.Context, k keeper.Keeper) error {
 		if err := CalcPrices(sdkCtx, params, k); err != nil {
 			return err
 		}
+
+		if k.IsPeriodLastBlock(sdkCtx, params.HistoricStampPeriod) {
+			for _, v := range params.AcceptList {
+				if err := k.ComputeAverages(sdkCtx, v.BaseDenom); err != nil {
+					return err
+				}
+			}
+		}
 	}
 	// Slash oracle providers who missed voting over the threshold and reset
 	// miss counters of all validators at the last block of slash window.
@@ -147,7 +155,6 @@ func CalcPrices(ctx sdk.Context, params types.Params, k keeper.Keeper) error {
 		if k.IsPeriodLastBlock(ctx, params.HistoricStampPeriod) {
 			k.AddHistoricPrice(ctx, ballotDenom.Denom, exchangeRate)
 		}
-
 		// Calculate and stamp median/median deviation if median stamp period has passed
 		if k.IsPeriodLastBlock(ctx, params.MedianStampPeriod) {
 			if err = k.CalcAndSetHistoricMedian(ctx, ballotDenom.Denom); err != nil {

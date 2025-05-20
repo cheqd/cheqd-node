@@ -57,11 +57,11 @@ var (
 			SymbolDenom: CheqdSymbol,
 			Exponent:    CheqdExponent,
 		},
-		{
-			BaseDenom:   AtomDenom,
-			SymbolDenom: AtomSymbol,
-			Exponent:    AtomExponent,
-		},
+		// {
+		// 	BaseDenom:   AtomDenom,
+		// 	SymbolDenom: AtomSymbol,
+		// 	Exponent:    AtomExponent,
+		// },
 		{
 			BaseDenom:   USDTDenom,
 			SymbolDenom: USDTSymbol,
@@ -89,16 +89,16 @@ var (
 			SymbolDenom: USDTSymbol,
 			Exponent:    USDTExponent,
 		},
-		// {
-		// 	BaseDenom:   BitcoinDenom,
-		// 	SymbolDenom: BitcoinSymbol,
-		// 	Exponent:    BitcoinExponent,
-		// },
-		// {
-		// 	BaseDenom:   EthereumDenom,
-		// 	SymbolDenom: EthereumSymbol,
-		// 	Exponent:    EthereumExponent,
-		// },
+		{
+			BaseDenom:   BitcoinDenom,
+			SymbolDenom: BitcoinSymbol,
+			Exponent:    BitcoinExponent,
+		},
+		{
+			BaseDenom:   EthereumDenom,
+			SymbolDenom: EthereumSymbol,
+			Exponent:    EthereumExponent,
+		},
 	}
 	DefaultSlashFraction     = math.LegacyNewDecWithPrec(1, 4) // 0.01%
 	DefaultMinValidPerWindow = math.LegacyNewDecWithPrec(5, 2) // 5%
@@ -118,6 +118,7 @@ var (
 			QuoteDenom: USDSymbol,
 			Providers: []string{
 				"mexc",
+				"coinbase",
 			},
 		},
 		// CurrencyPairProviders{
