@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"os"
 
@@ -252,7 +251,6 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Appconfig>>>>>>>.", appConfig)
 	app.OracleKeeper.PriceFeeder.AppConfig = appConfig
 
 	return app

@@ -19,5 +19,5 @@ func NewMigrator(keeper Keeper, legacySubspace exported.Subspace) Migrator {
 
 // module state.
 func (m Migrator) Migrate4to5(ctx sdk.Context) error {
-	return v5.MigrateStore(ctx, m.keeper.storeService, m.legacySubspace, m.keeper.cdc)
+	return v5.MigrateStore(ctx, m.keeper.storeService, m.legacySubspace, m.keeper.cdc, m.keeper.DidCount)
 }

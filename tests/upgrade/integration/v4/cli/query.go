@@ -100,7 +100,7 @@ func QueryProposal(container, id string) (govtypesv1.Proposal, error) {
 	}
 
 	var resp govtypesv1.QueryProposalResponse
-	err = MakeCodecWithExtendedRegistry().UnmarshalJSON(convertedJSON, &resp)
+	err = integrationhelpers.Codec.UnmarshalJSON(convertedJSON, &resp)
 	if err != nil {
 		return govtypesv1.Proposal{}, err
 	}
