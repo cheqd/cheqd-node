@@ -846,4 +846,61 @@ var _ = Describe("cheqd cli - positive did", func() {
 		// Check that DIDDoc is not deactivated
 		Expect(resp.Value.Metadata.Deactivated).To(BeFalse())
 	})
+
+	It("can create diddoc with Service section for didcomm)", func() {
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "can create diddoc with Service section for didcomm"))
+		// Create a new DID Doc
+		did := "did:cheqd:" + network.DidNamespace + ":" + uuid.NewString()
+		keyID := did + "#key1"
+
+		publicKey, privateKey, err := ed25519.GenerateKey(nil)
+		Expect(err).To(BeNil())
+
+		publicKeyMultibase := testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(publicKey)
+
+		payload := didcli.DIDDocument{
+			ID: did,
+			VerificationMethod: []didcli.VerificationMethod{
+				map[string]any{
+					"id":                 keyID,
+					"type":               "Ed25519VerificationKey2020",
+					"controller":         did,
+					"publicKeyMultibase": publicKeyMultibase,
+				},
+			},
+			Authentication: []string{keyID},
+			Service: []didcli.Service{
+				{
+					ID:              did + "#service-1",
+					Type:            "type-1",
+					ServiceEndpoint: []string{"endpoint-1"},
+					RecipientKeys:   []string{"did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"},
+					RoutingKeys:     []string{"did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp"},
+					Accept:          []string{"didcomm/v2"},
+					Priority:        0,
+				},
+				{
+					ID:              did + "#service-2",
+					Type:            "type-1",
+					ServiceEndpoint: []string{"endpoint-2"},
+					RecipientKeys:   []string{"did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"},
+					RoutingKeys:     []string{},
+					Priority:        1,
+				},
+			},
+		}
+
+		signInputs := []didcli.SignInput{
+			{
+				VerificationMethodID: keyID,
+				PrivKey:              privateKey,
+			},
+		}
+
+		versionID := uuid.NewString()
+
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid.String()))
+		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(0))
+	})
 })
