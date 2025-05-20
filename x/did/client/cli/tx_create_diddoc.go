@@ -61,7 +61,7 @@ Example payload file:
                 ],
 				"recipientKeys": [
 					"did:cheqd:<namespace>:<unique-identifier>#<service-id>",
-					"did:key:<unique-identifier"
+					"did:key:<unique-identifier>"
 				],
 				"accept": [ "<IANA-type>" ],
 				"priority": 1
