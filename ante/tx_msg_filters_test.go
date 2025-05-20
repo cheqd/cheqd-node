@@ -18,12 +18,48 @@ var _ = Describe("TxMsgFilters", func() {
 
 	BeforeEach(func() {
 		ante.TaxableMsgFees = ante.TaxableMsgFee{
-			ante.MsgCreateDidDoc:          sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(didtypes.DefaultCreateDidTxFee))),
-			ante.MsgUpdateDidDoc:          sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(didtypes.DefaultUpdateDidTxFee))),
-			ante.MsgDeactivateDidDoc:      sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(didtypes.DefaultDeactivateDidTxFee))),
-			ante.MsgCreateResourceDefault: sdk.NewCoins(sdk.NewCoin(resourcetypes.BaseMinimalDenom, math.NewInt(resourcetypes.DefaultCreateResourceDefaultFee))),
-			ante.MsgCreateResourceImage:   sdk.NewCoins(sdk.NewCoin(resourcetypes.BaseMinimalDenom, math.NewInt(resourcetypes.DefaultCreateResourceImageFee))),
-			ante.MsgCreateResourceJSON:    sdk.NewCoins(sdk.NewCoin(resourcetypes.BaseMinimalDenom, math.NewInt(resourcetypes.DefaultCreateResourceJSONFee))),
+			ante.MsgCreateDidDoc: []didtypes.FeeRange{
+				{
+					Denom:     didtypes.BaseMinimalDenom,
+					MinAmount: math.NewInt(didtypes.DefaultCreateDidTxFee),
+					MaxAmount: math.NewInt(100e9),
+				},
+			},
+			ante.MsgUpdateDidDoc: []didtypes.FeeRange{
+				{
+					Denom:     didtypes.BaseMinimalDenom,
+					MinAmount: math.NewInt(didtypes.DefaultUpdateDidTxFee),
+					MaxAmount: math.NewInt(100e9),
+				},
+			},
+			ante.MsgDeactivateDidDoc: []didtypes.FeeRange{
+				{
+					Denom:     didtypes.BaseMinimalDenom,
+					MinAmount: math.NewInt(didtypes.DefaultDeactivateDidTxFee),
+					MaxAmount: math.NewInt(100e9),
+				},
+			},
+			ante.MsgCreateResourceDefault: []didtypes.FeeRange{
+				{
+					Denom:     didtypes.BaseMinimalDenom,
+					MinAmount: math.NewInt(resourcetypes.DefaultCreateResourceDefaultFee),
+					MaxAmount: math.NewInt(100e9),
+				},
+			},
+			ante.MsgCreateResourceImage: []didtypes.FeeRange{
+				{
+					Denom:     didtypes.BaseMinimalDenom,
+					MinAmount: math.NewInt(resourcetypes.DefaultCreateResourceImageFee),
+					MaxAmount: math.NewInt(100e9),
+				},
+			},
+			ante.MsgCreateResourceJSON: []didtypes.FeeRange{
+				{
+					Denom:     didtypes.BaseMinimalDenom,
+					MinAmount: math.NewInt(resourcetypes.DefaultCreateResourceJSONFee),
+					MaxAmount: math.NewInt(100e9),
+				},
+			},
 		}
 
 		ante.BurnFactors = ante.BurnFactor{
@@ -69,12 +105,15 @@ var _ = Describe("TxMsgFilters", func() {
 					Signatures: signatures,
 				}
 
+				ncheqPrice := math.LegacyMustNewDecFromStr("0.016")
 				// calculate portions
-				reward, burn, ok := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg)
+				fee := ante.GetFeeForMsg(ante.TaxableMsgFees[ante.MsgCreateResourceImage], ncheqPrice)
+				reward, burn, ok := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice)
+
 				Expect(ok).To(BeTrue())
-				Expect(reward).To(Equal(ante.GetRewardPortion(ante.TaxableMsgFees[ante.MsgCreateResourceImage], ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], ante.TaxableMsgFees[ante.MsgCreateResourceImage]))))
-				Expect(burn).To(Equal(ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], ante.TaxableMsgFees[ante.MsgCreateResourceImage])))
-				Expect(reward.Add(burn[0])[0].Amount).To(BeEquivalentTo(ante.TaxableMsgFees[ante.MsgCreateResourceImage][0].Amount))
+				Expect(reward).To(Equal(ante.GetRewardPortion(fee, ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee))))
+				Expect(burn).To(Equal(ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee)))
+				Expect(reward.Add(burn[0])[0].Amount).To(BeEquivalentTo(fee[0].Amount))
 			}
 		})
 
@@ -113,12 +152,16 @@ var _ = Describe("TxMsgFilters", func() {
 					Signatures: signatures,
 				}
 
+				ncheqPrice := math.LegacyMustNewDecFromStr("0.016")
+				fee := ante.GetFeeForMsg(ante.TaxableMsgFees[ante.MsgCreateResourceJSON], ncheqPrice)
+
 				// calculate portions
-				reward, burn, ok := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg)
+				reward, burn, ok := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice)
 				Expect(ok).To(BeTrue())
-				Expect(reward).To(Equal(ante.GetRewardPortion(ante.TaxableMsgFees[ante.MsgCreateResourceJSON], ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], ante.TaxableMsgFees[ante.MsgCreateResourceJSON]))))
-				Expect(burn).To(Equal(ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], ante.TaxableMsgFees[ante.MsgCreateResourceJSON])))
-				Expect(reward.Add(burn[0])[0].Amount).To(BeEquivalentTo(ante.TaxableMsgFees[ante.MsgCreateResourceJSON][0].Amount))
+				Expect(reward).To(Equal(ante.GetRewardPortion(fee, ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee))))
+				Expect(burn).To(Equal(ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee)))
+
+				Expect(reward.Add(burn[0])[0].Amount).To(BeEquivalentTo(fee[0].Amount))
 			}
 		})
 
@@ -158,12 +201,15 @@ var _ = Describe("TxMsgFilters", func() {
 					Signatures: signatures,
 				}
 
+				ncheqPrice := math.LegacyMustNewDecFromStr("0.016")
+				fee := ante.GetFeeForMsg(ante.TaxableMsgFees[ante.MsgCreateResourceDefault], ncheqPrice)
+
 				// calculate portions
-				reward, burn, ok := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg)
+				reward, burn, ok := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice)
 				Expect(ok).To(BeTrue())
-				Expect(reward).To(Equal(ante.GetRewardPortion(ante.TaxableMsgFees[ante.MsgCreateResourceDefault], ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], ante.TaxableMsgFees[ante.MsgCreateResourceDefault]))))
-				Expect(burn).To(Equal(ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], ante.TaxableMsgFees[ante.MsgCreateResourceDefault])))
-				Expect(reward.Add(burn[0])[0].Amount).To(BeEquivalentTo(ante.TaxableMsgFees[ante.MsgCreateResourceDefault][0].Amount))
+				Expect(reward).To(Equal(ante.GetRewardPortion(fee, ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee))))
+				Expect(burn).To(Equal(ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee)))
+				Expect(reward.Add(burn[0])[0].Amount).To(BeEquivalentTo(fee[0].Amount))
 			}
 		})
 	})

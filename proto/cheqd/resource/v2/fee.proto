@@ -1,10 +1,11 @@
 syntax = "proto3";
 package cheqd.resource.v2;
 
+import "amino/amino.proto";
+import "cheqd/did/v2/fee.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
-import "amino/amino.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 option (gogoproto.equal_all) = true;
@@ -15,17 +16,17 @@ message FeeParams {
   // Fixed fee for creating a resource with media type 'image/*'
   //
   // Default: 10 CHEQ or 10000000000ncheq
-  cosmos.base.v1beta1.Coin image = 1 [(gogoproto.nullable) = false];
+  repeated cheqd.did.v2.FeeRange image = 1 [(gogoproto.nullable) = false];
 
   // Fixed fee for creating a resource with media type 'application/json'
   //
   // Default: 2.5 CHEQ or 2500000000ncheq
-  cosmos.base.v1beta1.Coin json = 2 [(gogoproto.nullable) = false];
+  repeated cheqd.did.v2.FeeRange json = 2 [(gogoproto.nullable) = false];
 
   // Fixed fee for creating a resource with all other media types
   //
   // Default: 5 CHEQ or 5000000000ncheq
-  cosmos.base.v1beta1.Coin default = 3 [(gogoproto.nullable) = false];
+  repeated cheqd.did.v2.FeeRange default = 3 [(gogoproto.nullable) = false];
 
   // Percentage of the fixed fee that will be burned
   //

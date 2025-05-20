@@ -334,7 +334,6 @@ func New(
 
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName).String()
 
-	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
 	bApp := baseapp.NewBaseApp(Name, logger, db, txConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetVersion(version.Version)
@@ -1284,7 +1283,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(feeabstypes.ModuleName).WithKeyTable(feeabstypes.ParamKeyTable())
 	paramsKeeper.Subspace(icqtypes.ModuleName)
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
-	paramsKeeper.Subspace(oracletypes.ModuleName)
+	paramsKeeper.Subspace(oracletypes.ModuleName).WithKeyTable(oracletypes.ParamKeyTable())
 
 	return paramsKeeper
 }
