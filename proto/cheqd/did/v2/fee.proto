@@ -2,7 +2,6 @@ syntax = "proto3";
 package cheqd.did.v2;
 
 import "amino/amino.proto";
-import "cosmos/base/v1beta1/coin.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 
