@@ -7,11 +7,23 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-func NewService(id string, serviceType string, serviceEndpoint []string) *Service {
+func NewService(
+	id string,
+	serviceType string,
+	serviceEndpoint []string,
+	recipientKeys []string,
+	routingKeys []string,
+	accept []string,
+	priority uint32,
+) *Service {
 	return &Service{
 		Id:              id,
 		ServiceType:     serviceType,
 		ServiceEndpoint: serviceEndpoint,
+		RecipientKeys:   recipientKeys,
+		RoutingKeys:     routingKeys,
+		Accept:          accept,
+		Priority:        priority,
 	}
 }
 

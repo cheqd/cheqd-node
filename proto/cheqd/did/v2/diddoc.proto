@@ -86,6 +86,21 @@ message Service {
   // serviceEndpoint is the endpoint of the service.
   // Example: https://example.com/endpoint
   repeated string service_endpoint = 3;
+
+  // recipient key identify the recipient’s public encryption keys
+  // Format: did:cheqd:<namespace>:<unique-identifier>#<key-id> or did:key:<identifier>
+  repeated string recipient_keys = 4 [(gogoproto.jsontag) = "recipientKeys,omitempty"];
+  
+  // routing keys contain a list of mediator or relay keys
+  // Format: did:cheqd:<namespace>:<unique-identifier>#<key-id> or did:key:<identifier>
+  repeated string routing_keys = 5 [(gogoproto.jsontag) = "routingKeys,omitempty"];
+  
+  // accept: list of MIME types or protocol formats the service supports.
+  // format: ["didcomm/v2", "didcomm/v1"]
+  repeated string accept = 6 [(gogoproto.jsontag) = "accept,omitempty"];
+  
+  // priority: An integer defining the priority of this service entry.
+  uint32 priority = 7 [(gogoproto.jsontag) = "priority,omitempty"];
 }
 
 // DidDocWithMetadata defines a DID Document with metadata, as defined in the DID Core specification.

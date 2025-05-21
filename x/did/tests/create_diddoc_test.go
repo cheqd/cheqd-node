@@ -160,6 +160,92 @@ var _ = Describe("Create DID tests", func() {
 		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
 	})
 
+	It("Valid: Works for DIDDoc with didcomm service type", func() {
+		did := testsetup.GenerateDID(testsetup.Base58_16bytes)
+
+		keypair1 := testsetup.GenerateKeyPair()
+		keyID1 := did + "#key-1"
+
+		keypair2 := testsetup.GenerateKeyPair()
+		keyID2 := did + "#key-2"
+
+		keypair3 := testsetup.GenerateKeyPair()
+		keyID3 := did + "#key-3"
+
+		keypair4 := testsetup.GenerateKeyPair()
+		keyID4 := did + "#key-4"
+
+		msg := &types.MsgCreateDidDocPayload{
+			Context:    []string{"abc", "def"},
+			Id:         did,
+			Controller: []string{did},
+			VerificationMethod: []*types.VerificationMethod{
+				{
+					Id:                     keyID1,
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
+					Controller:             did,
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(keypair1.Public),
+				},
+				{
+					Id:                     keyID2,
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
+					Controller:             did,
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(keypair2.Public),
+				},
+				{
+					Id:                     keyID3,
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
+					Controller:             did,
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(keypair3.Public),
+				},
+				{
+					Id:                     keyID4,
+					VerificationMethodType: types.Ed25519VerificationKey2020Type,
+					Controller:             did,
+					VerificationMaterial:   testsetup.GenerateEd25519VerificationKey2020VerificationMaterial(keypair4.Public),
+				},
+			},
+			Authentication:  []string{keyID1, keyID2},
+			AssertionMethod: []string{keyID3},
+			Service: []*types.Service{
+				{
+					Id:              did + "#service-1",
+					ServiceType:     "type-1",
+					ServiceEndpoint: []string{"endpoint-1"},
+					RecipientKeys:   []string{keyID4, "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"},
+					RoutingKeys:     []string{"did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp"},
+					Accept:          []string{"didcomm/v2"},
+					Priority:        0,
+				},
+				{
+					Id:              did + "#service-2",
+					ServiceType:     "type-1",
+					ServiceEndpoint: []string{"endpoint-2"},
+					RecipientKeys:   []string{"did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"},
+					RoutingKeys:     nil,
+					Accept:          nil,
+					Priority:        1,
+				},
+			},
+			VersionId: uuid.NewString(),
+		}
+
+		signatures := []testsetup.SignInput{
+			{
+				VerificationMethodID: keyID1,
+				Key:                  keypair1.Private,
+			},
+		}
+
+		_, err := setup.CreateDid(msg, signatures)
+		Expect(err).To(BeNil())
+
+		// check
+		created, err := setup.QueryDidDoc(did)
+		Expect(err).To(BeNil())
+		Expect(msg.ToDidDoc()).To(Equal(*created.Value.DidDoc))
+	})
+
 	It("Valid: Works for DIDDoc with all properties", func() {
 		did := testsetup.GenerateDID(testsetup.Base58_16bytes)
 
