@@ -238,7 +238,7 @@ message QueryMedians {
   string denom = 1;
   // numStamps defines the number of median stamps to query for. numStamps
   // must be greater than 0.
-  uint32 numStamps = 2;
+  uint32 num_stamps = 2;
 }
 
 // QueryMediansResponse is response type for the
@@ -261,7 +261,7 @@ message QueryMedianDeviations {
 // Query/MedianDeviations RPC method.
 message QueryMedianDeviationsResponse {
   // medians defines a list of the median deviations for all stamped denoms.
-  repeated PriceStamp medianDeviations = 1 [(gogoproto.nullable) = false];
+  repeated PriceStamp median_deviations = 1 [(gogoproto.nullable) = false];
 }
 
 // QueryValidatorRewardSet is the request type for the Query/ValidatorRewardSet RPC method.
