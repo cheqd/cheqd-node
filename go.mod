@@ -30,7 +30,7 @@ require (
 	github.com/osmosis-labs/fee-abstraction/v8 v8.0.2
 	github.com/rakyll/statik v0.1.7
 	github.com/skip-mev/feemarket v1.0.0-sdk47.0.20240822213759-ad21c7e69228
-	github.com/spf13/cast v1.7.1
+	github.com/spf13/cast v1.8.0
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.6
 	github.com/spf13/viper v1.19.0
