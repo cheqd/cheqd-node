@@ -9,6 +9,7 @@ import (
 	confixcmd "cosmossdk.io/tools/confix/cmd"
 	"github.com/cheqd/cheqd-node/app"
 	"github.com/cheqd/cheqd-node/app/params"
+	"github.com/cheqd/cheqd-node/pricefeeder"
 	cmtcfg "github.com/cometbft/cometbft/config"
 	cmtcli "github.com/cometbft/cometbft/libs/cli"
 	dbm "github.com/cosmos/cosmos-db"
@@ -158,6 +159,10 @@ func initRootCmd(
 		txCommand(),
 		keys.Commands(),
 	)
+
+	rootCmd.PersistentFlags().String(pricefeeder.FlagConfigPath, "", "Path to price feeder config file")
+	rootCmd.PersistentFlags().String(pricefeeder.FlagLogLevel, "", "Log level of price feeder process")
+	rootCmd.PersistentFlags().Bool(pricefeeder.FlagEnablePriceFeeder, false, "Enable the price feeder")
 }
 
 // genesisCommand builds genesis-related `universus genesis` command.
@@ -226,11 +231,20 @@ func txCommand() *cobra.Command {
 
 // newApp is an AppCreator
 func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
-	return app.New(
+	app := app.New(
 		logger, db, traceStore, true,
 		appOpts,
 		server.DefaultBaseappOptions(appOpts)...,
 	)
+
+	// load app config into oracle keeper price feeder
+	appConfig, err := pricefeeder.ReadConfigFromAppOpts(appOpts)
+	if err != nil {
+		panic(err)
+	}
+	app.OracleKeeper.PriceFeeder.AppConfig = appConfig
+
+	return app
 }
 
 // appExport creates a new app (optionally at a given height)

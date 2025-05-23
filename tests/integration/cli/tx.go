@@ -183,3 +183,60 @@ func VoteProposalTx(from, option, id string, feeParams []string) (sdk.TxResponse
 func SendTokensTx(from, to, amount string, feeParams []string) (sdk.TxResponse, error) {
 	return Tx("bank", "send", from, feeParams, from, to, amount)
 }
+
+// DelegateFeederAddress delegates a feeder address for a validator
+func DelegateFeedConsent(validatorAddr, feederAddr, account string, fees []string) (sdk.TxResponse, error) {
+	return Tx("oracle", "delegate-feed-consent", account, fees, validatorAddr, feederAddr)
+}
+
+// // DelegateFeedConsent executes the delegate-feed-consent transaction command
+// func DelegateFeedConsent(operatorAddr, feederAddr, from string, feeParams []string) (sdk.TxResponse, error) {
+// 	return Tx(ModuleName, "delegate-feed-consent", from, feeParams, operatorAddr, feederAddr)
+// }
+
+// AggregateExchangeRatePrevote executes the exchange-rate-prevote transaction command
+func AggregateExchangeRatePrevote(hash string, validatorAddr, from string, feeParams []string) (sdk.TxResponse, error) {
+	return Tx("oracle", "exchange-rate-prevote", from, feeParams, hash, validatorAddr)
+}
+
+// AggregateExchangeRateVote executes the exchange-rate-vote transaction command
+func AggregateExchangeRateVote(salt string, exchangeRates string, validatorAddr, from string, feeParams []string) (sdk.TxResponse, error) {
+	return Tx("oracle", "exchange-rate-vote", from, feeParams, salt, exchangeRates, validatorAddr)
+}
+
+// // SubmitExchangeRateVote submits an exchange rate vote
+// func SubmitExchangeRateVote(exchangeRates, salt, validatorAddr, feederAddr, account string, fees []string) (*sdk.TxResponse, error) {
+// 	cmd := fmt.Sprintf(
+// 		"%s tx oracle exchange-rate-vote %s %s %s --from %s %s -o json",
+// 		"cheqd",
+// 		salt,
+// 		exchangeRates,
+// 		validatorAddr,
+// 		account,
+// 		fees,
+// 	)
+// 	out, err := ExecuteWithInput(cmd, "")
+// 	if err != nil {
+// 		return nil, fmt.Errorf("error executing command: %s, error: %w, output: %s", cmd, err, string(out))
+// 	}
+
+// 	var response sdk.TxResponse
+// 	err = json.Unmarshal(out, &response)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("error unmarshaling response: %w, output: %s", err, string(out))
+// 	}
+
+// 	return &response, nil
+// }
+
+// // ExecuteWithInput executes a command with the given input
+// func ExecuteWithInput(command, input string) ([]byte, error) {
+// 	fmt.Printf("Executing command: %s\n", command)
+// 	cmd := exec.Command("sh", "-c", command)
+
+// 	if input != "" {
+// 		cmd.Stdin = strings.NewReader(input)
+// 	}
+
+// 	return cmd.CombinedOutput()
+// }
