@@ -39,6 +39,7 @@ import (
 	did "github.com/cheqd/cheqd-node/x/did"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	"github.com/cheqd/cheqd-node/x/oracle"
 	"github.com/cheqd/cheqd-node/x/resource"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -160,6 +161,10 @@ import (
 	upgradeV4 "github.com/cheqd/cheqd-node/app/upgrades/v4"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	protov2 "google.golang.org/protobuf/proto"
+
+	oracleabci "github.com/cheqd/cheqd-node/x/oracle/abci"
+	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
+	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 )
 
 var (
@@ -180,6 +185,7 @@ var (
 		didtypes.ModuleName:             {authtypes.Minter, authtypes.Burner},
 		feemarkettypes.ModuleName:       {authtypes.Burner},
 		feemarkettypes.FeeCollectorName: {authtypes.Burner},
+		oracletypes.ModuleName:          {authtypes.Minter},
 		feeabstypes.ModuleName:          nil,
 		ibcfeetypes.ModuleName:          nil,
 	}
@@ -246,6 +252,7 @@ type App struct {
 
 	DidKeeper      didkeeper.Keeper
 	ResourceKeeper resourcekeeper.Keeper
+	OracleKeeper   oraclekeeper.Keeper
 
 	// the module manager
 	ModuleManager      *module.Manager
@@ -327,7 +334,6 @@ func New(
 
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName).String()
 
-	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
 	bApp := baseapp.NewBaseApp(Name, logger, db, txConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetVersion(version.Version)
@@ -363,6 +369,7 @@ func New(
 		feeabstypes.StoreKey,
 		feemarkettypes.StoreKey,
 		circuittypes.StoreKey,
+		oracletypes.StoreKey,
 	)
 
 	tkeys := storetypes.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -743,6 +750,18 @@ func New(
 		app.AccountKeeper, app.BankKeeper,
 		app.StakingKeeper, authority,
 	)
+	app.OracleKeeper = oraclekeeper.NewKeeper(
+		appCodec,
+		keys[oracletypes.ModuleName],
+		app.GetSubspace(oracletypes.ModuleName),
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.DistrKeeper,
+		app.StakingKeeper,
+		distrtypes.ModuleName,
+		cast.ToBool(appOpts.Get("telemetry.enabled")),
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
 	// we prefer to be more strict in what arguments the modules expect.
@@ -787,6 +806,7 @@ func New(
 		did.NewAppModule(appCodec, app.DidKeeper, app.GetSubspace(didtypes.ModuleName)),
 		resource.NewAppModule(appCodec, app.ResourceKeeper, app.DidKeeper, app.GetSubspace(resourcetypes.ModuleName)),
 		feeabsModule,
+		oracle.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	// BasicModuleManager defines the module BasicManager is in charge of setting up basic,
@@ -846,6 +866,7 @@ func New(
 		resourcetypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		feemarkettypes.ModuleName,
+		oracletypes.ModuleName,
 	)
 
 	app.ModuleManager.SetOrderEndBlockers(
@@ -876,6 +897,7 @@ func New(
 		ibcfeetypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		feemarkettypes.ModuleName,
+		oracletypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -912,6 +934,7 @@ func New(
 		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 		feemarkettypes.ModuleName,
+		oracletypes.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
 	app.ModuleManager.SetOrderExportGenesis(genesisModuleOrder...)
@@ -938,6 +961,20 @@ func New(
 	}
 	reflectionv1.RegisterReflectionServiceServer(app.GRPCQueryRouter(), reflectionSvc)
 
+	proposalHandler := oracleabci.NewProposalHandler(
+		app.Logger(),
+		app.OracleKeeper,
+		app.StakingKeeper,
+	)
+	app.SetPrepareProposal(proposalHandler.PrepareProposalHandler())
+	app.SetProcessProposal(proposalHandler.ProcessProposalHandler())
+
+	voteExtensionsHandler := oracleabci.NewVoteExtensionHandler(
+		app.Logger(),
+		app.OracleKeeper,
+	)
+	app.SetExtendVoteHandler(voteExtensionsHandler.ExtendVoteHandler())
+	app.SetVerifyVoteExtensionHandler(voteExtensionsHandler.VerifyVoteExtensionHandler())
 	// initialize stores
 	app.MountKVStores(keys)
 	app.MountTransientStores(tkeys)
@@ -1020,6 +1057,7 @@ func (app *App) setPostHandler() {
 		DidKeeper:       app.DidKeeper,
 		ResourceKeeper:  app.ResourceKeeper,
 		FeeMarketKeeper: app.FeeMarketKeeper,
+		OracleKeeper:    app.OracleKeeper,
 	})
 	if err != nil {
 		panic(err)
@@ -1030,11 +1068,6 @@ func (app *App) setPostHandler() {
 
 // Name returns the name of the App
 func (app *App) Name() string { return app.BaseApp.Name() }
-
-// PreBlocker application updates every pre block
-func (app *App) PreBlocker(ctx sdk.Context, _ *abci.RequestFinalizeBlock) (*sdk.ResponsePreBlock, error) {
-	return app.ModuleManager.PreBlock(ctx)
-}
 
 // BeginBlocker application updates every begin block
 func (app *App) BeginBlocker(ctx sdk.Context) (sdk.BeginBlock, error) {
@@ -1189,7 +1222,7 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	// Register grpc-gateway routes for all modules.
 	app.BasicModuleManager.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
-	// register swagger API from root so that oticqher applications can override easily
+	// register swagger API from root so that other applications can override easily
 	if apiConfig.Swagger {
 		RegisterSwaggerAPI(apiSvr.Router)
 	}
@@ -1251,6 +1284,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(feeabstypes.ModuleName).WithKeyTable(feeabstypes.ParamKeyTable())
 	paramsKeeper.Subspace(icqtypes.ModuleName)
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
+	paramsKeeper.Subspace(oracletypes.ModuleName).WithKeyTable(oracletypes.ParamKeyTable())
 
 	return paramsKeeper
 }

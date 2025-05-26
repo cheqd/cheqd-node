@@ -23,10 +23,11 @@ type TaxDecorator struct {
 	didKeeper       cheqdante.DidKeeper
 	resourceKeeper  cheqdante.ResourceKeeper
 	feemarketKeeper FeeMarketKeeper
+	oracleKeeper    cheqdante.OracleKeeper
 }
 
 // NewTaxDecorator returns a new taxDecorator
-func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper, fmk FeeMarketKeeper) TaxDecorator {
+func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper, fmk FeeMarketKeeper, ok cheqdante.OracleKeeper) TaxDecorator {
 	return TaxDecorator{
 		accountKeeper:   ak,
 		bankKeeper:      bk,
@@ -34,6 +35,7 @@ func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeepe
 		didKeeper:       dk,
 		resourceKeeper:  rk,
 		feemarketKeeper: fmk,
+		oracleKeeper:    ok,
 	}
 }
 
@@ -245,7 +247,7 @@ func (td TaxDecorator) isTaxable(ctx sdk.Context, sdkTx sdk.Tx) (rewards sdk.Coi
 	taxable = cheqdante.IsTaxableTxLite(feeTx)
 	if taxable {
 		// run full validation
-		_, rewards, burn = cheqdante.IsTaxableTx(ctx, td.didKeeper, td.resourceKeeper, feeTx)
+		_, rewards, burn = cheqdante.IsTaxableTx(ctx, td.didKeeper, td.resourceKeeper, feeTx, td.oracleKeeper)
 		return rewards, burn, taxable, nil
 	}
 
