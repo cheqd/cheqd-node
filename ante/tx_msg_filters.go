@@ -137,7 +137,7 @@ func checkFeeParamsFromSubspace(ctx sdk.Context, didKeeper DidKeeper, resourceKe
 }
 
 func IsTaxableTx(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKeeper, tx sdk.Tx, oracleKeeper OracleKeeper) (bool, sdk.Coins, sdk.Coins) {
-	ncheqPrice, exist := oracleKeeper.GetEMA(ctx, "ncheq")
+	ncheqPrice, exist := oracleKeeper.GetEMA(ctx, "CHEQ")
 	if !exist {
 		return false, nil, nil
 	}
@@ -174,6 +174,7 @@ func IsTaxableTxLite(tx sdk.Tx) bool {
 
 	return false
 }
+
 func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec) sdk.Coins {
 	if len(feeRanges) == 0 || cheqEmaPrice.IsZero() {
 		return nil
@@ -193,15 +194,15 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 	for _, fr := range feeRanges {
 		var minUSD, maxUSD sdkmath.LegacyDec
 
-		if fr.Denom == "ncheq" {
+		switch fr.Denom {
+		case "ncheq":
 			// Convert native CHEQ to USD using EMA price
-
 			minCHEQ := sdkmath.LegacyNewDecFromInt(fr.MinAmount).QuoInt64(1e9)
 			maxCHEQ := sdkmath.LegacyNewDecFromInt(fr.MaxAmount).QuoInt64(1e9)
 
 			minUSD = cheqEmaPrice.MulInt(sdkmath.NewInt(minCHEQ.TruncateInt64()))
 			maxUSD = cheqEmaPrice.MulInt(sdkmath.NewInt(maxCHEQ.TruncateInt64()))
-		} else if fr.Denom == "usd" {
+		case "usd":
 			// Treat USD as 18-decimal fixed point
 			if fr.MinAmount.LT(sdkmath.NewInt(1e6)) {
 				minUSD = sdkmath.LegacyNewDecFromInt(fr.MinAmount)
@@ -211,9 +212,8 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 				minUSD = sdkmath.LegacyNewDecFromInt(fr.MinAmount).QuoInt64(1e18)
 				maxUSD = sdkmath.LegacyNewDecFromInt(fr.MaxAmount).QuoInt64(1e18)
 			}
-
-		} else {
-			continue // unsupported denom
+		default:
+			continue
 		}
 
 		ranges = append(ranges, usdRange{
@@ -247,18 +247,31 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 	}
 
 	// Step 3: Choose a denom to return the fee in — using the first one
-	chosen := ranges[0]
+	var chosen usdRange
+	for _, r := range ranges {
+		if r.denom == "usd" {
+			chosen = r
+			break
+		}
+	}
 	var finalAmount sdkmath.Int
+	// fallback to first if usd is not available
+	if chosen.denom == "" {
+		chosen = ranges[0]
+	}
 
-	if chosen.denom == "ncheq" {
+	switch chosen.denom {
+	case "ncheq":
 		finalAmount = overlapMin.Quo(cheqEmaPrice).TruncateInt()
-	} else if chosen.denom == "usd" {
+
+	case "usd":
 		if overlapMin.LT(sdkmath.LegacyNewDec(1e5)) {
 			finalAmount = overlapMin.MulInt64(1e18).TruncateInt()
 		} else {
 			finalAmount = overlapMin.TruncateInt()
 		}
-	} else {
+
+	default:
 		return nil
 	}
 

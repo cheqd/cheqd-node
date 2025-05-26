@@ -15,49 +15,60 @@ import (
 // If the valid vote rate is below the minValidPerWindow, the validator will be
 // slashed and jailed.
 func (k Keeper) SlashAndResetMissCounters(ctx sdk.Context) {
-	var (
-		possibleWinsPerSlashWindow = k.PossibleWinsPerSlashWindow(ctx)
-		minValidPerWindow          = k.MinValidPerWindow(ctx)
+	possibleWins := k.PossibleWinsPerSlashWindow(ctx)
+	minValidRate := k.MinValidPerWindow(ctx)
 
-		distributionHeight = ctx.BlockHeight() - sdk.ValidatorUpdateDelay - 1
-		slashFraction      = k.SlashFraction(ctx)
-		powerReduction     = k.StakingKeeper.PowerReduction(ctx)
-	)
+	distributionHeight := ctx.BlockHeight() - sdk.ValidatorUpdateDelay - 1
+	slashFraction := k.SlashFraction(ctx)
+	powerReduction := k.StakingKeeper.PowerReduction(ctx)
 
-	k.IterateMissCounters(ctx, func(operator sdk.ValAddress, missCounter uint64) bool {
-		validVotes := math.NewInt(possibleWinsPerSlashWindow - util.SafeUint64ToInt64(missCounter))
-		validVoteRate := math.LegacyNewDecFromInt(validVotes).QuoInt64(possibleWinsPerSlashWindow)
-
-		// Slash and jail the validator if their valid vote rate is smaller than the
-		// minimum threshold.
-		if validVoteRate.LT(minValidPerWindow) {
-			validator, err := k.StakingKeeper.Validator(ctx, operator)
-			if validator.IsBonded() && !validator.IsJailed() && err == nil {
-				consAddr, err := validator.GetConsAddr()
-				if err != nil {
-					panic(err)
-				}
-
-				_, err = k.StakingKeeper.Slash(
-					ctx,
-					consAddr,
-					distributionHeight,
-					validator.GetConsensusPower(powerReduction), slashFraction,
-				)
-				if err != nil {
-					panic(err)
-				}
-
-				err = k.StakingKeeper.Jail(ctx, consAddr)
-				if err != nil {
-					panic(err)
-				}
-			}
-		}
-
+	k.IterateMissCounters(ctx, func(operator sdk.ValAddress, missCount uint64) bool {
+		k.evaluateAndSlashIfNeeded(ctx, operator, missCount, possibleWins, minValidRate, distributionHeight, slashFraction, powerReduction)
 		k.DeleteMissCounter(ctx, operator)
 		return false
 	})
+}
+
+func (k Keeper) evaluateAndSlashIfNeeded(
+	ctx sdk.Context,
+	operator sdk.ValAddress,
+	missCount uint64,
+	possibleWinsPerSlashWindow int64,
+	minValidRate math.LegacyDec,
+	distributionHeight int64,
+	slashFraction math.LegacyDec,
+	powerReduction math.Int,
+) {
+	validVotes := math.NewInt(possibleWinsPerSlashWindow - util.SafeUint64ToInt64(missCount))
+	validRate := math.LegacyNewDecFromInt(validVotes).QuoInt64(possibleWinsPerSlashWindow)
+
+	if !validRate.LT(minValidRate) {
+		return // Validator is safe
+	}
+
+	validator, err := k.StakingKeeper.Validator(ctx, operator)
+	if err != nil || !validator.IsBonded() || validator.IsJailed() {
+		return // Cannot slash or jail this validator
+	}
+
+	consAddr, err := validator.GetConsAddr()
+	if err != nil {
+		panic(err)
+	}
+
+	if _, err := k.StakingKeeper.Slash(
+		ctx,
+		consAddr,
+		distributionHeight,
+		validator.GetConsensusPower(powerReduction),
+		slashFraction,
+	); err != nil {
+		panic(err)
+	}
+
+	if err := k.StakingKeeper.Jail(ctx, consAddr); err != nil {
+		panic(err)
+	}
 }
 
 // PossibleWinsPerSlashWindow returns the total number of possible correct votes

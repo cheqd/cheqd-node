@@ -42,7 +42,12 @@ func NewExchangeMock() *ExchangeMock {
 		if symbol == "" {
 			// If no symbol is provided, return all prices
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(mock.Prices)
+			err := json.NewEncoder(w).Encode(mock.Prices)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprintf(w, `{"error": "Failed to encode response"}`)
+				return
+			}
 			return
 		}
 
@@ -55,7 +60,12 @@ func NewExchangeMock() *ExchangeMock {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(price)
+		err := json.NewEncoder(w).Encode(price)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(w, `{"error": "Failed to encode response"}`)
+			return
+		}
 	}))
 
 	return mock
@@ -149,7 +159,11 @@ func NewMEXCMock() *MEXCMock {
 				}
 
 				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(combinedResponse)
+				err := json.NewEncoder(w).Encode(combinedResponse)
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					fmt.Fprintf(w, `{"error": "Failed to encode response"}`)
+				}
 				return
 			}
 
@@ -158,7 +172,7 @@ func NewMEXCMock() *MEXCMock {
 			if !exists {
 				// Return empty but successful response for unknown symbols
 				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(MEXCResponse{
+				err := json.NewEncoder(w).Encode(MEXCResponse{
 					Code: 200,
 					Data: []struct {
 						Symbol    string `json:"symbol"`
@@ -170,11 +184,20 @@ func NewMEXCMock() *MEXCMock {
 					}{},
 					Message: "success",
 				})
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					fmt.Fprintf(w, `{"error": "Failed to encode response"}`)
+					return
+				}
 				return
 			}
 
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(response)
+			err := json.NewEncoder(w).Encode(response)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprintf(w, `{"error": "Failed to encode response"}`)
+			}
 			return
 		}
 

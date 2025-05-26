@@ -108,7 +108,6 @@ var _ = Describe("cheqd cli - oracle module", func() {
 
 		// Execute the actual transaction command with our test keys
 		txResp, err := cli.DelegateFeedConsent(validatorOperAddr, feederAddr, validatorAddr, cli.CliGasParams)
-
 		// If the transaction still fails due to the validator not being registered in the test chain,
 		// we can check for that specific error and handle it gracefully
 		if err != nil {
@@ -482,7 +481,6 @@ var _ = Describe("cheqd cli - oracle module", func() {
 		// Try to query existing exchange rates
 		// Note: This might not return actual rates if the price-feeder isn't running
 		rateRes, err := cli.QueryExchangeRate(testDenom)
-
 		// Instead of skipping on error, handle both success and failure cases
 		if err != nil {
 			// This is acceptable if price-feeder isn't running
@@ -513,7 +511,6 @@ var _ = Describe("cheqd cli - oracle module", func() {
 
 		// Query the miss counter for the validator
 		missRes, err := cli.QueryMissCounter(validatorAddr)
-
 		// Instead of skipping, handle potential errors
 		if err != nil {
 			// If error indicates the validator isn't registered, that's acceptable
@@ -536,7 +533,6 @@ var _ = Describe("cheqd cli - oracle module", func() {
 
 		// Query aggregate prevotes for the validator
 		prevoteRes, err := cli.QueryAggregatePrevote(validatorAddr)
-
 		// Instead of skipping, we'll check if the CLI executed correctly
 		if err != nil {
 			// Check if the error indicates no prevotes, which is an acceptable condition
@@ -565,7 +561,6 @@ var _ = Describe("cheqd cli - oracle module", func() {
 
 		// Query aggregate votes for the validator
 		voteRes, err := cli.QueryAggregateVote(validatorAddr)
-
 		// Handle no votes case without skipping
 		if err != nil {
 			// Check if this is the expected "no votes" error
@@ -589,7 +584,6 @@ var _ = Describe("cheqd cli - oracle module", func() {
 	It("should query slash window", func() {
 		// Query the current slash window
 		slashRes, err := cli.QuerySlashWindow()
-
 		// Handle errors without skipping
 		if err != nil {
 			Fail(fmt.Sprintf("Failed to query slash window: %v", err))

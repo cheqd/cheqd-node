@@ -2,8 +2,8 @@
 package oraclev2
 
 import (
-	fmt "fmt"
 	v1beta1 "cosmossdk.io/api/cosmos/base/v1beta1"
+	fmt "fmt"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"

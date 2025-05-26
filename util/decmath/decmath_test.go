@@ -21,7 +21,7 @@ func TestMedian(t *testing.T) {
 	require.Equal(math.LegacyMustNewDecFromStr("1.115"), median)
 
 	// test empty prices list
-	median, err = Median([]math.LegacyDec{})
+	_, err = Median([]math.LegacyDec{})
 	require.ErrorIs(err, ErrEmptyList)
 }
 
@@ -40,7 +40,7 @@ func TestMedianDeviation(t *testing.T) {
 	require.Equal(math.LegacyMustNewDecFromStr("0.048218253804964775"), medianDeviation)
 
 	// test empty prices list
-	medianDeviation, err = MedianDeviation(median, []math.LegacyDec{})
+	_, err = MedianDeviation(median, []math.LegacyDec{})
 	require.ErrorIs(err, ErrEmptyList)
 }
 
@@ -58,7 +58,7 @@ func TestAverage(t *testing.T) {
 	require.Equal(math.LegacyMustNewDecFromStr("1.125"), average)
 
 	// test empty prices list
-	average, err = Average([]math.LegacyDec{})
+	_, err = Average([]math.LegacyDec{})
 	require.ErrorIs(err, ErrEmptyList)
 }
 
@@ -76,7 +76,7 @@ func TestMin(t *testing.T) {
 	require.Equal(math.LegacyMustNewDecFromStr("1.07"), min)
 
 	// test empty prices list
-	min, err = Min([]math.LegacyDec{})
+	_, err = Min([]math.LegacyDec{})
 	require.ErrorIs(err, ErrEmptyList)
 }
 
@@ -94,7 +94,7 @@ func TestMax(t *testing.T) {
 	require.Equal(math.LegacyMustNewDecFromStr("1.2"), max)
 
 	// test empty prices list
-	max, err = Max([]math.LegacyDec{})
+	_, err = Max([]math.LegacyDec{})
 	require.ErrorIs(err, ErrEmptyList)
 }
 

@@ -2,6 +2,7 @@ package abci
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"cosmossdk.io/math"
@@ -51,35 +52,52 @@ func EndBlocker(ctx context.Context, k keeper.Keeper) error {
 	}
 
 	if k.IsPeriodLastBlock(sdkCtx, params.VotePeriod) {
-		if k.PriceFeeder.Oracle != nil && k.PriceFeeder.AppConfig.Enable {
-			// Update price feeder oracle with latest params.
-			k.PriceFeeder.Oracle.ParamCache.UpdateParamCache(sdkCtx.BlockHeight(), k.GetParams(sdkCtx), nil)
+		RunPriceFeederIfEnabled(ctx, sdkCtx, params, k)
 
-			// Execute price feeder oracle tick.
-			if err := k.PriceFeeder.Oracle.TickClientless(ctx); err != nil {
-				sdkCtx.Logger().Error("Error in Oracle Keeper price feeder clientless tick", "err", err)
-			}
-		}
-
-		// Update oracle module with prices.
-		if err := CalcPrices(sdkCtx, params, k); err != nil {
+		if err := UpdateOraclePrices(sdkCtx, params, k); err != nil {
 			return err
 		}
 
-		if k.IsPeriodLastBlock(sdkCtx, params.HistoricStampPeriod) {
-			for _, v := range params.AcceptList {
-				if err := k.ComputeAverages(sdkCtx, v.BaseDenom); err != nil {
-					return err
-				}
+		if k.IsPeriodLastBlock(sdkCtx, params.HistoricStampPeriod*keeper.AveragingWindow) {
+			if err := ComputeAllAverages(sdkCtx, params, k); err != nil {
+				return err
 			}
 		}
 	}
+
 	// Slash oracle providers who missed voting over the threshold and reset
 	// miss counters of all validators at the last block of slash window.
 	if k.IsPeriodLastBlock(sdkCtx, params.SlashWindow) {
 		k.SlashAndResetMissCounters(sdkCtx)
 	}
 	k.PruneAllPrices(sdkCtx)
+	return nil
+}
+
+func RunPriceFeederIfEnabled(ctx context.Context, sdkCtx sdk.Context, params types.Params, k keeper.Keeper) {
+	if k.PriceFeeder.Oracle != nil && k.PriceFeeder.AppConfig.Enable {
+		k.PriceFeeder.Oracle.ParamCache.UpdateParamCache(
+			sdkCtx.BlockHeight(),
+			k.GetParams(sdkCtx),
+			nil,
+		)
+
+		if err := k.PriceFeeder.Oracle.TickClientless(ctx); err != nil {
+			sdkCtx.Logger().Error("Error in Oracle Keeper price feeder clientless tick", "err", err)
+		}
+	}
+}
+
+func UpdateOraclePrices(sdkCtx sdk.Context, params types.Params, k keeper.Keeper) error {
+	return CalcPrices(sdkCtx, params, k)
+}
+
+func ComputeAllAverages(sdkCtx sdk.Context, params types.Params, k keeper.Keeper) error {
+	for _, v := range params.AcceptList {
+		if err := k.ComputeAverages(sdkCtx, v.SymbolDenom); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -153,6 +171,7 @@ func CalcPrices(ctx sdk.Context, params types.Params, k keeper.Keeper) error {
 		}
 
 		if k.IsPeriodLastBlock(ctx, params.HistoricStampPeriod) {
+			fmt.Println(">>>>>>>>>>>>>>>>>>>.ballotDenom", ballotDenom.Denom, exchangeRate)
 			k.AddHistoricPrice(ctx, ballotDenom.Denom, exchangeRate)
 		}
 		// Calculate and stamp median/median deviation if median stamp period has passed
