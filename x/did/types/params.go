@@ -16,6 +16,11 @@ func DefaultFeeParams() *FeeParams {
 				MinAmount: sdkmath.NewInt(50000000000),
 				MaxAmount: sdkmath.NewInt(100000000000),
 			},
+			{
+				Denom:     "usd",
+				MinAmount: sdkmath.NewInt(1200000000000000000),
+				MaxAmount: sdkmath.NewInt(2000000000000000000),
+			},
 		},
 		UpdateDid: []FeeRange{
 			{
@@ -39,10 +44,6 @@ func DefaultFeeParams() *FeeParams {
 // ValidateBasic performs basic validation of cheqd module tx fee parameters
 func (tfp *FeeParams) ValidateBasic() error {
 	for i, f := range tfp.CreateDid {
-		if f.Denom != BaseMinimalDenom {
-			return fmt.Errorf("invalid denom in create_did[%d]: got %s, expected %s", i, f.Denom, BaseMinimalDenom)
-		}
-
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in create_did[%d]: got %s", i, f.MinAmount.String())
 		}
@@ -50,13 +51,9 @@ func (tfp *FeeParams) ValidateBasic() error {
 		if !f.MaxAmount.IsZero() && f.MaxAmount.LT(f.MinAmount) {
 			return fmt.Errorf("max_amount must be greater than or equal to min_amount in create_did[%d]: got max=%s, min=%s", i, f.MaxAmount.String(), f.MinAmount.String())
 		}
-
 	}
 
 	for i, f := range tfp.UpdateDid {
-		if f.Denom != BaseMinimalDenom {
-			return fmt.Errorf("invalid denom in update_did[%d]: got %s, expected %s", i, f.Denom, BaseMinimalDenom)
-		}
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in update_did[%d]: got %s", i, f.MinAmount.String())
 		}
@@ -66,9 +63,6 @@ func (tfp *FeeParams) ValidateBasic() error {
 	}
 
 	for i, f := range tfp.DeactivateDid {
-		if f.Denom != BaseMinimalDenom {
-			return fmt.Errorf("invalid denom in deactivate_did[%d]: got %s, expected %s", i, f.Denom, BaseMinimalDenom)
-		}
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in deactivate_did[%d]: got %s", i, f.MinAmount.String())
 		}
@@ -83,6 +77,7 @@ func (tfp *FeeParams) ValidateBasic() error {
 
 	return nil
 }
+
 func validateCreateDid(i interface{}) error {
 	v, ok := i.([]*FeeRange)
 	if !ok {
@@ -90,9 +85,6 @@ func validateCreateDid(i interface{}) error {
 	}
 
 	for idx, f := range v {
-		if f.Denom != BaseMinimalDenom {
-			return fmt.Errorf("invalid denom in create_did[%d]: got %s, expected %s", idx, f.Denom, BaseMinimalDenom)
-		}
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in create_did[%d]", idx)
 		}
@@ -110,9 +102,6 @@ func validateUpdateDid(i interface{}) error {
 	}
 
 	for idx, f := range v {
-		if f.Denom != BaseMinimalDenom {
-			return fmt.Errorf("invalid denom in update_did[%d]: got %s, expected %s", idx, f.Denom, BaseMinimalDenom)
-		}
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in update_did[%d]", idx)
 		}
@@ -130,9 +119,6 @@ func validateDeactivateDid(i interface{}) error {
 	}
 
 	for idx, f := range v {
-		if f.Denom != BaseMinimalDenom {
-			return fmt.Errorf("invalid denom in deactivate_did[%d]: got %s, expected %s", idx, f.Denom, BaseMinimalDenom)
-		}
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in deactivate_did[%d]", idx)
 		}

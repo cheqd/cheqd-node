@@ -172,7 +172,6 @@ var _ = Describe("cheqd cli - oracle module", func() {
 
 		// Execute the actual transaction command
 		txResp, err := cli.AggregateExchangeRatePrevote(voteHash, validatorAddr, fromAddr, cli.CliGasParams)
-
 		// In the test environment, the command might fail due to missing keys
 		// Handle both success and failure cases
 		if err != nil {
@@ -248,7 +247,7 @@ var _ = Describe("cheqd cli - oracle module", func() {
 
 		fmt.Printf("Submitting vote with matching parameters...\n")
 
-		//USING EXACT PARAMETERS FROM TEST CASE 3 - This should match the existing prevote hash
+		// USING EXACT PARAMETERS FROM TEST CASE 3 - This should match the existing prevote hash
 		txResp, err := cli.AggregateExchangeRateVote(sharedSalt, sharedRates, validatorAddr, fromAddr, cli.CliGasParams)
 		if err != nil {
 			if strings.Contains(err.Error(), "hash verification failed") {
