@@ -174,8 +174,8 @@ github.com/ccojocar/zxcvbn-go v1.0.2/go.mod h1:g1qkXtUSvHP8lhHp5GrSmTz6uWALGRMQd
 github.com/census-instrumentation/opencensus-proto v0.4.1/go.mod h1:4T9NM4+4Vw91VeyqjLS6ao50K5bOcLKN6Q42XnYaRYw=
 github.com/charithe/durationcheck v0.0.10/go.mod h1:bCWXb7gYRysD1CU3C+u4ceO49LoGOY1C1L6uouGNreQ=
 github.com/chavacava/garif v0.1.0/go.mod h1:XMyYCkEL58DF0oyW4qDjjnPWONs2HBqYKI+UIPD+Gww=
-github.com/cheqd/feemarket v1.0.5-uneven-heights h1:nnicfX1/2gVd3rAzYx6N316/9uwDt95a8XV/Kw8Gtw0=
-github.com/cheqd/feemarket v1.0.5-uneven-heights/go.mod h1:9az4B2TVuCOVDh+rlNyc36Wkl0rQ8bCBZmiUm3yqyxc=
+github.com/cheqd/cosmos-sdk/store v1.1.1-uneven-heights-iavl h1:bjpNdC0+/Z7r87kW5SkLp8o0j8WIdpRKyVCnEKPj+oY=
+github.com/cheqd/cosmos-sdk/store v1.1.1-uneven-heights-iavl/go.mod h1:mqMefBIF72t4yE81qSlHsBUkENfWJSKsNVzI8CEIPhc=
 github.com/chigopher/pathlib v0.19.1/go.mod h1:tzC1dZLW8o33UQpWkNkhvPwL5n4yyFRFm/jL1YGWFvY=
 github.com/ckaznocha/intrange v0.1.2/go.mod h1:RWffCw/vKBwHeOEwWdCikAtY0q4gGt8VhJZEEA5n+RE=
 github.com/clbanning/mxj v1.8.4/go.mod h1:BVjHeAH+rl9rs6f+QIpeRl0tfu10SXn1pUSa5PVGJng=

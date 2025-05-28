@@ -235,6 +235,8 @@ require (
 )
 
 replace (
+	// replace cosmossdk.io/store with patched version
+	cosmossdk.io/store => github.com/cheqd/cosmos-sdk/store v1.1.1-uneven-heights-iavl
 	// Keyring replacement from Cosmos SDK v0.50.13
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 
