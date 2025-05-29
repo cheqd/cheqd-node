@@ -38,7 +38,7 @@ function exit_if_tx_successful() {
     fi
 }
 
-`function assert_network_running() {
+function assert_network_running() {
     RES="$1"
     LATEST_HEIGHT=$(echo "${RES}" | jq --raw-output '.SyncInfo.latest_block_height')
     info "latest height: ${LATEST_HEIGHT}"
@@ -49,7 +49,7 @@ function exit_if_tx_successful() {
         err "network is not running"
         exit 1
     fi
-}`
+}
 
 function assert_network_running_comet_v38_or_above() {
     RES="$1"
