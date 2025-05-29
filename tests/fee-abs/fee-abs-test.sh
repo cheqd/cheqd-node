@@ -63,8 +63,6 @@ function assert_network_running_comet_v38_or_above() {
         exit 1
     fi
 }
-CHEQD_ROOT_DIR="/home/cheqd/.cheqdnode"
-
 info "Cleanup"
 docker compose down --volumes --remove-orphans
 
