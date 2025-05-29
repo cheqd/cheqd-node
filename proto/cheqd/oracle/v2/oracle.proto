@@ -72,6 +72,12 @@ message Params {
     (gogoproto.castrepeated) = "CurrencyDeviationThresholdList",
     (gogoproto.nullable) = false
   ];
+
+  // native ibced in osmosis
+  string native_ibced_in_osmosis = 16;
+
+  // usdc ibced in osmosis
+  string usdc_ibced_in_osmosis = 17;
 }
 
 // Denom - the object to hold configurations of each denom
