@@ -5,6 +5,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	resourceutils "github.com/cheqd/cheqd-node/x/resource/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -137,7 +138,7 @@ func checkFeeParamsFromSubspace(ctx sdk.Context, didKeeper DidKeeper, resourceKe
 }
 
 func IsTaxableTx(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKeeper, tx sdk.Tx, oracleKeeper OracleKeeper) (bool, sdk.Coins, sdk.Coins) {
-	ncheqPrice, exist := oracleKeeper.GetEMA(ctx, "CHEQ")
+	ncheqPrice, exist := oracleKeeper.GetEMA(ctx, oracletypes.CheqdSymbol)
 	if !exist {
 		return false, nil, nil
 	}

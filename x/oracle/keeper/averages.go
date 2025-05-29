@@ -25,7 +25,7 @@ func KeyWMAWithStrategy(denom, strategy string) []byte {
 	return []byte(fmt.Sprintf("wma:%s:%s", denom, strategy))
 }
 
-const AveragingWindow = 2 // N-period for SMA/WMA/EMA // TODO: make it a param
+const AveragingWindow = 3 // N-period for SMA/WMA/EMA // TODO: make it a param
 
 func (k Keeper) ComputeAverages(ctx sdk.Context, denom string) error {
 	store := ctx.KVStore(k.storeKey)
@@ -58,7 +58,6 @@ func (k Keeper) ComputeAverages(ctx sdk.Context, denom string) error {
 	prevEMA, present := k.GetAverage(ctx, KeyEMA(denom))
 
 	ema := CalculateEMA(prevEMA, present, prices)
-
 	k.setAverage(ctx, KeyEMA(denom), ema)
 	return nil
 }

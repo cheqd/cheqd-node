@@ -2,7 +2,6 @@ package abci
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"cosmossdk.io/math"
@@ -171,7 +170,6 @@ func CalcPrices(ctx sdk.Context, params types.Params, k keeper.Keeper) error {
 		}
 
 		if k.IsPeriodLastBlock(ctx, params.HistoricStampPeriod) {
-			fmt.Println(">>>>>>>>>>>>>>>>>>>.ballotDenom", ballotDenom.Denom, exchangeRate)
 			k.AddHistoricPrice(ctx, ballotDenom.Denom, exchangeRate)
 		}
 		// Calculate and stamp median/median deviation if median stamp period has passed
