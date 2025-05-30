@@ -16,7 +16,8 @@ const (
 
 	DidMethod = ModuleName
 
-	DidDocCountKey = "did-count:"
+	DidDocVersionKey = "did-version:"
+	DidDocCountKey   = "did-count:"
 )
 
 // State:
@@ -29,6 +30,6 @@ var (
 	DidDocCountKeyPrefix         = collections.NewPrefix(DidDocCountKey)
 	DidNamespaceKeyPrefix        = collections.NewPrefix("did-namespace:")
 	LatestDidDocVersionKeyPrefix = collections.NewPrefix("did-latest:")
-	DidDocVersionKeyPrefix       = collections.NewPrefix("did-version:")
+	DidDocVersionKeyPrefix       = collections.NewPrefix(DidDocVersionKey)
 	ParamStoreKeyFeeParams       = collections.NewPrefix("feeparams")
 )

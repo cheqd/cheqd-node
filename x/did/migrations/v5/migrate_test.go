@@ -13,6 +13,7 @@ import (
 	"github.com/cheqd/cheqd-node/x/did/exported"
 	v5 "github.com/cheqd/cheqd-node/x/did/migrations/v5"
 	"github.com/cheqd/cheqd-node/x/did/types"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdktestutil "github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -47,13 +48,16 @@ func TestMigrate(t *testing.T) {
 	sb := collections.NewSchemaBuilder(kvStoreService)
 	countCollection := collections.NewItem(sb, collections.Prefix(types.DidDocCountKey),
 		"did_count", collections.Uint64Value)
+	docCollection := collections.NewMap(sb, types.DidDocVersionKeyPrefix, "did_version",
+		collections.PairKeyCodec(collections.StringKey, collections.StringKey),
+		codec.CollValue[types.DidDocWithMetadata](cdc))
 
 	// set count key in old store
 	var countValue uint64 = 5
 	require.NoError(t, store.Set([]byte(types.DidDocCountKey), []byte(strconv.FormatUint(countValue, 10))))
 
 	legacySubspace := newMockSubspace(*types.DefaultFeeParams())
-	require.NoError(t, v5.MigrateStore(ctx, kvStoreService, legacySubspace, cdc, countCollection))
+	require.NoError(t, v5.MigrateStore(ctx, kvStoreService, legacySubspace, cdc, countCollection, docCollection))
 
 	var res types.FeeParams
 	bz, err := store.Get(types.ParamStoreKey)
