@@ -30,7 +30,7 @@ service Query {
 
    // Params queries params of the resource module.
    rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/cheqd/resource/v2/params";
+    option (google.api.http).get = "/cheqd/resource/v2/module/params";
   }
 }
 
