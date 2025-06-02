@@ -56,6 +56,19 @@ func TestMigrate(t *testing.T) {
 	var countValue uint64 = 5
 	require.NoError(t, store.Set([]byte(types.DidDocCountKey), []byte(strconv.FormatUint(countValue, 10))))
 
+	// set document in old store
+	testId := "test-id"
+	testVersion := "test-version"
+	doc := types.DidDocWithMetadata{
+		DidDoc: &types.DidDoc{
+			Id: testId,
+		},
+		Metadata: &types.Metadata{
+			VersionId: testVersion,
+		},
+	}
+	require.NoError(t, store.Set([]byte(types.DidDocVersionKey+testId+":"+testVersion), cdc.MustMarshal(&doc)))
+
 	legacySubspace := newMockSubspace(*types.DefaultFeeParams())
 	require.NoError(t, v5.MigrateStore(ctx, kvStoreService, legacySubspace, cdc, countCollection, docCollection))
 
@@ -69,4 +82,9 @@ func TestMigrate(t *testing.T) {
 	actualCount, err := countCollection.Get(ctx)
 	require.NoError(t, err)
 	require.Equal(t, countValue, actualCount)
+
+	// check document
+	docRes, err := docCollection.Get(ctx, collections.Join(testId, testVersion))
+	require.NoError(t, err)
+	require.Equal(t, doc, docRes)
 }
