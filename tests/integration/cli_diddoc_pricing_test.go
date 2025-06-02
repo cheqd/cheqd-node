@@ -76,9 +76,10 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		By("submitting a create diddoc message")
 		tax := feeParams.CreateDid[0]
 		cheqPrice, err := cli.QueryEMA("CHEQ")
-		cheqp := cheqPrice.Price
 		Expect(err).To(BeNil())
-		convertedFees := ante.GetFeeForMsg(feeParams.CreateDid, cheqp)
+		cheqp := cheqPrice.Price
+		convertedFees, err := ante.GetFeeForMsg(feeParams.CreateDid, cheqp)
+		Expect(err).To(BeNil())
 		burnPotionInUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
 		rewardPortionInUsd := helpers.GetRewardPortion(convertedFees, burnPotionInUsd)
 
@@ -301,8 +302,8 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		cheqPrice, err := cli.QueryEMA("CHEQ")
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
-
-		convertedFees := ante.GetFeeForMsg(feeParams.DeactivateDid, cheqp)
+		convertedFees, err := ante.GetFeeForMsg(feeParams.DeactivateDid, cheqp)
+		Expect(err).To(BeNil())
 		burnPotionInUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
 		rewardPortionInUsd := helpers.GetRewardPortion(convertedFees, burnPotionInUsd)
 
@@ -524,8 +525,8 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		cheqPrice, err := cli.QueryEMA("CHEQ")
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
-
-		convertedFees := ante.GetFeeForMsg(feeParams.DeactivateDid, cheqp)
+		convertedFees, err := ante.GetFeeForMsg(feeParams.DeactivateDid, cheqp)
+		Expect(err).To(BeNil())
 		burnPotionInUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
 		rewardPortionInUsd := helpers.GetRewardPortion(convertedFees, burnPotionInUsd)
 
