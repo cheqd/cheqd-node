@@ -5,6 +5,8 @@ import "cheqd/oracle/v2/oracle.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
+import "cosmos_proto/cosmos.proto";
+
 
 option go_package = "github.com/cheqd/cheqd-node/x/oracle/types";
 option (gogoproto.goproto_getters_all) = false;
@@ -80,6 +82,8 @@ service Query {
   rpc ValidatorRewardSet(QueryValidatorRewardSet) returns (QueryValidatorRewardSetResponse) {
     option (google.api.http).get = "/cheqd/oracle/v1/valdiators/validator_reward_set";
   }
+
+  rpc GetEma(GetEmaRequest) returns (GetEmaResponse) {}
 }
 
 // QueryExchangeRates is the request type for the Query/ExchangeRate RPC
@@ -270,4 +274,15 @@ message QueryValidatorRewardSet {}
 // QueryValidatorRewardSetResponse is the response type for the Query/ValidatorRewardSet RPC method.
 message QueryValidatorRewardSetResponse {
   ValidatorRewardSet validators = 1 [(gogoproto.nullable) = false];
+}
+
+message GetEmaRequest {
+  string denom = 1;
+}
+message GetEmaResponse {
+  string price = 2 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
 }

@@ -107,9 +107,11 @@ var _ = Describe("TxMsgFilters", func() {
 
 				ncheqPrice := math.LegacyMustNewDecFromStr("0.016")
 				// calculate portions
-				fee := ante.GetFeeForMsg(ante.TaxableMsgFees[ante.MsgCreateResourceImage], ncheqPrice)
-				reward, burn, ok := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice)
+				fee, err := ante.GetFeeForMsg(ante.TaxableMsgFees[ante.MsgCreateResourceImage], ncheqPrice)
+				Expect(err).To(BeNil())
 
+				reward, burn, ok, err := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice)
+				Expect(err).To(BeNil())
 				Expect(ok).To(BeTrue())
 				Expect(reward).To(Equal(ante.GetRewardPortion(fee, ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee))))
 				Expect(burn).To(Equal(ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee)))
@@ -153,10 +155,12 @@ var _ = Describe("TxMsgFilters", func() {
 				}
 
 				ncheqPrice := math.LegacyMustNewDecFromStr("0.016")
-				fee := ante.GetFeeForMsg(ante.TaxableMsgFees[ante.MsgCreateResourceJSON], ncheqPrice)
-
+				fee, err := ante.GetFeeForMsg(ante.TaxableMsgFees[ante.MsgCreateResourceJSON], ncheqPrice)
+				Expect(err).To(BeNil())
 				// calculate portions
-				reward, burn, ok := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice)
+				reward, burn, ok, err := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice)
+				Expect(err).To(BeNil())
+
 				Expect(ok).To(BeTrue())
 				Expect(reward).To(Equal(ante.GetRewardPortion(fee, ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee))))
 				Expect(burn).To(Equal(ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee)))
@@ -202,10 +206,13 @@ var _ = Describe("TxMsgFilters", func() {
 				}
 
 				ncheqPrice := math.LegacyMustNewDecFromStr("0.016")
-				fee := ante.GetFeeForMsg(ante.TaxableMsgFees[ante.MsgCreateResourceDefault], ncheqPrice)
+				fee, err := ante.GetFeeForMsg(ante.TaxableMsgFees[ante.MsgCreateResourceDefault], ncheqPrice)
+				Expect(err).To(BeNil())
 
 				// calculate portions
-				reward, burn, ok := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice)
+				reward, burn, ok, err := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice)
+				Expect(err).To(BeNil())
+
 				Expect(ok).To(BeTrue())
 				Expect(reward).To(Equal(ante.GetRewardPortion(fee, ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee))))
 				Expect(burn).To(Equal(ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee)))

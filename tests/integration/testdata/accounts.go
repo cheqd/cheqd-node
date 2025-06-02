@@ -25,8 +25,9 @@ const (
 
 	//? Module accounts can be safely hardcoded, as they are generated per module name
 	//? and the hex bytes are deterministically generated from the module name.
-	FEE_COLLECTOR_ADDR      = "cheqd17xpfvakm2amg962yls6f84z3kell8c5l7m0qqv"
-	DID_MODULE_ACCOUNT_ADDR = "cheqd1neus3an933cxp7ewuxw6jcuf6j8ka777h32p64"
+	FEE_COLLECTOR_ADDR         = "cheqd17xpfvakm2amg962yls6f84z3kell8c5l7m0qqv"
+	DID_MODULE_ACCOUNT_ADDR    = "cheqd1neus3an933cxp7ewuxw6jcuf6j8ka777h32p64"
+	ORACLE_MODULE_ACCOUNT_ADDR = "cheqd1jgp27m8fykex4e4jtt0l7ze8q528ux2lln5hxc"
 
 	VALIDATOR_1_ADDRESS = "cheqdvaloper1jvfm45nwpgvxg4m2r5l80j5my87uc54mfgwwu4"
 	FEEDER_ADDRESS      = "cheqd1jvfm45nwpgvxg4m2r5l80j5my87uc54mkzsg6h"

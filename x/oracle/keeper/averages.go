@@ -32,12 +32,14 @@ func (k Keeper) ComputeAverages(ctx sdk.Context, denom string) error {
 	currentBlock := util.SafeInt64ToUint64(ctx.BlockHeight())
 
 	// Collect last N prices
-	prices, err := CalculateHistoricPrices(store, denom, currentBlock, k)
+	prices, err := CalculateHistoricPrices(ctx, store, denom, currentBlock, k)
 	if err != nil {
-		return err
+		ctx.Logger().Error("Failed to calculate historic prices", "denom", denom, "error", err)
+		return nil
 	}
 	if len(prices) == 0 {
-		return types.ErrNoHistoricPrice.Wrapf("no prices for denom %s", denom)
+		ctx.Logger().Error("No historic prices for denom", "denom", denom)
+		return nil
 	}
 	// calculate sma and store it
 	sma := CalculateSMA(prices)
@@ -62,10 +64,18 @@ func (k Keeper) ComputeAverages(ctx sdk.Context, denom string) error {
 	return nil
 }
 
-func CalculateHistoricPrices(store cosmosstore.KVStore, denom string, currentBlock uint64, k Keeper) ([]math.LegacyDec, error) {
+func CalculateHistoricPrices(ctx sdk.Context, store cosmosstore.KVStore, denom string, currentBlock uint64, k Keeper) ([]math.LegacyDec, error) {
 	var prices []math.LegacyDec
+	// Get the last recorded block for this denom
+	lastBlockBz := store.Get(types.KeyLastHistoricPriceBlock(denom))
+	if lastBlockBz == nil {
+		ctx.Logger().Error("No historic prices recorded", "denom", denom)
+		return []math.LegacyDec{}, nil
+
+	}
+	lastBlock := sdk.BigEndianToUint64(lastBlockBz)
 	for i := uint64(0); i < AveragingWindow; i++ {
-		bz := store.Get(types.KeyHistoricPrice(denom, currentBlock-i*types.DefaultParams().HistoricStampPeriod))
+		bz := store.Get(types.KeyHistoricPrice(denom, lastBlock-i*types.DefaultParams().HistoricStampPeriod))
 		if bz == nil {
 			continue
 		}

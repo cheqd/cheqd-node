@@ -13,22 +13,22 @@ func DefaultFeeParams() *FeeParams {
 		Image: []didtypes.FeeRange{
 			{
 				Denom:     BaseMinimalDenom,
-				MinAmount: sdkmath.NewInt(10000000000),
-				MaxAmount: sdkmath.NewInt(20000000000),
+				MinAmount: sdkmath.NewInt(20000000000),
+				MaxAmount: sdkmath.NewInt(30000000000),
 			},
 		},
 		Json: []didtypes.FeeRange{
 			{
 				Denom:     BaseMinimalDenom,
-				MinAmount: sdkmath.NewInt(2500000000),
-				MaxAmount: sdkmath.NewInt(0),
+				MinAmount: sdkmath.NewInt(3500000000),
+				MaxAmount: sdkmath.NewInt(60000000000),
 			},
 		},
 		Default: []didtypes.FeeRange{
 			{
 				Denom:     BaseMinimalDenom,
-				MinAmount: sdkmath.NewInt(5000000000),
-				MaxAmount: sdkmath.NewInt(10000000000),
+				MinAmount: sdkmath.NewInt(6000000000),
+				MaxAmount: sdkmath.NewInt(20000000000),
 			},
 		},
 		BurnFactor: sdkmath.LegacyMustNewDecFromStr(DefaultBurnFactor),

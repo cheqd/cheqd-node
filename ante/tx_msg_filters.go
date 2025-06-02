@@ -1,6 +1,8 @@
 package ante
 
 import (
+	"errors"
+	"fmt"
 	"strings"
 
 	sdkmath "cosmossdk.io/math"
@@ -62,24 +64,33 @@ func GetTaxableMsg(msg interface{}) bool {
 	}
 }
 
-func GetTaxableMsgFeeWithBurnPortion(ctx sdk.Context, msg interface{}, ncheqPrice sdkmath.LegacyDec) (sdk.Coins, sdk.Coins, bool) {
+func GetTaxableMsgFeeWithBurnPortion(ctx sdk.Context, msg interface{}, ncheqPrice sdkmath.LegacyDec) (sdk.Coins, sdk.Coins, bool, error) {
 	switch msg := msg.(type) {
 	case *didtypes.MsgCreateDidDoc:
-		fee := GetFeeForMsg(TaxableMsgFees[MsgCreateDidDoc], ncheqPrice)
+		fee, err := GetFeeForMsg(TaxableMsgFees[MsgCreateDidDoc], ncheqPrice)
+		if err != nil {
+			return nil, nil, true, err
+		}
 		burnPortion := GetBurnFeePortion(BurnFactors[BurnFactorDid], fee)
-		return GetRewardPortion(fee, burnPortion), burnPortion, true
+		return GetRewardPortion(fee, burnPortion), burnPortion, true, nil
 	case *didtypes.MsgUpdateDidDoc:
-		fee := GetFeeForMsg(TaxableMsgFees[MsgUpdateDidDoc], ncheqPrice)
+		fee, err := GetFeeForMsg(TaxableMsgFees[MsgUpdateDidDoc], ncheqPrice)
+		if err != nil {
+			return nil, nil, true, err
+		}
 		burnPortion := GetBurnFeePortion(BurnFactors[BurnFactorDid], fee)
-		return GetRewardPortion(fee, burnPortion), burnPortion, true
+		return GetRewardPortion(fee, burnPortion), burnPortion, true, nil
 	case *didtypes.MsgDeactivateDidDoc:
-		fee := GetFeeForMsg(TaxableMsgFees[MsgDeactivateDidDoc], ncheqPrice)
+		fee, err := GetFeeForMsg(TaxableMsgFees[MsgDeactivateDidDoc], ncheqPrice)
+		if err != nil {
+			return nil, nil, true, err
+		}
 		burnPortion := GetBurnFeePortion(BurnFactors[BurnFactorDid], fee)
-		return GetRewardPortion(fee, burnPortion), burnPortion, true
+		return GetRewardPortion(fee, burnPortion), burnPortion, true, nil
 	case *resourcetypes.MsgCreateResource:
 		return GetResourceTaxableMsgFee(ctx, msg, ncheqPrice)
 	default:
-		return nil, nil, false
+		return nil, nil, false, nil
 	}
 }
 
@@ -90,28 +101,37 @@ func GetRewardPortion(total sdk.Coins, burnPortion sdk.Coins) sdk.Coins {
 	return total.Sub(burnPortion...)
 }
 
-func GetResourceTaxableMsgFee(ctx sdk.Context, msg *resourcetypes.MsgCreateResource, ncheqPrice sdkmath.LegacyDec) (sdk.Coins, sdk.Coins, bool) {
+func GetResourceTaxableMsgFee(ctx sdk.Context, msg *resourcetypes.MsgCreateResource, ncheqPrice sdkmath.LegacyDec) (sdk.Coins, sdk.Coins, bool, error) {
 	mediaType := resourceutils.DetectMediaType(msg.GetPayload().ToResource().Resource.Data)
 
 	// Mime type image
 	if strings.HasPrefix(mediaType, "image/") {
-		fee := GetFeeForMsg(TaxableMsgFees[MsgCreateResourceImage], ncheqPrice)
+		fee, err := GetFeeForMsg(TaxableMsgFees[MsgCreateResourceImage], ncheqPrice)
+		if err != nil {
+			return nil, nil, true, err
+		}
 		burnPortion := GetBurnFeePortion(BurnFactors[BurnFactorResource], fee)
-		return GetRewardPortion(fee, burnPortion), burnPortion, true
+		return GetRewardPortion(fee, burnPortion), burnPortion, true, nil
 	}
 
 	// Mime type json
 	if strings.HasPrefix(mediaType, "application/json") {
-		fee := GetFeeForMsg(TaxableMsgFees[MsgCreateResourceJSON], ncheqPrice)
+		fee, err := GetFeeForMsg(TaxableMsgFees[MsgCreateResourceJSON], ncheqPrice)
+		if err != nil {
+			return nil, nil, true, err
+		}
 		burnPortion := GetBurnFeePortion(BurnFactors[BurnFactorResource], fee)
-		return GetRewardPortion(fee, burnPortion), burnPortion, true
+		return GetRewardPortion(fee, burnPortion), burnPortion, true, nil
 	}
 
-	fee := GetFeeForMsg(TaxableMsgFees[MsgCreateResourceDefault], ncheqPrice)
+	fee, err := GetFeeForMsg(TaxableMsgFees[MsgCreateResourceDefault], ncheqPrice)
+	if err != nil {
+		return nil, nil, true, err
+	}
 
 	// Default mime type
 	burnPortion := GetBurnFeePortion(BurnFactors[BurnFactorResource], fee)
-	return GetRewardPortion(fee, burnPortion), burnPortion, true
+	return GetRewardPortion(fee, burnPortion), burnPortion, true, nil
 }
 
 func checkFeeParamsFromSubspace(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKeeper) bool {
@@ -137,10 +157,10 @@ func checkFeeParamsFromSubspace(ctx sdk.Context, didKeeper DidKeeper, resourceKe
 	return true
 }
 
-func IsTaxableTx(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKeeper, tx sdk.Tx, oracleKeeper OracleKeeper) (bool, sdk.Coins, sdk.Coins) {
+func IsTaxableTx(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKeeper, tx sdk.Tx, oracleKeeper OracleKeeper) (bool, sdk.Coins, sdk.Coins, error) {
 	ncheqPrice, exist := oracleKeeper.GetEMA(ctx, oracletypes.CheqdSymbol)
 	if !exist {
-		return false, nil, nil
+		return false, nil, nil, errors.New("ema not present")
 	}
 
 	_ = checkFeeParamsFromSubspace(ctx, didKeeper, resourceKeeper)
@@ -148,7 +168,10 @@ func IsTaxableTx(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKe
 	burn := (sdk.Coins)(nil)
 	msgs := tx.GetMsgs()
 	for _, msg := range msgs {
-		rewardPortion, burnPortion, isIdentityMsg := GetTaxableMsgFeeWithBurnPortion(ctx, msg, ncheqPrice)
+		rewardPortion, burnPortion, isIdentityMsg, err := GetTaxableMsgFeeWithBurnPortion(ctx, msg, ncheqPrice)
+		if err != nil {
+			return true, nil, nil, err
+		}
 		if !isIdentityMsg {
 			continue
 		}
@@ -159,10 +182,10 @@ func IsTaxableTx(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKe
 	}
 
 	if !reward.IsZero() {
-		return true, reward, burn
+		return true, reward, burn, nil
 	}
 
-	return false, nil, nil
+	return false, nil, nil, nil
 }
 
 func IsTaxableTxLite(tx sdk.Tx) bool {
@@ -176,9 +199,9 @@ func IsTaxableTxLite(tx sdk.Tx) bool {
 	return false
 }
 
-func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec) sdk.Coins {
+func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec) (sdk.Coins, error) {
 	if len(feeRanges) == 0 || cheqEmaPrice.IsZero() {
-		return nil
+		return nil, errors.New("fee ranges empty or cheq EMA price is zero")
 	}
 
 	type usdRange struct {
@@ -197,19 +220,16 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 
 		switch fr.Denom {
 		case "ncheq":
-			// Convert native CHEQ to USD using EMA price
 			minCHEQ := sdkmath.LegacyNewDecFromInt(fr.MinAmount).QuoInt64(1e9)
 			maxCHEQ := sdkmath.LegacyNewDecFromInt(fr.MaxAmount).QuoInt64(1e9)
 
 			minUSD = cheqEmaPrice.MulInt(sdkmath.NewInt(minCHEQ.TruncateInt64()))
 			maxUSD = cheqEmaPrice.MulInt(sdkmath.NewInt(maxCHEQ.TruncateInt64()))
 		case "usd":
-			// Treat USD as 18-decimal fixed point
 			if fr.MinAmount.LT(sdkmath.NewInt(1e6)) {
 				minUSD = sdkmath.LegacyNewDecFromInt(fr.MinAmount)
 				maxUSD = sdkmath.LegacyNewDecFromInt(fr.MaxAmount)
 			} else {
-				// Assume it's 18-dec format
 				minUSD = sdkmath.LegacyNewDecFromInt(fr.MinAmount).QuoInt64(1e18)
 				maxUSD = sdkmath.LegacyNewDecFromInt(fr.MaxAmount).QuoInt64(1e18)
 			}
@@ -227,10 +247,10 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 	}
 
 	if len(ranges) == 0 {
-		return nil
+		return nil, errors.New("no valid fee ranges could be converted")
 	}
 
-	// Step 2: Find overlap: [max(minA, minB...), min(maxA, maxB...)]
+	// Step 2: Find overlapping range
 	overlapMin := ranges[0].minUSD
 	overlapMax := ranges[0].maxUSD
 
@@ -242,12 +262,11 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 			overlapMax = r.maxUSD
 		}
 	}
-
 	if overlapMin.GT(overlapMax) {
-		return nil // No valid overlapping range
+		return nil, errors.New("no valid overlapping range")
 	}
 
-	// Step 3: Choose a denom to return the fee in — using the first one
+	// Step 3: Pick denom
 	var chosen usdRange
 	for _, r := range ranges {
 		if r.denom == "usd" {
@@ -255,33 +274,30 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 			break
 		}
 	}
-	var finalAmount sdkmath.Int
-	// fallback to first if usd is not available
 	if chosen.denom == "" {
 		chosen = ranges[0]
 	}
 
+	var finalAmount sdkmath.Int
 	switch chosen.denom {
 	case "ncheq":
 		finalAmount = overlapMin.Quo(cheqEmaPrice).TruncateInt()
-
 	case "usd":
 		if overlapMin.LT(sdkmath.LegacyNewDec(1e5)) {
 			finalAmount = overlapMin.MulInt64(1e18).TruncateInt()
 		} else {
 			finalAmount = overlapMin.TruncateInt()
 		}
-
 	default:
-		return nil
+		return nil, fmt.Errorf("unsupported denom selected: %s", chosen.denom)
 	}
 
-	// Clamp to denom-specific coin range
+	// Clamp to range
 	if finalAmount.LT(chosen.minCoin) {
 		finalAmount = chosen.minCoin
 	} else if finalAmount.GT(chosen.maxCoin) {
 		finalAmount = chosen.maxCoin
 	}
 
-	return sdk.NewCoins(sdk.NewCoin(chosen.denom, finalAmount))
+	return sdk.NewCoins(sdk.NewCoin(chosen.denom, finalAmount)), nil
 }
