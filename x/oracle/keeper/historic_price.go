@@ -348,6 +348,10 @@ func (k Keeper) SetHistoricPrice(
 	store := ctx.KVStore(k.storeKey)
 	bz := k.cdc.MustMarshal(&sdk.DecProto{Dec: exchangeRate})
 	store.Set(types.KeyHistoricPrice(denom, blockNum), bz)
+
+	// Store the latest block number for this denom
+	lastBlockBz := sdk.Uint64ToBigEndian(blockNum)
+	store.Set(types.KeyLastHistoricPriceBlock(denom), lastBlockBz)
 }
 
 // DeleteHistoricPrice deletes the historic price of a denom at a

@@ -9,61 +9,60 @@ GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
 function info() {
-  printf "${GREEN}[info] %s${NC}\n" "${1}"
+    printf "${GREEN}[info] %s${NC}\n" "${1}"
 }
 
 function err() {
-  printf "${RED}[err] %s${NC}\n" "${1}"
+    printf "${RED}[err] %s${NC}\n" "${1}"
 }
 
 function assert_tx_successful() {
-  RES="$1"
-
-  if [[ $(echo "${RES}" | jq --raw-output '.code') == 0 ]]; then
-    info "tx successful"
-  else
-    err "non zero tx return code"
-    exit 1
-  fi
+    RES="$1"
+    
+    if [[ $(echo "${RES}" | jq --raw-output '.code') == 0 ]]; then
+        info "tx successful"
+    else
+        err "non zero tx return code"
+        exit 1
+    fi
 }
 
 function exit_if_tx_successful() {
-  RES="$1"
-
-  if [[ $(echo "${RES}" | jq --raw-output '.code') == 0 ]]; then
-    info "tx successful"
-    exit 0
-  else
-    err "tx failed, retrying"
-  fi
+    RES="$1"
+    
+    if [[ $(echo "${RES}" | jq --raw-output '.code') == 0 ]]; then
+        info "tx successful"
+        exit 0
+    else
+        err "tx failed, retrying"
+    fi
 }
 
 function assert_network_running() {
-  RES="$1"
-  LATEST_HEIGHT=$(echo "${RES}" | jq --raw-output '.SyncInfo.latest_block_height')
-  info "latest height: ${LATEST_HEIGHT}"
-
-  if [[ $LATEST_HEIGHT -gt 1 ]]; then
-    info "network is running"
-  else
-    err "network is not running"
-    exit 1
-  fi
+    RES="$1"
+    LATEST_HEIGHT=$(echo "${RES}" | jq --raw-output '.SyncInfo.latest_block_height')
+    info "latest height: ${LATEST_HEIGHT}"
+    
+    if [[ $LATEST_HEIGHT -gt 1 ]]; then
+        info "network is running"
+    else
+        err "network is not running"
+        exit 1
+    fi
 }
 
 function assert_network_running_comet_v38_or_above() {
-  RES="$1"
-  LATEST_HEIGHT=$(echo "${RES}" | jq --raw-output '.sync_info.latest_block_height')
-  info "latest height: ${LATEST_HEIGHT}"
-
-  if [[ $LATEST_HEIGHT -gt 1 ]]; then
-    info "network is running"
-  else
-    err "network is not running"
-    exit 1
-  fi
+    RES="$1"
+    LATEST_HEIGHT=$(echo "${RES}" | jq --raw-output '.sync_info.latest_block_height')
+    info "latest height: ${LATEST_HEIGHT}"
+    
+    if [[ $LATEST_HEIGHT -gt 1 ]]; then
+        info "network is running"
+    else
+        err "network is not running"
+        exit 1
+    fi
 }
-
 info "Cleanup"
 docker compose down --volumes --remove-orphans
 
@@ -71,7 +70,7 @@ info "Running cheqd network"
 docker compose up -d cheqd
 docker compose cp ./cheqd cheqd:/
 docker compose exec cheqd bash /cheqd/cheqd-init.sh
-docker compose exec -d cheqd cheqd-noded start
+docker compose exec -d cheqd /bin/sh -c 'cheqd-noded start --pricefeeder.enable=true --pricefeeder.config_path="/home/cheqd/.cheqdnode/price-feeder.toml" --pricefeeder.log_level="INFO" >> cheqd.log 2>&1'
 
 info "Running osmosis network"
 docker compose up -d osmosis

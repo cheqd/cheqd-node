@@ -6,6 +6,9 @@ import (
 
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/stretchr/testify/require"
 )
 
@@ -69,12 +72,13 @@ func TestGetGenesisStateFromAppState(t *testing.T) {
 		AggregateExchangeRatePrevotes: []AggregateExchangeRatePrevote{},
 		AggregateExchangeRateVotes:    []AggregateExchangeRateVote{},
 	}
+	encodingConfig := moduletestutil.MakeTestEncodingConfig(auth.AppModuleBasic{}, staking.AppModuleBasic{})
 
 	bz, err := json.Marshal(emptyGenesis)
 	require.Nil(t, err)
 
-	require.NotNil(t, GetGenesisStateFromAppState(ModuleCdc, map[string]json.RawMessage{
+	require.NotNil(t, GetGenesisStateFromAppState(encodingConfig.Codec, map[string]json.RawMessage{
 		ModuleName: bz,
 	}))
-	require.NotNil(t, GetGenesisStateFromAppState(ModuleCdc, map[string]json.RawMessage{}))
+	require.NotNil(t, GetGenesisStateFromAppState(encodingConfig.Codec, map[string]json.RawMessage{}))
 }

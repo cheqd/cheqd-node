@@ -58,7 +58,7 @@ var _ = Describe("Upgrade - Pre", func() {
 				DidDocCreateSignInput, err = Loader(payload, &DidDocCreatePayload)
 				Expect(err).To(BeNil())
 
-				res, err := cli.CreateDid(DidDocCreatePayload, DidDocCreateSignInput, cli.Validator0, "", didFeeParams.CreateDid.String())
+				res, err := cli.CreateDid(DidDocCreatePayload, DidDocCreateSignInput, cli.Validator0, "", didFeeParams.CreateDid[0].MinAmount.String()+didFeeParams.CreateDid[0].Denom)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))
 			}
@@ -91,7 +91,7 @@ var _ = Describe("Upgrade - Pre", func() {
 					filepath.Base(ResourceFile),
 					ResourceCreateSignInput,
 					cli.Validator0,
-					resourceFeeParams.Json.String(),
+					resourceFeeParams.Json[0].MinAmount.String()+resourceFeeParams.Json[0].Denom,
 				)
 				Expect(err).To(BeNil())
 				Expect(res.Code).To(BeEquivalentTo(0))

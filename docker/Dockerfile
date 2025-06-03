@@ -5,7 +5,7 @@
 FROM golang:1.23-alpine AS builder
 
 # Install minimum necessary dependencies
-ENV PACKAGES="curl make git libc-dev bash gcc linux-headers findutils"
+ENV PACKAGES="curl make git libc-dev bash gcc linux-headers findutils gettext"
 RUN apk update && apk add --no-cache $PACKAGES
 
 # Set working directory for the build
@@ -27,7 +27,7 @@ RUN make tidy && make build-linux
 FROM alpine:3.21 AS runner
 
 # Install pre-requisites
-RUN apk update && apk add --no-cache bash ca-certificates
+RUN apk update && apk add --no-cache bash ca-certificates gettext
 
 # Copy over binaries from the build-env
 COPY --from=builder /go/src/github.com/cheqd/cheqd-node/build/cheqd-noded /bin/cheqd-noded

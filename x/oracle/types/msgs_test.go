@@ -135,7 +135,7 @@ func TestNewMsgAggregateExchangeRatePrevote(t *testing.T) {
 	feederAddr := sdk.AccAddress(vals[1])
 
 	exchangeRates := sdk.DecCoins{sdk.NewDecCoinFromDec(CheqdDenom, math.LegacyOneDec()), sdk.NewDecCoinFromDec(CheqdDenom, math.LegacyNewDecWithPrec(32121, 1))}
-	bz := GetAggregateVoteHash("1", exchangeRates.String(), sdk.ValAddress(vals[0]))
+	bz := GetAggregateVoteHash("1", exchangeRates.String(), vals[0])
 
 	aggregateExchangeRatePreVote := NewMsgAggregateExchangeRatePrevote(
 		bz,
