@@ -28,8 +28,9 @@ const (
 	FEE_COLLECTOR_ADDR      = "cheqd17xpfvakm2amg962yls6f84z3kell8c5l7m0qqv"
 	DID_MODULE_ACCOUNT_ADDR = "cheqd1neus3an933cxp7ewuxw6jcuf6j8ka777h32p64"
 
-	VALIDATOR_1_ADDRESS = "cheqdvaloper1jvfm45nwpgvxg4m2r5l80j5my87uc54mfgwwu4"
-	FEEDER_ADDRESS      = "cheqd1jvfm45nwpgvxg4m2r5l80j5my87uc54mkzsg6h"
+	VALIDATOR_ADDRESS            = "cheqd1eqt75k80sh3wcqzkr07k0ynyydc5093276tudc"
+	VALIDATOR_0_OPERATOR_ADDRESS = "cheqdvaloper1eqt75k80sh3wcqzkr07k0ynyydc50932ps46t6"
+	FEEDER_ADDRESS               = "cheqd1jvfm45nwpgvxg4m2r5l80j5my87uc54mkzsg6h"
 	// Fee amounts
 	DEFAULT_FEES = "1000ncheq"
 )
