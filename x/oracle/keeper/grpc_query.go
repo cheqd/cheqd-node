@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"errors"
 
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -326,5 +327,19 @@ func (q querier) ValidatorRewardSet(
 
 	return &types.QueryValidatorRewardSetResponse{
 		Validators: validatorRewardSet,
+	}, nil
+}
+
+func (q querier) GetEma(ctx context.Context, req *types.GetEmaRequest) (*types.GetEmaResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	price, present := q.GetEMA(sdkCtx, req.Denom)
+	if !present {
+		return nil, errors.New("ema not present")
+	}
+	return &types.GetEmaResponse{
+		Price: price,
 	}, nil
 }

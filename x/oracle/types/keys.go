@@ -35,6 +35,8 @@ var (
 	KeyPrefixHistoricPrice                = []byte{0x08} // prefix for each key to a historic price
 	KeyPrefixValidatorRewardSet           = []byte{0x09} // prefix for each key to a validator reward set
 	KeyPrefixParamUpdatePlan              = []byte{0x10} // prefix for each key to a param update plan
+	KeyPrefixLastHistoricPriceBlock       = []byte{0x11} // prefix for last block number per denom
+
 )
 
 // GetExchangeRateKey - stored by *denom*
@@ -97,4 +99,9 @@ func KeyParamUpdatePlan(planHeight uint64) (key []byte) {
 // that has a uint64 at the end with a null prefix (length 9).
 func ParseDenomAndBlockFromKey(key []byte, prefix []byte) (string, uint64) {
 	return string(key[len(prefix) : len(key)-9]), binary.LittleEndian.Uint64(key[len(key)-8:])
+}
+
+// KeyLastHistoricPriceBlock - stored by *denom*
+func KeyLastHistoricPriceBlock(denom string) []byte {
+	return util.ConcatBytes(0, KeyPrefixLastHistoricPriceBlock, []byte(denom))
 }

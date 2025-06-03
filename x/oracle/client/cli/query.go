@@ -32,6 +32,7 @@ func GetQueryCmd() *cobra.Command {
 		GetCmdQueryFeederDelegation(),
 		GetCmdQueryMissCounter(),
 		GetCmdQuerySlashWindow(),
+		GetEmaofCheqd(),
 	)
 
 	return cmd
@@ -270,6 +271,29 @@ func GetCmdQuerySlashWindow() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			res, err := queryClient.SlashWindow(cmd.Context(), &types.QuerySlashWindow{})
+			return cli.PrintOrErr(res, err, clientCtx)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+func GetEmaofCheqd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "ema",
+		Args:  cobra.ExactArgs(1),
+		Short: "Query the ema of the given denom",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			denom := strings.ToUpper(args[0]) // Convert denom to uppercase
+			req := &types.GetEmaRequest{Denom: denom}
+			res, err := queryClient.GetEma(cmd.Context(), req)
 			return cli.PrintOrErr(res, err, clientCtx)
 		},
 	}

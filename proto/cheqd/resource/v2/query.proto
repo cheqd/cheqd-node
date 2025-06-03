@@ -2,12 +2,12 @@ syntax = "proto3";
 
 package cheqd.resource.v2;
 
-import "cheqd/resource/v2/resource.proto";
+import "amino/amino.proto";
 import "cheqd/resource/v2/fee.proto";
+import "cheqd/resource/v2/resource.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "amino/amino.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/resource/types";
 
@@ -28,8 +28,8 @@ service Query {
     option (google.api.http).get = "/cheqd/resource/v2/{collection_id}/metadata";
   }
 
-   // Params queries params of the resource module.
-   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+  // Params queries params of the resource module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/cheqd/resource/v2/params";
   }
 }

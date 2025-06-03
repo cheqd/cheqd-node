@@ -74,7 +74,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 
 		versionID := uuid.NewString()
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(didFeeParams.CreateDid.String()))
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(didFeeParams.CreateDid[0].MinAmount.String()+didFeeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -94,7 +94,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json[0].MinAmount.String()+resourceFeeParams.Json[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -137,7 +137,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			Name:         nextResourceName,
 			Version:      nextResourceVersion,
 			ResourceType: nextResourceType,
-		}, signInputs, nextResourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
+		}, signInputs, nextResourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json[0].MinAmount.String()+resourceFeeParams.Json[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -198,7 +198,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 
 		versionID = uuid.NewString()
 
-		res, err = cli.CreateDidDoc(tmpDir, secondPayload, secondSignInputs, versionID, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(didFeeParams.CreateDid.String()))
+		res, err = cli.CreateDidDoc(tmpDir, secondPayload, secondSignInputs, versionID, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(didFeeParams.CreateDid[0].MinAmount.String()+didFeeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -216,7 +216,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			Name:         secondResourceName,
 			Version:      secondResourceVersion,
 			ResourceType: secondResourceType,
-		}, secondSignInputs, secondResourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json.String()))
+		}, secondSignInputs, secondResourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json[0].MinAmount.String()+resourceFeeParams.Json[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
