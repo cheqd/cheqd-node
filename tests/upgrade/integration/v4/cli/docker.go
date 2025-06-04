@@ -123,12 +123,12 @@ func LocalnetStopContainerWithId(containerId string) (string, error) {
 func GetContainerIDByName(container string) (string, error) {
 	out, err := ExecDirect(Docker, "ps", "-q", "-a", "-f", "name="+container)
 	if err != nil {
-		return "", fmt.Errorf("Failed to get container ID: %v", err)
+		return "", fmt.Errorf("failed to get container ID: %v", err)
 	}
 
 	containerId := strings.TrimSpace(out)
 	if containerId == "" {
-		log.Fatalf("No container id found for: %s", container)
+		log.Fatalf("no container id found for: %s", container)
 	}
 
 	return containerId, nil
