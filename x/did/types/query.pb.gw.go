@@ -482,7 +482,7 @@ var (
 
 	pattern_Query_AllDidDocVersionsMetadata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"cheqd", "did", "v2", "id", "versions"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"cheqd", "did", "v2", "params"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"cheqd", "did", "v2", "module", "params"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (

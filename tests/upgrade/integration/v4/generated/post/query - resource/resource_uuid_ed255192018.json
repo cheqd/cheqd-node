@@ -1,0 +1,24 @@
+{
+    "payload": {
+        "resource": {
+            "data": "eyAibWVzc2FnZSI6ICJoZWxsbyB3b3JsZCJ9"
+        },
+        "metadata": {
+            "collectionId": "aed908f0-ddd5-47ac-8e2e-afe10cc90f53",
+            "id": "b67d9bdc-b8f4-45fd-b5f6-1af38c26d4c8",
+            "name": "UUID Ed25519VerificationKey2018",
+            "version": "",
+            "resourceType": "TestResourceType",
+            "alsoKnownAs": [
+                {
+                    "uri": "did:cheqd:testnet:aed908f0-ddd5-47ac-8e2e-afe10cc90f53/resources/b67d9bdc-b8f4-45fd-b5f6-1af38c26d4c8",
+                    "description": "did-url"
+                }
+            ],
+            "mediaType": "application/json",
+            "checksum": "c841412ff85f5ab522efb9251d3c9a9975769a8f1c439d45bdc5d32a71b73f9c",
+            "previousVersionId": "",
+            "nextVersionId": ""
+        }
+    }
+}

@@ -2,10 +2,14 @@ package cli
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	errorsmod "cosmossdk.io/errors"
+	"github.com/joho/godotenv"
 )
 
 const (
@@ -85,4 +89,47 @@ func LocalnetExecCopyAbsoluteWithPermissions(path string, destination string, co
 
 func LocalnetExecRestorePermissions(path string, container string) (string, error) {
 	return LocalnetExec(DockerComposeLatestArgs, "exec", "-it", "--user", "root", container, "chown", "-R", DockerUser+":"+DockerUserGroup, path)
+}
+
+func LocalnetExecRunWithVolume(containerId string, command []string) (string, error) {
+	// Load .env file
+	envFile := filepath.Join(DockerLocalnetPath, DockerComposeEnvBL)
+	err := godotenv.Load(envFile)
+	if err != nil {
+		return "", fmt.Errorf("error loading %s file:%v", envFile, err)
+	}
+
+	// Get variables
+	imageName := os.Getenv("BUILD_IMAGE")
+	if imageName == "" {
+		return "", fmt.Errorf("BUILD_IMAGE is not set in .env")
+	}
+
+	return ExecDirect(append([]string{Docker, "run", "--rm", "--volumes-from", containerId, imageName}, command...)...)
+}
+
+func LocalnetStartContainer(container string) (string, error) {
+	containerId, err := GetContainerIDByName(container)
+	if err != nil {
+		return "", err
+	}
+	return ExecDirect(Docker, "start", containerId)
+}
+
+func LocalnetStopContainerWithId(containerId string) (string, error) {
+	return ExecDirect(Docker, "stop", containerId)
+}
+
+func GetContainerIDByName(container string) (string, error) {
+	out, err := ExecDirect(Docker, "ps", "-q", "-a", "-f", "name="+container)
+	if err != nil {
+		return "", fmt.Errorf("failed to get container ID: %v", err)
+	}
+
+	containerId := strings.TrimSpace(out)
+	if containerId == "" {
+		log.Fatalf("no container id found for: %s", container)
+	}
+
+	return containerId, nil
 }

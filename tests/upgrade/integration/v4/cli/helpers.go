@@ -268,3 +268,31 @@ func convertProposalJSON(input string) ([]byte, error) {
 
 	return output, nil
 }
+
+func RunExportCommand(container, binary string) (out string, err error) {
+	// get id of container
+	containerId, err := GetContainerIDByName(container)
+	if err != nil {
+		return
+	}
+
+	// fetch latest height which will be used for export
+	height, err := GetCurrentBlockHeight(container, binary)
+	if err != nil {
+		return
+	}
+
+	// stop container to make export command work
+	_, err = LocalnetStopContainerWithId(containerId)
+	if err != nil {
+		return
+	}
+
+	// run export command
+	out, err = LocalnetExecRunWithVolume(containerId, []string{binary, "export", fmt.Sprintf("--height=%d", height)})
+	if err != nil {
+		return
+	}
+
+	return
+}
