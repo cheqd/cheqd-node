@@ -66,6 +66,26 @@ var _ = Describe("Upgrade - Post", func() {
 			Expect(actual.ModuleVersions).To(Equal(expected.ModuleVersions), "module version map mismatch")
 		})
 
+		It("should export command work", func() {
+			By("running export command at latest height")
+			_, err := cli.RunExportCommand(cli.Validator2, cli.CliBinaryName)
+			Expect(err).To(BeNil())
+		})
+
+		It("should restart stopped container", func() {
+			By("restart container which was stopped while export command")
+			_, err := cli.LocalnetStartContainer(cli.Validator2)
+			Expect(err).To(BeNil())
+
+			By("fetching the current chain height")
+			currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
+			Expect(err).To(BeNil())
+
+			By("waiting for 10 blocks to be produced on top")
+			err = cli.WaitForChainHeight(cli.Validator2, cli.CliBinaryName, currentHeight+10, cli.VotingPeriod*8)
+			Expect(err).To(BeNil())
+		})
+
 		It("should load and run expected diddoc payloads", func() {
 			By("matching the glob pattern for existing diddoc payloads")
 			ExpectedDidDocExistingRecords, err := RelGlob(GeneratedJSONDir, "post", "query - diddoc", "*.json")
