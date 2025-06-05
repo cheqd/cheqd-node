@@ -251,7 +251,7 @@ replace (
 	github.com/cheqd/cheqd-node/api/v2 => ./api
 
 	// replace cosmos-sdk v0.50.13
-	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.50.13-height-mismatch-iavl
+	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.50.13-auth-uneven-heights-patched
 
 	// replace iavl v1.2.2
 	// https://github.com/cheqd/iavl/tree/cheqd-v1.2.2-uneven-heights
