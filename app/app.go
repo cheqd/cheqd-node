@@ -1425,6 +1425,7 @@ func (app *App) setupUpgradeStoreLoaders() {
 		storeUpgrades := storetypes.StoreUpgrades{
 			Added: []string{
 				circuittypes.ModuleName,
+				oracletypes.ModuleName,
 			},
 		}
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades

@@ -27,19 +27,43 @@ func MigrateStore(ctx sdk.Context, storeService corestoretypes.KVStoreService, l
 }
 
 func migrateParams(ctx sdk.Context, store corestoretypes.KVStore, legacySubspace exported.Subspace, cdc codec.BinaryCodec) error {
-	var currParams types.FeeParams
-	legacySubspace.Get(ctx, types.ParamStoreKey, &currParams)
-
-	if err := currParams.ValidateBasic(); err != nil {
-		return err
+	var legacyParams types.LegacyFeeParams
+	// Protect against missing param key (which causes panic in Get)
+	legacySubspace.Get(ctx, types.ParamStoreKey, &legacyParams)
+	// Now convert legacy to new format
+	newParams := types.FeeParams{
+		CreateDid: []types.FeeRange{
+			{
+				Denom:     legacyParams.CreateDid.Denom,
+				MinAmount: legacyParams.CreateDid.Amount,
+				MaxAmount: legacyParams.CreateDid.Amount,
+			},
+		},
+		UpdateDid: []types.FeeRange{
+			{
+				Denom:     legacyParams.CreateDid.Denom,
+				MinAmount: legacyParams.UpdateDid.Amount,
+				MaxAmount: legacyParams.UpdateDid.Amount,
+			},
+		},
+		DeactivateDid: []types.FeeRange{
+			{
+				Denom:     legacyParams.DeactivateDid.Denom,
+				MinAmount: legacyParams.DeactivateDid.Amount,
+				MaxAmount: legacyParams.DeactivateDid.Amount,
+			},
+		},
+		BurnFactor: legacyParams.BurnFactor,
 	}
 
-	bz, err := cdc.Marshal(&currParams)
+	// Marshal and write to the new store
+	bz, err := cdc.Marshal(&newParams)
 	if err != nil {
 		return err
 	}
 
-	return store.Set(types.ParamStoreKey, bz)
+	store.Set(types.ParamStoreKey, bz)
+	return nil
 }
 
 func migrateDidCount(ctx sdk.Context, store storetypes.KVStore, countCollection collections.Item[uint64]) error {

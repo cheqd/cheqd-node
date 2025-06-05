@@ -5,6 +5,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // DefaultFeeParams returns default cheqd module tx fee parameters
@@ -35,13 +36,19 @@ func DefaultFeeParams() *FeeParams {
 	}
 }
 
+// DefaultFeeParams returns default cheqd module tx fee parameters
+func DefaultLegacyFeeParams() *LegacyFeeParams {
+	return &LegacyFeeParams{
+		Image:      sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceImageFee)),
+		Json:       sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceJSONFee)),
+		Default:    sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceDefaultFee)),
+		BurnFactor: sdkmath.LegacyMustNewDecFromStr(DefaultBurnFactor),
+	}
+}
+
 // ValidateBasic performs basic validation of cheqd module tx fee parameters
 func (tfp *FeeParams) ValidateBasic() error {
 	for i, f := range tfp.Image {
-		if f.Denom != BaseMinimalDenom {
-			return fmt.Errorf("invalid denom in create_resource_image[%d]: got %s, expected %s", i, f.Denom, BaseMinimalDenom)
-		}
-
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in create_resource_image[%d]: got %s", i, f.MinAmount.String())
 		}
@@ -51,10 +58,6 @@ func (tfp *FeeParams) ValidateBasic() error {
 		}
 	}
 	for i, f := range tfp.Json {
-		if f.Denom != BaseMinimalDenom {
-			return fmt.Errorf("invalid denom in create_resource_json[%d]: got %s, expected %s", i, f.Denom, BaseMinimalDenom)
-		}
-
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in create_resource_json[%d]: got %s", i, f.MinAmount.String())
 		}
@@ -78,9 +81,6 @@ func validateImage(i interface{}) error {
 	}
 
 	for idx, f := range v {
-		if f.Denom != BaseMinimalDenom {
-			return fmt.Errorf("invalid denom in create_resource_image[%d]: got %s, expected %s", idx, f.Denom, BaseMinimalDenom)
-		}
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in create_resource_image[%d]", idx)
 		}
@@ -99,9 +99,6 @@ func validateJSON(i interface{}) error {
 	}
 
 	for idx, f := range v {
-		if f.Denom != BaseMinimalDenom {
-			return fmt.Errorf("invalid denom in create_resource_json[%d]: got %s, expected %s", idx, f.Denom, BaseMinimalDenom)
-		}
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in create_resource_json[%d]", idx)
 		}
@@ -120,9 +117,6 @@ func validateDefault(i interface{}) error {
 	}
 
 	for idx, f := range v {
-		if f.Denom != BaseMinimalDenom {
-			return fmt.Errorf("invalid denom in default_fee[%d]: got %s, expected %s", idx, f.Denom, BaseMinimalDenom)
-		}
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in default_fee[%d]", idx)
 		}

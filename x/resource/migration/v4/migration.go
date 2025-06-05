@@ -8,6 +8,7 @@ import (
 	corestoretypes "cosmossdk.io/core/store"
 	storetypes "cosmossdk.io/store/types"
 
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/resource/exported"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -27,14 +28,37 @@ func MigrateStore(ctx sdk.Context, storeService corestoretypes.KVStoreService, l
 }
 
 func migrateParams(ctx sdk.Context, store corestoretypes.KVStore, legacySubspace exported.Subspace, cdc codec.BinaryCodec) error {
-	var currParams types.FeeParams
-	legacySubspace.Get(ctx, types.ParamStoreKeyFeeParams, &currParams)
+	var legacyParams types.LegacyFeeParams
+	legacySubspace.Get(ctx, types.ParamStoreKeyFeeParams, &legacyParams)
 
-	if err := currParams.ValidateBasic(); err != nil {
-		return err
+	// Now convert legacy to new format
+	newParams := types.FeeParams{
+		Image: []didtypes.FeeRange{
+			{
+				Denom:     legacyParams.Image.Denom,
+				MinAmount: legacyParams.Image.Amount,
+				MaxAmount: legacyParams.Image.Amount,
+			},
+		},
+		Json: []didtypes.FeeRange{
+			{
+				Denom:     legacyParams.Json.Denom,
+				MinAmount: legacyParams.Json.Amount,
+				MaxAmount: legacyParams.Json.Amount,
+			},
+		},
+		Default: []didtypes.FeeRange{
+			{
+				Denom:     legacyParams.Default.Denom,
+				MinAmount: legacyParams.Default.Amount,
+				MaxAmount: legacyParams.Default.Amount,
+			},
+		},
+		BurnFactor: legacyParams.BurnFactor,
 	}
 
-	bz, err := cdc.Marshal(&currParams)
+	// Marshal and write
+	bz, err := cdc.Marshal(&newParams)
 	if err != nil {
 		return err
 	}
