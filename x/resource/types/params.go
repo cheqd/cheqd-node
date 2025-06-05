@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	sdkmath "cosmossdk.io/math"
+	util "github.com/cheqd/cheqd-node/util"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -15,28 +16,27 @@ func DefaultFeeParams() *FeeParams {
 			{
 				Denom:     BaseMinimalDenom,
 				MinAmount: sdkmath.NewInt(20000000000),
-				MaxAmount: sdkmath.NewInt(30000000000),
+				MaxAmount: util.PtrInt(30000000000),
 			},
 		},
 		Json: []didtypes.FeeRange{
 			{
 				Denom:     BaseMinimalDenom,
 				MinAmount: sdkmath.NewInt(3500000000),
-				MaxAmount: sdkmath.NewInt(60000000000),
+				MaxAmount: util.PtrInt(60000000000),
 			},
 		},
 		Default: []didtypes.FeeRange{
 			{
 				Denom:     BaseMinimalDenom,
 				MinAmount: sdkmath.NewInt(6000000000),
-				MaxAmount: sdkmath.NewInt(20000000000),
+				MaxAmount: util.PtrInt(20000000000),
 			},
 		},
 		BurnFactor: sdkmath.LegacyMustNewDecFromStr(DefaultBurnFactor),
 	}
 }
 
-// DefaultFeeParams returns default cheqd module tx fee parameters
 func DefaultLegacyFeeParams() *LegacyFeeParams {
 	return &LegacyFeeParams{
 		Image:      sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceImageFee)),
@@ -53,17 +53,28 @@ func (tfp *FeeParams) ValidateBasic() error {
 			return fmt.Errorf("min_amount must be non-negative in create_resource_image[%d]: got %s", i, f.MinAmount.String())
 		}
 
-		if !f.MaxAmount.IsZero() && f.MaxAmount.LT(f.MinAmount) {
+		if f.MaxAmount != nil && f.MaxAmount.LT(f.MinAmount) {
 			return fmt.Errorf("max_amount must be greater than or equal to min_amount in create_resource_image[%d]: got max=%s, min=%s", i, f.MaxAmount.String(), f.MinAmount.String())
 		}
 	}
+
 	for i, f := range tfp.Json {
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in create_resource_json[%d]: got %s", i, f.MinAmount.String())
 		}
 
-		if !f.MaxAmount.IsZero() && f.MaxAmount.LT(f.MinAmount) {
+		if f.MaxAmount != nil && f.MaxAmount.LT(f.MinAmount) {
 			return fmt.Errorf("max_amount must be greater than or equal to min_amount in create_resource_json[%d]: got max=%s, min=%s", i, f.MaxAmount.String(), f.MinAmount.String())
+		}
+	}
+
+	for i, f := range tfp.Default {
+		if f.MinAmount.IsNegative() {
+			return fmt.Errorf("min_amount must be non-negative in default_fee[%d]: got %s", i, f.MinAmount.String())
+		}
+
+		if f.MaxAmount != nil && f.MaxAmount.LT(f.MinAmount) {
+			return fmt.Errorf("max_amount must be greater than or equal to min_amount in default_fee[%d]: got max=%s, min=%s", i, f.MaxAmount.String(), f.MinAmount.String())
 		}
 	}
 
@@ -75,7 +86,7 @@ func (tfp *FeeParams) ValidateBasic() error {
 }
 
 func validateImage(i interface{}) error {
-	v, ok := i.([]*didtypes.FeeRange)
+	v, ok := i.([]didtypes.FeeRange)
 	if !ok {
 		return fmt.Errorf("invalid parameter type for create_resource_image: %T", i)
 	}
@@ -84,7 +95,7 @@ func validateImage(i interface{}) error {
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in create_resource_image[%d]", idx)
 		}
-		if !f.MaxAmount.IsZero() && f.MaxAmount.LT(f.MinAmount) {
+		if f.MaxAmount != nil && f.MaxAmount.LT(f.MinAmount) {
 			return fmt.Errorf("max_amount must be >= min_amount in create_resource_image[%d]", idx)
 		}
 	}
@@ -93,7 +104,7 @@ func validateImage(i interface{}) error {
 }
 
 func validateJSON(i interface{}) error {
-	v, ok := i.([]*didtypes.FeeRange)
+	v, ok := i.([]didtypes.FeeRange)
 	if !ok {
 		return fmt.Errorf("invalid parameter type for create_resource_json: %T", i)
 	}
@@ -102,7 +113,7 @@ func validateJSON(i interface{}) error {
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in create_resource_json[%d]", idx)
 		}
-		if !f.MaxAmount.IsZero() && f.MaxAmount.LT(f.MinAmount) {
+		if f.MaxAmount != nil && f.MaxAmount.LT(f.MinAmount) {
 			return fmt.Errorf("max_amount must be >= min_amount in create_resource_json[%d]", idx)
 		}
 	}
@@ -111,7 +122,7 @@ func validateJSON(i interface{}) error {
 }
 
 func validateDefault(i interface{}) error {
-	v, ok := i.([]*didtypes.FeeRange)
+	v, ok := i.([]didtypes.FeeRange)
 	if !ok {
 		return fmt.Errorf("invalid parameter type for default_fee: %T", i)
 	}
@@ -120,7 +131,7 @@ func validateDefault(i interface{}) error {
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in default_fee[%d]", idx)
 		}
-		if !f.MaxAmount.IsZero() && f.MaxAmount.LT(f.MinAmount) {
+		if f.MaxAmount != nil && f.MaxAmount.LT(f.MinAmount) {
 			return fmt.Errorf("max_amount must be >= min_amount in default_fee[%d]", idx)
 		}
 	}

@@ -37,21 +37,21 @@ func migrateParams(ctx sdk.Context, store corestoretypes.KVStore, legacySubspace
 			{
 				Denom:     legacyParams.Image.Denom,
 				MinAmount: legacyParams.Image.Amount,
-				MaxAmount: legacyParams.Image.Amount,
+				MaxAmount: &legacyParams.Image.Amount,
 			},
 		},
 		Json: []didtypes.FeeRange{
 			{
 				Denom:     legacyParams.Json.Denom,
 				MinAmount: legacyParams.Json.Amount,
-				MaxAmount: legacyParams.Json.Amount,
+				MaxAmount: &legacyParams.Json.Amount,
 			},
 		},
 		Default: []didtypes.FeeRange{
 			{
 				Denom:     legacyParams.Default.Denom,
 				MinAmount: legacyParams.Default.Amount,
-				MaxAmount: legacyParams.Default.Amount,
+				MaxAmount: &legacyParams.Default.Amount,
 			},
 		},
 		BurnFactor: legacyParams.BurnFactor,

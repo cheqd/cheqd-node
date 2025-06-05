@@ -21,7 +21,7 @@ message FeeRange {
   // Maximum fee amount allowed (stored as string for large values)
   string max_amount = 3 [
     (gogoproto.customtype) = "cosmossdk.io/math.Int",
-    (gogoproto.nullable) = false
+    (gogoproto.nullable) = true
   ];
 }
 

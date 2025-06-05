@@ -6,6 +6,8 @@ import (
 	"crypto/ed25519"
 
 	sdkmath "cosmossdk.io/math"
+	"github.com/cheqd/cheqd-node/ante"
+	posthandler "github.com/cheqd/cheqd-node/post"
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
@@ -188,64 +190,64 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
-	// It("should not charge more than tax for update diddoc message - case: fixed fee", func() {
-	// 	By("submitting the create diddoc message")
-	// 	res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
-	// 	Expect(err).To(BeNil())
-	// 	fmt.Println("create did resp=====", res)
-	// 	Expect(res.Code).To(BeEquivalentTo(0))
+	It("should not charge more than tax for update diddoc message - case: fixed fee", func() {
+		By("submitting the create diddoc message")
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
+		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(0))
 
-	// 	By("preparing the update diddoc message")
-	// 	payload2 := didcli.DIDDocument{
-	// 		ID: payload.ID,
-	// 		VerificationMethod: []didcli.VerificationMethod{
-	// 			map[string]any{
-	// 				"id":                 payload.VerificationMethod[0]["id"],
-	// 				"type":               "Ed25519VerificationKey2020",
-	// 				"controller":         payload.VerificationMethod[0]["controller"],
-	// 				"publicKeyMultibase": payload.VerificationMethod[0]["publicKeyMultibase"],
-	// 			},
-	// 		},
-	// 		Authentication:  payload.Authentication,
-	// 		AssertionMethod: []string{payload.VerificationMethod[0]["id"].(string)},
-	// 	}
+		By("preparing the update diddoc message")
+		payload2 := didcli.DIDDocument{
+			ID: payload.ID,
+			VerificationMethod: []didcli.VerificationMethod{
+				map[string]any{
+					"id":                 payload.VerificationMethod[0]["id"],
+					"type":               "Ed25519VerificationKey2020",
+					"controller":         payload.VerificationMethod[0]["controller"],
+					"publicKeyMultibase": payload.VerificationMethod[0]["publicKeyMultibase"],
+				},
+			},
+			Authentication:  payload.Authentication,
+			AssertionMethod: []string{payload.VerificationMethod[0]["id"].(string)},
+		}
 
-	// 	By("querying the fee payer account balance before the transaction")
-	// 	balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_5_ADDR, types.BaseMinimalDenom)
-	// 	Expect(err).To(BeNil())
+		By("querying the fee payer account balance before the transaction")
+		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_5_ADDR, types.BaseMinimalDenom)
+		Expect(err).To(BeNil())
 
-	// 	By("fetching cheq EMA price and computing fees")
-	// 	tax := feeParams.UpdateDid[0]
-	// 	cheqPrice, err := cli.QueryEMA("CHEQ")
-	// 	Expect(err).To(BeNil())
-	// 	cheqp := cheqPrice.Price
+		By("fetching cheq EMA price and computing fees")
+		tax := feeParams.UpdateDid[0]
+		cheqPrice, err := cli.QueryEMA("CHEQ")
+		Expect(err).To(BeNil())
+		cheqp := cheqPrice.Price
 
-	// 	convertedFees := ante.GetFeeForMsg(feeParams.UpdateDid, cheqp)
-	// 	burnPortionUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
-	// 	rewardPortionUsd := helpers.GetRewardPortion(convertedFees, burnPortionUsd)
+		convertedFees, err := ante.GetFeeForMsg(feeParams.UpdateDid, cheqp)
+		Expect(err).To(BeNil())
+		burnPortionUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
+		rewardPortionUsd := helpers.GetRewardPortion(convertedFees, burnPortionUsd)
 
-	// 	burnPortionCheq, err := posthandler.ConvertToCheq(burnPortionUsd, cheqp)
-	// 	Expect(err).To(BeNil())
+		burnPortionCheq, err := posthandler.ConvertToCheq(burnPortionUsd, cheqp)
+		Expect(err).To(BeNil())
 
-	// 	rewardPortionCheq, err := posthandler.ConvertToCheq(rewardPortionUsd, cheqp)
-	// 	Expect(err).To(BeNil())
+		rewardPortionCheq, err := posthandler.ConvertToCheq(rewardPortionUsd, cheqp)
+		Expect(err).To(BeNil())
 
-	// 	taxInCheqd := burnPortionCheq.Add(rewardPortionCheq...)
+		taxInCheqd := burnPortionCheq.Add(rewardPortionCheq...)
 
-	// 	By("submitting the update diddoc message with double the tax")
-	// 	doubleTax := sdk.NewCoin(types.BaseMinimalDenom, tax.MinAmount.Mul(sdkmath.NewInt(2)))
-	// 	res, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_5, helpers.GenerateFees(doubleTax.String()))
-	// 	Expect(err).To(BeNil())
-	// 	Expect(res.Code).To(BeEquivalentTo(0))
+		By("submitting the update diddoc message with double the tax")
+		doubleTax := sdk.NewCoin(types.BaseMinimalDenom, tax.MinAmount.Mul(sdkmath.NewInt(2)))
+		res, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_5, helpers.GenerateFees(doubleTax.String()))
+		Expect(err).To(BeNil())
+		Expect(res.Code).To(BeEquivalentTo(0))
 
-	// 	By("querying the fee payer account balance after the transaction")
-	// 	balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_5_ADDR, types.BaseMinimalDenom)
-	// 	Expect(err).To(BeNil())
+		By("querying the fee payer account balance after the transaction")
+		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_5_ADDR, types.BaseMinimalDenom)
+		Expect(err).To(BeNil())
 
-	// 	By("checking that the fee payer account balance has been decreased only by the actual tax")
-	// 	diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-	// 	Expect(diff).To(Equal(taxInCheqd.AmountOf("ncheq")))
-	// })
+		By("checking that the fee payer account balance has been decreased only by the actual tax")
+		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
+		Expect(diff).To(BeEquivalentTo(taxInCheqd.AmountOf("ncheq")))
+	})
 
 	It("should not charge more than tax for deactivate diddoc message - case: fixed fee", func() {
 		By("submitting the create diddoc message")
