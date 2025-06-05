@@ -62,7 +62,10 @@ func migrateParams(ctx sdk.Context, store corestoretypes.KVStore, legacySubspace
 		return err
 	}
 
-	store.Set(types.ParamStoreKey, bz)
+	err = store.Set(types.ParamStoreKey, bz)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

@@ -3,7 +3,6 @@ package types
 import (
 	"fmt"
 
-	"cosmossdk.io/math"
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -167,7 +166,7 @@ func validateDeactivateDid(i interface{}) error {
 }
 
 func validateBurnFactor(i interface{}) error {
-	v, ok := i.(math.LegacyDec)
+	v, ok := i.(sdkmath.LegacyDec)
 	if !ok {
 		return fmt.Errorf("invalid type for burn_factor: %T", i)
 	}
