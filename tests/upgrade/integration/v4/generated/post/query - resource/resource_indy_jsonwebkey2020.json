@@ -1,0 +1,24 @@
+{
+    "payload": {
+        "resource": {
+            "data": "eyAibWVzc2FnZSI6ICJoZWxsbyB3b3JsZCJ9"
+        },
+        "metadata": {
+            "collectionId": "3mfFCU1qMJE6WrWeJp3xhF",
+            "id": "9011d912-258e-4c76-93a8-200c2031685e",
+            "name": "Indy JsonWebKey2020",
+            "version": "",
+            "resourceType": "TestResourceType",
+            "alsoKnownAs": [
+                {
+                    "uri": "did:cheqd:testnet:3mfFCU1qMJE6WrWeJp3xhF/resources/9011d912-258e-4c76-93a8-200c2031685e",
+                    "description": "did-url"
+                }
+            ],
+            "mediaType": "application/json",
+            "checksum": "c841412ff85f5ab522efb9251d3c9a9975769a8f1c439d45bdc5d32a71b73f9c",
+            "previousVersionId": "",
+            "nextVersionId": ""
+        }
+    }
+}

@@ -56,6 +56,7 @@ require (
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/ojo-network/ojo v0.4.0-rc1.0.20240912201233-2af60de6026b // indirect
 	github.com/rs/xid v1.6.0 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.uber.org/automaxprocs v1.6.0 // indirect
 )
@@ -241,6 +242,8 @@ require (
 )
 
 replace (
+	// replace cosmossdk.io/store with patched version
+	cosmossdk.io/store => github.com/cheqd/cosmos-sdk/store v1.1.1-uneven-heights-iavl
 	// Keyring replacement from Cosmos SDK v0.50.13
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 
@@ -248,11 +251,11 @@ replace (
 	github.com/cheqd/cheqd-node/api/v2 => ./api
 
 	// replace cosmos-sdk v0.50.13
-	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.50.13-height-mismatch-patched
+	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.50.13-height-mismatch-iavl
 
 	// replace iavl v1.2.2
 	// https://github.com/cheqd/iavl/tree/cheqd-v1.2.2-uneven-heights
-	github.com/cosmos/iavl => github.com/cheqd/iavl v0.19.2-0.20250417102206-84370d5811fb
+	github.com/cosmos/iavl => github.com/cheqd/iavl v1.2.2-uneven-heights
 
 	// dgrijalva/jwt-go is deprecated and doesn't receive security updates.
 	// TODO: remove it: https://github.com/cosmos/cosmos-sdk/issues/13134
@@ -267,10 +270,10 @@ replace (
 	github.com/ojo-network/price-feeder => github.com/cheqd/price-feeder v0.2.1-rc1.0.20250508101226-320b95563cd9
 
 	// https://github.com/cheqd/fee-abstraction/tree/cheqd/v0.50.x
-	github.com/osmosis-labs/fee-abstraction/v8 => github.com/cheqd/fee-abstraction/v8 v8.0.3-0.20250515095052-ea7c07e5df2d
+	github.com/osmosis-labs/fee-abstraction/v8 => github.com/cheqd/fee-abstraction/v8 v8.0.3-uneven-heights-holistic
 
 	// https://github.com/cheqd/feemarket/tree/cheqd/v0.50.x
-	github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.5-0.20250515091338-b2d79e0d3595
+	github.com/skip-mev/feemarket => github.com/cheqd/feemarket v1.0.5-uneven-heights
 
 	// replace broken goleveldb
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7

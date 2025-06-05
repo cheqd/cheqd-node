@@ -13,6 +13,7 @@ import (
 	"github.com/cheqd/cheqd-node/x/did/exported"
 	v5 "github.com/cheqd/cheqd-node/x/did/migrations/v5"
 	"github.com/cheqd/cheqd-node/x/did/types"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdktestutil "github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -47,13 +48,29 @@ func TestMigrate(t *testing.T) {
 	sb := collections.NewSchemaBuilder(kvStoreService)
 	countCollection := collections.NewItem(sb, collections.Prefix(types.DidDocCountKey),
 		"did_count", collections.Uint64Value)
+	docCollection := collections.NewMap(sb, types.DidDocVersionKeyPrefix, "did_version",
+		collections.PairKeyCodec(collections.StringKey, collections.StringKey),
+		codec.CollValue[types.DidDocWithMetadata](cdc))
 
 	// set count key in old store
 	var countValue uint64 = 5
 	require.NoError(t, store.Set([]byte(types.DidDocCountKey), []byte(strconv.FormatUint(countValue, 10))))
 
+	// set document in old store
+	testId := "test-id"
+	testVersion := "test-version"
+	doc := types.DidDocWithMetadata{
+		DidDoc: &types.DidDoc{
+			Id: testId,
+		},
+		Metadata: &types.Metadata{
+			VersionId: testVersion,
+		},
+	}
+	require.NoError(t, store.Set([]byte(types.DidDocVersionKey+testId+":"+testVersion), cdc.MustMarshal(&doc)))
+
 	legacySubspace := newMockSubspace(*types.DefaultLegacyFeeParams())
-	require.NoError(t, v5.MigrateStore(ctx, kvStoreService, legacySubspace, cdc, countCollection))
+	require.NoError(t, v5.MigrateStore(ctx, kvStoreService, legacySubspace, cdc, countCollection, docCollection))
 
 	var res types.LegacyFeeParams
 	bz, err := store.Get(types.ParamStoreKey)
@@ -65,4 +82,9 @@ func TestMigrate(t *testing.T) {
 	actualCount, err := countCollection.Get(ctx)
 	require.NoError(t, err)
 	require.Equal(t, countValue, actualCount)
+
+	// check document
+	docRes, err := docCollection.Get(ctx, collections.Join(testId, testVersion))
+	require.NoError(t, err)
+	require.Equal(t, doc, docRes)
 }

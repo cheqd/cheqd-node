@@ -17,13 +17,20 @@ import (
 
 func MigrateStore(ctx sdk.Context, storeService corestoretypes.KVStoreService, legacySubspace exported.Subspace,
 	cdc codec.BinaryCodec, countCollection collections.Item[uint64],
+	docCollection collections.Map[collections.Pair[string, string], types.DidDocWithMetadata],
 ) error {
 	store := storeService.OpenKVStore(ctx)
 	if err := migrateParams(ctx, store, legacySubspace, cdc); err != nil {
 		return err
 	}
 
-	return migrateDidCount(ctx, runtime.KVStoreAdapter(store), countCollection)
+	kvStore := runtime.KVStoreAdapter(store)
+
+	if err := migrateDidCount(ctx, kvStore, countCollection); err != nil {
+		return err
+	}
+
+	return migrateDidDocuments(ctx, kvStore, cdc, docCollection)
 }
 
 func migrateParams(ctx sdk.Context, store corestoretypes.KVStore, legacySubspace exported.Subspace, cdc codec.BinaryCodec) error {
@@ -82,4 +89,25 @@ func migrateDidCount(ctx sdk.Context, store storetypes.KVStore, countCollection 
 	}
 
 	return countCollection.Set(ctx, count)
+}
+
+func migrateDidDocuments(ctx sdk.Context, store storetypes.KVStore, cdc codec.BinaryCodec,
+	docCollection collections.Map[collections.Pair[string, string], types.DidDocWithMetadata],
+) error {
+	iterator := storetypes.KVStorePrefixIterator(store, []byte(types.DidDocVersionKey))
+
+	for ; iterator.Valid(); iterator.Next() {
+		var didDoc types.DidDocWithMetadata
+		cdc.MustUnmarshal(iterator.Value(), &didDoc)
+
+		// set document in collection
+		if err := docCollection.Set(ctx, collections.Join(didDoc.DidDoc.Id, didDoc.Metadata.VersionId), didDoc); err != nil {
+			return err
+		}
+
+		// delete old record
+		store.Delete(iterator.Key())
+	}
+
+	return nil
 }

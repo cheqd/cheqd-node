@@ -16,15 +16,28 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+// LegacyResourceDataKey returns the byte representation of legacy resource data key
+func LegacyResourceDataKey(collectionID string, id string) []byte {
+	return []byte(types.ResourceDataKey + collectionID + ":" + id)
+}
+
 func MigrateStore(ctx sdk.Context, storeService corestoretypes.KVStoreService, legacySubspace exported.Subspace,
 	cdc codec.BinaryCodec, countCollection collections.Item[uint64],
+	metadataCollection collections.Map[collections.Pair[string, string], types.Metadata],
+	dataCollection collections.Map[collections.Pair[string, string], []byte],
 ) error {
 	store := storeService.OpenKVStore(ctx)
 	if err := migrateParams(ctx, store, legacySubspace, cdc); err != nil {
 		return err
 	}
 
-	return migrateResourceCount(ctx, runtime.KVStoreAdapter(store), countCollection)
+	kvStore := runtime.KVStoreAdapter(store)
+
+	if err := migrateResourceCount(ctx, kvStore, countCollection); err != nil {
+		return err
+	}
+
+	return migrateResources(ctx, kvStore, cdc, metadataCollection, dataCollection)
 }
 
 func migrateParams(ctx sdk.Context, store corestoretypes.KVStore, legacySubspace exported.Subspace, cdc codec.BinaryCodec) error {
@@ -79,4 +92,37 @@ func migrateResourceCount(ctx sdk.Context, store storetypes.KVStore, countCollec
 	}
 
 	return countCollection.Set(ctx, count)
+}
+
+func migrateResources(ctx sdk.Context, store storetypes.KVStore, cdc codec.BinaryCodec,
+	metadataCollection collections.Map[collections.Pair[string, string], types.Metadata],
+	dataCollection collections.Map[collections.Pair[string, string], []byte],
+) error {
+	iterator := storetypes.KVStorePrefixIterator(store, []byte(types.ResourceMetadataKey))
+
+	for ; iterator.Valid(); iterator.Next() {
+		var metadata types.Metadata
+		cdc.MustUnmarshal(iterator.Value(), &metadata)
+
+		// set resource metadata in metadata collection
+		if err := metadataCollection.Set(ctx, collections.Join(metadata.CollectionId, metadata.Id), metadata); err != nil {
+			return err
+		}
+
+		dataKey := LegacyResourceDataKey(metadata.CollectionId, metadata.Id)
+		data := store.Get(dataKey)
+		if data != nil {
+			// set resource data in data collection
+			if err := dataCollection.Set(ctx, collections.Join(metadata.CollectionId, metadata.Id), data); err != nil {
+				return err
+			}
+			// delete old record
+			store.Delete(dataKey)
+		}
+
+		// delete old record
+		store.Delete(iterator.Key())
+	}
+
+	return nil
 }

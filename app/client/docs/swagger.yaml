@@ -24,7 +24,7 @@ externalDocs:
   description: cheqd Network Documentation
   url: https://docs.cheqd.io/node
 paths:
-  /cheqd/did/v2/params:
+  /cheqd/did/v2/module/params:
     get:
       summary: Params queries params of the did module.
       operationId: DidFeeParams
@@ -957,7 +957,7 @@ paths:
           type: boolean
       tags:
         - DID module queries
-  /cheqd/resource/v2/params:
+  /cheqd/resource/v2/module/params:
     get:
       summary: Params queries params of the resource module.
       operationId: ResourceFeeParams
