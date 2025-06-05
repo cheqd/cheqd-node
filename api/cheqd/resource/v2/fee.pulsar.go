@@ -4,7 +4,7 @@ package resourcev2
 import (
 	fmt "fmt"
 	_ "cosmossdk.io/api/amino"
-	v1beta1 "cosmossdk.io/api/cosmos/base/v1beta1"
+	v2 "github.com/cheqd/cheqd-node/api/v2/cheqd/did/v2"
 	_ "github.com/cosmos/cosmos-proto"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
 	_ "github.com/cosmos/gogoproto/gogoproto"
