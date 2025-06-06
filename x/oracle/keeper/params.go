@@ -212,6 +212,28 @@ func (k Keeper) SetCurrencyDeviationThresholds(
 	k.paramSpace.Set(ctx, types.KeyCurrencyDeviationThresholds, currencyDeviationThresholds)
 }
 
+// NativeIbcedInOsmosis returns the current native ibced in osmosis denom
+func (k Keeper) NativeIbcedInOsmosis(ctx sdk.Context) (res string) {
+	k.paramSpace.Get(ctx, types.KeyNativeIbcedInOsmosis, &res)
+	return
+}
+
+// SetNativeIbcedInOsmosis updates the current native ibced in osmosis denom
+func (k Keeper) SetNativeIbcedInOsmosis(ctx sdk.Context, value string) {
+	k.paramSpace.Set(ctx, types.KeyNativeIbcedInOsmosis, value)
+}
+
+// UsdcIbcedInOsmosis returns the current usdc ibced in osmosis denom
+func (k Keeper) UsdcIbcedInOsmosis(ctx sdk.Context) (res string) {
+	k.paramSpace.Get(ctx, types.KeyUsdcIbcedInOsmosis, &res)
+	return
+}
+
+// SetUsdcIbcedInOsmosis updates the current usdc ibced in osmosis denom
+func (k Keeper) SetUsdcIbcedInOsmosis(ctx sdk.Context, value string) {
+	k.paramSpace.Set(ctx, types.KeyUsdcIbcedInOsmosis, value)
+}
+
 func (k Keeper) GetExponent(ctx sdk.Context, denom string) (uint32, error) {
 	params := k.GetParams(ctx)
 	for _, v := range params.AcceptList {

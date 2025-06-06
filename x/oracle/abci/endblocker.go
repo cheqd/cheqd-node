@@ -14,7 +14,7 @@ import (
 )
 
 // EndBlocker is called at the end of every block
-func EndBlocker(ctx context.Context, k keeper.Keeper) error {
+func EndBlocker(ctx context.Context, k keeper.Keeper, feeabsk types.FeeAbskeeper) error {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker)
 
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
@@ -51,7 +51,7 @@ func EndBlocker(ctx context.Context, k keeper.Keeper) error {
 	}
 
 	if k.IsPeriodLastBlock(sdkCtx, params.VotePeriod) {
-		RunPriceFeederIfEnabled(ctx, sdkCtx, params, k)
+		RunPriceFeederIfEnabled(ctx, sdkCtx, params, k, feeabsk)
 
 		if err := UpdateOraclePrices(sdkCtx, params, k); err != nil {
 			return err
@@ -73,18 +73,35 @@ func EndBlocker(ctx context.Context, k keeper.Keeper) error {
 	return nil
 }
 
-func RunPriceFeederIfEnabled(ctx context.Context, sdkCtx sdk.Context, params types.Params, k keeper.Keeper) {
+func RunPriceFeederIfEnabled(ctx context.Context, sdkCtx sdk.Context, params types.Params,
+	k keeper.Keeper, feeabsk types.FeeAbskeeper,
+) {
 	if k.PriceFeeder.Oracle != nil && k.PriceFeeder.AppConfig.Enable {
+		params := k.GetParams(sdkCtx)
 		k.PriceFeeder.Oracle.ParamCache.UpdateParamCache(
 			sdkCtx.BlockHeight(),
-			k.GetParams(sdkCtx),
+			params,
 			nil,
 		)
+
+		if err := SetNativePriceUsingICQ(sdkCtx, k, feeabsk, params); err != nil {
+			sdkCtx.Logger().Error("error when setting native price using icq", "err", err)
+		}
 
 		if err := k.PriceFeeder.Oracle.TickClientless(ctx); err != nil {
 			sdkCtx.Logger().Error("Error in Oracle Keeper price feeder clientless tick", "err", err)
 		}
 	}
+}
+
+func SetNativePriceUsingICQ(ctx sdk.Context, k keeper.Keeper, feeabsk types.FeeAbskeeper, params types.Params) error {
+	price, err := feeabsk.GetTwapRate(ctx, params.UsdcIbcedInOsmosis)
+	if err != nil {
+		return err
+	}
+
+	k.PriceFeeder.Oracle.SetICQProviderPrice(price)
+	return nil
 }
 
 func UpdateOraclePrices(sdkCtx sdk.Context, params types.Params, k keeper.Keeper) error {

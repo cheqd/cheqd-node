@@ -49,3 +49,7 @@ type BankKeeper interface {
 	GetDenomMetaData(ctx context.Context, denom string) (banktypes.Metadata, bool)
 	SetDenomMetaData(ctx context.Context, denomMetaData banktypes.Metadata)
 }
+
+type FeeAbskeeper interface {
+	GetTwapRate(ctx sdk.Context, ibcDenom string) (sdkmath.LegacyDec, error)
+}
