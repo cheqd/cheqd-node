@@ -5,6 +5,9 @@ package integration
 import (
 	"crypto/ed25519"
 
+	"cosmossdk.io/math"
+	"github.com/cheqd/cheqd-node/ante"
+	posthandler "github.com/cheqd/cheqd-node/post"
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
@@ -13,6 +16,7 @@ import (
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -71,7 +75,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		}
 
 		// Submit the DID Doc
-		resp, err := cli.CreateDidDoc(tmpDir, didPayload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(didFeeParams.CreateDid.String()))
+		resp, err := cli.CreateDidDoc(tmpDir, didPayload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(didFeeParams.CreateDid[0].MinAmount.String()+didFeeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 	})
@@ -91,14 +95,41 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
 		By("submitting the json resource message")
-		tax := resourceFeeParams.Json
+		tax := resourceFeeParams.Json[0]
+
+		cheqPrice, err := cli.QueryEMA("CHEQ")
+		cheqp := cheqPrice.Price
+		Expect(err).To(BeNil())
+
+		convertedFees, err := ante.GetFeeForMsg(resourceFeeParams.Json, cheqp)
+		Expect(err).To(BeNil())
+
+		burnPotionInUsd := helpers.GetBurnFeePortion(resourceFeeParams.BurnFactor, convertedFees)
+		rewardPortionInUsd := helpers.GetRewardPortion(convertedFees, burnPotionInUsd)
+
+		burnPotionInUsdToCheq, err := posthandler.ConvertToCheq(burnPotionInUsd, cheqp)
+		Expect(err).To(BeNil())
+
+		rewardPortionInUsdToCheq, err := posthandler.ConvertToCheq(rewardPortionInUsd, cheqp)
+		Expect(err).To(BeNil())
+
+		coin := rewardPortionInUsdToCheq.AmountOf("ncheq")
+
+		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.5%
+
+		oracleReward := oracleShareRate.MulInt(coin).TruncateInt()
+		oracleRewardCoin := sdk.NewCoin("ncheq", oracleReward)
+		feeCollectorReward := sdk.NewCoin("ncheq", coin.Sub(oracleReward))
+
+		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
+
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -109,7 +140,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(tax.Amount))
+		Expect(diff).To(Equal(taxIncheqd.AmountOf("ncheq")))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -122,33 +153,41 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			helpers.HumanReadableEvent{
 				Type: "tx",
 				Attributes: []helpers.HumanReadableEventAttribute{
-					{Key: "fee", Value: tax.String(), Index: true},
+					{Key: "fee", Value: taxIncheqd.String(), Index: true},
 					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_4_ADDR, Index: true},
 				},
 			},
 		))
 
 		By("ensuring the events contain the expected supply deflation event")
-		burnt := helpers.GetBurntPortion(tax, resourceFeeParams.BurnFactor)
 		Expect(events).To(ContainElement(
 			helpers.HumanReadableEvent{
 				Type: "burn",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "burner", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
-					{Key: "amount", Value: burnt.String(), Index: true},
+					{Key: "amount", Value: burnPotionInUsdToCheq.String(), Index: true},
 				},
 			},
 		))
 
-		By("ensuring the events contain the expected reward distribution event")
-		reward := helpers.GetRewardPortion(tax, burnt)
+		By("ensuring the events contain the expected reward distribution events")
 		Expect(events).To(ContainElement(
 			helpers.HumanReadableEvent{
 				Type: "transfer",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "recipient", Value: testdata.FEE_COLLECTOR_ADDR, Index: true},
 					{Key: "sender", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
-					{Key: "amount", Value: reward.String(), Index: true},
+					{Key: "amount", Value: feeCollectorReward.String(), Index: true},
+				},
+			},
+		))
+		Expect(events).To(ContainElement(
+			helpers.HumanReadableEvent{
+				Type: "transfer",
+				Attributes: []helpers.HumanReadableEventAttribute{
+					{Key: "recipient", Value: testdata.ORACLE_MODULE_ACCOUNT_ADDR, Index: true},
+					{Key: "sender", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
+					{Key: "amount", Value: oracleRewardCoin.String(), Index: true},
 				},
 			},
 		))
@@ -169,14 +208,45 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
 		By("submitting the image resource message")
-		tax := resourceFeeParams.Image
+		tax := resourceFeeParams.Image[0]
+
+		cheqPrice, err := cli.QueryEMA("CHEQ")
+		cheqp := cheqPrice.Price
+		Expect(err).To(BeNil())
+
+		// Calculate fee portions in USD
+		convertedFees, err := ante.GetFeeForMsg(resourceFeeParams.Image, cheqp)
+		Expect(err).To(BeNil())
+
+		burnPotionInUsd := helpers.GetBurnFeePortion(resourceFeeParams.BurnFactor, convertedFees)
+		rewardPortionInUsd := helpers.GetRewardPortion(convertedFees, burnPotionInUsd)
+
+		// Convert USD portions back to ncheq tokens
+		burnPotionInUsdToCheq, err := posthandler.ConvertToCheq(burnPotionInUsd, cheqp)
+		Expect(err).To(BeNil())
+
+		rewardPortionInUsdToCheq, err := posthandler.ConvertToCheq(rewardPortionInUsd, cheqp)
+		Expect(err).To(BeNil())
+
+		// Calculate oracle and fee collector rewards
+		coin := rewardPortionInUsdToCheq.AmountOf("ncheq")
+
+		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.5%
+
+		oracleReward := oracleShareRate.MulInt(coin).TruncateInt()
+		oracleRewardCoin := sdk.NewCoin("ncheq", oracleReward)
+		feeCollectorReward := sdk.NewCoin("ncheq", coin.Sub(oracleReward))
+
+		// Total tax amount (burn + reward)
+		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
+
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -187,7 +257,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(tax.Amount))
+		Expect(diff).To(Equal(taxIncheqd.AmountOf("ncheq")))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -200,33 +270,41 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			helpers.HumanReadableEvent{
 				Type: "tx",
 				Attributes: []helpers.HumanReadableEventAttribute{
-					{Key: "fee", Value: tax.String(), Index: true},
+					{Key: "fee", Value: taxIncheqd.String(), Index: true},
 					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_4_ADDR, Index: true},
 				},
 			},
 		))
 
 		By("ensuring the events contain the expected supply deflation event")
-		burnt := helpers.GetBurntPortion(tax, resourceFeeParams.BurnFactor)
 		Expect(events).To(ContainElement(
 			helpers.HumanReadableEvent{
 				Type: "burn",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "burner", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
-					{Key: "amount", Value: burnt.String(), Index: true},
+					{Key: "amount", Value: burnPotionInUsdToCheq.String(), Index: true},
 				},
 			},
 		))
 
-		By("ensuring the events contain the expected reward distribution event")
-		reward := helpers.GetRewardPortion(tax, burnt)
+		By("ensuring the events contain the expected reward distribution events")
 		Expect(events).To(ContainElement(
 			helpers.HumanReadableEvent{
 				Type: "transfer",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "recipient", Value: testdata.FEE_COLLECTOR_ADDR, Index: true},
 					{Key: "sender", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
-					{Key: "amount", Value: reward.String(), Index: true},
+					{Key: "amount", Value: feeCollectorReward.String(), Index: true},
+				},
+			},
+		))
+		Expect(events).To(ContainElement(
+			helpers.HumanReadableEvent{
+				Type: "transfer",
+				Attributes: []helpers.HumanReadableEventAttribute{
+					{Key: "recipient", Value: testdata.ORACLE_MODULE_ACCOUNT_ADDR, Index: true},
+					{Key: "sender", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
+					{Key: "amount", Value: oracleRewardCoin.String(), Index: true},
 				},
 			},
 		))
@@ -247,14 +325,40 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
 		By("submitting the default resource message")
-		tax := resourceFeeParams.Default
+		tax := resourceFeeParams.Default[0]
+
+		cheqPrice, err := cli.QueryEMA("CHEQ")
+		Expect(err).To(BeNil())
+		cheqp := cheqPrice.Price
+
+		convertedFees, err := ante.GetFeeForMsg(resourceFeeParams.Default, cheqp)
+		Expect(err).To(BeNil())
+
+		burnPortionUsd := helpers.GetBurnFeePortion(resourceFeeParams.BurnFactor, convertedFees)
+		rewardPortionUsd := helpers.GetRewardPortion(convertedFees, burnPortionUsd)
+
+		burnPortionCheq, err := posthandler.ConvertToCheq(burnPortionUsd, cheqp)
+		Expect(err).To(BeNil())
+		rewardPortionCheq, err := posthandler.ConvertToCheq(rewardPortionUsd, cheqp)
+		Expect(err).To(BeNil())
+
+		coin := rewardPortionCheq.AmountOf("ncheq")
+
+		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.5%
+
+		oracleReward := oracleShareRate.MulInt(coin).TruncateInt()
+		oracleRewardCoin := sdk.NewCoin("ncheq", oracleReward)
+		feeCollectorReward := sdk.NewCoin("ncheq", coin.Sub(oracleReward))
+
+		taxIncheqd := burnPortionCheq.Add(rewardPortionCheq...)
+
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -265,7 +369,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(tax.Amount))
+		Expect(diff).To(Equal(taxIncheqd.AmountOf("ncheq")))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -278,33 +382,41 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			helpers.HumanReadableEvent{
 				Type: "tx",
 				Attributes: []helpers.HumanReadableEventAttribute{
-					{Key: "fee", Value: tax.String(), Index: true},
+					{Key: "fee", Value: taxIncheqd.String(), Index: true},
 					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_4_ADDR, Index: true},
 				},
 			},
 		))
 
 		By("ensuring the events contain the expected supply deflation event")
-		burnt := helpers.GetBurntPortion(tax, resourceFeeParams.BurnFactor)
 		Expect(events).To(ContainElement(
 			helpers.HumanReadableEvent{
 				Type: "burn",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "burner", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
-					{Key: "amount", Value: burnt.String(), Index: true},
+					{Key: "amount", Value: burnPortionCheq.String(), Index: true},
 				},
 			},
 		))
 
-		By("ensuring the events contain the expected reward distribution event")
-		reward := helpers.GetRewardPortion(tax, burnt)
+		By("ensuring the events contain the expected reward distribution events")
 		Expect(events).To(ContainElement(
 			helpers.HumanReadableEvent{
 				Type: "transfer",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "recipient", Value: testdata.FEE_COLLECTOR_ADDR, Index: true},
 					{Key: "sender", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
-					{Key: "amount", Value: reward.String(), Index: true},
+					{Key: "amount", Value: feeCollectorReward.String(), Index: true},
+				},
+			},
+		))
+		Expect(events).To(ContainElement(
+			helpers.HumanReadableEvent{
+				Type: "transfer",
+				Attributes: []helpers.HumanReadableEventAttribute{
+					{Key: "recipient", Value: testdata.ORACLE_MODULE_ACCOUNT_ADDR, Index: true},
+					{Key: "sender", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
+					{Key: "amount", Value: oracleRewardCoin.String(), Index: true},
 				},
 			},
 		))
@@ -333,14 +445,14 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting a create resource json message")
-		tax := resourceFeeParams.Json
+		tax := resourceFeeParams.Json[0]
 		resp, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.String())))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -354,7 +466,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("checking the granter balance difference")
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(tax.Amount))
+		Expect(diff).To(Equal(tax.MinAmount))
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
@@ -389,14 +501,14 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting a create resource image message")
-		tax := resourceFeeParams.Image
+		tax := resourceFeeParams.Image[0]
 		resp, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.String())))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -410,7 +522,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("checking the granter balance difference")
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(tax.Amount))
+		Expect(diff).To(Equal(tax.MinAmount))
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
@@ -445,14 +557,14 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting a create resource default message")
-		tax := resourceFeeParams.Default
+		tax := resourceFeeParams.Default[0]
 		resp, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.String())))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -466,7 +578,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("checking the granter balance difference")
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(tax.Amount))
+		Expect(diff).To(Equal(tax.MinAmount))
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
