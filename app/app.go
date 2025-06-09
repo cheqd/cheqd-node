@@ -1399,19 +1399,24 @@ func (app *App) RegisterUpgradeHandlers() {
 		upgradeV4.UpgradeName,
 		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			migrations, err := app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+			sdkCtx := sdk.UnwrapSDKContext(ctx)
 			if err != nil {
 				return migrations, err
 			}
-			err = app.ConsensusParamsKeeper.ParamsStore.Set(
-				sdk.UnwrapSDKContext(ctx),
-				tmproto.ConsensusParams{
-					Abci: &tmproto.ABCIParams{
-						VoteExtensionsEnableHeight: 350, // TODO: make this dynamic or use different height
-					},
-				})
+			currentParams, err := app.ConsensusParamsKeeper.ParamsStore.Get(sdkCtx)
 			if err != nil {
 				return migrations, err
 			}
+			newParams := currentParams
+			newParams.Abci = &tmproto.ABCIParams{
+				VoteExtensionsEnableHeight: 350,
+			}
+
+			err = app.ConsensusParamsKeeper.ParamsStore.Set(sdkCtx, newParams)
+			if err != nil {
+				return migrations, err
+			}
+
 			return migrations, nil
 		},
 	)
