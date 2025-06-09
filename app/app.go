@@ -1399,10 +1399,11 @@ func (app *App) RegisterUpgradeHandlers() {
 		upgradeV4.UpgradeName,
 		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			migrations, err := app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
-			sdkCtx := sdk.UnwrapSDKContext(ctx)
 			if err != nil {
 				return migrations, err
 			}
+			sdkCtx := sdk.UnwrapSDKContext(ctx)
+
 			currentParams, err := app.ConsensusParamsKeeper.ParamsStore.Get(sdkCtx)
 			if err != nil {
 				return migrations, err
