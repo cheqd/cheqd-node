@@ -310,8 +310,8 @@ github.com/cheqd/feemarket v1.0.5-0.20250515091338-b2d79e0d3595 h1:jQni4hA31eQdC
 github.com/cheqd/feemarket v1.0.5-0.20250515091338-b2d79e0d3595/go.mod h1:ypViL3yKw6aM8/yxwUwwqEJKIAPpT8KrvIOxIL+llXU=
 github.com/cheqd/iavl v0.19.2-0.20250417102206-84370d5811fb h1:CkUOzUDYO6lk9R5F2QtXvmPs/qNG/JheDCHEoUT1jMI=
 github.com/cheqd/iavl v0.19.2-0.20250417102206-84370d5811fb/go.mod h1:GiM43q0pB+uG53mLxLDzimxM9l/5N9UuSY3/D0huuVw=
-github.com/cheqd/price-feeder v0.2.1-rc1.0.20250508101226-320b95563cd9 h1:qRcK71+ooPg9n+D4ILYWFLp0xBnSxF9eHwZtaH1vSI0=
-github.com/cheqd/price-feeder v0.2.1-rc1.0.20250508101226-320b95563cd9/go.mod h1:MpUgd05tGqPl/mJV8JJ2v4OLokT0fBOj3H8WF9lsk9Y=
+github.com/cheqd/price-feeder v0.2.1-rc1.0.20250606104253-7b1d6b7b617d h1:sFr3X04a/zsMIvWf1WdOwHHQ6IEY7yJQx8Ck3uc8qMs=
+github.com/cheqd/price-feeder v0.2.1-rc1.0.20250606104253-7b1d6b7b617d/go.mod h1:u25us3Ax7nE1EZE1D+algFk49zui4csrQYyBVGqPTv4=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
 github.com/chzyer/logex v1.2.1 h1:XHDu3E6q+gdHgsdTPH6ImJMIp436vR6MPtH8gP05QzM=
 github.com/chzyer/logex v1.2.1/go.mod h1:JLbx6lG2kDbNRFnfkgvh4eRJRPX1QCoOIWomwysCBrQ=

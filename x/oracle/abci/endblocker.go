@@ -95,10 +95,14 @@ func RunPriceFeederIfEnabled(ctx context.Context, sdkCtx sdk.Context, params typ
 }
 
 func SetNativePriceUsingICQ(ctx sdk.Context, k keeper.Keeper, feeabsk types.FeeAbskeeper, params types.Params) error {
-	price, err := feeabsk.GetTwapRate(ctx, params.UsdcIbcedInOsmosis)
+	rate, err := feeabsk.GetTwapRate(ctx, params.UsdcIbcedInOsmosis)
 	if err != nil {
 		return err
 	}
+
+	// convert rate based on exponents
+	ten := math.LegacyMustNewDecFromStr("10")
+	price := rate.Mul(ten.Power(uint64(types.CheqdExponent))).Quo(ten.Power(uint64(types.USDCExponent)))
 
 	k.PriceFeeder.Oracle.SetICQProviderPrice(price)
 	return nil

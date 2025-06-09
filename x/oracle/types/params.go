@@ -66,6 +66,11 @@ var (
 			SymbolDenom: USDTSymbol,
 			Exponent:    USDTExponent,
 		},
+		{
+			BaseDenom:   USDCDenom,
+			SymbolDenom: USDCSymbol,
+			Exponent:    USDCExponent,
+		},
 	}
 	DefaultMandatoryList = DenomList{
 		{
@@ -78,6 +83,11 @@ var (
 			SymbolDenom: USDTSymbol,
 			Exponent:    USDTExponent,
 		},
+		{
+			BaseDenom:   USDCDenom,
+			SymbolDenom: USDCSymbol,
+			Exponent:    USDCExponent,
+		},
 	}
 	DefaultSlashFraction     = math.LegacyNewDecWithPrec(1, 4) // 0.01%
 	DefaultMinValidPerWindow = math.LegacyNewDecWithPrec(5, 2) // 5%
@@ -88,8 +98,14 @@ var (
 			BaseDenom:  USDTSymbol,
 			QuoteDenom: USDSymbol,
 			Providers: []string{
-				"mexc",
 				"coinbase",
+			},
+		},
+		CurrencyPairProviders{
+			BaseDenom:  USDCSymbol,
+			QuoteDenom: USDTSymbol,
+			Providers: []string{
+				"mexc",
 			},
 		},
 		CurrencyPairProviders{
@@ -97,6 +113,13 @@ var (
 			QuoteDenom: USDTSymbol,
 			Providers: []string{
 				"mexc",
+			},
+		},
+		CurrencyPairProviders{
+			BaseDenom:  CheqdSymbol,
+			QuoteDenom: USDCSymbol,
+			Providers: []string{
+				"osmosis-icq",
 			},
 		},
 	}
@@ -108,6 +131,10 @@ var (
 		},
 		CurrencyDeviationThreshold{
 			BaseDenom: USDTSymbol,
+			Threshold: "2",
+		},
+		CurrencyDeviationThreshold{
+			BaseDenom: USDCSymbol,
 			Threshold: "2",
 		},
 	}
@@ -127,6 +154,10 @@ func DefaultRewardBands() RewardBandList {
 		},
 		{
 			SymbolDenom: USDTSymbol,
+			RewardBand:  defaultRewardBand,
+		},
+		{
+			SymbolDenom: USDCSymbol,
 			RewardBand:  defaultRewardBand,
 		},
 	}
