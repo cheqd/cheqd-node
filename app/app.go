@@ -1406,7 +1406,7 @@ func (app *App) RegisterUpgradeHandlers() {
 				sdk.UnwrapSDKContext(ctx),
 				tmproto.ConsensusParams{
 					Abci: &tmproto.ABCIParams{
-						VoteExtensionsEnableHeight: 260, // TODO: make this dynamic or use different height
+						VoteExtensionsEnableHeight: 350, // TODO: make this dynamic or use different height
 					},
 				})
 			if err != nil {
