@@ -1398,6 +1398,13 @@ func (app *App) RegisterUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
 		upgradeV4.UpgradeName,
 		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			app.ConsensusParamsKeeper.ParamsStore.Set(
+				sdk.UnwrapSDKContext(ctx),
+				tmproto.ConsensusParams{
+					Abci: &tmproto.ABCIParams{
+						VoteExtensionsEnableHeight: 260,
+					},
+				})
 			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
 		},
 	)
@@ -1428,6 +1435,7 @@ func (app *App) setupUpgradeStoreLoaders() {
 				oracletypes.ModuleName,
 			},
 		}
+
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 	}
