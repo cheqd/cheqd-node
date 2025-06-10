@@ -300,8 +300,8 @@ github.com/cheggaaa/pb v1.0.27/go.mod h1:pQciLPpbU0oxA0h+VJYYLxO+XeDQb5pZijXscXH
 github.com/chenzhuoyu/base64x v0.0.0-20211019084208-fb5309c8db06/go.mod h1:DH46F32mSOjUmXrMHnKwZdA8wcEefY7UVqBKYGjpdQY=
 github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 h1:qSGYFH7+jGhDF8vLC+iwCD4WpbV1EBDSzWkJODFLams=
 github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311/go.mod h1:b583jCggY9gE99b6G5LEC39OIiVsWj+R97kbl5odCEk=
-github.com/cheqd/cosmos-sdk v0.50.13-auth-uneven-heights-patched h1:dKshGnZuGrRHZUsqr025FCf67RtMmnPvGBoUBc3HvXE=
-github.com/cheqd/cosmos-sdk v0.50.13-auth-uneven-heights-patched/go.mod h1:qCualmj5nhCX7Yih7qKiswPTmLsQxHlHk9cMG38N9zs=
+github.com/cheqd/cosmos-sdk v0.50.13-auth-uneven-heights-fix h1:7pEWsVM9KZZiIZK5nSWZ2+RvJanEgESLgbgGC9RaGiY=
+github.com/cheqd/cosmos-sdk v0.50.13-auth-uneven-heights-fix/go.mod h1:qCualmj5nhCX7Yih7qKiswPTmLsQxHlHk9cMG38N9zs=
 github.com/cheqd/cosmos-sdk/store v1.1.1-uneven-heights-iavl h1:bjpNdC0+/Z7r87kW5SkLp8o0j8WIdpRKyVCnEKPj+oY=
 github.com/cheqd/cosmos-sdk/store v1.1.1-uneven-heights-iavl/go.mod h1:mqMefBIF72t4yE81qSlHsBUkENfWJSKsNVzI8CEIPhc=
 github.com/cheqd/fee-abstraction/v8 v8.0.3-uneven-heights-holistic h1:QZDA3nK5Iawpty0Pc0eK4LKmP4r23H6vHN3WwEnxCVM=

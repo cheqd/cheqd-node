@@ -1410,7 +1410,7 @@ func (app *App) RegisterUpgradeHandlers() {
 			}
 			newParams := currentParams
 			newParams.Abci = &tmproto.ABCIParams{
-				VoteExtensionsEnableHeight: 350,
+				VoteExtensionsEnableHeight: plan.Height + 10,
 			}
 
 			err = app.ConsensusParamsKeeper.ParamsStore.Set(sdkCtx, newParams)
