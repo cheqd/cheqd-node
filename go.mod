@@ -264,7 +264,7 @@ replace (
 
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
-	github.com/ojo-network/price-feeder => github.com/cheqd/price-feeder v0.2.1-rc1.0.20250606104253-7b1d6b7b617d
+	github.com/ojo-network/price-feeder => github.com/cheqd/price-feeder v0.2.1-rc1.0.20250609094742-b45bdc5a2eed
 
 	// https://github.com/cheqd/fee-abstraction/tree/cheqd/v0.50.x
 	github.com/osmosis-labs/fee-abstraction/v8 => github.com/cheqd/fee-abstraction/v8 v8.0.3-0.20250515095052-ea7c07e5df2d

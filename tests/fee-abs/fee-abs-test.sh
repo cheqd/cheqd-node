@@ -137,7 +137,7 @@ info "Open channel" # ---
 docker compose exec hermes hermes create channel --a-chain cheqd --b-chain osmosis --a-port transfer --b-port transfer --new-client-connection --yes
 docker compose exec hermes hermes create channel --a-chain osmosis --b-chain cheqd --a-port icqhost --b-port feeabs --new-client-connection --yes
 info "Start hermes" # ---
-docker compose exec -d hermes hermes start
+docker compose exec -d hermes /bin/sh -c 'hermes start >> hermes.log 2>&1'
 
 info "Deploy the smart contracts in osmosis"
 docker compose cp osmosis/deploy_osmosis_contract.sh osmosis:/osmosis/deploy_osmosis_contract.sh
@@ -152,7 +152,7 @@ OSMOSIS_RELAYER_ADDRESS=$(docker compose exec osmosis osmosisd keys show --addre
 info "Transfer cheqd -> osmosis" # ---
 PORT="transfer"
 CHANNEL="channel-0"
-docker compose exec cheqd cheqd-noded tx ibc-transfer transfer $PORT $CHANNEL "$OSMOSIS_USER_ADDRESS" 10000000000ncheq --from cheqd-user --chain-id cheqd --gas-prices 10000ncheq --keyring-backend test -y
+docker compose exec cheqd cheqd-noded tx ibc-transfer transfer $PORT $CHANNEL "$OSMOSIS_USER_ADDRESS" 10000000000000ncheq --from cheqd-user --chain-id cheqd --gas-prices 10000ncheq --keyring-backend test -y
 sleep 30 # Wait for relayer
 
 info "Get balances" # ---
@@ -246,7 +246,7 @@ sleep 600
 info "pay fees using osmo in cheqd (recursively)"
 # shellcheck disable=SC2034
 for i in {1..20}; do
-  RES=$(docker compose exec cheqd cheqd-noded tx bank send cheqd-user "$CHEQD_RELAYER_ADDRESS" 50000000ncheq --fees 200000000000ibc/ED07A3391A112B175915CD8FAF43A2DA8E4790EDE12566649D0C2F97716B8518 --chain-id cheqd -y --keyring-backend test)
+  RES=$(docker compose exec cheqd cheqd-noded tx bank send cheqd-user "$CHEQD_RELAYER_ADDRESS" 50000000ncheq --fees 20000000ibc/ED07A3391A112B175915CD8FAF43A2DA8E4790EDE12566649D0C2F97716B8518 --chain-id cheqd -y --keyring-backend test)
   exit_if_tx_successful "${RES}"
   sleep 6
 done
