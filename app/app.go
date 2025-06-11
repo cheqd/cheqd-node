@@ -1398,7 +1398,27 @@ func (app *App) RegisterUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
 		upgradeV4.UpgradeName,
 		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+			migrations, err := app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+			if err != nil {
+				return migrations, err
+			}
+			sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+			currentParams, err := app.ConsensusParamsKeeper.ParamsStore.Get(sdkCtx)
+			if err != nil {
+				return migrations, err
+			}
+			newParams := currentParams
+			newParams.Abci = &tmproto.ABCIParams{
+				VoteExtensionsEnableHeight: plan.Height + 10,
+			}
+
+			err = app.ConsensusParamsKeeper.ParamsStore.Set(sdkCtx, newParams)
+			if err != nil {
+				return migrations, err
+			}
+
+			return migrations, nil
 		},
 	)
 }
@@ -1425,8 +1445,10 @@ func (app *App) setupUpgradeStoreLoaders() {
 		storeUpgrades := storetypes.StoreUpgrades{
 			Added: []string{
 				circuittypes.ModuleName,
+				oracletypes.ModuleName,
 			},
 		}
+
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 	}

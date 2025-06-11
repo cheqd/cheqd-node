@@ -5,6 +5,7 @@ import (
 
 	"cosmossdk.io/math"
 	"github.com/cheqd/cheqd-node/ante"
+	"github.com/cheqd/cheqd-node/util"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	resourceutils "github.com/cheqd/cheqd-node/x/resource/utils"
@@ -22,42 +23,42 @@ var _ = Describe("TxMsgFilters", func() {
 				{
 					Denom:     didtypes.BaseMinimalDenom,
 					MinAmount: math.NewInt(didtypes.DefaultCreateDidTxFee),
-					MaxAmount: math.NewInt(100e9),
+					MaxAmount: util.PtrInt(100e9),
 				},
 			},
 			ante.MsgUpdateDidDoc: []didtypes.FeeRange{
 				{
 					Denom:     didtypes.BaseMinimalDenom,
 					MinAmount: math.NewInt(didtypes.DefaultUpdateDidTxFee),
-					MaxAmount: math.NewInt(100e9),
+					MaxAmount: util.PtrInt(100e9),
 				},
 			},
 			ante.MsgDeactivateDidDoc: []didtypes.FeeRange{
 				{
 					Denom:     didtypes.BaseMinimalDenom,
 					MinAmount: math.NewInt(didtypes.DefaultDeactivateDidTxFee),
-					MaxAmount: math.NewInt(100e9),
+					MaxAmount: util.PtrInt(100e9),
 				},
 			},
 			ante.MsgCreateResourceDefault: []didtypes.FeeRange{
 				{
 					Denom:     didtypes.BaseMinimalDenom,
 					MinAmount: math.NewInt(resourcetypes.DefaultCreateResourceDefaultFee),
-					MaxAmount: math.NewInt(100e9),
+					MaxAmount: util.PtrInt(100e9),
 				},
 			},
 			ante.MsgCreateResourceImage: []didtypes.FeeRange{
 				{
 					Denom:     didtypes.BaseMinimalDenom,
 					MinAmount: math.NewInt(resourcetypes.DefaultCreateResourceImageFee),
-					MaxAmount: math.NewInt(100e9),
+					MaxAmount: util.PtrInt(100e9),
 				},
 			},
 			ante.MsgCreateResourceJSON: []didtypes.FeeRange{
 				{
 					Denom:     didtypes.BaseMinimalDenom,
 					MinAmount: math.NewInt(resourcetypes.DefaultCreateResourceJSONFee),
-					MaxAmount: math.NewInt(100e9),
+					MaxAmount: util.PtrInt(100e9),
 				},
 			},
 		}

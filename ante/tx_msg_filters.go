@@ -140,7 +140,7 @@ func checkFeeParamsFromSubspace(ctx sdk.Context, didKeeper DidKeeper, resourceKe
 		return false
 	}
 	TaxableMsgFees[MsgCreateDidDoc] = didParams.CreateDid
-	TaxableMsgFees[MsgUpdateDidDoc] = didParams.DeactivateDid
+	TaxableMsgFees[MsgUpdateDidDoc] = didParams.UpdateDid
 	TaxableMsgFees[MsgDeactivateDidDoc] = didParams.DeactivateDid
 
 	resourceParams, err := resourceKeeper.GetParams(ctx)
@@ -207,34 +207,48 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 	type usdRange struct {
 		denom   string
 		minUSD  sdkmath.LegacyDec
-		maxUSD  sdkmath.LegacyDec
+		maxUSD  *sdkmath.LegacyDec // nil means no upper limit
 		minCoin sdkmath.Int
-		maxCoin sdkmath.Int
+		maxCoin *sdkmath.Int // nil means no upper limit
 	}
 
 	var ranges []usdRange
 
 	// Step 1: Convert each denom’s fee range into USD values
 	for _, fr := range feeRanges {
-		var minUSD, maxUSD sdkmath.LegacyDec
+		var minUSD sdkmath.LegacyDec
+		var maxUSD *sdkmath.LegacyDec
 
 		switch fr.Denom {
 		case "ncheq":
+			// Convert from ncheq (nano) to CHEQ, then to USD
 			minCHEQ := sdkmath.LegacyNewDecFromInt(fr.MinAmount).QuoInt64(1e9)
-			maxCHEQ := sdkmath.LegacyNewDecFromInt(fr.MaxAmount).QuoInt64(1e9)
+			minUSD = cheqEmaPrice.Mul(minCHEQ)
 
-			minUSD = cheqEmaPrice.MulInt(sdkmath.NewInt(minCHEQ.TruncateInt64()))
-			maxUSD = cheqEmaPrice.MulInt(sdkmath.NewInt(maxCHEQ.TruncateInt64()))
+			if fr.MaxAmount != nil {
+				maxCHEQ := sdkmath.LegacyNewDecFromInt(*fr.MaxAmount).QuoInt64(1e9)
+				val := cheqEmaPrice.Mul(maxCHEQ)
+				maxUSD = &val
+			}
 		case "usd":
+			// Handle both scaled (1e18) and unscaled USD values
 			if fr.MinAmount.LT(sdkmath.NewInt(1e6)) {
+				// Treat as already unscaled USD
 				minUSD = sdkmath.LegacyNewDecFromInt(fr.MinAmount)
-				maxUSD = sdkmath.LegacyNewDecFromInt(fr.MaxAmount)
+				if fr.MaxAmount != nil {
+					val := sdkmath.LegacyNewDecFromInt(*fr.MaxAmount)
+					maxUSD = &val
+				}
 			} else {
+				// Treat as scaled by 1e18
 				minUSD = sdkmath.LegacyNewDecFromInt(fr.MinAmount).QuoInt64(1e18)
-				maxUSD = sdkmath.LegacyNewDecFromInt(fr.MaxAmount).QuoInt64(1e18)
+				if fr.MaxAmount != nil {
+					val := sdkmath.LegacyNewDecFromInt(*fr.MaxAmount).QuoInt64(1e18)
+					maxUSD = &val
+				}
 			}
 		default:
-			continue
+			continue // Skip unsupported denoms
 		}
 
 		ranges = append(ranges, usdRange{
@@ -250,7 +264,7 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 		return nil, errors.New("no valid fee ranges could be converted")
 	}
 
-	// Step 2: Find overlapping range
+	// Step 2: Find overlapping USD range
 	overlapMin := ranges[0].minUSD
 	overlapMax := ranges[0].maxUSD
 
@@ -258,15 +272,19 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 		if r.minUSD.GT(overlapMin) {
 			overlapMin = r.minUSD
 		}
-		if r.maxUSD.LT(overlapMax) {
-			overlapMax = r.maxUSD
+		if r.maxUSD != nil {
+			if overlapMax == nil || r.maxUSD.LT(*overlapMax) {
+				val := *r.maxUSD
+				overlapMax = &val
+			}
 		}
 	}
-	if overlapMin.GT(overlapMax) {
+
+	if overlapMax != nil && overlapMin.GT(*overlapMax) {
 		return nil, errors.New("no valid overlapping range")
 	}
 
-	// Step 3: Pick denom
+	// Step 3: Pick denom to use (prefer USD if available)
 	var chosen usdRange
 	for _, r := range ranges {
 		if r.denom == "usd" {
@@ -278,13 +296,14 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 		chosen = ranges[0]
 	}
 
+	// Step 4: Compute final amount in chosen denom
 	var finalAmount sdkmath.Int
 	switch chosen.denom {
 	case "ncheq":
-		finalAmount = overlapMin.Quo(cheqEmaPrice).TruncateInt()
+		finalAmount = overlapMin.Quo(cheqEmaPrice).TruncateInt().MulRaw(1e9) // convert to ncheq (nano)
 	case "usd":
 		if overlapMin.LT(sdkmath.LegacyNewDec(1e5)) {
-			finalAmount = overlapMin.MulInt64(1e18).TruncateInt()
+			finalAmount = overlapMin.MulInt64(1e18).TruncateInt() // scale up if small value
 		} else {
 			finalAmount = overlapMin.TruncateInt()
 		}
@@ -292,11 +311,11 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 		return nil, fmt.Errorf("unsupported denom selected: %s", chosen.denom)
 	}
 
-	// Clamp to range
+	// Step 5: Clamp to min and max if needed
 	if finalAmount.LT(chosen.minCoin) {
 		finalAmount = chosen.minCoin
-	} else if finalAmount.GT(chosen.maxCoin) {
-		finalAmount = chosen.maxCoin
+	} else if chosen.maxCoin != nil && finalAmount.GT(*chosen.maxCoin) {
+		finalAmount = *chosen.maxCoin
 	}
 
 	return sdk.NewCoins(sdk.NewCoin(chosen.denom, finalAmount)), nil

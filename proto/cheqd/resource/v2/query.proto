@@ -28,9 +28,9 @@ service Query {
     option (google.api.http).get = "/cheqd/resource/v2/{collection_id}/metadata";
   }
 
-  // Params queries params of the resource module.
-  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/cheqd/resource/v2/params";
+   // Params queries params of the resource module.
+   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/cheqd/resource/v2/module/params";
   }
 }
 

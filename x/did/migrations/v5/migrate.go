@@ -17,29 +17,63 @@ import (
 
 func MigrateStore(ctx sdk.Context, storeService corestoretypes.KVStoreService, legacySubspace exported.Subspace,
 	cdc codec.BinaryCodec, countCollection collections.Item[uint64],
+	docCollection collections.Map[collections.Pair[string, string], types.DidDocWithMetadata],
 ) error {
 	store := storeService.OpenKVStore(ctx)
 	if err := migrateParams(ctx, store, legacySubspace, cdc); err != nil {
 		return err
 	}
 
-	return migrateDidCount(ctx, runtime.KVStoreAdapter(store), countCollection)
-}
+	kvStore := runtime.KVStoreAdapter(store)
 
-func migrateParams(ctx sdk.Context, store corestoretypes.KVStore, legacySubspace exported.Subspace, cdc codec.BinaryCodec) error {
-	var currParams types.FeeParams
-	legacySubspace.Get(ctx, types.ParamStoreKey, &currParams)
-
-	if err := currParams.ValidateBasic(); err != nil {
+	if err := migrateDidCount(ctx, kvStore, countCollection); err != nil {
 		return err
 	}
 
-	bz, err := cdc.Marshal(&currParams)
+	return migrateDidDocuments(ctx, kvStore, cdc, docCollection)
+}
+
+func migrateParams(ctx sdk.Context, store corestoretypes.KVStore, legacySubspace exported.Subspace, cdc codec.BinaryCodec) error {
+	var legacyParams types.LegacyFeeParams
+	// Protect against missing param key (which causes panic in Get)
+	legacySubspace.Get(ctx, types.ParamStoreKey, &legacyParams)
+	// Now convert legacy to new format
+	newParams := types.FeeParams{
+		CreateDid: []types.FeeRange{
+			{
+				Denom:     legacyParams.CreateDid.Denom,
+				MinAmount: legacyParams.CreateDid.Amount,
+				MaxAmount: &legacyParams.CreateDid.Amount,
+			},
+		},
+		UpdateDid: []types.FeeRange{
+			{
+				Denom:     legacyParams.CreateDid.Denom,
+				MinAmount: legacyParams.UpdateDid.Amount,
+				MaxAmount: &legacyParams.UpdateDid.Amount,
+			},
+		},
+		DeactivateDid: []types.FeeRange{
+			{
+				Denom:     legacyParams.DeactivateDid.Denom,
+				MinAmount: legacyParams.DeactivateDid.Amount,
+				MaxAmount: &legacyParams.DeactivateDid.Amount,
+			},
+		},
+		BurnFactor: legacyParams.BurnFactor,
+	}
+
+	// Marshal and write to the new store
+	bz, err := cdc.Marshal(&newParams)
 	if err != nil {
 		return err
 	}
 
-	return store.Set(types.ParamStoreKey, bz)
+	err = store.Set(types.ParamStoreKey, bz)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func migrateDidCount(ctx sdk.Context, store storetypes.KVStore, countCollection collections.Item[uint64]) error {
@@ -55,4 +89,25 @@ func migrateDidCount(ctx sdk.Context, store storetypes.KVStore, countCollection 
 	}
 
 	return countCollection.Set(ctx, count)
+}
+
+func migrateDidDocuments(ctx sdk.Context, store storetypes.KVStore, cdc codec.BinaryCodec,
+	docCollection collections.Map[collections.Pair[string, string], types.DidDocWithMetadata],
+) error {
+	iterator := storetypes.KVStorePrefixIterator(store, []byte(types.DidDocVersionKey))
+
+	for ; iterator.Valid(); iterator.Next() {
+		var didDoc types.DidDocWithMetadata
+		cdc.MustUnmarshal(iterator.Value(), &didDoc)
+
+		// set document in collection
+		if err := docCollection.Set(ctx, collections.Join(didDoc.DidDoc.Id, didDoc.Metadata.VersionId), didDoc); err != nil {
+			return err
+		}
+
+		// delete old record
+		store.Delete(iterator.Key())
+	}
+
+	return nil
 }

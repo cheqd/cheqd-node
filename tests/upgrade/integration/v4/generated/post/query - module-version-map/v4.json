@@ -90,6 +90,10 @@
         "version": 2
       },
       {
+        "name": "oracle",
+        "version": 1
+      },
+      {
         "name": "params",
         "version": 1
       },

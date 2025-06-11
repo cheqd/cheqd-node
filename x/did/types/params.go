@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	sdkmath "cosmossdk.io/math"
+	"github.com/cheqd/cheqd-node/util"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -14,19 +15,19 @@ func DefaultFeeParams() *FeeParams {
 			{
 				Denom:     BaseMinimalDenom,
 				MinAmount: sdkmath.NewInt(50000000000),
-				MaxAmount: sdkmath.NewInt(100000000000),
+				MaxAmount: util.PtrInt(100000000000),
 			},
 			{
 				Denom:     "usd",
 				MinAmount: sdkmath.NewInt(1200000000000000000),
-				MaxAmount: sdkmath.NewInt(2000000000000000000),
+				MaxAmount: util.PtrInt(2000000000000000000),
 			},
 		},
 		UpdateDid: []FeeRange{
 			{
 				Denom:     BaseMinimalDenom,
 				MinAmount: sdkmath.NewInt(25000000000),
-				MaxAmount: sdkmath.NewInt(0),
+				MaxAmount: nil,
 			},
 		},
 
@@ -34,143 +35,134 @@ func DefaultFeeParams() *FeeParams {
 			{
 				Denom:     BaseMinimalDenom,
 				MinAmount: sdkmath.NewInt(10000000000),
-				MaxAmount: sdkmath.NewInt(20000000000),
+				MaxAmount: util.PtrInt(20000000000),
 			},
 		},
 		BurnFactor: sdkmath.LegacyMustNewDecFromStr(DefaultBurnFactor),
 	}
 }
 
-// ValidateBasic performs basic validation of cheqd module tx fee parameters
-func (tfp *FeeParams) ValidateBasic() error {
-	for i, f := range tfp.CreateDid {
+// DefaultLegacyFeeParams returns default fee params using sdk.Coins
+func DefaultLegacyFeeParams() *LegacyFeeParams {
+	return &LegacyFeeParams{
+		CreateDid:     sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateDidTxFee)),
+		UpdateDid:     sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultUpdateDidTxFee)),
+		DeactivateDid: sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultDeactivateDidTxFee)),
+		BurnFactor:    sdkmath.LegacyMustNewDecFromStr(DefaultBurnFactor),
+	}
+}
+
+// validateFeeRangeList is a generic validator for []FeeRange
+func validateFeeRangeList(name string, frs []FeeRange) error {
+	for i, f := range frs {
 		if f.MinAmount.IsNegative() {
-			return fmt.Errorf("min_amount must be non-negative in create_did[%d]: got %s", i, f.MinAmount.String())
+			return fmt.Errorf("min_amount must be non-negative in %s[%d]: got %s", name, i, f.MinAmount.String())
 		}
-
-		if !f.MaxAmount.IsZero() && f.MaxAmount.LT(f.MinAmount) {
-			return fmt.Errorf("max_amount must be greater than or equal to min_amount in create_did[%d]: got max=%s, min=%s", i, f.MaxAmount.String(), f.MinAmount.String())
-		}
-	}
-
-	for i, f := range tfp.UpdateDid {
-		if f.MinAmount.IsNegative() {
-			return fmt.Errorf("min_amount must be non-negative in update_did[%d]: got %s", i, f.MinAmount.String())
-		}
-		if !f.MaxAmount.IsZero() && f.MaxAmount.LT(f.MinAmount) {
-			return fmt.Errorf("max_amount must be greater than or equal to min_amount in update_did[%d]: got max=%s, min=%s", i, f.MaxAmount.String(), f.MinAmount.String())
+		if f.MaxAmount != nil && f.MaxAmount.LT(f.MinAmount) {
+			return fmt.Errorf("max_amount must be >= min_amount in %s[%d]: got max=%s, min=%s", name, i, f.MaxAmount, f.MinAmount)
 		}
 	}
+	return nil
+}
 
-	for i, f := range tfp.DeactivateDid {
-		if f.MinAmount.IsNegative() {
-			return fmt.Errorf("min_amount must be non-negative in deactivate_did[%d]: got %s", i, f.MinAmount.String())
-		}
-		if !f.MaxAmount.IsZero() && f.MaxAmount.LT(f.MinAmount) {
-			return fmt.Errorf("max_amount must be greater than or equal to min_amount in deactivate_did[%d]: got max=%s, min=%s", i, f.MaxAmount.String(), f.MinAmount.String())
-		}
+// validateCoin is a helper to validate sdk.Coin
+func validateCoin(name string, c sdk.Coin) error {
+	if c.IsNil() || !c.IsPositive() {
+		return fmt.Errorf("%s fee must be a positive coin: %s", name, c.String())
 	}
-
-	if !tfp.BurnFactor.IsPositive() || tfp.BurnFactor.GTE(sdkmath.LegacyOneDec()) {
-		return fmt.Errorf("invalid burn factor: %s", tfp.BurnFactor)
-	}
-
 	return nil
 }
 
 func validateCreateDid(i interface{}) error {
-	v, ok := i.([]*FeeRange)
-	if !ok {
-		return fmt.Errorf("invalid parameter type for create_did: %T", i)
+	switch v := i.(type) {
+	case []FeeRange:
+		return validateFeeRangeList("create_did", v)
+	case sdk.Coin:
+		return validateCoin("create_did", v)
+	default:
+		return fmt.Errorf("invalid type for create_did: %T", i)
 	}
-
-	for idx, f := range v {
-		if f.MinAmount.IsNegative() {
-			return fmt.Errorf("min_amount must be non-negative in create_did[%d]", idx)
-		}
-		if !f.MaxAmount.IsZero() && f.MaxAmount.LT(f.MinAmount) {
-			return fmt.Errorf("max_amount must be >= min_amount in create_did[%d]", idx)
-		}
-	}
-	return nil
 }
 
 func validateUpdateDid(i interface{}) error {
-	v, ok := i.([]*FeeRange)
-	if !ok {
-		return fmt.Errorf("invalid parameter type for update_did: %T", i)
+	switch v := i.(type) {
+	case []FeeRange:
+		return validateFeeRangeList("update_did", v)
+	case sdk.Coin:
+		return validateCoin("update_did", v)
+	default:
+		return fmt.Errorf("invalid type for update_did: %T", i)
 	}
-
-	for idx, f := range v {
-		if f.MinAmount.IsNegative() {
-			return fmt.Errorf("min_amount must be non-negative in update_did[%d]", idx)
-		}
-		if !f.MaxAmount.IsZero() && f.MaxAmount.LT(f.MinAmount) {
-			return fmt.Errorf("max_amount must be >= min_amount in update_did[%d]", idx)
-		}
-	}
-	return nil
 }
 
 func validateDeactivateDid(i interface{}) error {
-	v, ok := i.([]*FeeRange)
-	if !ok {
-		return fmt.Errorf("invalid parameter type for deactivate_did: %T", i)
+	switch v := i.(type) {
+	case []FeeRange:
+		return validateFeeRangeList("deactivate_did", v)
+	case sdk.Coin:
+		return validateCoin("deactivate_did", v)
+	default:
+		return fmt.Errorf("invalid type for deactivate_did: %T", i)
 	}
-
-	for idx, f := range v {
-		if f.MinAmount.IsNegative() {
-			return fmt.Errorf("min_amount must be non-negative in deactivate_did[%d]", idx)
-		}
-		if !f.MaxAmount.IsZero() && f.MaxAmount.LT(f.MinAmount) {
-			return fmt.Errorf("max_amount must be >= min_amount in deactivate_did[%d]", idx)
-		}
-	}
-	return nil
 }
 
 func validateBurnFactor(i interface{}) error {
-	v, ok := i.(sdk.DecCoin)
+	v, ok := i.(sdkmath.LegacyDec)
 	if !ok {
-		return fmt.Errorf("invalid parameter type: %T", i)
+		return fmt.Errorf("invalid type for burn_factor: %T", i)
 	}
-
-	if v.Amount.IsNil() {
-		return fmt.Errorf("burn factor must not be nil")
+	if v.IsNil() || v.IsNegative() || v.GTE(sdkmath.LegacyOneDec()) {
+		return fmt.Errorf("burn factor must be positive and < 1: %s", v)
 	}
-
-	if v.IsNegative() {
-		return fmt.Errorf("burn factor must not be negative: %s", v)
-	}
-
-	if v.Amount.GTE(sdkmath.LegacyOneDec()) {
-		return fmt.Errorf("burn factor must be less than 1: %s", v)
-	}
-
 	return nil
 }
 
+// ValidateBasic validates FeeParams structure using individual validators
+func (tfp *FeeParams) ValidateBasic() error {
+	if err := validateCreateDid(tfp.CreateDid); err != nil {
+		return err
+	}
+	if err := validateUpdateDid(tfp.UpdateDid); err != nil {
+		return err
+	}
+	if err := validateDeactivateDid(tfp.DeactivateDid); err != nil {
+		return err
+	}
+	if err := validateBurnFactor(tfp.BurnFactor); err != nil {
+		return err
+	}
+	return nil
+}
+
+// ValidateBasic validates LegacyFeeParams structure using individual validators
+func (tfp *LegacyFeeParams) ValidateBasic() error {
+	if err := validateCreateDid(tfp.CreateDid); err != nil {
+		return fmt.Errorf("invalid create did tx fee: %w", err)
+	}
+	if err := validateUpdateDid(tfp.UpdateDid); err != nil {
+		return fmt.Errorf("invalid update did tx fee: %w", err)
+	}
+	if err := validateDeactivateDid(tfp.DeactivateDid); err != nil {
+		return fmt.Errorf("invalid deactivate did tx fee: %w", err)
+	}
+	if err := validateBurnFactor(tfp.BurnFactor); err != nil {
+		return fmt.Errorf("invalid burn factor: %w", err)
+	}
+	return nil
+}
+
+// validateFeeParams validates either FeeParams or LegacyFeeParams
 func validateFeeParams(i interface{}) error {
-	v, ok := i.(FeeParams)
-	if !ok {
+	switch v := i.(type) {
+	case FeeParams:
+		return v.ValidateBasic()
+	case *FeeParams:
+		return v.ValidateBasic()
+	case LegacyFeeParams:
+		return v.ValidateBasic()
+	case *LegacyFeeParams:
+		return v.ValidateBasic()
+	default:
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
-
-	if err := validateCreateDid(v.CreateDid); err != nil {
-		return err
-	}
-
-	if err := validateUpdateDid(v.UpdateDid); err != nil {
-		return err
-	}
-
-	if err := validateDeactivateDid(v.DeactivateDid); err != nil {
-		return err
-	}
-
-	if err := validateBurnFactor(v.BurnFactor); err != nil {
-		return err
-	}
-
-	return v.ValidateBasic()
 }

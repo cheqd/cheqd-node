@@ -504,7 +504,7 @@ var (
 
 	pattern_Query_CollectionResources_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"cheqd", "resource", "v2", "collection_id", "metadata"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"cheqd", "resource", "v2", "params"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"cheqd", "resource", "v2", "module", "params"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (
