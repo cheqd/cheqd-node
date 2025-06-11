@@ -117,6 +117,7 @@ var _ = Describe("Create Resource Tests", func() {
 				Name:         existingResource.Resource.Name,
 				ResourceType: CLSchemaType,
 				Data:         []byte(SchemaData),
+				Version:      "KnownLatestVersion",
 			}
 
 			_, err := setup.CreateResource(&msg, []didsetup.SignInput{alice.SignInput})
@@ -128,6 +129,27 @@ var _ = Describe("Create Resource Tests", func() {
 
 			ExpectPayloadToMatchResource(&msg, created.Resource)
 			Expect(created.Resource.Metadata.PreviousVersionId).To(Equal(existingResource.Resource.Id))
+		})
+
+		It("Uses provided resource", func() {
+			msg := resourcetypes.MsgCreateResourcePayload{
+				CollectionId:      alice.CollectionID,
+				Id:                uuid.NewString(),
+				Name:              existingResource.Resource.Name,
+				ResourceType:      CLSchemaType,
+				Data:              []byte(SchemaData),
+				PreviousVersionId: "KnownLatestVersion",
+			}
+
+			_, err := setup.CreateResource(&msg, []didsetup.SignInput{alice.SignInput})
+			Expect(err).To(BeNil())
+
+			// check
+			created, err := setup.QueryResource(alice.CollectionID, msg.Id)
+			Expect(err).To(BeNil())
+
+			ExpectPayloadToMatchResource(&msg, created.Resource)
+			Expect(created.Resource.Metadata.PreviousVersionId).To(Equal("KnownLatestVersion"))
 		})
 	})
 
