@@ -262,4 +262,4 @@ for i in {1..20}; do
 done
 
 info "test CHEQ/USDC exchange rate received"
-docker compose exec cheqd cheqd-noded q feeabs osmo-arithmetic-twap ibc/A1A6E963EBFE83F5BA5785DD7804B388C1FD50F4F3BF30C14A66A1FC48500F3E && info "Received cheq/usdc exchange rate" || { err "Failed to get cheqd/usdc exchange rate"; exit 1; }
+{ docker compose exec cheqd cheqd-noded q feeabs osmo-arithmetic-twap ibc/A1A6E963EBFE83F5BA5785DD7804B388C1FD50F4F3BF30C14A66A1FC48500F3E && info "Received cheq/usdc exchange rate"; } || { err "Failed to get cheqd/usdc exchange rate"; exit 1; }
