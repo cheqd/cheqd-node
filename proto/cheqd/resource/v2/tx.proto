@@ -86,6 +86,16 @@ message MsgCreateResourcePayload {
     (gogoproto.jsontag) = "resourceAlternativeUri",
     (gogoproto.nullable) = true
   ];
+
+  // previousVersionId is a latest known version of the resource if exists.
+  // Format: <string>
+  // Stored as a string. OPTIONAL.
+  //
+  // Example: 1.0.0, v2.1.0
+  string previous_version_id = 8 [
+    (gogoproto.jsontag) = "previousVersionId",
+    (gogoproto.nullable) = true
+  ];
 }
 
 message MsgCreateResourceResponse {
