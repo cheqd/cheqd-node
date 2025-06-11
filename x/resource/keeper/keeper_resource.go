@@ -29,7 +29,7 @@ func (k Keeper) SetResourceCount(ctx context.Context, count uint64) error {
 
 func (k Keeper) AddNewResourceVersion(ctx context.Context, resource *types.ResourceWithMetadata) error {
 	// Find previous version and upgrade backward and forward version links
-	previousResourceVersionHeader, found, err := k.GetLastResourceVersionMetadata(ctx, resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType)
+	previousResourceVersionHeader, found, err := k.GetLastResourceVersionMetadata(ctx, resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType, resource.Metadata.PreviousVersionId)
 	if err != nil {
 		return err
 	}
@@ -140,24 +140,36 @@ func (k Keeper) GetResourceCollection(ctx context.Context, collectionID string) 
 	return resources, nil
 }
 
-func (k Keeper) GetLastResourceVersionMetadata(ctx context.Context, collectionID, name, resourceType string) (types.Metadata, bool, error) {
+func (k Keeper) GetLastResourceVersionMetadata(ctx context.Context, collectionID, name, resourceType string, previousVersionId string) (types.Metadata, bool, error) {
 	var lastVersion types.Metadata
-	found := false
-
-	rng := collections.NewPrefixedPairRange[string, string](collectionID)
-	err := k.ResourceMetadata.Walk(ctx, rng, func(_ collections.Pair[string, string], metadata types.Metadata) (bool, error) {
-		if metadata.Name == name && metadata.ResourceType == resourceType && metadata.NextVersionId == "" {
-			lastVersion = metadata
-			found = true
-			return true, nil // Stop iteration as we found what we need
+	if previousVersionId == "" {
+		found := false
+		rng := collections.NewPrefixedPairRange[string, string](collectionID)
+		err := k.ResourceMetadata.Walk(ctx, rng, func(_ collections.Pair[string, string], metadata types.Metadata) (bool, error) {
+			if metadata.Name == name && metadata.ResourceType == resourceType && metadata.NextVersionId == "" {
+				lastVersion = metadata
+				found = true
+				return true, nil // Stop iteration as we found what we need
+			}
+			return false, nil // Continue iteration
+		})
+		if err != nil {
+			return types.Metadata{}, false, err
 		}
-		return false, nil // Continue iteration
-	})
-	if err != nil {
+
+		return lastVersion, found, nil
+	} else {
+		lastVersion, err := k.ResourceMetadata.Get(ctx, collections.Join(collectionID, previousVersionId))
+		if err != nil {
+			return types.Metadata{}, false, err
+		}
+
+		if lastVersion.NextVersionId == "" && lastVersion.Name == name && lastVersion.ResourceType == resourceType {
+			return lastVersion, true, err
+		}
+
 		return types.Metadata{}, false, err
 	}
-
-	return lastVersion, found, nil
 }
 
 // UpdateResourceMetadata update the metadata of a resource. Returns an error if the resource doesn't exist
