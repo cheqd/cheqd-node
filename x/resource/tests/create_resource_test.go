@@ -110,8 +110,8 @@ var _ = Describe("Create Resource Tests", func() {
 			existingResource = setup.CreateSimpleResource(alice.CollectionID, SchemaData, "Test Resource Name", CLSchemaType, []didsetup.SignInput{alice.SignInput})
 		})
 
-		It("Is linked to the previous one when name matches", func() {
-			msg := resourcetypes.MsgCreateResourcePayload{
+		It("Creates a New version with and without PreviousVersionId", func() {
+			msg1 := resourcetypes.MsgCreateResourcePayload{
 				CollectionId: alice.CollectionID,
 				Id:           uuid.NewString(),
 				Name:         existingResource.Resource.Name,
@@ -120,36 +120,33 @@ var _ = Describe("Create Resource Tests", func() {
 				Version:      "KnownLatestVersion",
 			}
 
-			_, err := setup.CreateResource(&msg, []didsetup.SignInput{alice.SignInput})
+			_, err := setup.CreateResource(&msg1, []didsetup.SignInput{alice.SignInput})
 			Expect(err).To(BeNil())
 
-			// check
-			created, err := setup.QueryResource(alice.CollectionID, msg.Id)
+			created1, err := setup.QueryResource(alice.CollectionID, msg1.Id)
 			Expect(err).To(BeNil())
 
-			ExpectPayloadToMatchResource(&msg, created.Resource)
-			Expect(created.Resource.Metadata.PreviousVersionId).To(Equal(existingResource.Resource.Id))
-		})
+			ExpectPayloadToMatchResource(&msg1, created1.Resource)
+			Expect(created1.Resource.Metadata.PreviousVersionId).To(Equal(existingResource.Resource.Id))
 
-		It("Uses provided resource", func() {
-			msg := resourcetypes.MsgCreateResourcePayload{
+			// Use the created resource as previous
+			msg2 := resourcetypes.MsgCreateResourcePayload{
 				CollectionId:      alice.CollectionID,
 				Id:                uuid.NewString(),
 				Name:              existingResource.Resource.Name,
 				ResourceType:      CLSchemaType,
 				Data:              []byte(SchemaData),
-				PreviousVersionId: "KnownLatestVersion",
+				PreviousVersionId: msg1.Id,
 			}
 
-			_, err := setup.CreateResource(&msg, []didsetup.SignInput{alice.SignInput})
+			_, err = setup.CreateResource(&msg2, []didsetup.SignInput{alice.SignInput})
 			Expect(err).To(BeNil())
 
-			// check
-			created, err := setup.QueryResource(alice.CollectionID, msg.Id)
+			created2, err := setup.QueryResource(alice.CollectionID, msg2.Id)
 			Expect(err).To(BeNil())
 
-			ExpectPayloadToMatchResource(&msg, created.Resource)
-			Expect(created.Resource.Metadata.PreviousVersionId).To(Equal("KnownLatestVersion"))
+			ExpectPayloadToMatchResource(&msg2, created2.Resource)
+			Expect(created2.Resource.Metadata.PreviousVersionId).To(Equal(msg1.Id))
 		})
 	})
 
