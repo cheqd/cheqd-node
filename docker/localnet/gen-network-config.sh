@@ -212,8 +212,10 @@ do
     --pubkey "${NODE_VAL_PUBKEY}" --keyring-backend "test"  --home "${NODE_HOME}"
     
     
-    export ACCOUNT_ADDRESS=$(cheqd-noded keys show  "operator-$i"  --keyring-backend test  --home "${NODE_HOME}" -a)
-    export VALIDATOR_ADDRESS=$(cheqd-noded keys show  "operator-$i"  --keyring-backend test  --home "${NODE_HOME}" --bech val -a)
+    ACCOUNT_ADDRESS=$(cheqd-noded keys show  "operator-$i"  --keyring-backend test  --home "${NODE_HOME}" -a)
+    export ACCOUNT_ADDRESS
+    VALIDATOR_ADDRESS=$(cheqd-noded keys show  "operator-$i"  --keyring-backend test  --home "${NODE_HOME}" --bech val -a)
+    export VALIDATOR_ADDRESS
     export NODE_HOME
     
     
