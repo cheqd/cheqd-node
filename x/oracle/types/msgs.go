@@ -267,13 +267,8 @@ func (msg MsgLegacyGovUpdateParams) ValidateBasic() error {
 				return err
 			}
 
-		case string(KeyNativeIbcedInOsmosis):
-			if err := validateString(msg.Changes.NativeIbcedInOsmosis); err != nil {
-				return err
-			}
-
-		case string(KeyUsdcIbcedInOsmosis):
-			if err := validateString(msg.Changes.UsdcIbcedInOsmosis); err != nil {
+		case string(KeyUsdcIbcDenom):
+			if err := validateString(msg.Changes.UsdcIbcDenom); err != nil {
 				return err
 			}
 

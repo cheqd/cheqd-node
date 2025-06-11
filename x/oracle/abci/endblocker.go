@@ -95,7 +95,7 @@ func RunPriceFeederIfEnabled(ctx context.Context, sdkCtx sdk.Context, params typ
 }
 
 func SetNativePriceUsingICQ(ctx sdk.Context, k keeper.Keeper, feeabsk types.FeeAbskeeper, params types.Params) error {
-	rate, err := feeabsk.GetTwapRate(ctx, params.UsdcIbcedInOsmosis)
+	rate, err := feeabsk.GetTwapRate(ctx, params.UsdcIbcDenom)
 	if err != nil {
 		return err
 	}

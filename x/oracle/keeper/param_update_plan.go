@@ -126,11 +126,8 @@ func (k Keeper) ValidateParamChanges(ctx sdk.Context, keys []string, changes typ
 		case string(types.KeyCurrencyDeviationThresholds):
 			params.CurrencyDeviationThresholds = changes.CurrencyDeviationThresholds
 
-		case string(types.KeyNativeIbcedInOsmosis):
-			params.NativeIbcedInOsmosis = changes.NativeIbcedInOsmosis
-
-		case string(types.KeyUsdcIbcedInOsmosis):
-			params.UsdcIbcedInOsmosis = changes.UsdcIbcedInOsmosis
+		case string(types.KeyUsdcIbcDenom):
+			params.UsdcIbcDenom = changes.UsdcIbcDenom
 		}
 	}
 
@@ -187,11 +184,8 @@ func (k Keeper) ExecuteParamUpdatePlan(ctx sdk.Context, plan types.ParamUpdatePl
 		case string(types.KeyCurrencyDeviationThresholds):
 			k.SetCurrencyDeviationThresholds(ctx, plan.Changes.CurrencyDeviationThresholds)
 
-		case string(types.KeyNativeIbcedInOsmosis):
-			k.SetNativeIbcedInOsmosis(ctx, plan.Changes.NativeIbcedInOsmosis)
-
-		case string(types.KeyUsdcIbcedInOsmosis):
-			k.SetUsdcIbcedInOsmosis(ctx, plan.Changes.UsdcIbcedInOsmosis)
+		case string(types.KeyUsdcIbcDenom):
+			k.SetUsdcIbcDenom(ctx, plan.Changes.UsdcIbcDenom)
 		}
 	}
 

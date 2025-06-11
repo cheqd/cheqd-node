@@ -212,26 +212,15 @@ func (k Keeper) SetCurrencyDeviationThresholds(
 	k.paramSpace.Set(ctx, types.KeyCurrencyDeviationThresholds, currencyDeviationThresholds)
 }
 
-// NativeIbcedInOsmosis returns the current native ibced in osmosis denom
-func (k Keeper) NativeIbcedInOsmosis(ctx sdk.Context) (res string) {
-	k.paramSpace.Get(ctx, types.KeyNativeIbcedInOsmosis, &res)
+// UsdcIbcDenom returns the current usdc ibc denom
+func (k Keeper) UsdcIbcDenom(ctx sdk.Context) (res string) {
+	k.paramSpace.Get(ctx, types.KeyUsdcIbcDenom, &res)
 	return
 }
 
-// SetNativeIbcedInOsmosis updates the current native ibced in osmosis denom
-func (k Keeper) SetNativeIbcedInOsmosis(ctx sdk.Context, value string) {
-	k.paramSpace.Set(ctx, types.KeyNativeIbcedInOsmosis, value)
-}
-
-// UsdcIbcedInOsmosis returns the current usdc ibced in osmosis denom
-func (k Keeper) UsdcIbcedInOsmosis(ctx sdk.Context) (res string) {
-	k.paramSpace.Get(ctx, types.KeyUsdcIbcedInOsmosis, &res)
-	return
-}
-
-// SetUsdcIbcedInOsmosis updates the current usdc ibced in osmosis denom
-func (k Keeper) SetUsdcIbcedInOsmosis(ctx sdk.Context, value string) {
-	k.paramSpace.Set(ctx, types.KeyUsdcIbcedInOsmosis, value)
+// SetUsdcIbcDenom updates the current usdc ibc denom
+func (k Keeper) SetUsdcIbcDenom(ctx sdk.Context, value string) {
+	k.paramSpace.Set(ctx, types.KeyUsdcIbcDenom, value)
 }
 
 func (k Keeper) GetExponent(ctx sdk.Context, denom string) (uint32, error) {

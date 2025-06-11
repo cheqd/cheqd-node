@@ -210,11 +210,21 @@ RES=$(docker compose exec cheqd cheqd-noded tx gov vote 1 yes --from $CHEQD_USER
 assert_tx_successful "${RES}"
 sleep 5
 
+info "update usdc ibc denom param in oracle params"
+RES=$(docker compose exec cheqd cheqd-noded tx gov submit-proposal /cheqd/oracle_params_proposal.json --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
+assert_tx_successful "${RES}"
+sleep 5
+
+info "vote on oracle param change proposal"
+RES=$(docker compose exec cheqd cheqd-noded tx gov vote 2 yes --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
+assert_tx_successful "${RES}"
+sleep 5
+
 info "add cheqd-osmo host zone config"
 RES=$(docker compose exec cheqd cheqd-noded tx gov submit-proposal /cheqd/host_zone.json --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
 assert_tx_successful "${RES}"
 sleep 5
-RES=$(docker compose exec cheqd cheqd-noded tx gov vote 2 yes --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
+RES=$(docker compose exec cheqd cheqd-noded tx gov vote 3 yes --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
 assert_tx_successful "${RES}"
 sleep 5
 
@@ -222,7 +232,7 @@ info "add cheqd-usdc host zone config"
 RES=$(docker compose exec cheqd cheqd-noded tx gov submit-proposal /cheqd/usdc_host_zone.json --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
 assert_tx_successful "${RES}"
 sleep 5
-RES=$(docker compose exec cheqd cheqd-noded tx gov vote 3 yes --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
+RES=$(docker compose exec cheqd cheqd-noded tx gov vote 4 yes --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
 assert_tx_successful "${RES}"
 sleep 5
 

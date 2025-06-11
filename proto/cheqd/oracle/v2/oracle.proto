@@ -73,11 +73,8 @@ message Params {
     (gogoproto.nullable) = false
   ];
 
-  // native ibced in osmosis
-  string native_ibced_in_osmosis = 16;
-
-  // usdc ibced in osmosis
-  string usdc_ibced_in_osmosis = 17;
+  // usdc ibc denom
+  string usdc_ibc_denom = 16;
 }
 
 // Denom - the object to hold configurations of each denom

@@ -36,8 +36,7 @@ var (
 	KeyMaximumMedianStamps         = []byte("MaximumMedianStamps")
 	KeyCurrencyPairProviders       = []byte("CurrencyPairProviders")
 	KeyCurrencyDeviationThresholds = []byte("CurrencyDeviationThresholds")
-	KeyNativeIbcedInOsmosis        = []byte("NativeIbcedInOsmosis")
-	KeyUsdcIbcedInOsmosis          = []byte("UsdcIbcedInOsmosis")
+	KeyUsdcIbcDenom                = []byte("UsdcIbcDenom")
 )
 
 // Default parameter values
@@ -204,8 +203,7 @@ func DefaultParams() Params {
 		RewardBands:                 DefaultRewardBands(),
 		CurrencyPairProviders:       DefaultCurrencyPairProviders,
 		CurrencyDeviationThresholds: DefaultCurrencyDeviationThresholds,
-		NativeIbcedInOsmosis:        "ibc/7A08C6F11EF0F59EB841B9F788A87EC9F2361C7D9703157EC13D940DC53031FA",
-		UsdcIbcedInOsmosis:          "ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4",
+		UsdcIbcDenom:                "ibc/F5FABF52B54E65064B57BF6DBD8E5FAD22CEE9F4B8A57ADBB20CCD0173AA72A4",
 	}
 }
 
@@ -294,13 +292,8 @@ func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
 			validateCurrencyDeviationThresholds,
 		),
 		paramstypes.NewParamSetPair(
-			KeyNativeIbcedInOsmosis,
-			&p.NativeIbcedInOsmosis,
-			validateString,
-		),
-		paramstypes.NewParamSetPair(
-			KeyUsdcIbcedInOsmosis,
-			&p.UsdcIbcedInOsmosis,
+			KeyUsdcIbcDenom,
+			&p.UsdcIbcDenom,
 			validateString,
 		),
 	}
@@ -372,11 +365,7 @@ func (p Params) Validate() error {
 		return ErrInvalidParamValue.Wrap("denom in MandatoryList not present in AcceptList")
 	}
 
-	if err := validateString(p.NativeIbcedInOsmosis); err != nil {
-		return err
-	}
-
-	if err := validateString(p.UsdcIbcedInOsmosis); err != nil {
+	if err := validateString(p.UsdcIbcDenom); err != nil {
 		return err
 	}
 

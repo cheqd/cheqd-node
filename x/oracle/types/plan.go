@@ -97,13 +97,8 @@ func (p ParamUpdatePlan) ValidateBasic() error {
 				return err
 			}
 
-		case string(KeyNativeIbcedInOsmosis):
-			if err := validateString(p.Changes.NativeIbcedInOsmosis); err != nil {
-				return err
-			}
-
-		case string(KeyUsdcIbcedInOsmosis):
-			if err := validateString(p.Changes.UsdcIbcedInOsmosis); err != nil {
+		case string(KeyUsdcIbcDenom):
+			if err := validateString(p.Changes.UsdcIbcDenom); err != nil {
 				return err
 			}
 
