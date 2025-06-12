@@ -306,5 +306,6 @@ func TestAddDefaultRB(t *testing.T) {
 	require.Equal(t, p.String(),
 		"symbol_denom: CHEQ\nreward_band: \"0.020000000000000000\"\n\n"+
 			"symbol_denom: USDT\nreward_band: \"0.020000000000000000\"\n\n"+
+			"symbol_denom: USDC\nreward_band: \"0.020000000000000000\"\n\n"+
 			"symbol_denom: foo\nreward_band: \"0.020000000000000000\"")
 }

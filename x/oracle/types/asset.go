@@ -22,6 +22,9 @@ const (
 	USDTSymbol       string = "USDT"
 	USDTExponent            = uint32(18)
 	USDSymbol        string = "USD"
+	USDCDenom        string = "USDC"
+	USDCSymbol       string = "USDC"
+	USDCExponent            = uint32(6)
 	BlocksPerMinute         = uint64(10)
 	BlocksPerHour           = BlocksPerMinute * 60
 	BlocksPerDay            = BlocksPerHour * 24

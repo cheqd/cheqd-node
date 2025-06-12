@@ -212,8 +212,10 @@ do
   cp "${NODE_HOME}/config/genesis.json" "${TMP_NODE_HOME}/config/genesis.json"
   cp -R "${NODE_HOME}/config/gentx/." "${TMP_NODE_HOME}/config/gentx"
       
-    export ACCOUNT_ADDRESS=$(cheqd-noded keys show  "operator-$i"  --keyring-backend test  --home "${NODE_HOME}" -a)
-    export VALIDATOR_ADDRESS=$(cheqd-noded keys show  "operator-$i"  --keyring-backend test  --home "${NODE_HOME}" --bech val -a)
+    ACCOUNT_ADDRESS=$(cheqd-noded keys show  "operator-$i"  --keyring-backend test  --home "${NODE_HOME}" -a)
+    export ACCOUNT_ADDRESS
+    VALIDATOR_ADDRESS=$(cheqd-noded keys show  "operator-$i"  --keyring-backend test  --home "${NODE_HOME}" --bech val -a)
+    export VALIDATOR_ADDRESS
     export NODE_HOME
     
     

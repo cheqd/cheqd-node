@@ -97,6 +97,11 @@ func (p ParamUpdatePlan) ValidateBasic() error {
 				return err
 			}
 
+		case string(KeyUsdcIbcDenom):
+			if err := validateString(p.Changes.UsdcIbcDenom); err != nil {
+				return err
+			}
+
 		default:
 			return fmt.Errorf("%s is not an existing oracle param key", key)
 		}

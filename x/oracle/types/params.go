@@ -1,6 +1,8 @@
 package types
 
 import (
+	fmt "fmt"
+
 	"cosmossdk.io/math"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"gopkg.in/yaml.v3"
@@ -34,6 +36,7 @@ var (
 	KeyMaximumMedianStamps         = []byte("MaximumMedianStamps")
 	KeyCurrencyPairProviders       = []byte("CurrencyPairProviders")
 	KeyCurrencyDeviationThresholds = []byte("CurrencyDeviationThresholds")
+	KeyUsdcIbcDenom                = []byte("UsdcIbcDenom")
 )
 
 // Default parameter values
@@ -62,6 +65,11 @@ var (
 			SymbolDenom: USDTSymbol,
 			Exponent:    USDTExponent,
 		},
+		{
+			BaseDenom:   USDCDenom,
+			SymbolDenom: USDCSymbol,
+			Exponent:    USDCExponent,
+		},
 	}
 	DefaultMandatoryList = DenomList{
 		{
@@ -74,6 +82,11 @@ var (
 			SymbolDenom: USDTSymbol,
 			Exponent:    USDTExponent,
 		},
+		{
+			BaseDenom:   USDCDenom,
+			SymbolDenom: USDCSymbol,
+			Exponent:    USDCExponent,
+		},
 	}
 	DefaultSlashFraction     = math.LegacyNewDecWithPrec(1, 4) // 0.01%
 	DefaultMinValidPerWindow = math.LegacyNewDecWithPrec(5, 2) // 5%
@@ -84,8 +97,14 @@ var (
 			BaseDenom:  USDTSymbol,
 			QuoteDenom: USDSymbol,
 			Providers: []string{
-				"mexc",
 				"coinbase",
+			},
+		},
+		CurrencyPairProviders{
+			BaseDenom:  USDCSymbol,
+			QuoteDenom: USDTSymbol,
+			Providers: []string{
+				"mexc",
 			},
 		},
 		CurrencyPairProviders{
@@ -93,6 +112,13 @@ var (
 			QuoteDenom: USDTSymbol,
 			Providers: []string{
 				"mexc",
+			},
+		},
+		CurrencyPairProviders{
+			BaseDenom:  CheqdSymbol,
+			QuoteDenom: USDCSymbol,
+			Providers: []string{
+				"osmosis-icq",
 			},
 		},
 	}
@@ -104,6 +130,10 @@ var (
 		},
 		CurrencyDeviationThreshold{
 			BaseDenom: USDTSymbol,
+			Threshold: "2",
+		},
+		CurrencyDeviationThreshold{
+			BaseDenom: USDCSymbol,
 			Threshold: "2",
 		},
 	}
@@ -123,6 +153,10 @@ func DefaultRewardBands() RewardBandList {
 		},
 		{
 			SymbolDenom: USDTSymbol,
+			RewardBand:  defaultRewardBand,
+		},
+		{
+			SymbolDenom: USDCSymbol,
 			RewardBand:  defaultRewardBand,
 		},
 	}
@@ -169,6 +203,7 @@ func DefaultParams() Params {
 		RewardBands:                 DefaultRewardBands(),
 		CurrencyPairProviders:       DefaultCurrencyPairProviders,
 		CurrencyDeviationThresholds: DefaultCurrencyDeviationThresholds,
+		UsdcIbcDenom:                "ibc/F5FABF52B54E65064B57BF6DBD8E5FAD22CEE9F4B8A57ADBB20CCD0173AA72A4",
 	}
 }
 
@@ -256,6 +291,11 @@ func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
 			&p.CurrencyDeviationThresholds,
 			validateCurrencyDeviationThresholds,
 		),
+		paramstypes.NewParamSetPair(
+			KeyUsdcIbcDenom,
+			&p.UsdcIbcDenom,
+			validateString,
+		),
 	}
 }
 
@@ -323,6 +363,10 @@ func (p Params) Validate() error {
 	// all denoms in mandatory list must be in accept list
 	if !p.AcceptList.ContainDenoms(p.MandatoryList) {
 		return ErrInvalidParamValue.Wrap("denom in MandatoryList not present in AcceptList")
+	}
+
+	if err := validateString(p.UsdcIbcDenom); err != nil {
+		return err
 	}
 
 	return nil
@@ -557,6 +601,15 @@ func validateCurrencyDeviationThresholds(i interface{}) error {
 		if len(c.Threshold) == 0 {
 			return ErrInvalidParamValue.Wrap("oracle parameter CurrencyDeviationThreshold must have Threshold")
 		}
+	}
+
+	return nil
+}
+
+func validateString(i interface{}) error {
+	_, ok := i.(string)
+	if !ok {
+		return fmt.Errorf("invalid parameter type string: %T", i)
 	}
 
 	return nil

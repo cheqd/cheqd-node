@@ -267,6 +267,11 @@ func (msg MsgLegacyGovUpdateParams) ValidateBasic() error {
 				return err
 			}
 
+		case string(KeyUsdcIbcDenom):
+			if err := validateString(msg.Changes.UsdcIbcDenom); err != nil {
+				return err
+			}
+
 		default:
 			return fmt.Errorf("%s is not an existing oracle param key", key)
 		}

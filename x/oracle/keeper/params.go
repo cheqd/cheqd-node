@@ -212,6 +212,17 @@ func (k Keeper) SetCurrencyDeviationThresholds(
 	k.paramSpace.Set(ctx, types.KeyCurrencyDeviationThresholds, currencyDeviationThresholds)
 }
 
+// UsdcIbcDenom returns the current usdc ibc denom
+func (k Keeper) UsdcIbcDenom(ctx sdk.Context) (res string) {
+	k.paramSpace.Get(ctx, types.KeyUsdcIbcDenom, &res)
+	return
+}
+
+// SetUsdcIbcDenom updates the current usdc ibc denom
+func (k Keeper) SetUsdcIbcDenom(ctx sdk.Context, value string) {
+	k.paramSpace.Set(ctx, types.KeyUsdcIbcDenom, value)
+}
+
 func (k Keeper) GetExponent(ctx sdk.Context, denom string) (uint32, error) {
 	params := k.GetParams(ctx)
 	for _, v := range params.AcceptList {

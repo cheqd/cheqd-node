@@ -247,6 +247,9 @@ func (ms msgServer) LegacyGovUpdateParams(
 			}
 			ms.SetMaximumMedianStamps(ctx, msg.Changes.MaximumMedianStamps)
 
+		case string(types.KeyUsdcIbcDenom):
+			ms.SetUsdcIbcDenom(ctx, msg.Changes.UsdcIbcDenom)
+
 		default:
 			return nil, fmt.Errorf("%s is not an existing oracle param key", key)
 		}
