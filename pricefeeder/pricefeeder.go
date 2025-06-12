@@ -37,12 +37,10 @@ func (pf *PriceFeeder) Start(currentBlockHeight int64, oracleParams types.Params
 		return err
 	}
 	logger := zerolog.New(logWriter).Level(logLevel).With().Timestamp().Logger()
-
 	cfg, err := config.LoadConfigFromFlags(pf.AppConfig.ConfigPath, "")
 	if err != nil {
 		return err
 	}
-
 	// listen for and trap any OS signal to gracefully shutdown and exit
 	ctx, cancel := context.WithCancel(context.TODO())
 	g, ctx := errgroup.WithContext(ctx)
@@ -59,7 +57,6 @@ func (pf *PriceFeeder) Start(currentBlockHeight int64, oracleParams types.Params
 	if err != nil {
 		return err
 	}
-
 	pf.Oracle = oracle.New(
 		logger,
 		client.OracleClient{},

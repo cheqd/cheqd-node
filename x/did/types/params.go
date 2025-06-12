@@ -55,7 +55,10 @@ func DefaultLegacyFeeParams() *LegacyFeeParams {
 // validateFeeRangeList is a generic validator for []FeeRange
 func validateFeeRangeList(name string, frs []FeeRange) error {
 	for i, f := range frs {
-		if f.MinAmount.IsNegative() {
+		if f.Denom != BaseMinimalDenom && f.Denom != "usd" {
+			return fmt.Errorf("invalid denom in %s[%d]: got %s", name, i, f.Denom)
+		}
+		if f.MinAmount.IsNegative() || f.MinAmount.IsZero() {
 			return fmt.Errorf("min_amount must be non-negative in %s[%d]: got %s", name, i, f.MinAmount.String())
 		}
 		if f.MaxAmount != nil && f.MaxAmount.LT(f.MinAmount) {
@@ -111,7 +114,7 @@ func validateBurnFactor(i interface{}) error {
 	if !ok {
 		return fmt.Errorf("invalid type for burn_factor: %T", i)
 	}
-	if v.IsNil() || v.IsNegative() || v.GTE(sdkmath.LegacyOneDec()) {
+	if !v.IsPositive() || v.GTE(sdkmath.LegacyOneDec()) {
 		return fmt.Errorf("burn factor must be positive and < 1: %s", v)
 	}
 	return nil

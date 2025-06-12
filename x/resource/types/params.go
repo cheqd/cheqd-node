@@ -49,8 +49,11 @@ func DefaultLegacyFeeParams() *LegacyFeeParams {
 // ValidateBasic performs basic validation of cheqd module tx fee parameters
 func (tfp *FeeParams) ValidateBasic() error {
 	for i, f := range tfp.Image {
-		if f.MinAmount.IsNegative() {
-			return fmt.Errorf("min_amount must be non-negative in create_resource_image[%d]: got %s", i, f.MinAmount.String())
+		if f.Denom != BaseMinimalDenom && f.Denom != "usd" {
+			return fmt.Errorf("invalid denom in create_resource_image[%d]: got %s", i, f.Denom)
+		}
+		if !f.MinAmount.IsPositive() {
+			return fmt.Errorf("min_amount must be positive in create_resource_image[%d]: got %s", i, f.MinAmount.String())
 		}
 
 		if f.MaxAmount != nil && f.MaxAmount.LT(f.MinAmount) {
@@ -59,7 +62,10 @@ func (tfp *FeeParams) ValidateBasic() error {
 	}
 
 	for i, f := range tfp.Json {
-		if f.MinAmount.IsNegative() {
+		if f.Denom != BaseMinimalDenom && f.Denom != "usd" {
+			return fmt.Errorf("invalid denom in create_resource_json[%d]: got %s", i, f.Denom)
+		}
+		if !f.MinAmount.IsPositive() {
 			return fmt.Errorf("min_amount must be non-negative in create_resource_json[%d]: got %s", i, f.MinAmount.String())
 		}
 
@@ -69,7 +75,10 @@ func (tfp *FeeParams) ValidateBasic() error {
 	}
 
 	for i, f := range tfp.Default {
-		if f.MinAmount.IsNegative() {
+		if f.Denom != BaseMinimalDenom && f.Denom != "usd" {
+			return fmt.Errorf("invalid denom in default_fee[%d]: got %s", i, f.Denom)
+		}
+		if !f.MinAmount.IsPositive() {
 			return fmt.Errorf("min_amount must be non-negative in default_fee[%d]: got %s", i, f.MinAmount.String())
 		}
 
@@ -92,6 +101,9 @@ func validateImage(i interface{}) error {
 	}
 
 	for idx, f := range v {
+		if f.Denom != BaseMinimalDenom && f.Denom != "usd" {
+			return fmt.Errorf("invalid denom in create_resource_image[%d]: got %s", idx, f.Denom)
+		}
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in create_resource_image[%d]", idx)
 		}
@@ -110,6 +122,9 @@ func validateJSON(i interface{}) error {
 	}
 
 	for idx, f := range v {
+		if f.Denom != BaseMinimalDenom && f.Denom != "usd" {
+			return fmt.Errorf("invalid denom in create_resource_json[%d]: got %s", idx, f.Denom)
+		}
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in create_resource_json[%d]", idx)
 		}
@@ -128,6 +143,9 @@ func validateDefault(i interface{}) error {
 	}
 
 	for idx, f := range v {
+		if f.Denom != BaseMinimalDenom && f.Denom != "usd" {
+			return fmt.Errorf("invalid denom in default_fee[%d]: got %s", idx, f.Denom)
+		}
 		if f.MinAmount.IsNegative() {
 			return fmt.Errorf("min_amount must be non-negative in default_fee[%d]", idx)
 		}

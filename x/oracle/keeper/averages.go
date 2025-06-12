@@ -43,7 +43,7 @@ func (k Keeper) ComputeAverages(ctx sdk.Context, denom string) error {
 	}
 	// calculate sma and store it
 	sma := CalculateSMA(prices)
-	k.setAverage(ctx, KeySMA(denom), sma)
+	k.SetAverage(ctx, KeySMA(denom), sma)
 
 	// Calculate WMA for all strategies
 	strategies := []string{string(WmaStrategyBalanced), string(WmaStrategyOldest), string(WmaStrategyRecent)}
@@ -53,14 +53,14 @@ func (k Keeper) ComputeAverages(ctx sdk.Context, denom string) error {
 			return types.ErrInvalidWmaStrategy.Wrapf("invalid WMA strategy: %s", strategy)
 		}
 		wma := CalculateWMA(prices, strategy, nil)
-		k.setAverage(ctx, KeyWMAWithStrategy(denom, strategy), wma)
+		k.SetAverage(ctx, KeyWMAWithStrategy(denom, strategy), wma)
 	}
 
 	// 3. EMA (smoothing factor α = 2 / (N + 1))
 	prevEMA, present := k.GetAverage(ctx, KeyEMA(denom))
 
 	ema := CalculateEMA(prevEMA, present, prices)
-	k.setAverage(ctx, KeyEMA(denom), ema)
+	k.SetAverage(ctx, KeyEMA(denom), ema)
 	return nil
 }
 
@@ -108,7 +108,7 @@ func CalculateEMA(previousEMA math.LegacyDec, present bool, prices []math.Legacy
 	return ema
 }
 
-func (k Keeper) setAverage(ctx sdk.Context, key []byte, value math.LegacyDec) {
+func (k Keeper) SetAverage(ctx sdk.Context, key []byte, value math.LegacyDec) {
 	bz := k.cdc.MustMarshal(&sdk.DecProto{Dec: value})
 	ctx.KVStore(k.storeKey).Set(key, bz)
 }

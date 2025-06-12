@@ -56,11 +56,10 @@ func EndBlocker(ctx context.Context, k keeper.Keeper) error {
 		if err := UpdateOraclePrices(sdkCtx, params, k); err != nil {
 			return err
 		}
-
-		if k.IsPeriodLastBlock(sdkCtx, params.HistoricStampPeriod*keeper.AveragingWindow) {
-			if err := ComputeAllAverages(sdkCtx, params, k); err != nil {
-				return err
-			}
+	}
+	if k.IsPeriodLastBlock(sdkCtx, params.HistoricStampPeriod*keeper.AveragingWindow) {
+		if err := ComputeAllAverages(sdkCtx, params, k); err != nil {
+			return err
 		}
 	}
 
@@ -168,7 +167,6 @@ func CalcPrices(ctx sdk.Context, params types.Params, k keeper.Keeper) error {
 		if err = k.SetExchangeRateWithEvent(ctx, ballotDenom.Denom, exchangeRate); err != nil {
 			return err
 		}
-
 		if k.IsPeriodLastBlock(ctx, params.HistoricStampPeriod) {
 			k.AddHistoricPrice(ctx, ballotDenom.Denom, exchangeRate)
 		}
