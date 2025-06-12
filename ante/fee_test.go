@@ -295,7 +295,6 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
-		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper)
@@ -317,7 +316,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		Expect(err).To(BeNil())
 
 		// check balance of fee payer
-		balance = s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
+		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
 		Expect(amount.Sub(math.NewInt(feeParams.CreateDid[0].MinAmount.Int64()))).To(Equal(balance.Amount), "Tax was not subtracted from the fee payer")
 
 		// get supply after tx
@@ -349,7 +348,6 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		oracleModule := s.app.AccountKeeper.GetModuleAddress("oracle")
 		oracleBalance := s.app.BankKeeper.GetBalance(s.ctx, oracleModule, didtypes.BaseMinimalDenom)
 		Expect(oracleBalance.Amount).To(Equal(oracleShare), "Oracle module did not receive the correct reward share")
-
 	})
 
 	It("TaxableTx Lifecycle - DLR: MsgCreateResource JSON", func() {

@@ -457,6 +457,7 @@ func (td *TaxDecorator) processNativeDenomTax(
 	tax = convertedRewards.Add(*convertedBurn...)
 	return td.deductTaxFromFeePayer(ctx, feePayer, tax)
 }
+
 func ConvertToCheq(coins sdk.Coins, cheqPrice math.LegacyDec) (sdk.Coins, error) {
 	const usdExponent = 1e18
 
@@ -490,13 +491,4 @@ func ConvertToCheq(coins sdk.Coins, cheqPrice math.LegacyDec) (sdk.Coins, error)
 	}
 
 	return converted, nil
-}
-
-func isAllNcheq(coins sdk.Coins) bool {
-	for _, coin := range coins {
-		if coin.Denom != oracletypes.CheqdDenom {
-			return false
-		}
-	}
-	return true
 }

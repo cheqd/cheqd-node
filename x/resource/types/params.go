@@ -49,7 +49,7 @@ func DefaultLegacyFeeParams() *LegacyFeeParams {
 // ValidateBasic performs basic validation of cheqd module tx fee parameters
 func (tfp *FeeParams) ValidateBasic() error {
 	for i, f := range tfp.Image {
-		if f.Denom != BaseMinimalDenom && f.Denom != "usd" {
+		if f.Denom != BaseMinimalDenom && f.Denom != UsdDenom {
 			return fmt.Errorf("invalid denom in create_resource_image[%d]: got %s", i, f.Denom)
 		}
 		if !f.MinAmount.IsPositive() {
@@ -62,7 +62,7 @@ func (tfp *FeeParams) ValidateBasic() error {
 	}
 
 	for i, f := range tfp.Json {
-		if f.Denom != BaseMinimalDenom && f.Denom != "usd" {
+		if f.Denom != BaseMinimalDenom && f.Denom != UsdDenom {
 			return fmt.Errorf("invalid denom in create_resource_json[%d]: got %s", i, f.Denom)
 		}
 		if !f.MinAmount.IsPositive() {
@@ -75,7 +75,7 @@ func (tfp *FeeParams) ValidateBasic() error {
 	}
 
 	for i, f := range tfp.Default {
-		if f.Denom != BaseMinimalDenom && f.Denom != "usd" {
+		if f.Denom != BaseMinimalDenom && f.Denom != UsdDenom {
 			return fmt.Errorf("invalid denom in default_fee[%d]: got %s", i, f.Denom)
 		}
 		if !f.MinAmount.IsPositive() {
@@ -101,7 +101,7 @@ func validateImage(i interface{}) error {
 	}
 
 	for idx, f := range v {
-		if f.Denom != BaseMinimalDenom && f.Denom != "usd" {
+		if f.Denom != BaseMinimalDenom && f.Denom != UsdDenom {
 			return fmt.Errorf("invalid denom in create_resource_image[%d]: got %s", idx, f.Denom)
 		}
 		if f.MinAmount.IsNegative() {
@@ -122,7 +122,7 @@ func validateJSON(i interface{}) error {
 	}
 
 	for idx, f := range v {
-		if f.Denom != BaseMinimalDenom && f.Denom != "usd" {
+		if f.Denom != BaseMinimalDenom && f.Denom != UsdDenom {
 			return fmt.Errorf("invalid denom in create_resource_json[%d]: got %s", idx, f.Denom)
 		}
 		if f.MinAmount.IsNegative() {
@@ -143,7 +143,7 @@ func validateDefault(i interface{}) error {
 	}
 
 	for idx, f := range v {
-		if f.Denom != BaseMinimalDenom && f.Denom != "usd" {
+		if f.Denom != BaseMinimalDenom && f.Denom != UsdDenom {
 			return fmt.Errorf("invalid denom in default_fee[%d]: got %s", idx, f.Denom)
 		}
 		if f.MinAmount.IsNegative() {
