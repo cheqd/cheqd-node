@@ -160,7 +160,8 @@ func checkFeeParamsFromSubspace(ctx sdk.Context, didKeeper DidKeeper, resourceKe
 func IsTaxableTx(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKeeper, tx sdk.Tx, oracleKeeper OracleKeeper) (bool, sdk.Coins, sdk.Coins, error) {
 	ncheqPrice, exist := oracleKeeper.GetEMA(ctx, oracletypes.CheqdSymbol)
 	if !exist {
-		return false, nil, nil, errors.New("ema not present")
+		// fallback to fixed fee range in ncheq if defined
+		ncheqPrice = sdkmath.LegacyZeroDec() // zero value, GetFeeForMsg will handle fallback
 	}
 
 	_ = checkFeeParamsFromSubspace(ctx, didKeeper, resourceKeeper)
@@ -168,6 +169,7 @@ func IsTaxableTx(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKe
 	burn := (sdk.Coins)(nil)
 	msgs := tx.GetMsgs()
 	for _, msg := range msgs {
+
 		rewardPortion, burnPortion, isIdentityMsg, err := GetTaxableMsgFeeWithBurnPortion(ctx, msg, ncheqPrice)
 		if err != nil {
 			return true, nil, nil, err
@@ -200,28 +202,38 @@ func IsTaxableTxLite(tx sdk.Tx) bool {
 }
 
 func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec) (sdk.Coins, error) {
-	if len(feeRanges) == 0 || cheqEmaPrice.IsZero() {
-		return nil, errors.New("fee ranges empty or cheq EMA price is zero")
-	}
-
 	type usdRange struct {
 		denom   string
 		minUSD  sdkmath.LegacyDec
-		maxUSD  *sdkmath.LegacyDec // nil means no upper limit
+		maxUSD  *sdkmath.LegacyDec
 		minCoin sdkmath.Int
-		maxCoin *sdkmath.Int // nil means no upper limit
+		maxCoin *sdkmath.Int
+	}
+
+	if len(feeRanges) == 0 {
+		return nil, errors.New("fee ranges empty")
+	}
+
+	// Fallback: If CHEQ price is not available, try to return ncheq fixed fee
+	if cheqEmaPrice.IsZero() {
+		for _, fr := range feeRanges {
+			if fr.Denom == oracletypes.CheqdDenom {
+				// Use MinAmount directly as fallback fixed fee
+				return sdk.NewCoins(sdk.NewCoin(oracletypes.CheqdDenom, fr.MinAmount)), nil
+			}
+		}
+		return nil, errors.New("cheq price not available and no ncheq fallback fee defined")
 	}
 
 	var ranges []usdRange
 
-	// Step 1: Convert each denom’s fee range into USD values
+	// Step 1: Convert fee ranges into USD values
 	for _, fr := range feeRanges {
 		var minUSD sdkmath.LegacyDec
 		var maxUSD *sdkmath.LegacyDec
 
 		switch fr.Denom {
-		case "ncheq":
-			// Convert from ncheq (nano) to CHEQ, then to USD
+		case oracletypes.CheqdDenom:
 			minCHEQ := sdkmath.LegacyNewDecFromInt(fr.MinAmount).QuoInt64(1e9)
 			minUSD = cheqEmaPrice.Mul(minCHEQ)
 
@@ -231,16 +243,13 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 				maxUSD = &val
 			}
 		case "usd":
-			// Handle both scaled (1e18) and unscaled USD values
 			if fr.MinAmount.LT(sdkmath.NewInt(1e6)) {
-				// Treat as already unscaled USD
 				minUSD = sdkmath.LegacyNewDecFromInt(fr.MinAmount)
 				if fr.MaxAmount != nil {
 					val := sdkmath.LegacyNewDecFromInt(*fr.MaxAmount)
 					maxUSD = &val
 				}
 			} else {
-				// Treat as scaled by 1e18
 				minUSD = sdkmath.LegacyNewDecFromInt(fr.MinAmount).QuoInt64(1e18)
 				if fr.MaxAmount != nil {
 					val := sdkmath.LegacyNewDecFromInt(*fr.MaxAmount).QuoInt64(1e18)
@@ -248,7 +257,7 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 				}
 			}
 		default:
-			continue // Skip unsupported denoms
+			continue
 		}
 
 		ranges = append(ranges, usdRange{
@@ -284,7 +293,7 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 		return nil, errors.New("no valid overlapping range")
 	}
 
-	// Step 3: Pick denom to use (prefer USD if available)
+	// Step 3: Prefer USD denom
 	var chosen usdRange
 	for _, r := range ranges {
 		if r.denom == "usd" {
@@ -296,14 +305,14 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 		chosen = ranges[0]
 	}
 
-	// Step 4: Compute final amount in chosen denom
+	// Step 4: Compute final amount
 	var finalAmount sdkmath.Int
 	switch chosen.denom {
-	case "ncheq":
-		finalAmount = overlapMin.Quo(cheqEmaPrice).TruncateInt().MulRaw(1e9) // convert to ncheq (nano)
+	case oracletypes.CheqdDenom:
+		finalAmount = overlapMin.Quo(cheqEmaPrice).TruncateInt().MulRaw(1e9)
 	case "usd":
 		if overlapMin.LT(sdkmath.LegacyNewDec(1e5)) {
-			finalAmount = overlapMin.MulInt64(1e18).TruncateInt() // scale up if small value
+			finalAmount = overlapMin.MulInt64(1e18).TruncateInt()
 		} else {
 			finalAmount = overlapMin.TruncateInt()
 		}
@@ -311,7 +320,7 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 		return nil, fmt.Errorf("unsupported denom selected: %s", chosen.denom)
 	}
 
-	// Step 5: Clamp to min and max if needed
+	// Step 5: Clamp
 	if finalAmount.LT(chosen.minCoin) {
 		finalAmount = chosen.minCoin
 	} else if chosen.maxCoin != nil && finalAmount.GT(*chosen.maxCoin) {

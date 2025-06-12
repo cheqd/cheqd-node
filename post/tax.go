@@ -385,27 +385,29 @@ func (td *TaxDecorator) handleTaxableTransaction(
 		return err
 	}
 	nativeDenom := params.FeeDenom
-
 	onlyNativeDenom := td.isOnlyNativeDenom(feeTx.GetFee(), nativeDenom)
 
-	cheqPrice, found := td.oracleKeeper.GetEMA(ctx, oracletypes.CheqdSymbol)
-	if !found || cheqPrice.IsZero() {
-		return fmt.Errorf("could not fetch CHEQ price from oracle")
-	}
+	cheqPrice, _ := td.oracleKeeper.GetEMA(ctx, oracletypes.CheqdSymbol)
+
+	// Let ConvertToCheq handle missing/zero price gracefully
 	if onlyNativeDenom {
 		if err := td.processNativeDenomTax(ctx, feeTx, simulate, rewards, burn, tx, &convertedRewards, &convertedBurn, cheqPrice); err != nil {
 			return err
 		}
 	} else {
+		var err error
+
 		convertedRewards, err = ConvertToCheq(rewards, cheqPrice)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to convert rewards to ncheq: %w", err)
 		}
+
 		convertedBurn, err = ConvertToCheq(burn, cheqPrice)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to convert burn to ncheq: %w", err)
 		}
 	}
+
 	// Common logic
 	if err := td.distributeRewards(ctx, convertedRewards); err != nil {
 		return err
@@ -458,26 +460,35 @@ func (td *TaxDecorator) processNativeDenomTax(
 
 func ConvertToCheq(coins sdk.Coins, cheqPrice math.LegacyDec) (sdk.Coins, error) {
 	const usdExponent = 1e18
+
+	// If all coins are already in ncheq, return them directly
+	if coins.DenomsSubsetOf(sdk.NewCoins(sdk.NewCoin(oracletypes.CheqdDenom, math.ZeroInt()))) {
+		return coins, nil
+	}
+
 	converted := sdk.NewCoins()
 
 	for _, coin := range coins {
 		switch coin.Denom {
 		case "usd":
-			// Adjust for USD 18 decimals
-			usdAmount := coin.Amount.ToLegacyDec().QuoInt64(usdExponent)
+			if cheqPrice.IsZero() {
+				return nil, fmt.Errorf("cannot convert USD to ncheq: CHEQ price unavailable")
+			}
 
-			// Convert USD → CHEQ → ncheq (CHEQ has 9 decimals)
+			// Convert: USD (18 decimals) → CHEQ → ncheq (9 decimals)
+			usdAmount := coin.Amount.ToLegacyDec().QuoInt64(usdExponent)
 			ncheqAmount := usdAmount.Quo(cheqPrice).MulInt64(1e9).TruncateInt()
 
 			converted = converted.Add(sdk.NewCoin(oracletypes.CheqdDenom, ncheqAmount))
 
-		case oracletypes.CheqdDenom: // e.g., "ncheq"
-			// Already in target denom, just pass it through
+		case oracletypes.CheqdDenom: // "ncheq"
+			// Already in target denom
 			converted = converted.Add(coin)
 
 		default:
 			return nil, fmt.Errorf("unexpected denom: %s", coin.Denom)
 		}
 	}
+
 	return converted, nil
 }
