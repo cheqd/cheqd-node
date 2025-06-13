@@ -5,6 +5,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/cheqd/cheqd-node/util"
+	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -18,7 +19,7 @@ func DefaultFeeParams() *FeeParams {
 				MaxAmount: util.PtrInt(100000000000),
 			},
 			{
-				Denom:     "usd",
+				Denom:     oracletypes.UsdDenom,
 				MinAmount: sdkmath.NewInt(1200000000000000000),
 				MaxAmount: util.PtrInt(2000000000000000000),
 			},
@@ -55,7 +56,7 @@ func DefaultLegacyFeeParams() *LegacyFeeParams {
 // validateFeeRangeList is a generic validator for []FeeRange
 func validateFeeRangeList(name string, frs []FeeRange) error {
 	for i, f := range frs {
-		if f.Denom != BaseMinimalDenom && f.Denom != "usd" {
+		if f.Denom != BaseMinimalDenom && f.Denom != oracletypes.UsdDenom {
 			return fmt.Errorf("invalid denom in %s[%d]: got %s", name, i, f.Denom)
 		}
 		if f.MinAmount.IsNegative() || f.MinAmount.IsZero() {

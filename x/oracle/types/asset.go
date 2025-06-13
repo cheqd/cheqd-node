@@ -7,6 +7,7 @@ import (
 
 const (
 	CheqdDenom       string = "ncheq"
+	UsdDenom         string = "usd"
 	CheqdSymbol      string = "CHEQ"
 	CheqdExponent           = uint32(9)
 	AtomDenom        string = "ibc/C4CFF46FD6DE35CA4CF4CE031E643C8FDC9BA4B99AE598E9B0ED98FE3A2319F9"

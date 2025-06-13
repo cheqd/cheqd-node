@@ -470,7 +470,7 @@ func ConvertToCheq(coins sdk.Coins, cheqPrice math.LegacyDec) (sdk.Coins, error)
 
 	for _, coin := range coins {
 		switch coin.Denom {
-		case "usd":
+		case oracletypes.UsdDenom:
 			if cheqPrice.IsZero() {
 				return nil, fmt.Errorf("cannot convert USD to ncheq: CHEQ price unavailable")
 			}

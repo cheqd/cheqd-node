@@ -242,7 +242,7 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 				val := cheqEmaPrice.Mul(maxCHEQ)
 				maxUSD = &val
 			}
-		case "usd":
+		case oracletypes.UsdDenom:
 			if fr.MinAmount.LT(sdkmath.NewInt(1e6)) {
 				minUSD = sdkmath.LegacyNewDecFromInt(fr.MinAmount)
 				if fr.MaxAmount != nil {
@@ -296,7 +296,7 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 	// Step 3: Prefer USD denom
 	var chosen usdRange
 	for _, r := range ranges {
-		if r.denom == "usd" {
+		if r.denom == oracletypes.UsdDenom {
 			chosen = r
 			break
 		}
@@ -310,7 +310,7 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 	switch chosen.denom {
 	case oracletypes.CheqdDenom:
 		finalAmount = overlapMin.Quo(cheqEmaPrice).TruncateInt().MulRaw(1e9)
-	case "usd":
+	case oracletypes.UsdDenom:
 		if overlapMin.LT(sdkmath.LegacyNewDec(1e5)) {
 			finalAmount = overlapMin.MulInt64(1e18).TruncateInt()
 		} else {
