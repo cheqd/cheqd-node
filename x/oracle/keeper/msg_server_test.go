@@ -696,10 +696,8 @@ func (s *IntegrationTestSuite) TestMsgServer_GovAddDenom() {
 			err := tc.req.ValidateBasic()
 			if err == nil {
 				_, err = s.msgServer.GovAddDenoms(s.ctx, tc.req)
-				s.Require().NoError(err)
-				err = abci.EndBlocker(s.ctx, s.app.OracleKeeper, s.app.FeeabsKeeper)
-				s.Require().NoError(err)
-
+				err1 := abci.EndBlocker(s.ctx, s.app.OracleKeeper, s.app.FeeabsKeeper)
+				s.Require().NoError(err1)
 			}
 			if tc.expectErr {
 				s.Require().ErrorContains(err, tc.errMsg)
@@ -923,10 +921,8 @@ func (s *IntegrationTestSuite) TestMsgServer_GovRemoveCurrencyPairProviders() {
 			err := tc.req.ValidateBasic()
 			if err == nil {
 				_, err = s.msgServer.GovRemoveCurrencyPairProviders(s.ctx, tc.req)
-				s.Require().NoError(err)
-
-				err = abci.EndBlocker(s.ctx, s.app.OracleKeeper, s.app.FeeabsKeeper)
-				s.Require().NoError(err)
+				err1 := abci.EndBlocker(s.ctx, s.app.OracleKeeper, s.app.FeeabsKeeper)
+				s.Require().NoError(err1)
 			}
 
 			if tc.expectErr {
@@ -1053,10 +1049,8 @@ func (s *IntegrationTestSuite) TestMsgServer_GovRemoveCurrencyDeviationThreshold
 			err := tc.req.ValidateBasic()
 			if err == nil {
 				_, err = s.msgServer.GovRemoveCurrencyDeviationThresholds(s.ctx, tc.req)
-				s.Require().NoError(err)
-
-				err = abci.EndBlocker(s.ctx, s.app.OracleKeeper, s.app.FeeabsKeeper)
-				s.Require().NoError(err)
+				err1 := abci.EndBlocker(s.ctx, s.app.OracleKeeper, s.app.FeeabsKeeper)
+				s.Require().NoError(err1)
 			}
 
 			if tc.expectErr {
