@@ -13,21 +13,21 @@ import (
 	"github.com/cheqd/cheqd-node/x/oracle/types"
 )
 
-var _ types.QueryServer = querier{}
+var _ types.QueryServer = Querier{}
 
 // Querier implements a QueryServer for the x/oracle module.
-type querier struct {
+type Querier struct {
 	Keeper
 }
 
 // NewQuerier returns an implementation of the oracle QueryServer interface
 // for the provided Keeper.
 func NewQuerier(keeper Keeper) types.QueryServer {
-	return &querier{Keeper: keeper}
+	return &Querier{Keeper: keeper}
 }
 
 // Params queries params of x/oracle module.
-func (q querier) Params(
+func (q Querier) Params(
 	goCtx context.Context,
 	req *types.QueryParams,
 ) (*types.QueryParamsResponse, error) {
@@ -43,7 +43,7 @@ func (q querier) Params(
 
 // ExchangeRates queries exchange rates of all denoms, or, if specified, returns
 // a single denom.
-func (q querier) ExchangeRates(
+func (q Querier) ExchangeRates(
 	goCtx context.Context,
 	req *types.QueryExchangeRates,
 ) (*types.QueryExchangeRatesResponse, error) {
@@ -73,7 +73,7 @@ func (q querier) ExchangeRates(
 }
 
 // ActiveExchangeRates queries all denoms for which exchange rates exist.
-func (q querier) ActiveExchangeRates(
+func (q Querier) ActiveExchangeRates(
 	goCtx context.Context,
 	req *types.QueryActiveExchangeRates,
 ) (*types.QueryActiveExchangeRatesResponse, error) {
@@ -94,7 +94,7 @@ func (q querier) ActiveExchangeRates(
 
 // FeederDelegation queries the account address to which the validator operator
 // delegated oracle vote rights.
-func (q querier) FeederDelegation(
+func (q Querier) FeederDelegation(
 	goCtx context.Context,
 	req *types.QueryFeederDelegation,
 ) (*types.QueryFeederDelegationResponse, error) {
@@ -119,7 +119,7 @@ func (q querier) FeederDelegation(
 }
 
 // MissCounter queries oracle miss counter of a validator.
-func (q querier) MissCounter(
+func (q Querier) MissCounter(
 	goCtx context.Context,
 	req *types.QueryMissCounter,
 ) (*types.QueryMissCounterResponse, error) {
@@ -140,7 +140,7 @@ func (q querier) MissCounter(
 }
 
 // SlashWindow queries the current slash window progress of the oracle.
-func (q querier) SlashWindow(
+func (q Querier) SlashWindow(
 	goCtx context.Context,
 	req *types.QuerySlashWindow,
 ) (*types.QuerySlashWindowResponse, error) {
@@ -158,7 +158,7 @@ func (q querier) SlashWindow(
 }
 
 // AggregatePrevote queries an aggregate prevote of a validator.
-func (q querier) AggregatePrevote(
+func (q Querier) AggregatePrevote(
 	goCtx context.Context,
 	req *types.QueryAggregatePrevote,
 ) (*types.QueryAggregatePrevoteResponse, error) {
@@ -184,7 +184,7 @@ func (q querier) AggregatePrevote(
 }
 
 // AggregatePrevotes queries aggregate prevotes of all validators
-func (q querier) AggregatePrevotes(
+func (q Querier) AggregatePrevotes(
 	goCtx context.Context,
 	req *types.QueryAggregatePrevotes,
 ) (*types.QueryAggregatePrevotesResponse, error) {
@@ -206,7 +206,7 @@ func (q querier) AggregatePrevotes(
 }
 
 // AggregateVote queries an aggregate vote of a validator
-func (q querier) AggregateVote(
+func (q Querier) AggregateVote(
 	goCtx context.Context,
 	req *types.QueryAggregateVote,
 ) (*types.QueryAggregateVoteResponse, error) {
@@ -232,7 +232,7 @@ func (q querier) AggregateVote(
 }
 
 // AggregateVotes queries aggregate votes of all validators
-func (q querier) AggregateVotes(
+func (q Querier) AggregateVotes(
 	goCtx context.Context,
 	req *types.QueryAggregateVotes,
 ) (*types.QueryAggregateVotesResponse, error) {
@@ -255,7 +255,7 @@ func (q querier) AggregateVotes(
 
 // Medians queries medians of all denoms, or, if specified, returns
 // a single median.
-func (q querier) Medians(
+func (q Querier) Medians(
 	goCtx context.Context,
 	req *types.QueryMedians,
 ) (*types.QueryMediansResponse, error) {
@@ -286,7 +286,7 @@ func (q querier) Medians(
 
 // MedianDeviations queries median deviations of all denoms, or, if specified, returns
 // a single median deviation.
-func (q querier) MedianDeviations(
+func (q Querier) MedianDeviations(
 	goCtx context.Context,
 	req *types.QueryMedianDeviations,
 ) (*types.QueryMedianDeviationsResponse, error) {
@@ -313,7 +313,7 @@ func (q querier) MedianDeviations(
 
 // ValidatorRewardSet queries the list of validators that can earn rewards in
 // the current Slash Window.
-func (q querier) ValidatorRewardSet(
+func (q Querier) ValidatorRewardSet(
 	goCtx context.Context,
 	req *types.QueryValidatorRewardSet,
 ) (*types.QueryValidatorRewardSetResponse, error) {
@@ -330,7 +330,7 @@ func (q querier) ValidatorRewardSet(
 	}, nil
 }
 
-func (q querier) GetEma(ctx context.Context, req *types.GetEmaRequest) (*types.GetEmaResponse, error) {
+func (q Querier) GetEma(ctx context.Context, req *types.GetEmaRequest) (*types.GetEmaResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
