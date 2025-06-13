@@ -65,7 +65,6 @@ func (s *IntegrationTestSuite) SetupTest() {
 	require.NoError(app.BankKeeper.MintCoins(ctx, minttypes.ModuleName, initCoins))
 	require.NoError(app.BankKeeper.SendCoinsFromModuleToAccount(ctx, minttypes.ModuleName, addr2, initCoins))
 
-	// fmt.Println("sh------", sh.Denom)
 	sh.CreateValidator(valAddr, valPubKey, amt, true)
 	sh.CreateValidator(valAddr2, valPubKey2, amt, true)
 

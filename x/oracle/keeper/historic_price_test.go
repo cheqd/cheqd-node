@@ -1,8 +1,6 @@
 package keeper_test
 
 import (
-	"fmt"
-
 	"cosmossdk.io/math"
 	"github.com/cheqd/cheqd-node/x/oracle/types"
 )
@@ -19,7 +17,6 @@ func (s *IntegrationTestSuite) TestSetHistoraclePricing() {
 	// similar prefixes
 	displayDenomVariation := displayDenom + "test"
 
-	fmt.Println("--------------", ctx.BlockHeight())
 	// add multiple historic prices to store
 	exchangeRates := []string{"1.0", "1.2", "1.1", "1.4", "1.1", "1.15", "1.2", "1.3", "1.2"}
 	for i, exchangeRate := range exchangeRates {

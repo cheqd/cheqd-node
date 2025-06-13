@@ -30,7 +30,6 @@ func (s *IntegrationTestSuite) TestIterateMissCounters() {
 
 	for _, mc := range missCounters {
 		operator, _ := sdk.ValAddressFromBech32(mc.ValidatorAddress)
-		fmt.Println("operator------", operator, mc.MissCounter)
 		keeper.SetMissCounter(ctx, operator, mc.MissCounter)
 	}
 

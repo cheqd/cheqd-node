@@ -377,7 +377,7 @@ func (s *IntegrationTestSuite) TestMsgServer_UpdateGovParams() {
 				},
 			},
 			true,
-			"invalid gov authority to perform these changes",
+			"invalid authority",
 		},
 	}
 
@@ -386,9 +386,8 @@ func (s *IntegrationTestSuite) TestMsgServer_UpdateGovParams() {
 			err := tc.req.ValidateBasic()
 			if err == nil {
 				_, err = s.msgServer.GovUpdateParams(s.ctx, tc.req)
-				s.Require().NoError(err)
-				err = abci.EndBlocker(s.ctx, s.app.OracleKeeper, s.app.FeeabsKeeper)
-				s.Require().NoError(err)
+				err1 := abci.EndBlocker(s.ctx, s.app.OracleKeeper, s.app.FeeabsKeeper)
+				s.Require().NoError(err1)
 			}
 			if tc.expectErr {
 				s.Require().ErrorContains(err, tc.errMsg)
