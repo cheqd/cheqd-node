@@ -4,22 +4,41 @@ import (
 	"fmt"
 
 	sdkmath "cosmossdk.io/math"
+	util "github.com/cheqd/cheqd-node/util"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
-
-// NewParams creates a new FeeParams object with specified parameters
-func NewParams(image, json, defaultFee sdk.Coin, burnFactor sdkmath.LegacyDec) FeeParams {
-	return FeeParams{
-		Image:      image,
-		Json:       json,
-		Default:    defaultFee,
-		BurnFactor: burnFactor,
-	}
-}
 
 // DefaultFeeParams returns default cheqd module tx fee parameters
 func DefaultFeeParams() *FeeParams {
 	return &FeeParams{
+		Image: []didtypes.FeeRange{
+			{
+				Denom:     BaseMinimalDenom,
+				MinAmount: sdkmath.NewInt(20000000000),
+				MaxAmount: util.PtrInt(30000000000),
+			},
+		},
+		Json: []didtypes.FeeRange{
+			{
+				Denom:     BaseMinimalDenom,
+				MinAmount: sdkmath.NewInt(3500000000),
+				MaxAmount: util.PtrInt(60000000000),
+			},
+		},
+		Default: []didtypes.FeeRange{
+			{
+				Denom:     BaseMinimalDenom,
+				MinAmount: sdkmath.NewInt(6000000000),
+				MaxAmount: util.PtrInt(20000000000),
+			},
+		},
+		BurnFactor: sdkmath.LegacyMustNewDecFromStr(DefaultBurnFactor),
+	}
+}
+
+func DefaultLegacyFeeParams() *LegacyFeeParams {
+	return &LegacyFeeParams{
 		Image:      sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceImageFee)),
 		Json:       sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceJSONFee)),
 		Default:    sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceDefaultFee)),
@@ -29,16 +48,43 @@ func DefaultFeeParams() *FeeParams {
 
 // ValidateBasic performs basic validation of cheqd module tx fee parameters
 func (tfp *FeeParams) ValidateBasic() error {
-	if !tfp.Image.IsPositive() || tfp.Image.Denom != BaseMinimalDenom {
-		return fmt.Errorf("invalid create resource image tx fee: %s", tfp.Image)
+	for i, f := range tfp.Image {
+		if f.Denom != BaseMinimalDenom && f.Denom != UsdDenom {
+			return fmt.Errorf("invalid denom in create_resource_image[%d]: got %s", i, f.Denom)
+		}
+		if !f.MinAmount.IsPositive() {
+			return fmt.Errorf("min_amount must be positive in create_resource_image[%d]: got %s", i, f.MinAmount.String())
+		}
+
+		if f.MaxAmount != nil && f.MaxAmount.LT(f.MinAmount) {
+			return fmt.Errorf("max_amount must be greater than or equal to min_amount in create_resource_image[%d]: got max=%s, min=%s", i, f.MaxAmount.String(), f.MinAmount.String())
+		}
 	}
 
-	if !tfp.Json.IsPositive() || tfp.Json.Denom != BaseMinimalDenom {
-		return fmt.Errorf("invalid create resource json tx fee: %s", tfp.Json)
+	for i, f := range tfp.Json {
+		if f.Denom != BaseMinimalDenom && f.Denom != UsdDenom {
+			return fmt.Errorf("invalid denom in create_resource_json[%d]: got %s", i, f.Denom)
+		}
+		if !f.MinAmount.IsPositive() {
+			return fmt.Errorf("min_amount must be non-negative in create_resource_json[%d]: got %s", i, f.MinAmount.String())
+		}
+
+		if f.MaxAmount != nil && f.MaxAmount.LT(f.MinAmount) {
+			return fmt.Errorf("max_amount must be greater than or equal to min_amount in create_resource_json[%d]: got max=%s, min=%s", i, f.MaxAmount.String(), f.MinAmount.String())
+		}
 	}
 
-	if !tfp.Json.IsPositive() || tfp.Json.Denom != BaseMinimalDenom {
-		return fmt.Errorf("invalid create resource default tx fee: %s", tfp.Json)
+	for i, f := range tfp.Default {
+		if f.Denom != BaseMinimalDenom && f.Denom != UsdDenom {
+			return fmt.Errorf("invalid denom in default_fee[%d]: got %s", i, f.Denom)
+		}
+		if !f.MinAmount.IsPositive() {
+			return fmt.Errorf("min_amount must be non-negative in default_fee[%d]: got %s", i, f.MinAmount.String())
+		}
+
+		if f.MaxAmount != nil && f.MaxAmount.LT(f.MinAmount) {
+			return fmt.Errorf("max_amount must be greater than or equal to min_amount in default_fee[%d]: got max=%s, min=%s", i, f.MaxAmount.String(), f.MinAmount.String())
+		}
 	}
 
 	if !tfp.BurnFactor.IsPositive() || tfp.BurnFactor.GTE(sdkmath.LegacyOneDec()) {
@@ -49,51 +95,63 @@ func (tfp *FeeParams) ValidateBasic() error {
 }
 
 func validateImage(i interface{}) error {
-	v, ok := i.(sdk.Coin)
+	v, ok := i.([]didtypes.FeeRange)
 	if !ok {
-		return fmt.Errorf("invalid parameter type: %T", i)
+		return fmt.Errorf("invalid parameter type for create_resource_image: %T", i)
 	}
 
-	if v.IsNil() {
-		return fmt.Errorf("create resource image msg fee param must not be nil")
-	}
-
-	if !v.IsPositive() {
-		return fmt.Errorf("create resource image msg fee param must be positive coin: %s", v)
+	for idx, f := range v {
+		if f.Denom != BaseMinimalDenom && f.Denom != UsdDenom {
+			return fmt.Errorf("invalid denom in create_resource_image[%d]: got %s", idx, f.Denom)
+		}
+		if f.MinAmount.IsNegative() {
+			return fmt.Errorf("min_amount must be non-negative in create_resource_image[%d]", idx)
+		}
+		if f.MaxAmount != nil && f.MaxAmount.LT(f.MinAmount) {
+			return fmt.Errorf("max_amount must be >= min_amount in create_resource_image[%d]", idx)
+		}
 	}
 
 	return nil
 }
 
 func validateJSON(i interface{}) error {
-	v, ok := i.(sdk.Coin)
+	v, ok := i.([]didtypes.FeeRange)
 	if !ok {
-		return fmt.Errorf("invalid parameter type: %T", i)
+		return fmt.Errorf("invalid parameter type for create_resource_json: %T", i)
 	}
 
-	if v.IsNil() {
-		return fmt.Errorf("create resource json msg fee param must not be nil")
-	}
-
-	if !v.IsPositive() {
-		return fmt.Errorf("create resource json msg fee param must be positive coin: %s", v)
+	for idx, f := range v {
+		if f.Denom != BaseMinimalDenom && f.Denom != UsdDenom {
+			return fmt.Errorf("invalid denom in create_resource_json[%d]: got %s", idx, f.Denom)
+		}
+		if f.MinAmount.IsNegative() {
+			return fmt.Errorf("min_amount must be non-negative in create_resource_json[%d]", idx)
+		}
+		if f.MaxAmount != nil && f.MaxAmount.LT(f.MinAmount) {
+			return fmt.Errorf("max_amount must be >= min_amount in create_resource_json[%d]", idx)
+		}
 	}
 
 	return nil
 }
 
 func validateDefault(i interface{}) error {
-	v, ok := i.(sdk.Coin)
+	v, ok := i.([]didtypes.FeeRange)
 	if !ok {
-		return fmt.Errorf("invalid parameter type: %T", i)
+		return fmt.Errorf("invalid parameter type for default_fee: %T", i)
 	}
 
-	if v.IsNil() {
-		return fmt.Errorf("create resource default msg fee param must not be nil")
-	}
-
-	if !v.IsPositive() {
-		return fmt.Errorf("create resource default msg fee param must be positive coin: %s", v)
+	for idx, f := range v {
+		if f.Denom != BaseMinimalDenom && f.Denom != UsdDenom {
+			return fmt.Errorf("invalid denom in default_fee[%d]: got %s", idx, f.Denom)
+		}
+		if f.MinAmount.IsNegative() {
+			return fmt.Errorf("min_amount must be non-negative in default_fee[%d]", idx)
+		}
+		if f.MaxAmount != nil && f.MaxAmount.LT(f.MinAmount) {
+			return fmt.Errorf("max_amount must be >= min_amount in default_fee[%d]", idx)
+		}
 	}
 
 	return nil

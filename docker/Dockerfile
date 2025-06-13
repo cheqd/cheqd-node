@@ -5,13 +5,13 @@
 FROM golang:1.23-alpine AS builder
 
 # Install minimum necessary dependencies
-ENV PACKAGES="curl make git libc-dev bash gcc linux-headers findutils"
+ENV PACKAGES="curl make git libc-dev bash gcc linux-headers findutils gettext"
 RUN apk update && apk add --no-cache $PACKAGES
 
 # Set working directory for the build
 WORKDIR /go/src/github.com/cheqd/cheqd-node
 
-# Add source files
+# # Add source files
 COPY . .
 
 # Make node binary
@@ -24,7 +24,7 @@ RUN make tidy && make build-linux
 FROM alpine:3.21 AS runner
 
 # Install pre-requisites
-RUN apk update && apk add --no-cache bash ca-certificates
+RUN apk update && apk add --no-cache bash ca-certificates gettext
 
 # Copy over binaries from the build-env
 COPY --from=builder /go/src/github.com/cheqd/cheqd-node/build/cheqd-noded /bin/cheqd-noded
@@ -35,6 +35,8 @@ ARG USER="cheqd"
 ARG GROUP=${USER}
 ARG UID=1000
 ARG GID=${UID}
+
+COPY docker/localnet/price-feeder.toml.template /etc/price-feeder/price-feeder.toml.template
 
 # Add cheqd user to use in the container
 RUN addgroup --system ${GROUP} --gid ${GID} \
@@ -49,7 +51,7 @@ WORKDIR ${HOME_DIR}
 USER ${USER}
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
-EXPOSE 26656 26657 26660 1317 9090 9091
+EXPOSE 26656 26657 26660 1317 9090 9091 7171
 
 # Set plain vanilla default entrypoint/command
 CMD [ "cheqd-noded" ]

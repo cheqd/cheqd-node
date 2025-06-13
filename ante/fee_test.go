@@ -270,14 +270,14 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 
 		Expect(err).To(BeNil(), "Tx errored after account has been set with sufficient funds")
 	})
-
 	It("TaxableTx Lifecycle - DID: MsgCreateDidDoc", func() {
 		// keys and addresses
 		priv1, _, addr1 := testdata.KeyTestPubAddr()
 
 		// msg and signatures
 		msg := SandboxDidDoc()
-		feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(5_000_000_000)))
+		feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(50_000_000_000)))
+
 		gasLimit := testdata.NewTestGasLimit()
 		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
 		s.txBuilder.SetFeeAmount(feeAmount)
@@ -297,8 +297,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
-
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -318,22 +317,37 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
-		Expect(amount.Sub(math.NewInt(feeParams.CreateDid.Amount.Int64()))).To(Equal(balance.Amount), "Tax was not subtracted from the fee payer")
+		Expect(amount.Sub(math.NewInt(feeParams.CreateDid[0].MinAmount.Int64()))).To(Equal(balance.Amount), "Tax was not subtracted from the fee payer")
 
 		// get supply after tx
 		supplyAfterDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
 		Expect(err).To(BeNil())
 
 		// check that supply was deflated
-		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(feeParams.CreateDid))
+		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, feeParams.CreateDid[0].MinAmount)))
 		Expect(supplyBeforeDeflation.Sub(supplyAfterDeflation...)).To(Equal(burnt), "Supply was not deflated")
 
 		// check that reward has been sent to the fee collector
-		reward := cheqdante.GetRewardPortion(sdk.NewCoins(feeParams.CreateDid), burnt)
+		reward := cheqdante.GetRewardPortion(sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, feeParams.CreateDid[0].MinAmount)), burnt)
+
+		// calculate oracle share (0.5%)
+		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.005 = 0.5%
+		rewardAmt := reward.AmountOf(didtypes.BaseMinimalDenom)
+		rewardDec := math.LegacyNewDecFromInt(rewardAmt)
+		oracleShare := rewardDec.Mul(oracleShareRate).TruncateInt()
+
+		// expected fee collector reward = reward - oracle share
+		expectedFeeCollectorReward := rewardAmt.Sub(oracleShare)
+
+		// check fee collector balance
 		feeCollector := s.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
 		feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
+		Expect(feeCollectorBalance.Amount).To(Equal(expectedFeeCollectorReward), "Fee Collector did not receive correct reward after oracle share deduction")
 
-		Expect(feeCollectorBalance.Amount).To(Equal(reward.AmountOf(didtypes.BaseMinimalDenom)), "Reward was not sent to the fee collector")
+		// check oracle module balance
+		oracleModule := s.app.AccountKeeper.GetModuleAddress("oracle")
+		oracleBalance := s.app.BankKeeper.GetBalance(s.ctx, oracleModule, didtypes.BaseMinimalDenom)
+		Expect(oracleBalance.Amount).To(Equal(oracleShare), "Oracle module did not receive the correct reward share")
 	})
 
 	It("TaxableTx Lifecycle - DLR: MsgCreateResource JSON", func() {
@@ -364,14 +378,14 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
 		supplyBeforeDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
 		Expect(err).To(BeNil())
 
-		// antehandler should not error to replay in mempool or deliverTx
+		// antehandler should not error
 		_, err = antehandler(s.ctx, tx, false)
 		Expect(err).To(BeNil(), "Tx errored when taxable on deliverTx")
 
@@ -384,22 +398,37 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
-		Expect(amount.Sub(math.NewInt(feeParams.Json.Amount.Int64()))).To(Equal(balance.Amount), "Tax was not subtracted from the fee payer")
+		Expect(amount.Sub(math.NewInt(feeParams.Json[0].MinAmount.Int64()))).To(Equal(balance.Amount), "Tax was not subtracted from the fee payer")
 
 		// get supply after tx
 		supplyAfterDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
 		Expect(err).To(BeNil())
 
 		// check that supply was deflated
-		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(feeParams.Json))
+		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(sdk.NewCoin(feeParams.Json[0].Denom, feeParams.Json[0].MinAmount)))
 		Expect(supplyBeforeDeflation.Sub(supplyAfterDeflation...)).To(Equal(burnt), "Supply was not deflated")
 
-		// check that reward has been sent to the fee collector
-		reward := cheqdante.GetRewardPortion(sdk.NewCoins(feeParams.Json), burnt)
+		// reward and oracle share logic
+		reward := cheqdante.GetRewardPortion(sdk.NewCoins(sdk.NewCoin(feeParams.Json[0].Denom, feeParams.Json[0].MinAmount)), burnt)
+		rewardAmt := reward.AmountOf(didtypes.BaseMinimalDenom) // type: math.Int
+		rewardCoin := sdk.NewCoin(didtypes.BaseMinimalDenom, rewardAmt)
+		rewardDecCoin := sdk.NewDecCoinFromCoin(rewardCoin)
+
+		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.005 = 0.5%
+		oracleShare := rewardDecCoin.Amount.Mul(oracleShareRate).TruncateInt()
+
+		expectedFeeCollectorReward := rewardAmt.Sub(oracleShare)
+
 		feeCollector := s.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
 		feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
 
-		Expect(feeCollectorBalance.Amount).To(Equal(reward.AmountOf(didtypes.BaseMinimalDenom)), "Reward was not sent to the fee collector")
+		Expect(feeCollectorBalance.Amount).To(Equal(expectedFeeCollectorReward), "Reward sent to fee collector is incorrect after subtracting oracle share")
+
+		// Optional: verify oracle module received its share
+		oracleModule := s.app.AccountKeeper.GetModuleAddress("oracle")
+		oracleBalance := s.app.BankKeeper.GetBalance(s.ctx, oracleModule, didtypes.BaseMinimalDenom)
+
+		Expect(oracleBalance.Amount).To(Equal(oracleShare), "Oracle did not receive correct reward share")
 	})
 
 	It("Non TaxableTx Lifecycle", func() {
@@ -429,7 +458,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -523,7 +552,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		err = s.app.FeeMarketKeeper.SetState(s.ctx, feemarketState)
 		Expect(err).To(BeNil())
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -584,7 +613,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -1288,6 +1317,7 @@ var _ = Describe("Test PostHandle", func() {
 			s.app.DidKeeper,
 			s.app.ResourceKeeper,
 			s.app.FeeMarketKeeper,
+			s.app.OracleKeeper,
 		)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
@@ -1444,7 +1474,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		err = testutil.FundModuleAccount(s.ctx, s.app.BankKeeper, types.ModuleName, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -1463,22 +1493,37 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
-		Expect(amount.Sub(feeParams.CreateDid.Amount).Equal(balance.Amount)).To(BeTrue(), "Tax was not subtracted from the fee payer")
+		Expect(amount.Sub(feeParams.CreateDid[0].MinAmount).Equal(balance.Amount)).To(BeTrue(), "Tax was not subtracted from the fee payer")
 
 		// get supply after tx
 		supplyAfterDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
 		Expect(err).To(BeNil())
 
 		// check that supply was deflated
-		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(feeParams.CreateDid))
+		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, feeParams.CreateDid[0].MinAmount)))
 		Expect(supplyBeforeDeflation.Sub(supplyAfterDeflation...)).To(Equal(burnt), "Supply was not deflated")
 
 		// check that reward has been sent to the fee collector
-		reward := cheqdante.GetRewardPortion(sdk.NewCoins(feeParams.CreateDid), burnt)
+		reward := cheqdante.GetRewardPortion(sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, feeParams.CreateDid[0].MinAmount)), burnt)
+
+		// calculate oracle share (0.5%)
+		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.005 = 0.5%
+		rewardAmt := reward.AmountOf(didtypes.BaseMinimalDenom)
+		rewardDec := math.LegacyNewDecFromInt(rewardAmt)
+		oracleShare := rewardDec.Mul(oracleShareRate).TruncateInt()
+
+		// expected fee collector reward = reward - oracle share
+		expectedFeeCollectorReward := rewardAmt.Sub(oracleShare)
+
+		// check fee collector balance
 		feeCollector := s.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
 		feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
+		Expect(feeCollectorBalance.Amount).To(Equal(expectedFeeCollectorReward), "Fee Collector did not receive correct reward after oracle share deduction")
 
-		Expect(feeCollectorBalance.Amount).To(Equal(reward.AmountOf(didtypes.BaseMinimalDenom)), "Reward was not sent to the fee collector")
+		// check oracle module balance
+		oracleModule := s.app.AccountKeeper.GetModuleAddress("oracle")
+		oracleBalance := s.app.BankKeeper.GetBalance(s.ctx, oracleModule, didtypes.BaseMinimalDenom)
+		Expect(oracleBalance.Amount).To(Equal(oracleShare), "Oracle module did not receive the correct reward share")
 	})
 
 	It("Ensure to convert the IBC Denom to native fee for non taxable txn", func() {
@@ -1514,7 +1559,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		err = testutil.FundModuleAccount(s.ctx, s.app.BankKeeper, types.ModuleName, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -1577,7 +1622,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -1596,21 +1641,36 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
-		Expect(amount.Sub(feeParams.CreateDid.Amount).Equal(balance.Amount)).To(BeTrue(), "Tax was not subtracted from the fee payer")
+		Expect(amount.Sub(feeParams.CreateDid[0].MinAmount).Equal(balance.Amount)).To(BeTrue(), "Tax was not subtracted from the fee payer")
 
 		// get supply after tx
 		supplyAfterDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
 		Expect(err).To(BeNil())
 
 		// check that supply was deflated
-		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(feeParams.CreateDid))
+		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, feeParams.CreateDid[0].MinAmount)))
 		Expect(supplyBeforeDeflation.Sub(supplyAfterDeflation...)).To(Equal(burnt), "Supply was not deflated")
 
 		// check that reward has been sent to the fee collector
-		reward := cheqdante.GetRewardPortion(sdk.NewCoins(feeParams.CreateDid), burnt)
+		reward := cheqdante.GetRewardPortion(sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, feeParams.CreateDid[0].MinAmount)), burnt)
+
+		// calculate oracle share (0.5%)
+		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.005 = 0.5%
+		rewardAmt := reward.AmountOf(didtypes.BaseMinimalDenom)
+		rewardDec := math.LegacyNewDecFromInt(rewardAmt)
+		oracleShare := rewardDec.Mul(oracleShareRate).TruncateInt()
+
+		// expected fee collector reward = reward - oracle share
+		expectedFeeCollectorReward := rewardAmt.Sub(oracleShare)
+
+		// check fee collector balance
 		feeCollector := s.app.AccountKeeper.GetModuleAddress(authtypes.FeeCollectorName)
 		feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
+		Expect(feeCollectorBalance.Amount).To(Equal(expectedFeeCollectorReward), "Fee Collector did not receive correct reward after oracle share deduction")
 
-		Expect(feeCollectorBalance.Amount).To(Equal(reward.AmountOf(didtypes.BaseMinimalDenom)), "Reward was not sent to the fee collector")
+		// check oracle module balance
+		oracleModule := s.app.AccountKeeper.GetModuleAddress("oracle")
+		oracleBalance := s.app.BankKeeper.GetBalance(s.ctx, oracleModule, didtypes.BaseMinimalDenom)
+		Expect(oracleBalance.Amount).To(Equal(oracleShare), "Oracle module did not receive the correct reward share")
 	})
 })

@@ -5,6 +5,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	cheqdapp "github.com/cheqd/cheqd-node/app"
+	"github.com/cheqd/cheqd-node/util"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -82,10 +83,22 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 			name: "valid params - all fields",
 			input: &didtypes.MsgUpdateParams{
 				Params: didtypes.FeeParams{
-					CreateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					UpdateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					DeactivateDid: sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
-					BurnFactor:    sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"),
+					CreateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(10000000000),
+						MaxAmount: util.PtrInt(10000000000),
+					}},
+					UpdateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(4000000000),
+						MaxAmount: util.PtrInt(4000000000),
+					}},
+					DeactivateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(2000000000),
+						MaxAmount: util.PtrInt(2000000000),
+					}},
+					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.6"),
 				},
 			},
 			expErr:    false,
@@ -96,140 +109,260 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 			name: "invalid create_did amount 0",
 			input: &didtypes.MsgUpdateParams{
 				Params: didtypes.FeeParams{
-					CreateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(0)},
-					UpdateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					DeactivateDid: sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
-					BurnFactor:    sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"),
+					CreateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(0),
+						MaxAmount: util.PtrInt(0),
+					}},
+					UpdateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(4000000000),
+						MaxAmount: util.PtrInt(4000000000),
+					}},
+					DeactivateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(2000000000),
+						MaxAmount: util.PtrInt(2000000000),
+					}},
+					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.6"),
 				},
 			},
 			expErr:    true,
-			expErrMsg: "invalid create did tx fee:",
+			expErrMsg: "min_amount must be non-negative",
 		}),
 	Entry("invalid create_did denom",
 		TestCaseUpdateParams{
 			name: "invalid create_did denom",
 			input: &didtypes.MsgUpdateParams{
 				Params: didtypes.FeeParams{
-					CreateDid:     sdk.Coin{Denom: "wrongdenom", Amount: sdkmath.NewInt(10000000000)},
-					UpdateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					DeactivateDid: sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
-					BurnFactor:    sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"),
+					CreateDid: []didtypes.FeeRange{{
+						Denom:     "wrongdenom",
+						MinAmount: sdkmath.NewInt(10000000000),
+						MaxAmount: util.PtrInt(10000000000),
+					}},
+					UpdateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(4000000000),
+						MaxAmount: util.PtrInt(4000000000),
+					}},
+					DeactivateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(2000000000),
+						MaxAmount: util.PtrInt(2000000000),
+					}},
+					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.6"),
 				},
 			},
 			expErr:    true,
-			expErrMsg: "invalid create did tx fee:",
+			expErrMsg: "invalid denom",
 		}),
 	Entry("invalid update_did amount 0",
 		TestCaseUpdateParams{
 			name: "invalid update_did amount 0",
 			input: &didtypes.MsgUpdateParams{
 				Params: didtypes.FeeParams{
-					CreateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					UpdateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(0)},
-					DeactivateDid: sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
-					BurnFactor:    sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"),
+					CreateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(10000000000),
+						MaxAmount: util.PtrInt(10000000000),
+					}},
+					UpdateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(0),
+						MaxAmount: util.PtrInt(0),
+					}},
+					DeactivateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(2000000000),
+						MaxAmount: util.PtrInt(2000000000),
+					}},
+					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.6"),
 				},
 			},
 			expErr:    true,
-			expErrMsg: "invalid update did tx fee:",
+			expErrMsg: "min_amount must be non-negative",
 		}),
 	Entry("invalid update_did denom",
 		TestCaseUpdateParams{
 			name: "invalid update_did denom",
 			input: &didtypes.MsgUpdateParams{
 				Params: didtypes.FeeParams{
-					CreateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					UpdateDid:     sdk.Coin{Denom: "wrongdenom", Amount: sdkmath.NewInt(4000000000)},
-					DeactivateDid: sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
-					BurnFactor:    sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"),
+					CreateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(10000000000),
+						MaxAmount: util.PtrInt(10000000000),
+					}},
+					UpdateDid: []didtypes.FeeRange{{
+						Denom:     "wrongdenom",
+						MinAmount: sdkmath.NewInt(4000000000),
+						MaxAmount: util.PtrInt(4000000000),
+					}},
+					DeactivateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(2000000000),
+						MaxAmount: util.PtrInt(2000000000),
+					}},
+					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.6"),
 				},
 			},
 			expErr:    true,
-			expErrMsg: "invalid update did tx fee:",
+			expErrMsg: "invalid denom",
 		}),
 	Entry("invalid deactivate_did amount 0",
 		TestCaseUpdateParams{
 			name: "invalid deactivate_did amount 0",
 			input: &didtypes.MsgUpdateParams{
 				Params: didtypes.FeeParams{
-					CreateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					UpdateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					DeactivateDid: sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(0)},
-					BurnFactor:    sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"),
+					CreateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(10000000000),
+						MaxAmount: util.PtrInt(10000000000),
+					}},
+					UpdateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(4000000000),
+						MaxAmount: util.PtrInt(4000000000),
+					}},
+					DeactivateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(0),
+						MaxAmount: util.PtrInt(0),
+					}},
+					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.6"),
 				},
 			},
 			expErr:    true,
-			expErrMsg: "invalid deactivate did tx fee:",
+			expErrMsg: "min_amount must be non-negative",
 		}),
 	Entry("invalid deactivate_did denom",
 		TestCaseUpdateParams{
 			name: "invalid deactivate_did denom",
 			input: &didtypes.MsgUpdateParams{
 				Params: didtypes.FeeParams{
-					CreateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					UpdateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					DeactivateDid: sdk.Coin{Denom: "wrongdenom", Amount: sdkmath.NewInt(2000000000)},
-					BurnFactor:    sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"),
+					CreateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(10000000000),
+						MaxAmount: util.PtrInt(10000000000),
+					}},
+					UpdateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(4000000000),
+						MaxAmount: util.PtrInt(4000000000),
+					}},
+					DeactivateDid: []didtypes.FeeRange{{
+						Denom:     "wrongdenom",
+						MinAmount: sdkmath.NewInt(2000000000),
+						MaxAmount: util.PtrInt(2000000000),
+					}},
+					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.6"),
 				},
 			},
 			expErr:    true,
-			expErrMsg: "invalid deactivate did tx fee:",
+			expErrMsg: "invalid denom",
 		}),
 	Entry("invalid burn_factor 0",
 		TestCaseUpdateParams{
 			name: "invalid burn_factor 0",
 			input: &didtypes.MsgUpdateParams{
 				Params: didtypes.FeeParams{
-					CreateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					UpdateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					DeactivateDid: sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
-					BurnFactor:    sdkmath.LegacyMustNewDecFromStr("0"),
+					CreateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(10000000000),
+						MaxAmount: util.PtrInt(10000000000),
+					}},
+					UpdateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(4000000000),
+						MaxAmount: util.PtrInt(4000000000),
+					}},
+					DeactivateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(2000000000),
+						MaxAmount: util.PtrInt(2000000000),
+					}},
+					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0"),
 				},
 			},
 			expErr:    true,
-			expErrMsg: "invalid burn factor:",
+			expErrMsg: "burn factor must be positive and < 1",
 		}),
 	Entry("invalid burn_factor negative",
 		TestCaseUpdateParams{
 			name: "invalid burn_factor negative",
 			input: &didtypes.MsgUpdateParams{
 				Params: didtypes.FeeParams{
-					CreateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					UpdateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					DeactivateDid: sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
-					BurnFactor:    sdkmath.LegacyMustNewDecFromStr("-0.1"),
+					CreateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(10000000000),
+						MaxAmount: util.PtrInt(10000000000),
+					}},
+					UpdateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(4000000000),
+						MaxAmount: util.PtrInt(4000000000),
+					}},
+					DeactivateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(2000000000),
+						MaxAmount: util.PtrInt(2000000000),
+					}},
+					BurnFactor: sdkmath.LegacyMustNewDecFromStr("-0.1"),
 				},
 			},
 			expErr:    true,
-			expErrMsg: "invalid burn factor:",
+			expErrMsg: "burn factor must be positive and < 1",
 		}),
 	Entry("invalid burn_factor equal to 1",
 		TestCaseUpdateParams{
 			name: "invalid burn_factor equal to 1",
 			input: &didtypes.MsgUpdateParams{
 				Params: didtypes.FeeParams{
-					CreateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					UpdateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					DeactivateDid: sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
-					BurnFactor:    sdkmath.LegacyMustNewDecFromStr("1.0"),
+					CreateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(10000000000),
+						MaxAmount: util.PtrInt(10000000000),
+					}},
+					UpdateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(4000000000),
+						MaxAmount: util.PtrInt(4000000000),
+					}},
+					DeactivateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(2000000000),
+						MaxAmount: util.PtrInt(2000000000),
+					}},
+					BurnFactor: sdkmath.LegacyMustNewDecFromStr("1"),
 				},
 			},
 			expErr:    true,
-			expErrMsg: "invalid burn factor:",
+			expErrMsg: "burn factor must be positive and < 1",
 		}),
 	Entry("invalid burn_factor greater than 1",
 		TestCaseUpdateParams{
 			name: "invalid burn_factor greater than 1",
 			input: &didtypes.MsgUpdateParams{
 				Params: didtypes.FeeParams{
-					CreateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					UpdateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					DeactivateDid: sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
-					BurnFactor:    sdkmath.LegacyMustNewDecFromStr("1.1"),
+					CreateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(10000000000),
+						MaxAmount: util.PtrInt(10000000000),
+					}},
+					UpdateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(4000000000),
+						MaxAmount: util.PtrInt(4000000000),
+					}},
+					DeactivateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(2000000000),
+						MaxAmount: util.PtrInt(2000000000),
+					}},
+					BurnFactor: sdkmath.LegacyMustNewDecFromStr("1.1"),
 				},
 			},
 			expErr:    true,
-			expErrMsg: "invalid burn factor:",
+			expErrMsg: "burn factor must be positive and < 1",
 		}),
 	Entry("invalid authority",
 		TestCaseUpdateParams{
@@ -237,10 +370,22 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 			input: &didtypes.MsgUpdateParams{
 				Authority: "invalid",
 				Params: didtypes.FeeParams{
-					CreateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					UpdateDid:     sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					DeactivateDid: sdk.Coin{Denom: didtypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
-					BurnFactor:    sdkmath.LegacyMustNewDecFromStr("0.6"),
+					CreateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(10000000000),
+						MaxAmount: util.PtrInt(10000000000),
+					}},
+					UpdateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(4000000000),
+						MaxAmount: util.PtrInt(4000000000),
+					}},
+					DeactivateDid: []didtypes.FeeRange{{
+						Denom:     didtypes.BaseMinimalDenom,
+						MinAmount: sdkmath.NewInt(2000000000),
+						MaxAmount: util.PtrInt(2000000000),
+					}},
+					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.6"),
 				},
 			},
 			expErr:    true,

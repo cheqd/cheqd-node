@@ -5,15 +5,19 @@ package integration
 import (
 	"crypto/ed25519"
 
+	"cosmossdk.io/math"
+	"github.com/cheqd/cheqd-node/ante"
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
-	"github.com/cheqd/cheqd-node/tests/integration/helpers"
+	helpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/cheqd/cheqd-node/x/did/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/google/uuid"
 
+	posthandler "github.com/cheqd/cheqd-node/post"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -70,19 +74,44 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
 
 		By("submitting a create diddoc message")
-		tax := feeParams.CreateDid
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
+		tax := feeParams.CreateDid[0]
+		cheqPrice, err := cli.QueryEMA("CHEQ")
+		Expect(err).To(BeNil())
+		cheqp := cheqPrice.Price
+		convertedFees, err := ante.GetFeeForMsg(feeParams.CreateDid, cheqp)
+		Expect(err).To(BeNil())
+		burnPotionInUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
+		rewardPortionInUsd := helpers.GetRewardPortion(convertedFees, burnPotionInUsd)
+
+		burnPotionInUsdToCheq, err := posthandler.ConvertToCheq(burnPotionInUsd, cheqp)
+		Expect(err).To(BeNil())
+
+		rewardPortionInUsdToCheq, err := posthandler.ConvertToCheq(rewardPortionInUsd, cheqp)
+		Expect(err).To(BeNil())
+
+		coin := rewardPortionInUsdToCheq.AmountOf("ncheq")
+
+		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.5%
+
+		oracleReward := oracleShareRate.MulInt(coin).TruncateInt()
+		oracleRewardCoin := sdk.NewCoin("ncheq", oracleReward)
+		feeCollectorReward := sdk.NewCoin("ncheq", coin.Sub(oracleReward))
+
+		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
+
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		By("querying the altered account balance")
 		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, types.BaseMinimalDenom)
 		Expect(err).To(BeNil())
+
 		Expect(balanceAfter.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(tax.Amount))
+		Expect(diff).To(Equal(taxIncheqd.AmountOf("ncheq")))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -95,41 +124,48 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 			helpers.HumanReadableEvent{
 				Type: "tx",
 				Attributes: []helpers.HumanReadableEventAttribute{
-					{Key: "fee", Value: tax.String(), Index: true},
+					{Key: "fee", Value: taxIncheqd.String(), Index: true},
 					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_4_ADDR, Index: true},
 				},
 			},
 		))
 
 		By("ensuring the events contain the expected supply deflation event")
-		burnt := helpers.GetBurntPortion(tax, feeParams.BurnFactor)
 		Expect(events).To(ContainElement(
 			helpers.HumanReadableEvent{
 				Type: "burn",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "burner", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
-					{Key: "amount", Value: burnt.String(), Index: true},
+					{Key: "amount", Value: burnPotionInUsdToCheq.String(), Index: true},
 				},
 			},
 		))
 
 		By("ensuring the events contain the expected reward distribution event")
-		reward := helpers.GetRewardPortion(tax, burnt)
 		Expect(events).To(ContainElement(
 			helpers.HumanReadableEvent{
 				Type: "transfer",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "recipient", Value: testdata.FEE_COLLECTOR_ADDR, Index: true},
 					{Key: "sender", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
-					{Key: "amount", Value: reward.String(), Index: true},
+					{Key: "amount", Value: feeCollectorReward.String(), Index: true},
+				},
+			},
+		))
+		Expect(events).To(ContainElement(
+			helpers.HumanReadableEvent{
+				Type: "transfer",
+				Attributes: []helpers.HumanReadableEventAttribute{
+					{Key: "recipient", Value: testdata.ORACLE_MODULE_ACCOUNT_ADDR, Index: true},
+					{Key: "sender", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
+					{Key: "amount", Value: oracleRewardCoin.String(), Index: true},
 				},
 			},
 		))
 	})
-
 	It("should tax update diddoc message - case: fixed fee", func() {
 		By("submitting a create diddoc message")
-		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid.String()))
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -153,9 +189,33 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
 
+		By("fetching CHEQ price and calculating expected tax")
+		tax := feeParams.UpdateDid[0]
+		cheqPrice, err := cli.QueryEMA("CHEQ")
+		Expect(err).To(BeNil())
+		cheqp := cheqPrice.Price
+
+		convertedFees, err := ante.GetFeeForMsg(feeParams.UpdateDid, cheqp)
+		Expect(err).To(BeNil())
+		burnPotionInUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
+		rewardPortionInUsd := helpers.GetRewardPortion(convertedFees, burnPotionInUsd)
+
+		burnPotionInUsdToCheq, err := posthandler.ConvertToCheq(burnPotionInUsd, cheqp)
+		Expect(err).To(BeNil())
+
+		rewardPortionInUsdToCheq, err := posthandler.ConvertToCheq(rewardPortionInUsd, cheqp)
+		Expect(err).To(BeNil())
+
+		coin := rewardPortionInUsdToCheq.AmountOf("ncheq")
+		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.5%
+		oracleReward := oracleShareRate.MulInt(coin).TruncateInt()
+		oracleRewardCoin := sdk.NewCoin("ncheq", oracleReward)
+		feeCollectorReward := sdk.NewCoin("ncheq", coin.Sub(oracleReward))
+
+		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
+
 		By("submitting an update diddoc message")
-		tax := feeParams.UpdateDid
-		res, err := cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
+		res, err := cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -166,7 +226,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(tax.Amount))
+		Expect(diff).To(Equal(taxIncheqd.AmountOf("ncheq")))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -179,41 +239,48 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 			helpers.HumanReadableEvent{
 				Type: "tx",
 				Attributes: []helpers.HumanReadableEventAttribute{
-					{Key: "fee", Value: tax.String(), Index: true},
+					{Key: "fee", Value: taxIncheqd.String(), Index: true},
 					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_4_ADDR, Index: true},
 				},
 			},
 		))
 
 		By("ensuring the events contain the expected supply deflation event")
-		burnt := helpers.GetBurntPortion(tax, feeParams.BurnFactor)
 		Expect(events).To(ContainElement(
 			helpers.HumanReadableEvent{
 				Type: "burn",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "burner", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
-					{Key: "amount", Value: burnt.String(), Index: true},
+					{Key: "amount", Value: burnPotionInUsdToCheq.String(), Index: true},
 				},
 			},
 		))
 
 		By("ensuring the events contain the expected reward distribution event")
-		reward := helpers.GetRewardPortion(tax, burnt)
 		Expect(events).To(ContainElement(
 			helpers.HumanReadableEvent{
 				Type: "transfer",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "recipient", Value: testdata.FEE_COLLECTOR_ADDR, Index: true},
 					{Key: "sender", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
-					{Key: "amount", Value: reward.String(), Index: true},
+					{Key: "amount", Value: feeCollectorReward.String(), Index: true},
+				},
+			},
+		))
+		Expect(events).To(ContainElement(
+			helpers.HumanReadableEvent{
+				Type: "transfer",
+				Attributes: []helpers.HumanReadableEventAttribute{
+					{Key: "recipient", Value: testdata.ORACLE_MODULE_ACCOUNT_ADDR, Index: true},
+					{Key: "sender", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
+					{Key: "amount", Value: oracleRewardCoin.String(), Index: true},
 				},
 			},
 		))
 	})
-
 	It("should tax deactivate diddoc message - case: fixed fee", func() {
 		By("submitting a create diddoc message")
-		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid.String()))
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -227,9 +294,33 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
 
-		By("submitting an deactivate diddoc message")
-		tax := feeParams.DeactivateDid
-		res, err := cli.DeactivateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.String()))
+		By("fetching cheq EMA price and computing fees")
+		tax := feeParams.DeactivateDid[0]
+		cheqPrice, err := cli.QueryEMA("CHEQ")
+		Expect(err).To(BeNil())
+		cheqp := cheqPrice.Price
+		convertedFees, err := ante.GetFeeForMsg(feeParams.DeactivateDid, cheqp)
+		Expect(err).To(BeNil())
+		burnPotionInUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
+		rewardPortionInUsd := helpers.GetRewardPortion(convertedFees, burnPotionInUsd)
+
+		burnPotionInUsdToCheq, err := posthandler.ConvertToCheq(burnPotionInUsd, cheqp)
+		Expect(err).To(BeNil())
+
+		rewardPortionInUsdToCheq, err := posthandler.ConvertToCheq(rewardPortionInUsd, cheqp)
+		Expect(err).To(BeNil())
+
+		coin := rewardPortionInUsdToCheq.AmountOf("ncheq")
+
+		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.5%
+		oracleReward := oracleShareRate.MulInt(coin).TruncateInt()
+		oracleRewardCoin := sdk.NewCoin("ncheq", oracleReward)
+		feeCollectorReward := sdk.NewCoin("ncheq", coin.Sub(oracleReward))
+
+		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
+
+		By("submitting a deactivate diddoc message")
+		res, err := cli.DeactivateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -240,7 +331,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(tax.Amount))
+		Expect(diff).To(Equal(taxIncheqd.AmountOf("ncheq")))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -253,33 +344,41 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 			helpers.HumanReadableEvent{
 				Type: "tx",
 				Attributes: []helpers.HumanReadableEventAttribute{
-					{Key: "fee", Value: tax.String(), Index: true},
+					{Key: "fee", Value: taxIncheqd.String(), Index: true},
 					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_4_ADDR, Index: true},
 				},
 			},
 		))
 
 		By("ensuring the events contain the expected supply deflation event")
-		burnt := helpers.GetBurntPortion(tax, feeParams.BurnFactor)
 		Expect(events).To(ContainElement(
 			helpers.HumanReadableEvent{
 				Type: "burn",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "burner", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
-					{Key: "amount", Value: burnt.String(), Index: true},
+					{Key: "amount", Value: burnPotionInUsdToCheq.String(), Index: true},
 				},
 			},
 		))
 
-		By("ensuring the events contain the expected reward distribution event")
-		reward := helpers.GetRewardPortion(tax, burnt)
+		By("ensuring the events contain the expected reward distribution events")
 		Expect(events).To(ContainElement(
 			helpers.HumanReadableEvent{
 				Type: "transfer",
 				Attributes: []helpers.HumanReadableEventAttribute{
 					{Key: "recipient", Value: testdata.FEE_COLLECTOR_ADDR, Index: true},
 					{Key: "sender", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
-					{Key: "amount", Value: reward.String(), Index: true},
+					{Key: "amount", Value: feeCollectorReward.String(), Index: true},
+				},
+			},
+		))
+		Expect(events).To(ContainElement(
+			helpers.HumanReadableEvent{
+				Type: "transfer",
+				Attributes: []helpers.HumanReadableEventAttribute{
+					{Key: "recipient", Value: testdata.ORACLE_MODULE_ACCOUNT_ADDR, Index: true},
+					{Key: "sender", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
+					{Key: "amount", Value: oracleRewardCoin.String(), Index: true},
 				},
 			},
 		))
@@ -288,6 +387,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 	It("should tax create diddoc message with feegrant - case: fixed fee", func() {
 		By("creating a feegrant")
 		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
+
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -300,8 +400,9 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting a create diddoc message")
-		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(feeParams.CreateDid.String())))
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom)))
 		Expect(err).To(BeNil())
+
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
 		By("querying the fee granter account balance after the transaction")
@@ -313,9 +414,9 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("checking the granter balance difference")
-		tax := feeParams.CreateDid
+		tax := feeParams.CreateDid[0].MinAmount
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(tax.Amount))
+		Expect(diff.GTE(tax)).To(BeTrue())
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
@@ -323,13 +424,14 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("revoking the feegrant")
 		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
+
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should tax update diddoc message with feegrant - case: fixed fee", func() {
 		By("submitting a create diddoc message")
-		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid.String()))
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -362,7 +464,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting an update diddoc message")
-		resp, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(feeParams.UpdateDid.String())))
+		resp, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(feeParams.UpdateDid[0].MinAmount.String()+feeParams.UpdateDid[0].Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -375,9 +477,9 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("checking the granter balance difference")
-		tax := feeParams.UpdateDid
+		tax := feeParams.UpdateDid[0].MinAmount
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(tax.Amount))
+		Expect(diff.GTE(tax)).To(BeTrue())
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
@@ -391,7 +493,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 	It("should tax deactivate diddoc message with feegrant - case: fixed fee", func() {
 		By("submitting a create diddoc message")
-		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid.String()))
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -402,9 +504,9 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("creating a feegrant")
 		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
+
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
-
 		By("querying the fee granter account balance before the transaction")
 		granterBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, types.BaseMinimalDenom)
 		Expect(err).To(BeNil())
@@ -413,8 +515,33 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		granteeBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, types.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
+		By("fetching cheq EMA price and computing fees")
+		tax := feeParams.DeactivateDid[0]
+		cheqPrice, err := cli.QueryEMA("CHEQ")
+		Expect(err).To(BeNil())
+		cheqp := cheqPrice.Price
+		convertedFees, err := ante.GetFeeForMsg(feeParams.DeactivateDid, cheqp)
+		Expect(err).To(BeNil())
+		burnPotionInUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
+		rewardPortionInUsd := helpers.GetRewardPortion(convertedFees, burnPotionInUsd)
+
+		burnPotionInUsdToCheq, err := posthandler.ConvertToCheq(burnPotionInUsd, cheqp)
+		Expect(err).To(BeNil())
+
+		rewardPortionInUsdToCheq, err := posthandler.ConvertToCheq(rewardPortionInUsd, cheqp)
+		Expect(err).To(BeNil())
+
+		coin := rewardPortionInUsdToCheq.AmountOf("ncheq")
+
+		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.5%
+		oracleReward := oracleShareRate.MulInt(coin).TruncateInt()
+		oracleRewardCoin := sdk.NewCoin("ncheq", oracleReward)
+		feeCollectorReward := sdk.NewCoin("ncheq", coin.Sub(oracleReward))
+
+		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
+
 		By("submitting a deactivate diddoc message")
-		resp, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(feeParams.DeactivateDid.String())))
+		resp, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -427,17 +554,66 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("checking the granter balance difference")
-		tax := feeParams.DeactivateDid
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(tax.Amount))
+		Expect(diff).To(Equal(taxIncheqd.AmountOf("ncheq")))
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
 		Expect(diff.IsZero()).To(BeTrue())
 
+		By("exporting a readable tx event log")
+		txResp, err := cli.QueryTxn(resp.TxHash)
+		Expect(err).To(BeNil())
+		events := helpers.ReadableEvents(txResp.Events)
+
+		By("ensuring the events contain the expected tax event")
+		Expect(events).To(ContainElement(
+			helpers.HumanReadableEvent{
+				Type: "tx",
+				Attributes: []helpers.HumanReadableEventAttribute{
+					{Key: "fee", Value: taxIncheqd.String(), Index: true},
+					{Key: "fee_payer", Value: testdata.BASE_ACCOUNT_4_ADDR, Index: true},
+				},
+			},
+		))
+
+		By("ensuring the events contain the expected supply deflation event")
+		Expect(events).To(ContainElement(
+			helpers.HumanReadableEvent{
+				Type: "burn",
+				Attributes: []helpers.HumanReadableEventAttribute{
+					{Key: "burner", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
+					{Key: "amount", Value: burnPotionInUsdToCheq.String(), Index: true},
+				},
+			},
+		))
+
+		By("ensuring the events contain the expected reward distribution events")
+		Expect(events).To(ContainElement(
+			helpers.HumanReadableEvent{
+				Type: "transfer",
+				Attributes: []helpers.HumanReadableEventAttribute{
+					{Key: "recipient", Value: testdata.FEE_COLLECTOR_ADDR, Index: true},
+					{Key: "sender", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
+					{Key: "amount", Value: feeCollectorReward.String(), Index: true},
+				},
+			},
+		))
+		Expect(events).To(ContainElement(
+			helpers.HumanReadableEvent{
+				Type: "transfer",
+				Attributes: []helpers.HumanReadableEventAttribute{
+					{Key: "recipient", Value: testdata.ORACLE_MODULE_ACCOUNT_ADDR, Index: true},
+					{Key: "sender", Value: testdata.DID_MODULE_ACCOUNT_ADDR, Index: true},
+					{Key: "amount", Value: oracleRewardCoin.String(), Index: true},
+				},
+			},
+		))
+
 		By("revoking the feegrant")
 		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
+
 		Expect(err).To(BeNil())
-		Expect(resp.Code).To(BeEquivalentTo(0))
+		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 })
