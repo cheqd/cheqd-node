@@ -115,7 +115,7 @@ func (s *IntegrationTestSuite) TestMsgServer_AggregateExchangeRateVote() {
 		ctx,
 		valAddr,
 		types.NewAggregateExchangeRatePrevote(
-			hash, valAddr, 8,
+			hash, valAddr, 9,
 		))
 	_, err = s.msgServer.AggregateExchangeRateVote(ctx, voteMsg)
 	s.Require().NoError(err)
@@ -171,7 +171,7 @@ func (s *IntegrationTestSuite) TestMsgServer_UpdateGovParams() {
 				Description: "test",
 				Plan: types.ParamUpdatePlan{
 					Keys:   []string{"AcceptList"},
-					Height: 9,
+					Height: 11,
 					Changes: types.Params{
 						AcceptList: append(types.DefaultAcceptList, types.Denom{
 							BaseDenom:   "base",
@@ -192,7 +192,7 @@ func (s *IntegrationTestSuite) TestMsgServer_UpdateGovParams() {
 				Description: "test",
 				Plan: types.ParamUpdatePlan{
 					Keys:   []string{"MandatoryList"},
-					Height: 9,
+					Height: 11,
 					Changes: types.Params{
 						MandatoryList: types.DefaultMandatoryList,
 					},
@@ -209,7 +209,7 @@ func (s *IntegrationTestSuite) TestMsgServer_UpdateGovParams() {
 				Description: "test",
 				Plan: types.ParamUpdatePlan{
 					Keys:   []string{"MandatoryList"},
-					Height: 9,
+					Height: 11,
 					Changes: types.Params{
 						MandatoryList: types.DenomList{
 							{
@@ -232,7 +232,7 @@ func (s *IntegrationTestSuite) TestMsgServer_UpdateGovParams() {
 				Description: "test",
 				Plan: types.ParamUpdatePlan{
 					Keys:   []string{"RewardBands"},
-					Height: 9,
+					Height: 11,
 					Changes: types.Params{
 						RewardBands: append(types.DefaultRewardBands(), types.RewardBand{
 							SymbolDenom: "symbol",
@@ -252,7 +252,7 @@ func (s *IntegrationTestSuite) TestMsgServer_UpdateGovParams() {
 				Description: "test",
 				Plan: types.ParamUpdatePlan{
 					Keys:   []string{"RewardBands"},
-					Height: 9,
+					Height: 11,
 					Changes: types.Params{
 						RewardBands: types.RewardBandList{
 							{
@@ -289,7 +289,7 @@ func (s *IntegrationTestSuite) TestMsgServer_UpdateGovParams() {
 						"MaximumPriceStamps",
 						"MaximumMedianStamps",
 					},
-					Height: 9,
+					Height: 11,
 					Changes: types.Params{
 						VotePeriod:               10,
 						VoteThreshold:            math.LegacyNewDecWithPrec(40, 2),
@@ -315,7 +315,7 @@ func (s *IntegrationTestSuite) TestMsgServer_UpdateGovParams() {
 				Description: "test",
 				Plan: types.ParamUpdatePlan{
 					Keys:   []string{"VoteThreshold"},
-					Height: 9,
+					Height: 11,
 					Changes: types.Params{
 						VoteThreshold: math.LegacyNewDecWithPrec(10, 2),
 					},
@@ -332,7 +332,7 @@ func (s *IntegrationTestSuite) TestMsgServer_UpdateGovParams() {
 				Description: "test",
 				Plan: types.ParamUpdatePlan{
 					Keys:   []string{"VotePeriod", "SlashWindow"},
-					Height: 9,
+					Height: 11,
 					Changes: types.Params{
 						VotePeriod:  5,
 						SlashWindow: 4,
@@ -350,7 +350,7 @@ func (s *IntegrationTestSuite) TestMsgServer_UpdateGovParams() {
 				Description: "test",
 				Plan: types.ParamUpdatePlan{
 					Keys:    []string{"test"},
-					Height:  9,
+					Height:  11,
 					Changes: types.Params{},
 				},
 			},
@@ -365,7 +365,7 @@ func (s *IntegrationTestSuite) TestMsgServer_UpdateGovParams() {
 				Description: "test",
 				Plan: types.ParamUpdatePlan{
 					Keys:   []string{"RewardBands"},
-					Height: 9,
+					Height: 11,
 					Changes: types.Params{
 						RewardBands: types.RewardBandList{
 							{
@@ -523,7 +523,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovAddDenom() {
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 				DenomList:   append(types.DenomList{}, *foo, *bar),
 				Mandatory:   false,
 			},
@@ -536,7 +536,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovAddDenom() {
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 				DenomList:   append(types.DenomList{}, *foo, *bar),
 				Mandatory:   true,
 
@@ -552,7 +552,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovAddDenom() {
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 				DenomList:   append(types.DenomList{}, *reward),
 				Mandatory:   true,
 				RewardBand:  &bandArgument,
@@ -566,7 +566,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovAddDenom() {
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 				DenomList:   types.DenomList{},
 				Mandatory:   true,
 
@@ -582,7 +582,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovAddDenom() {
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 				DenomList:   append(types.DenomList{}, *foo, *foo),
 				Mandatory:   false,
 			},
@@ -595,7 +595,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovAddDenom() {
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 				DenomList:   append(types.DenomList{}, *bar, *bar),
 				Mandatory:   true,
 			},
@@ -608,7 +608,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovAddDenom() {
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 				DenomList: append(types.DenomList{}, types.Denom{
 					SymbolDenom: "CHEQ",
 					BaseDenom:   "CHEQ",
@@ -625,7 +625,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovAddDenom() {
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 				DenomList: append(types.DenomList{}, types.Denom{
 					SymbolDenom: "USDC",
 					BaseDenom:   "USDC",
@@ -642,7 +642,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovAddDenom() {
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 				DenomList:   append(types.DenomList{}, types.Denom{}),
 				Mandatory:   true,
 			},
@@ -655,7 +655,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovAddDenom() {
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 				DenomList:   append(types.DenomList{}, *foobar),
 				Mandatory:   true,
 
@@ -676,7 +676,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovAddDenom() {
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 				DenomList:   append(types.DenomList{}, *foobar),
 				Mandatory:   true,
 
@@ -840,7 +840,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovRemoveCurrencyPairProviders() {
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 
 				CurrencyPairProviders: types.CurrencyPairProvidersList{
 					{
@@ -858,7 +858,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovRemoveCurrencyPairProviders() {
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 
 				CurrencyPairProviders: types.CurrencyPairProvidersList{
 					{
@@ -880,7 +880,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovRemoveCurrencyPairProviders() {
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 
 				CurrencyPairProviders: types.CurrencyPairProvidersList{
 					{
@@ -898,7 +898,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovRemoveCurrencyPairProviders() {
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 
 				CurrencyPairProviders: types.CurrencyPairProvidersList{
 					{
@@ -996,7 +996,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovRemoveCurrencyDeviationThreshold
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 
 				Currencies: []string{"CURR1"},
 			},
@@ -1009,7 +1009,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovRemoveCurrencyDeviationThreshold
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 
 				Currencies: []string{"CURR1", "CURR2"},
 			},
@@ -1022,7 +1022,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovRemoveCurrencyDeviationThreshold
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 
 				Currencies: []string{"FOO"},
 			},
@@ -1035,7 +1035,7 @@ func (s *IntegrationTestSuite) TestMsgServer_GovRemoveCurrencyDeviationThreshold
 				Authority:   govAccAddr,
 				Title:       "test",
 				Description: "test",
-				Height:      9,
+				Height:      11,
 
 				Currencies: []string{"BAR", "FOOBAR"},
 			},

@@ -230,22 +230,19 @@ var _ = Describe("cheqd cli - oracle module", func() {
 		Expect(err).To(BeNil())
 
 		prevoteBlock := prevote.AggregatePrevote.SubmitBlock
+		nextVotePeriodStart := ((prevoteBlock / votePeriod) + 1) * votePeriod
 
-		fmt.Printf("Waiting until we are in the reveal period (current voting period == prevote period + 1)...\n")
+		fmt.Printf(" Waiting until block height >= %d to enter the correct voting period...\n", nextVotePeriodStart)
 
-		// Wait until reveal period starts
+		// Wait until block height reaches required voting period
 		for {
 			currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
 			Expect(err).To(BeNil())
 
-			vp := int64(votePeriod)
-			currentPeriod := currentHeight / vp
-			prevotePeriod := int64(prevoteBlock) / vp
-
-			if currentPeriod-prevotePeriod == 1 {
+			if currentHeight >= int64(nextVotePeriodStart) {
 				break
 			}
-			time.Sleep(1 * time.Second)
+			time.Sleep(2 * time.Second)
 		}
 
 		fmt.Printf("Submitting vote with matching parameters...\n")

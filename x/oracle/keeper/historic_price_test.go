@@ -8,6 +8,7 @@ import (
 func (s *IntegrationTestSuite) TestSetHistoraclePricing() {
 	app, ctx := s.app, s.ctx
 
+	ctx = ctx.WithBlockHeight(9)
 	// update stamp params
 	app.OracleKeeper.SetHistoricStampPeriod(ctx, 1)
 	app.OracleKeeper.SetMedianStampPeriod(ctx, 3)

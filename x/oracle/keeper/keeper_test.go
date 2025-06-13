@@ -47,7 +47,7 @@ func (s *IntegrationTestSuite) SetupTest() {
 	require.NoError(err)
 	ctx := app.BaseApp.NewContextLegacy(false, cmtproto.Header{
 		ChainID: fmt.Sprintf("test-chain-%s", cmtrand.Str(4)),
-		Height:  9,
+		Height:  11,
 	},
 	)
 	queryHelper := baseapp.NewQueryServerTestHelper(ctx, app.InterfaceRegistry())
