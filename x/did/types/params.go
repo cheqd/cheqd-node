@@ -1,6 +1,7 @@
 package types
 
 import (
+	"context"
 	"fmt"
 
 	sdkmath "cosmossdk.io/math"
@@ -51,6 +52,123 @@ func DefaultLegacyFeeParams() *LegacyFeeParams {
 		DeactivateDid: sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultDeactivateDidTxFee)),
 		BurnFactor:    sdkmath.LegacyMustNewDecFromStr(DefaultBurnFactor),
 	}
+}
+
+// USDRange represents a fee range converted to USD for comparison
+type USDRange struct {
+	MinUSD sdkmath.LegacyDec
+	MaxUSD *sdkmath.LegacyDec // nil means no upper bound
+}
+
+// convertFeeRangeToUSD converts a FeeRange to USD using oracle price
+func convertFeeRangeToUSD(ctx context.Context, oracleKeeper OracleKeeper, fr FeeRange) (USDRange, error) {
+	normalizeUSD := func(amount sdkmath.Int) sdkmath.LegacyDec {
+		// Heuristic: If value >= 1e12, likely fixed-point with 18 decimals
+		if amount.GTE(sdkmath.NewInt(1_000_000_000_000)) {
+			return sdkmath.LegacyNewDecFromInt(amount).Quo(sdkmath.LegacyNewDec(1_000_000_000_000_000_000)) // 1e18
+		}
+		return sdkmath.LegacyNewDecFromInt(amount)
+	}
+
+	if fr.Denom == oracletypes.UsdDenom {
+		minUSD := normalizeUSD(fr.MinAmount)
+
+		var maxUSD *sdkmath.LegacyDec
+		if fr.MaxAmount != nil {
+			val := normalizeUSD(*fr.MaxAmount)
+			maxUSD = &val
+		}
+		// If fr.MaxAmount is nil, maxUSD remains nil (no upper bound)
+
+		return USDRange{
+			MinUSD: minUSD,
+			MaxUSD: maxUSD,
+		}, nil
+	}
+
+	if fr.Denom == BaseMinimalDenom {
+		// Get CHEQ/USD price from oracle
+		sdkCtx := sdk.UnwrapSDKContext(ctx)
+		price, found := oracleKeeper.GetWMA(sdkCtx, oracletypes.CheqdSymbol, "BALANCED")
+		if !found {
+			return USDRange{}, fmt.Errorf("failed to get CHEQ/USD price")
+		}
+
+		// Validate price is positive
+		if !price.IsPositive() {
+			return USDRange{}, fmt.Errorf("invalid CHEQ/USD price: %s", price)
+		}
+
+		// Convert from base units (ncheq) to CHEQ, then to USD
+		// 1 CHEQ = 1e9 ncheq
+		cheqDecimals := sdkmath.LegacyNewDec(1_000_000_000) // 9 decimals
+
+		minCheq := sdkmath.LegacyNewDecFromInt(fr.MinAmount).Quo(cheqDecimals)
+		minUSD := minCheq.Mul(price)
+
+		var maxUSD *sdkmath.LegacyDec
+		if fr.MaxAmount != nil {
+			maxCheq := sdkmath.LegacyNewDecFromInt(*fr.MaxAmount).Quo(cheqDecimals)
+			val := maxCheq.Mul(price)
+			maxUSD = &val
+		}
+		// If fr.MaxAmount is nil, maxUSD remains nil (no upper bound)
+
+		return USDRange{
+			MinUSD: minUSD,
+			MaxUSD: maxUSD,
+		}, nil
+	}
+
+	return USDRange{}, fmt.Errorf("unsupported denomination: %s", fr.Denom)
+}
+
+// validateFeeRangeOverlap validates that fee ranges for a message type have overlapping USD ranges
+func validateFeeRangeOverlap(ctx context.Context, oracleKeeper OracleKeeper, msgType string, feeRanges []FeeRange) error {
+	if len(feeRanges) <= 1 {
+		return nil // No overlap validation needed for single or no ranges
+	}
+
+	// Convert all ranges to USD
+	usdRanges := make([]USDRange, len(feeRanges))
+	for i, fr := range feeRanges {
+		usdRange, err := convertFeeRangeToUSD(ctx, oracleKeeper, fr)
+		if err != nil {
+			return fmt.Errorf("failed to convert %s fee range %d to USD: %w", msgType, i, err)
+		}
+		usdRanges[i] = usdRange
+	}
+
+	// Check if all ranges have overlapping region
+	// Start with first range as the overlap candidate
+	overlapMin := usdRanges[0].MinUSD
+	overlapMax := usdRanges[0].MaxUSD
+
+	// For each subsequent range, find intersection
+	for i := 1; i < len(usdRanges); i++ {
+		// Update minimum to the higher of the two minimums
+		if usdRanges[i].MinUSD.GT(overlapMin) {
+			overlapMin = usdRanges[i].MinUSD
+		}
+
+		// Update maximum to the lower of the two maximums
+		// Handle nil (unbounded) cases
+		if usdRanges[i].MaxUSD != nil {
+			if overlapMax == nil || usdRanges[i].MaxUSD.LT(*overlapMax) {
+				val := *usdRanges[i].MaxUSD
+				overlapMax = &val
+			}
+		}
+		// If usdRanges[i].MaxUSD is nil but overlapMax is not, keep overlapMax
+		// If both are nil, overlapMax remains nil (unbounded)
+	}
+
+	// Check if intersection is valid
+	if overlapMax != nil && overlapMin.GT(*overlapMax) {
+		return fmt.Errorf("no overlapping fee range found for %s: ranges do not have common USD value range", msgType)
+	}
+
+	return nil
 }
 
 // validateFeeRangeList is a generic validator for []FeeRange
@@ -135,6 +253,28 @@ func (tfp *FeeParams) ValidateBasic() error {
 	if err := validateBurnFactor(tfp.BurnFactor); err != nil {
 		return err
 	}
+	return nil
+}
+
+// ValidateWithOracle validates FeeParams with oracle price overlap checking
+func (tfp *FeeParams) ValidateWithOracle(ctx context.Context, oracleKeeper OracleKeeper) error {
+	// First do basic validation
+	if err := tfp.ValidateBasic(); err != nil {
+		return err
+	}
+	// Then validate overlaps for each message type
+	if err := validateFeeRangeOverlap(ctx, oracleKeeper, "create_did", tfp.CreateDid); err != nil {
+		return err
+	}
+
+	if err := validateFeeRangeOverlap(ctx, oracleKeeper, "update_did", tfp.UpdateDid); err != nil {
+		return err
+	}
+
+	if err := validateFeeRangeOverlap(ctx, oracleKeeper, "deactivate_did", tfp.DeactivateDid); err != nil {
+		return err
+	}
+
 	return nil
 }
 

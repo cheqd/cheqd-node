@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -33,6 +34,7 @@ func GetQueryCmd() *cobra.Command {
 		GetCmdQueryMissCounter(),
 		GetCmdQuerySlashWindow(),
 		GetEmaofCheqd(),
+		CmdQueryWMA(),
 	)
 
 	return cmd
@@ -299,5 +301,47 @@ func GetEmaofCheqd() *cobra.Command {
 	}
 
 	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+func CmdQueryWMA() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "wma [denom]",
+		Short: "Query WMA price for a denom with specified strategy",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			denom := args[0]
+			strategy, _ := cmd.Flags().GetString("strategy")
+			weightsStr, _ := cmd.Flags().GetString("weights")
+
+			var weights []int64
+			if weightsStr != "" {
+				for _, w := range strings.Split(weightsStr, ",") {
+					val, err := strconv.ParseInt(strings.TrimSpace(w), 10, 64)
+					if err != nil {
+						return err
+					}
+					weights = append(weights, val)
+				}
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.WMA(cmd.Context(), &types.QueryWMARequest{
+				Denom:         denom,
+				Strategy:      strategy,
+				CustomWeights: weights,
+			})
+			return cli.PrintOrErr(res, err, clientCtx)
+		},
+	}
+
+	cmd.Flags().String("strategy", "BALANCED", "WMA strategy: BALANCED | OLDEST | RECENT | CUSTOM")
+	cmd.Flags().String("weights", "", "Custom weights (comma-separated, e.g. 10,9,8...)")
+
 	return cmd
 }

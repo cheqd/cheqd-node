@@ -744,12 +744,6 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	app.DidKeeper = *didkeeper.NewKeeper(
-		appCodec, runtime.NewKVStoreService(keys[didtypes.StoreKey]),
-		app.GetSubspace(didtypes.ModuleName),
-		app.AccountKeeper, app.BankKeeper,
-		app.StakingKeeper, authority,
-	)
 	app.OracleKeeper = oraclekeeper.NewKeeper(
 		appCodec,
 		keys[oracletypes.ModuleName],
@@ -761,6 +755,12 @@ func New(
 		distrtypes.ModuleName,
 		cast.ToBool(appOpts.Get("telemetry.enabled")),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+	app.DidKeeper = *didkeeper.NewKeeper(
+		appCodec, runtime.NewKVStoreService(keys[didtypes.StoreKey]),
+		app.GetSubspace(didtypes.ModuleName),
+		app.AccountKeeper, app.BankKeeper,
+		app.StakingKeeper, app.OracleKeeper, authority,
 	)
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment

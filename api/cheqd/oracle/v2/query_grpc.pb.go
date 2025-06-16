@@ -33,6 +33,7 @@ const (
 	Query_MedianDeviations_FullMethodName    = "/cheqd.oracle.v2.Query/MedianDeviations"
 	Query_ValidatorRewardSet_FullMethodName  = "/cheqd.oracle.v2.Query/ValidatorRewardSet"
 	Query_GetEma_FullMethodName              = "/cheqd.oracle.v2.Query/GetEma"
+	Query_WMA_FullMethodName                 = "/cheqd.oracle.v2.Query/WMA"
 )
 
 // QueryClient is the client API for Query service.
@@ -73,6 +74,7 @@ type QueryClient interface {
 	// misscounter in a given Slash Window
 	ValidatorRewardSet(ctx context.Context, in *QueryValidatorRewardSet, opts ...grpc.CallOption) (*QueryValidatorRewardSetResponse, error)
 	GetEma(ctx context.Context, in *GetEmaRequest, opts ...grpc.CallOption) (*GetEmaResponse, error)
+	WMA(ctx context.Context, in *QueryWMARequest, opts ...grpc.CallOption) (*QueryWMAResponse, error)
 }
 
 type queryClient struct {
@@ -223,6 +225,16 @@ func (c *queryClient) GetEma(ctx context.Context, in *GetEmaRequest, opts ...grp
 	return out, nil
 }
 
+func (c *queryClient) WMA(ctx context.Context, in *QueryWMARequest, opts ...grpc.CallOption) (*QueryWMAResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryWMAResponse)
+	err := c.cc.Invoke(ctx, Query_WMA_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility.
@@ -261,6 +273,7 @@ type QueryServer interface {
 	// misscounter in a given Slash Window
 	ValidatorRewardSet(context.Context, *QueryValidatorRewardSet) (*QueryValidatorRewardSetResponse, error)
 	GetEma(context.Context, *GetEmaRequest) (*GetEmaResponse, error)
+	WMA(context.Context, *QueryWMARequest) (*QueryWMAResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -312,6 +325,9 @@ func (UnimplementedQueryServer) ValidatorRewardSet(context.Context, *QueryValida
 }
 func (UnimplementedQueryServer) GetEma(context.Context, *GetEmaRequest) (*GetEmaResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEma not implemented")
+}
+func (UnimplementedQueryServer) WMA(context.Context, *QueryWMARequest) (*QueryWMAResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method WMA not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 func (UnimplementedQueryServer) testEmbeddedByValue()               {}
@@ -586,6 +602,24 @@ func _Query_GetEma_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_WMA_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryWMARequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).WMA(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_WMA_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).WMA(ctx, req.(*QueryWMARequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -648,6 +682,10 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetEma",
 			Handler:    _Query_GetEma_Handler,
+		},
+		{
+			MethodName: "WMA",
+			Handler:    _Query_WMA_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -18,6 +18,7 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	appparams "github.com/cheqd/cheqd-node/app"
 	"github.com/cheqd/cheqd-node/x/did/keeper"
+	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
@@ -25,12 +26,16 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
+	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
+	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
 type TestSetup struct {
@@ -53,6 +58,8 @@ func Setup() TestSetup {
 	authtypes.RegisterInterfaces(ir)
 	banktypes.RegisterInterfaces(ir)
 	stakingtypes.RegisterInterfaces(ir)
+	distrtypes.RegisterInterfaces(ir)
+	oracletypes.RegisterInterfaces(ir)
 
 	Cdc := codec.NewProtoCodec(ir)
 	aminoCdc := codec.NewLegacyAmino()
@@ -64,12 +71,16 @@ func Setup() TestSetup {
 		banktypes.StoreKey,
 		types.StoreKey,
 		stakingtypes.StoreKey,
+		distrtypes.StoreKey,
+		oracletypes.StoreKey,
 	)
 	dbStore := store.NewCommitMultiStore(db, log.NewNopLogger(), storemetrics.NewNoOpMetrics())
 	dbStore.MountStoreWithDB(keys[types.StoreKey], storetypes.StoreTypeIAVL, nil)
 	dbStore.MountStoreWithDB(keys[authtypes.StoreKey], storetypes.StoreTypeIAVL, nil)
 	dbStore.MountStoreWithDB(keys[banktypes.StoreKey], storetypes.StoreTypeIAVL, nil)
 	dbStore.MountStoreWithDB(keys[stakingtypes.StoreKey], storetypes.StoreTypeIAVL, nil)
+	dbStore.MountStoreWithDB(keys[distrtypes.StoreKey], storetypes.StoreTypeIAVL, nil)
+	dbStore.MountStoreWithDB(keys[oracletypes.StoreKey], storetypes.StoreTypeIAVL, nil)
 
 	_ = dbStore.LoadLatestVersion()
 
@@ -97,7 +108,29 @@ func Setup() TestSetup {
 		log.NewNopLogger(),
 	)
 	stakingKeeper := stakingkeeper.NewKeeper(Cdc, runtime.NewKVStoreService(keys[stakingtypes.StoreKey]), accountKeeper, bankKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String(), authcodec.NewBech32Codec(appparams.ValidatorAddressPrefix), authcodec.NewBech32Codec(appparams.ConsNodeAddressPrefix))
-	newKeeper := keeper.NewKeeper(Cdc, runtime.NewKVStoreService(keys[types.StoreKey]), getSubspace(types.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	distrKeeper := distrkeeper.NewKeeper(
+		Cdc,
+		runtime.NewKVStoreService(keys[distrtypes.StoreKey]),
+		accountKeeper,
+		bankKeeper,
+		stakingKeeper,
+		authtypes.FeeCollectorName,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
+	OracleKeeper := oraclekeeper.NewKeeper(
+		Cdc,
+		keys[oracletypes.ModuleName],
+		getSubspace(oracletypes.ModuleName, paramsKeeper),
+		accountKeeper,
+		bankKeeper,
+		distrKeeper,
+		stakingKeeper,
+		distrtypes.ModuleName,
+		true, // cast.ToBool(appOpts.Get("telemetry.enabled")),
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+	newKeeper := keeper.NewKeeper(Cdc, runtime.NewKVStoreService(keys[types.StoreKey]), getSubspace(types.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper, OracleKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 
 	// Create Tx
 	txBytes := make([]byte, 28)

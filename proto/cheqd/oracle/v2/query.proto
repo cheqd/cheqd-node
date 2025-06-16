@@ -3,10 +3,9 @@ package cheqd.oracle.v2;
 
 import "cheqd/oracle/v2/oracle.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "cosmos_proto/cosmos.proto";
-
 
 option go_package = "github.com/cheqd/cheqd-node/x/oracle/types";
 option (gogoproto.goproto_getters_all) = false;
@@ -84,6 +83,8 @@ service Query {
   }
 
   rpc GetEma(GetEmaRequest) returns (GetEmaResponse) {}
+
+  rpc WMA(QueryWMARequest) returns (QueryWMAResponse) {}
 }
 
 // QueryExchangeRates is the request type for the Query/ExchangeRate RPC
@@ -280,7 +281,21 @@ message GetEmaRequest {
   string denom = 1;
 }
 message GetEmaResponse {
-  string price = 2 [
+  string price = 1 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message QueryWMARequest {
+  string denom = 1;
+  string strategy = 2; // "BALANCED", "RECENT", etc.
+  repeated int64 custom_weights = 3; // Only used if strategy == "CUSTOM"
+}
+
+message QueryWMAResponse {
+  string price = 1 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false

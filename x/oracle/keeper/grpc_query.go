@@ -343,3 +343,38 @@ func (q Querier) GetEma(ctx context.Context, req *types.GetEmaRequest) (*types.G
 		Price: price,
 	}, nil
 }
+
+func (q Querier) WMA(goCtx context.Context, req *types.QueryWMARequest) (*types.QueryWMAResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "request cannot be nil")
+	}
+
+	if !IsValidWmaStrategy(req.Strategy) {
+		return nil, types.ErrInvalidWmaStrategy.Wrapf("invalid strategy: %s", req.Strategy)
+	}
+
+	prices, err := CalculateHistoricPrices(ctx, ctx.KVStore(q.storeKey), req.Denom, uint64(ctx.BlockHeight()), q.Keeper)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get historic prices: %v", err)
+	}
+	if len(prices) == 0 {
+		return nil, status.Errorf(codes.NotFound, "no historic prices found for denom: %s", req.Denom)
+	}
+
+	var result math.LegacyDec
+	switch req.Strategy {
+	case string(WmaStrategyCustom):
+		if len(req.CustomWeights) != AveragingWindow {
+			return nil, status.Errorf(codes.InvalidArgument,
+				"custom_weights must have exactly %d elements (one per period)", AveragingWindow)
+		}
+		result = CalculateWMA(prices, req.Strategy, req.CustomWeights)
+
+	default:
+		result = CalculateWMA(prices, req.Strategy, nil)
+	}
+
+	return &types.QueryWMAResponse{Price: result}, nil
+}
