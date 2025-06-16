@@ -91,6 +91,8 @@ func Setup() TestSetup {
 		authtypes.FeeCollectorName:     nil,
 		types.ModuleName:               {authtypes.Minter, authtypes.Burner},
 		govtypes.ModuleName:            {authtypes.Burner, authtypes.Minter},
+		distrtypes.ModuleName:          nil,
+		oracletypes.ModuleName:         {authtypes.Minter},
 	}
 
 	// Init ParamsKeeper KVStore
@@ -178,7 +180,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	// set params subspaces
 	paramsKeeper.Subspace(types.ModuleName)
 	paramsKeeper.Subspace(stakingtypes.ModuleName)
-
+	paramsKeeper.Subspace(oracletypes.ModuleName)
 	return paramsKeeper
 }
 
