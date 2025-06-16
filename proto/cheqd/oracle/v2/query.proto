@@ -82,9 +82,11 @@ service Query {
     option (google.api.http).get = "/cheqd/oracle/v1/valdiators/validator_reward_set";
   }
 
-  rpc GetEma(GetEmaRequest) returns (GetEmaResponse) {}
+  rpc EMA(QueryEMARequest) returns (QueryEMAResponse) {}
 
   rpc WMA(QueryWMARequest) returns (QueryWMAResponse) {}
+
+  rpc SMA(QuerySMARequest) returns (QuerySMAResponse) {}
 }
 
 // QueryExchangeRates is the request type for the Query/ExchangeRate RPC
@@ -277,10 +279,10 @@ message QueryValidatorRewardSetResponse {
   ValidatorRewardSet validators = 1 [(gogoproto.nullable) = false];
 }
 
-message GetEmaRequest {
+message QueryEMARequest {
   string denom = 1;
 }
-message GetEmaResponse {
+message QueryEMAResponse {
   string price = 1 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
@@ -295,6 +297,17 @@ message QueryWMARequest {
 }
 
 message QueryWMAResponse {
+  string price = 1 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message QuerySMARequest {
+  string denom = 1;
+}
+message QuerySMAResponse {
   string price = 1 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",

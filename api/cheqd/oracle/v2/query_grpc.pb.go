@@ -32,8 +32,9 @@ const (
 	Query_Medians_FullMethodName             = "/cheqd.oracle.v2.Query/Medians"
 	Query_MedianDeviations_FullMethodName    = "/cheqd.oracle.v2.Query/MedianDeviations"
 	Query_ValidatorRewardSet_FullMethodName  = "/cheqd.oracle.v2.Query/ValidatorRewardSet"
-	Query_GetEma_FullMethodName              = "/cheqd.oracle.v2.Query/GetEma"
+	Query_EMA_FullMethodName                 = "/cheqd.oracle.v2.Query/EMA"
 	Query_WMA_FullMethodName                 = "/cheqd.oracle.v2.Query/WMA"
+	Query_SMA_FullMethodName                 = "/cheqd.oracle.v2.Query/SMA"
 )
 
 // QueryClient is the client API for Query service.
@@ -73,8 +74,9 @@ type QueryClient interface {
 	// earning rewards for voting on exchange rates based on their
 	// misscounter in a given Slash Window
 	ValidatorRewardSet(ctx context.Context, in *QueryValidatorRewardSet, opts ...grpc.CallOption) (*QueryValidatorRewardSetResponse, error)
-	GetEma(ctx context.Context, in *GetEmaRequest, opts ...grpc.CallOption) (*GetEmaResponse, error)
+	EMA(ctx context.Context, in *QueryEMARequest, opts ...grpc.CallOption) (*QueryEMAResponse, error)
 	WMA(ctx context.Context, in *QueryWMARequest, opts ...grpc.CallOption) (*QueryWMAResponse, error)
+	SMA(ctx context.Context, in *QuerySMARequest, opts ...grpc.CallOption) (*QuerySMAResponse, error)
 }
 
 type queryClient struct {
@@ -215,10 +217,10 @@ func (c *queryClient) ValidatorRewardSet(ctx context.Context, in *QueryValidator
 	return out, nil
 }
 
-func (c *queryClient) GetEma(ctx context.Context, in *GetEmaRequest, opts ...grpc.CallOption) (*GetEmaResponse, error) {
+func (c *queryClient) EMA(ctx context.Context, in *QueryEMARequest, opts ...grpc.CallOption) (*QueryEMAResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetEmaResponse)
-	err := c.cc.Invoke(ctx, Query_GetEma_FullMethodName, in, out, cOpts...)
+	out := new(QueryEMAResponse)
+	err := c.cc.Invoke(ctx, Query_EMA_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -229,6 +231,16 @@ func (c *queryClient) WMA(ctx context.Context, in *QueryWMARequest, opts ...grpc
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(QueryWMAResponse)
 	err := c.cc.Invoke(ctx, Query_WMA_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) SMA(ctx context.Context, in *QuerySMARequest, opts ...grpc.CallOption) (*QuerySMAResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QuerySMAResponse)
+	err := c.cc.Invoke(ctx, Query_SMA_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -272,8 +284,9 @@ type QueryServer interface {
 	// earning rewards for voting on exchange rates based on their
 	// misscounter in a given Slash Window
 	ValidatorRewardSet(context.Context, *QueryValidatorRewardSet) (*QueryValidatorRewardSetResponse, error)
-	GetEma(context.Context, *GetEmaRequest) (*GetEmaResponse, error)
+	EMA(context.Context, *QueryEMARequest) (*QueryEMAResponse, error)
 	WMA(context.Context, *QueryWMARequest) (*QueryWMAResponse, error)
+	SMA(context.Context, *QuerySMARequest) (*QuerySMAResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -323,11 +336,14 @@ func (UnimplementedQueryServer) MedianDeviations(context.Context, *QueryMedianDe
 func (UnimplementedQueryServer) ValidatorRewardSet(context.Context, *QueryValidatorRewardSet) (*QueryValidatorRewardSetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ValidatorRewardSet not implemented")
 }
-func (UnimplementedQueryServer) GetEma(context.Context, *GetEmaRequest) (*GetEmaResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetEma not implemented")
+func (UnimplementedQueryServer) EMA(context.Context, *QueryEMARequest) (*QueryEMAResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EMA not implemented")
 }
 func (UnimplementedQueryServer) WMA(context.Context, *QueryWMARequest) (*QueryWMAResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method WMA not implemented")
+}
+func (UnimplementedQueryServer) SMA(context.Context, *QuerySMARequest) (*QuerySMAResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SMA not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 func (UnimplementedQueryServer) testEmbeddedByValue()               {}
@@ -584,20 +600,20 @@ func _Query_ValidatorRewardSet_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_GetEma_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetEmaRequest)
+func _Query_EMA_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryEMARequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).GetEma(ctx, in)
+		return srv.(QueryServer).EMA(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Query_GetEma_FullMethodName,
+		FullMethod: Query_EMA_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GetEma(ctx, req.(*GetEmaRequest))
+		return srv.(QueryServer).EMA(ctx, req.(*QueryEMARequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -616,6 +632,24 @@ func _Query_WMA_Handler(srv interface{}, ctx context.Context, dec func(interface
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(QueryServer).WMA(ctx, req.(*QueryWMARequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_SMA_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QuerySMARequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).SMA(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_SMA_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).SMA(ctx, req.(*QuerySMARequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -680,12 +714,16 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Query_ValidatorRewardSet_Handler,
 		},
 		{
-			MethodName: "GetEma",
-			Handler:    _Query_GetEma_Handler,
+			MethodName: "EMA",
+			Handler:    _Query_EMA_Handler,
 		},
 		{
 			MethodName: "WMA",
 			Handler:    _Query_WMA_Handler,
+		},
+		{
+			MethodName: "SMA",
+			Handler:    _Query_SMA_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

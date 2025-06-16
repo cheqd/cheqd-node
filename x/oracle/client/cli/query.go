@@ -33,8 +33,9 @@ func GetQueryCmd() *cobra.Command {
 		GetCmdQueryFeederDelegation(),
 		GetCmdQueryMissCounter(),
 		GetCmdQuerySlashWindow(),
-		GetEmaofCheqd(),
+		CmdQueryEMA(),
 		CmdQueryWMA(),
+		CmdQuerySMA(),
 	)
 
 	return cmd
@@ -281,9 +282,9 @@ func GetCmdQuerySlashWindow() *cobra.Command {
 	return cmd
 }
 
-func GetEmaofCheqd() *cobra.Command {
+func CmdQueryEMA() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "ema",
+		Use:   "ema [denom]",
 		Args:  cobra.ExactArgs(1),
 		Short: "Query the ema of the given denom",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -294,8 +295,8 @@ func GetEmaofCheqd() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 			denom := strings.ToUpper(args[0]) // Convert denom to uppercase
-			req := &types.GetEmaRequest{Denom: denom}
-			res, err := queryClient.GetEma(cmd.Context(), req)
+			req := &types.QueryEMARequest{Denom: denom}
+			res, err := queryClient.EMA(cmd.Context(), req)
 			return cli.PrintOrErr(res, err, clientCtx)
 		},
 	}
@@ -343,5 +344,28 @@ func CmdQueryWMA() *cobra.Command {
 	cmd.Flags().String("strategy", "BALANCED", "WMA strategy: BALANCED | OLDEST | RECENT | CUSTOM")
 	cmd.Flags().String("weights", "", "Custom weights (comma-separated, e.g. 10,9,8...)")
 
+	return cmd
+}
+
+func CmdQuerySMA() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "sma [denom]",
+		Args:  cobra.ExactArgs(1),
+		Short: "Query the SMA of the given denom",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			denom := strings.ToUpper(args[0]) // Convert denom to uppercase
+			req := &types.QuerySMARequest{Denom: denom}
+			res, err := queryClient.SMA(cmd.Context(), req)
+			return cli.PrintOrErr(res, err, clientCtx)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
 	return cmd
 }

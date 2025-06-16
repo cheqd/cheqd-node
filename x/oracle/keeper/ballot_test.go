@@ -2,9 +2,8 @@ package keeper_test
 
 import (
 	"cosmossdk.io/math"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/cheqd/cheqd-node/x/oracle/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func (s *IntegrationTestSuite) TestBallot_OrganizeBallotByDenom() {
@@ -20,7 +19,7 @@ func (s *IntegrationTestSuite) TestBallot_OrganizeBallotByDenom() {
 		s.ctx, valAddr, types.AggregateExchangeRateVote{
 			ExchangeRates: sdk.DecCoins{
 				sdk.DecCoin{
-					Denom:  "CHEQ",
+					Denom:  types.CheqdSymbol,
 					Amount: math.LegacyOneDec(),
 				},
 			},
@@ -37,8 +36,8 @@ func (s *IntegrationTestSuite) TestBallot_OrganizeBallotByDenom() {
 	res = s.app.OracleKeeper.OrganizeBallotByDenom(s.ctx, claimMap)
 	require.Equal([]types.BallotDenom{
 		{
-			Ballot: types.ExchangeRateBallot{types.NewVoteForTally(math.LegacyOneDec(), "CHEQ", valAddr, 1)},
-			Denom:  "CHEQ",
+			Ballot: types.ExchangeRateBallot{types.NewVoteForTally(math.LegacyOneDec(), types.CheqdSymbol, valAddr, 1)},
+			Denom:  types.CheqdSymbol,
 		},
 	}, res)
 }
@@ -56,7 +55,7 @@ func (s *IntegrationTestSuite) TestBallot_ClearBallots() {
 
 	var decCoins sdk.DecCoins
 	decCoins = append(decCoins, sdk.DecCoin{
-		Denom:  "CHEQ",
+		Denom:  types.CheqdSymbol,
 		Amount: math.LegacyZeroDec(),
 	})
 	vote := types.AggregateExchangeRateVote{

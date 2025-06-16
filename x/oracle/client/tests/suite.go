@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	appante "github.com/cheqd/cheqd-node/ante"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/oracle/client/cli"
 	"github.com/cheqd/cheqd-node/x/oracle/types"
 )
@@ -81,7 +82,7 @@ func (s *IntegrationTestSuite) TestDelegateFeedConsent() {
 				s.network.Validators[1].Address.String(),
 				fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 				fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
-				fmt.Sprintf("--%s=%s", flags.FlagGasPrices, appante.ErrNeitherNativeDenom("ncheq", "ncheq")),
+				fmt.Sprintf("--%s=%s", flags.FlagGasPrices, appante.ErrNeitherNativeDenom(didtypes.BaseMinimalDenom, didtypes.BaseMinimalDenom)),
 			},
 			expectErr:    false,
 			expectedCode: 0,
@@ -172,7 +173,7 @@ func (s *IntegrationTestSuite) TestQueryExchangeRates() {
 	s.Require().NoError(clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 
 	s.Require().Len(res.ExchangeRates, 1)
-	s.Require().Equal(res.ExchangeRates[0].Denom, "ncheq")
+	s.Require().Equal(res.ExchangeRates[0].Denom, didtypes.BaseMinimalDenom)
 	s.Require().False(res.ExchangeRates[0].Amount.IsZero())
 }
 

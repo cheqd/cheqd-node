@@ -330,7 +330,7 @@ func (q Querier) ValidatorRewardSet(
 	}, nil
 }
 
-func (q Querier) GetEma(ctx context.Context, req *types.GetEmaRequest) (*types.GetEmaResponse, error) {
+func (q Querier) EMA(ctx context.Context, req *types.QueryEMARequest) (*types.QueryEMAResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -339,7 +339,7 @@ func (q Querier) GetEma(ctx context.Context, req *types.GetEmaRequest) (*types.G
 	if !present {
 		return nil, errors.New("ema not present")
 	}
-	return &types.GetEmaResponse{
+	return &types.QueryEMAResponse{
 		Price: price,
 	}, nil
 }
@@ -377,4 +377,18 @@ func (q Querier) WMA(goCtx context.Context, req *types.QueryWMARequest) (*types.
 	}
 
 	return &types.QueryWMAResponse{Price: result}, nil
+}
+
+func (q Querier) SMA(ctx context.Context, req *types.QuerySMARequest) (*types.QuerySMAResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	price, present := q.GetEMA(sdkCtx, req.Denom)
+	if !present {
+		return nil, errors.New("ema not present")
+	}
+	return &types.QuerySMAResponse{
+		Price: price,
+	}, nil
 }

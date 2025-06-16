@@ -408,7 +408,7 @@ func FundAccount(recipientAddr, fromAddr string, amount string, feeParams []stri
 // EnsureAccountFunded checks if an account has sufficient funds and funds it if needed
 func EnsureAccountFunded(accountAddr, funderAddr string, minAmount string, feeParams []string) error {
 	// First check the account balance
-	balance, err := QueryBankBalance(accountAddr, "ncheq")
+	balance, err := QueryBankBalance(accountAddr, didtypes.BaseMinimalDenom)
 	if err != nil {
 		// If we can't query the balance, try funding anyway
 		fundingAmount := "5000000000ncheq" // 5000 CHEQ in ncheq
@@ -466,13 +466,13 @@ func parseAmount(amount string) (int64, error) {
 	return value, nil
 }
 
-func QueryEMA(denom string) (*oracletypes.GetEmaResponse, error) {
+func QueryEMA(denom string) (*oracletypes.QueryEMAResponse, error) {
 	res, err := Query("oracle", "ema", denom)
 	if err != nil {
 		return nil, err
 	}
 
-	var resp oracletypes.GetEmaResponse
+	var resp oracletypes.QueryEMAResponse
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshaling exchange rate response: %w", err)

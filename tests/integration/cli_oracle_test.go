@@ -11,6 +11,7 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
 	"github.com/cheqd/cheqd-node/tests/integration/mocks"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
+	"github.com/cheqd/cheqd-node/x/did/types"
 	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -192,7 +193,7 @@ var _ = Describe("cheqd cli - oracle module", func() {
 				// Check if it's specifically an "insufficient funds" error
 				if strings.Contains(txResp.RawLog, "insufficient funds") {
 					// Try to display the current balance for diagnostic purposes
-					balance, _ := cli.QueryBankBalance(fromAddr, "ncheq")
+					balance, _ := cli.QueryBankBalance(fromAddr, types.BaseMinimalDenom)
 					fmt.Printf("Note: Account has insufficient funds. Current balance: %d ncheq\n", balance)
 
 					AddReportEntry("Integration", fmt.Sprintf("%sNote: %s", cli.Green, "exchange-rate-prevote transaction executed but failed due to insufficient funds - this is expected if account funding failed"))

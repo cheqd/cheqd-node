@@ -7,6 +7,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
 	cheqdante "github.com/cheqd/cheqd-node/ante"
+	"github.com/cheqd/cheqd-node/util"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -325,37 +326,40 @@ func (td TaxDecorator) distributeRewards(ctx sdk.Context, rewards sdk.Coins) err
 		return nil
 	}
 
-	// Define share for oracle (e.g., 0.5%)
 	oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.005 = 0.5%
-	oracleRewards := sdk.NewCoins()
-	feeCollectorRewards := sdk.NewCoins()
+	oracleRewards, feeCollectorRewards := SplitRewardsByRatio(rewards, oracleShareRate)
 
-	for _, coin := range rewards {
-		oracleAmount := oracleShareRate.MulInt(coin.Amount).TruncateInt()
-		feeCollectorAmount := coin.Amount.Sub(oracleAmount)
-
-		if oracleAmount.IsPositive() {
-			oracleRewards = oracleRewards.Add(sdk.NewCoin(coin.Denom, oracleAmount))
-		}
-		if feeCollectorAmount.IsPositive() {
-			feeCollectorRewards = feeCollectorRewards.Add(sdk.NewCoin(coin.Denom, feeCollectorAmount))
-		}
-	}
-	// Send oracle rewards
 	if !oracleRewards.IsZero() {
-		err := td.bankKeeper.SendCoinsFromModuleToModule(ctx, didtypes.ModuleName, oracletypes.ModuleName, oracleRewards)
-		if err != nil {
+		if err := td.bankKeeper.SendCoinsFromModuleToModule(ctx, didtypes.ModuleName, oracletypes.ModuleName, oracleRewards); err != nil {
 			return err
 		}
 	}
-	// Send the rest to fee collector
 	if !feeCollectorRewards.IsZero() {
-		err := td.bankKeeper.SendCoinsFromModuleToModule(ctx, didtypes.ModuleName, types.FeeCollectorName, feeCollectorRewards)
-		if err != nil {
+		if err := td.bankKeeper.SendCoinsFromModuleToModule(ctx, didtypes.ModuleName, types.FeeCollectorName, feeCollectorRewards); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+// SplitRewardsByRatio splits the input rewards by a share ratio.
+// It returns two sdk.Coins:  and remainingShare.
+func SplitRewardsByRatio(rewards sdk.Coins, ratio math.LegacyDec) (oracleRewards sdk.Coins, feeCollectorRewards sdk.Coins) {
+	oracleRewards = sdk.NewCoins()
+	feeCollectorRewards = sdk.NewCoins()
+
+	for _, coin := range rewards {
+		portion := ratio.MulInt(coin.Amount).TruncateInt()
+		rest := coin.Amount.Sub(portion)
+
+		if portion.IsPositive() {
+			oracleRewards = oracleRewards.Add(sdk.NewCoin(coin.Denom, portion))
+		}
+		if rest.IsPositive() {
+			feeCollectorRewards = feeCollectorRewards.Add(sdk.NewCoin(coin.Denom, rest))
+		}
+	}
+	return
 }
 
 // burnFees burns fees from the module account
@@ -459,8 +463,6 @@ func (td *TaxDecorator) processNativeDenomTax(
 }
 
 func ConvertToCheq(coins sdk.Coins, cheqPrice math.LegacyDec) (sdk.Coins, error) {
-	const usdExponent = 1e18
-
 	// If all coins are already in ncheq, return them directly
 	if coins.DenomsSubsetOf(sdk.NewCoins(sdk.NewCoin(oracletypes.CheqdDenom, math.ZeroInt()))) {
 		return coins, nil
@@ -476,7 +478,7 @@ func ConvertToCheq(coins sdk.Coins, cheqPrice math.LegacyDec) (sdk.Coins, error)
 			}
 
 			// Convert: USD (18 decimals) → CHEQ → ncheq (9 decimals)
-			usdAmount := coin.Amount.ToLegacyDec().QuoInt64(usdExponent)
+			usdAmount := coin.Amount.ToLegacyDec().QuoInt64(util.UsdExponent)
 			ncheqAmount := usdAmount.Quo(cheqPrice).MulInt64(1e9).TruncateInt()
 
 			converted = converted.Add(sdk.NewCoin(oracletypes.CheqdDenom, ncheqAmount))

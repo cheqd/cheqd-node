@@ -217,7 +217,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 
 		By("fetching cheq EMA price and computing fees")
 		tax := feeParams.UpdateDid[0]
-		cheqPrice, err := cli.QueryEMA("CHEQ")
+		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 
@@ -246,7 +246,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 
 		By("checking that the fee payer account balance has been decreased only by the actual tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(BeEquivalentTo(taxInCheqd.AmountOf("ncheq")))
+		Expect(diff).To(BeEquivalentTo(taxInCheqd.AmountOf(types.BaseMinimalDenom)))
 	})
 
 	It("should not charge more than tax for deactivate diddoc message - case: fixed fee", func() {

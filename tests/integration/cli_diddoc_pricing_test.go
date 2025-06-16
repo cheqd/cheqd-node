@@ -75,7 +75,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("submitting a create diddoc message")
 		tax := feeParams.CreateDid[0]
-		cheqPrice, err := cli.QueryEMA("CHEQ")
+		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 		convertedFees, err := ante.GetFeeForMsg(feeParams.CreateDid, cheqp)
@@ -89,13 +89,13 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		rewardPortionInUsdToCheq, err := posthandler.ConvertToCheq(rewardPortionInUsd, cheqp)
 		Expect(err).To(BeNil())
 
-		coin := rewardPortionInUsdToCheq.AmountOf("ncheq")
+		coin := rewardPortionInUsdToCheq.AmountOf(types.BaseMinimalDenom)
 
 		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.5%
 
 		oracleReward := oracleShareRate.MulInt(coin).TruncateInt()
-		oracleRewardCoin := sdk.NewCoin("ncheq", oracleReward)
-		feeCollectorReward := sdk.NewCoin("ncheq", coin.Sub(oracleReward))
+		oracleRewardCoin := sdk.NewCoin(types.BaseMinimalDenom, oracleReward)
+		feeCollectorReward := sdk.NewCoin(types.BaseMinimalDenom, coin.Sub(oracleReward))
 
 		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
 
@@ -111,7 +111,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(taxIncheqd.AmountOf("ncheq")))
+		Expect(diff).To(Equal(taxIncheqd.AmountOf(types.BaseMinimalDenom)))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -191,7 +191,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("fetching CHEQ price and calculating expected tax")
 		tax := feeParams.UpdateDid[0]
-		cheqPrice, err := cli.QueryEMA("CHEQ")
+		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 
@@ -206,11 +206,11 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		rewardPortionInUsdToCheq, err := posthandler.ConvertToCheq(rewardPortionInUsd, cheqp)
 		Expect(err).To(BeNil())
 
-		coin := rewardPortionInUsdToCheq.AmountOf("ncheq")
+		coin := rewardPortionInUsdToCheq.AmountOf(types.BaseMinimalDenom)
 		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.5%
 		oracleReward := oracleShareRate.MulInt(coin).TruncateInt()
-		oracleRewardCoin := sdk.NewCoin("ncheq", oracleReward)
-		feeCollectorReward := sdk.NewCoin("ncheq", coin.Sub(oracleReward))
+		oracleRewardCoin := sdk.NewCoin(types.BaseMinimalDenom, oracleReward)
+		feeCollectorReward := sdk.NewCoin(types.BaseMinimalDenom, coin.Sub(oracleReward))
 
 		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
 
@@ -226,7 +226,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(taxIncheqd.AmountOf("ncheq")))
+		Expect(diff).To(Equal(taxIncheqd.AmountOf(types.BaseMinimalDenom)))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -296,7 +296,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("fetching cheq EMA price and computing fees")
 		tax := feeParams.DeactivateDid[0]
-		cheqPrice, err := cli.QueryEMA("CHEQ")
+		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 		convertedFees, err := ante.GetFeeForMsg(feeParams.DeactivateDid, cheqp)
@@ -310,12 +310,12 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		rewardPortionInUsdToCheq, err := posthandler.ConvertToCheq(rewardPortionInUsd, cheqp)
 		Expect(err).To(BeNil())
 
-		coin := rewardPortionInUsdToCheq.AmountOf("ncheq")
+		coin := rewardPortionInUsdToCheq.AmountOf(types.BaseMinimalDenom)
 
 		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.5%
 		oracleReward := oracleShareRate.MulInt(coin).TruncateInt()
-		oracleRewardCoin := sdk.NewCoin("ncheq", oracleReward)
-		feeCollectorReward := sdk.NewCoin("ncheq", coin.Sub(oracleReward))
+		oracleRewardCoin := sdk.NewCoin(types.BaseMinimalDenom, oracleReward)
+		feeCollectorReward := sdk.NewCoin(types.BaseMinimalDenom, coin.Sub(oracleReward))
 
 		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
 
@@ -331,7 +331,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(taxIncheqd.AmountOf("ncheq")))
+		Expect(diff).To(Equal(taxIncheqd.AmountOf(types.BaseMinimalDenom)))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -517,7 +517,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("fetching cheq EMA price and computing fees")
 		tax := feeParams.DeactivateDid[0]
-		cheqPrice, err := cli.QueryEMA("CHEQ")
+		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 		convertedFees, err := ante.GetFeeForMsg(feeParams.DeactivateDid, cheqp)
@@ -531,12 +531,12 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		rewardPortionInUsdToCheq, err := posthandler.ConvertToCheq(rewardPortionInUsd, cheqp)
 		Expect(err).To(BeNil())
 
-		coin := rewardPortionInUsdToCheq.AmountOf("ncheq")
+		coin := rewardPortionInUsdToCheq.AmountOf(types.BaseMinimalDenom)
 
 		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.5%
 		oracleReward := oracleShareRate.MulInt(coin).TruncateInt()
-		oracleRewardCoin := sdk.NewCoin("ncheq", oracleReward)
-		feeCollectorReward := sdk.NewCoin("ncheq", coin.Sub(oracleReward))
+		oracleRewardCoin := sdk.NewCoin(types.BaseMinimalDenom, oracleReward)
+		feeCollectorReward := sdk.NewCoin(types.BaseMinimalDenom, coin.Sub(oracleReward))
 
 		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
 
@@ -555,7 +555,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("checking the granter balance difference")
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(taxIncheqd.AmountOf("ncheq")))
+		Expect(diff).To(Equal(taxIncheqd.AmountOf(types.BaseMinimalDenom)))
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)

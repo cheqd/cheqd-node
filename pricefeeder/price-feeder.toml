@@ -1,5 +1,3 @@
-config_dir = "ojo-provider-config"
-
 gas_adjustment = 1
 provider_timeout = "1000000s"
 
@@ -10,9 +8,9 @@ verbose_cors = true
 write_timeout = "20s"
 
 [account]
-address = "cheqd1jvfm45nwpgvxg4m2r5l80j5my87uc54mkzsg6h"
+address = ""
 chain_id = "cheqd"
-validator = "cheqdvaloper1jvfm45nwpgvxg4m2r5l80j5my87uc54mfgwwu4"
+validator = ""
 
 [keyring]
 backend = "test"

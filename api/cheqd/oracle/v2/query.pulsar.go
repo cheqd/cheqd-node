@@ -11059,25 +11059,25 @@ func (x *fastReflection_QueryValidatorRewardSetResponse) ProtoMethods() *protoif
 }
 
 var (
-	md_GetEmaRequest       protoreflect.MessageDescriptor
-	fd_GetEmaRequest_denom protoreflect.FieldDescriptor
+	md_QueryEMARequest       protoreflect.MessageDescriptor
+	fd_QueryEMARequest_denom protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_cheqd_oracle_v2_query_proto_init()
-	md_GetEmaRequest = File_cheqd_oracle_v2_query_proto.Messages().ByName("GetEmaRequest")
-	fd_GetEmaRequest_denom = md_GetEmaRequest.Fields().ByName("denom")
+	md_QueryEMARequest = File_cheqd_oracle_v2_query_proto.Messages().ByName("QueryEMARequest")
+	fd_QueryEMARequest_denom = md_QueryEMARequest.Fields().ByName("denom")
 }
 
-var _ protoreflect.Message = (*fastReflection_GetEmaRequest)(nil)
+var _ protoreflect.Message = (*fastReflection_QueryEMARequest)(nil)
 
-type fastReflection_GetEmaRequest GetEmaRequest
+type fastReflection_QueryEMARequest QueryEMARequest
 
-func (x *GetEmaRequest) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_GetEmaRequest)(x)
+func (x *QueryEMARequest) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_QueryEMARequest)(x)
 }
 
-func (x *GetEmaRequest) slowProtoReflect() protoreflect.Message {
+func (x *QueryEMARequest) slowProtoReflect() protoreflect.Message {
 	mi := &file_cheqd_oracle_v2_query_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -11089,43 +11089,43 @@ func (x *GetEmaRequest) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_GetEmaRequest_messageType fastReflection_GetEmaRequest_messageType
-var _ protoreflect.MessageType = fastReflection_GetEmaRequest_messageType{}
+var _fastReflection_QueryEMARequest_messageType fastReflection_QueryEMARequest_messageType
+var _ protoreflect.MessageType = fastReflection_QueryEMARequest_messageType{}
 
-type fastReflection_GetEmaRequest_messageType struct{}
+type fastReflection_QueryEMARequest_messageType struct{}
 
-func (x fastReflection_GetEmaRequest_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_GetEmaRequest)(nil)
+func (x fastReflection_QueryEMARequest_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_QueryEMARequest)(nil)
 }
-func (x fastReflection_GetEmaRequest_messageType) New() protoreflect.Message {
-	return new(fastReflection_GetEmaRequest)
+func (x fastReflection_QueryEMARequest_messageType) New() protoreflect.Message {
+	return new(fastReflection_QueryEMARequest)
 }
-func (x fastReflection_GetEmaRequest_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_GetEmaRequest
+func (x fastReflection_QueryEMARequest_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryEMARequest
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_GetEmaRequest) Descriptor() protoreflect.MessageDescriptor {
-	return md_GetEmaRequest
+func (x *fastReflection_QueryEMARequest) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryEMARequest
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_GetEmaRequest) Type() protoreflect.MessageType {
-	return _fastReflection_GetEmaRequest_messageType
+func (x *fastReflection_QueryEMARequest) Type() protoreflect.MessageType {
+	return _fastReflection_QueryEMARequest_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_GetEmaRequest) New() protoreflect.Message {
-	return new(fastReflection_GetEmaRequest)
+func (x *fastReflection_QueryEMARequest) New() protoreflect.Message {
+	return new(fastReflection_QueryEMARequest)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_GetEmaRequest) Interface() protoreflect.ProtoMessage {
-	return (*GetEmaRequest)(x)
+func (x *fastReflection_QueryEMARequest) Interface() protoreflect.ProtoMessage {
+	return (*QueryEMARequest)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -11133,10 +11133,10 @@ func (x *fastReflection_GetEmaRequest) Interface() protoreflect.ProtoMessage {
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_GetEmaRequest) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_QueryEMARequest) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Denom != "" {
 		value := protoreflect.ValueOfString(x.Denom)
-		if !f(fd_GetEmaRequest_denom, value) {
+		if !f(fd_QueryEMARequest_denom, value) {
 			return
 		}
 	}
@@ -11153,15 +11153,15 @@ func (x *fastReflection_GetEmaRequest) Range(f func(protoreflect.FieldDescriptor
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_GetEmaRequest) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_QueryEMARequest) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "cheqd.oracle.v2.GetEmaRequest.denom":
+	case "cheqd.oracle.v2.QueryEMARequest.denom":
 		return x.Denom != ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.GetEmaRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QueryEMARequest"))
 		}
-		panic(fmt.Errorf("message cheqd.oracle.v2.GetEmaRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.oracle.v2.QueryEMARequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -11171,15 +11171,15 @@ func (x *fastReflection_GetEmaRequest) Has(fd protoreflect.FieldDescriptor) bool
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_GetEmaRequest) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_QueryEMARequest) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "cheqd.oracle.v2.GetEmaRequest.denom":
+	case "cheqd.oracle.v2.QueryEMARequest.denom":
 		x.Denom = ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.GetEmaRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QueryEMARequest"))
 		}
-		panic(fmt.Errorf("message cheqd.oracle.v2.GetEmaRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.oracle.v2.QueryEMARequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -11189,16 +11189,16 @@ func (x *fastReflection_GetEmaRequest) Clear(fd protoreflect.FieldDescriptor) {
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_GetEmaRequest) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryEMARequest) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "cheqd.oracle.v2.GetEmaRequest.denom":
+	case "cheqd.oracle.v2.QueryEMARequest.denom":
 		value := x.Denom
 		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.GetEmaRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QueryEMARequest"))
 		}
-		panic(fmt.Errorf("message cheqd.oracle.v2.GetEmaRequest does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message cheqd.oracle.v2.QueryEMARequest does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -11212,15 +11212,15 @@ func (x *fastReflection_GetEmaRequest) Get(descriptor protoreflect.FieldDescript
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_GetEmaRequest) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_QueryEMARequest) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "cheqd.oracle.v2.GetEmaRequest.denom":
+	case "cheqd.oracle.v2.QueryEMARequest.denom":
 		x.Denom = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.GetEmaRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QueryEMARequest"))
 		}
-		panic(fmt.Errorf("message cheqd.oracle.v2.GetEmaRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.oracle.v2.QueryEMARequest does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -11234,40 +11234,40 @@ func (x *fastReflection_GetEmaRequest) Set(fd protoreflect.FieldDescriptor, valu
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_GetEmaRequest) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryEMARequest) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.oracle.v2.GetEmaRequest.denom":
-		panic(fmt.Errorf("field denom of message cheqd.oracle.v2.GetEmaRequest is not mutable"))
+	case "cheqd.oracle.v2.QueryEMARequest.denom":
+		panic(fmt.Errorf("field denom of message cheqd.oracle.v2.QueryEMARequest is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.GetEmaRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QueryEMARequest"))
 		}
-		panic(fmt.Errorf("message cheqd.oracle.v2.GetEmaRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.oracle.v2.QueryEMARequest does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_GetEmaRequest) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryEMARequest) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.oracle.v2.GetEmaRequest.denom":
+	case "cheqd.oracle.v2.QueryEMARequest.denom":
 		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.GetEmaRequest"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QueryEMARequest"))
 		}
-		panic(fmt.Errorf("message cheqd.oracle.v2.GetEmaRequest does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.oracle.v2.QueryEMARequest does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_GetEmaRequest) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_QueryEMARequest) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in cheqd.oracle.v2.GetEmaRequest", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in cheqd.oracle.v2.QueryEMARequest", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -11275,7 +11275,7 @@ func (x *fastReflection_GetEmaRequest) WhichOneof(d protoreflect.OneofDescriptor
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_GetEmaRequest) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_QueryEMARequest) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -11286,7 +11286,7 @@ func (x *fastReflection_GetEmaRequest) GetUnknown() protoreflect.RawFields {
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_GetEmaRequest) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_QueryEMARequest) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -11298,7 +11298,7 @@ func (x *fastReflection_GetEmaRequest) SetUnknown(fields protoreflect.RawFields)
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_GetEmaRequest) IsValid() bool {
+func (x *fastReflection_QueryEMARequest) IsValid() bool {
 	return x != nil
 }
 
@@ -11308,9 +11308,9 @@ func (x *fastReflection_GetEmaRequest) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_GetEmaRequest) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_QueryEMARequest) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*GetEmaRequest)
+		x := input.Message.Interface().(*QueryEMARequest)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -11336,7 +11336,7 @@ func (x *fastReflection_GetEmaRequest) ProtoMethods() *protoiface.Methods {
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*GetEmaRequest)
+		x := input.Message.Interface().(*QueryEMARequest)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -11373,7 +11373,7 @@ func (x *fastReflection_GetEmaRequest) ProtoMethods() *protoiface.Methods {
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*GetEmaRequest)
+		x := input.Message.Interface().(*QueryEMARequest)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -11405,10 +11405,10 @@ func (x *fastReflection_GetEmaRequest) ProtoMethods() *protoiface.Methods {
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: GetEmaRequest: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryEMARequest: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: GetEmaRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryEMARequest: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -11479,25 +11479,25 @@ func (x *fastReflection_GetEmaRequest) ProtoMethods() *protoiface.Methods {
 }
 
 var (
-	md_GetEmaResponse       protoreflect.MessageDescriptor
-	fd_GetEmaResponse_price protoreflect.FieldDescriptor
+	md_QueryEMAResponse       protoreflect.MessageDescriptor
+	fd_QueryEMAResponse_price protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_cheqd_oracle_v2_query_proto_init()
-	md_GetEmaResponse = File_cheqd_oracle_v2_query_proto.Messages().ByName("GetEmaResponse")
-	fd_GetEmaResponse_price = md_GetEmaResponse.Fields().ByName("price")
+	md_QueryEMAResponse = File_cheqd_oracle_v2_query_proto.Messages().ByName("QueryEMAResponse")
+	fd_QueryEMAResponse_price = md_QueryEMAResponse.Fields().ByName("price")
 }
 
-var _ protoreflect.Message = (*fastReflection_GetEmaResponse)(nil)
+var _ protoreflect.Message = (*fastReflection_QueryEMAResponse)(nil)
 
-type fastReflection_GetEmaResponse GetEmaResponse
+type fastReflection_QueryEMAResponse QueryEMAResponse
 
-func (x *GetEmaResponse) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_GetEmaResponse)(x)
+func (x *QueryEMAResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_QueryEMAResponse)(x)
 }
 
-func (x *GetEmaResponse) slowProtoReflect() protoreflect.Message {
+func (x *QueryEMAResponse) slowProtoReflect() protoreflect.Message {
 	mi := &file_cheqd_oracle_v2_query_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -11509,43 +11509,43 @@ func (x *GetEmaResponse) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_GetEmaResponse_messageType fastReflection_GetEmaResponse_messageType
-var _ protoreflect.MessageType = fastReflection_GetEmaResponse_messageType{}
+var _fastReflection_QueryEMAResponse_messageType fastReflection_QueryEMAResponse_messageType
+var _ protoreflect.MessageType = fastReflection_QueryEMAResponse_messageType{}
 
-type fastReflection_GetEmaResponse_messageType struct{}
+type fastReflection_QueryEMAResponse_messageType struct{}
 
-func (x fastReflection_GetEmaResponse_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_GetEmaResponse)(nil)
+func (x fastReflection_QueryEMAResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_QueryEMAResponse)(nil)
 }
-func (x fastReflection_GetEmaResponse_messageType) New() protoreflect.Message {
-	return new(fastReflection_GetEmaResponse)
+func (x fastReflection_QueryEMAResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_QueryEMAResponse)
 }
-func (x fastReflection_GetEmaResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_GetEmaResponse
+func (x fastReflection_QueryEMAResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryEMAResponse
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_GetEmaResponse) Descriptor() protoreflect.MessageDescriptor {
-	return md_GetEmaResponse
+func (x *fastReflection_QueryEMAResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryEMAResponse
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_GetEmaResponse) Type() protoreflect.MessageType {
-	return _fastReflection_GetEmaResponse_messageType
+func (x *fastReflection_QueryEMAResponse) Type() protoreflect.MessageType {
+	return _fastReflection_QueryEMAResponse_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_GetEmaResponse) New() protoreflect.Message {
-	return new(fastReflection_GetEmaResponse)
+func (x *fastReflection_QueryEMAResponse) New() protoreflect.Message {
+	return new(fastReflection_QueryEMAResponse)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_GetEmaResponse) Interface() protoreflect.ProtoMessage {
-	return (*GetEmaResponse)(x)
+func (x *fastReflection_QueryEMAResponse) Interface() protoreflect.ProtoMessage {
+	return (*QueryEMAResponse)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -11553,10 +11553,10 @@ func (x *fastReflection_GetEmaResponse) Interface() protoreflect.ProtoMessage {
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_GetEmaResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_QueryEMAResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Price != "" {
 		value := protoreflect.ValueOfString(x.Price)
-		if !f(fd_GetEmaResponse_price, value) {
+		if !f(fd_QueryEMAResponse_price, value) {
 			return
 		}
 	}
@@ -11573,15 +11573,15 @@ func (x *fastReflection_GetEmaResponse) Range(f func(protoreflect.FieldDescripto
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_GetEmaResponse) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_QueryEMAResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "cheqd.oracle.v2.GetEmaResponse.price":
+	case "cheqd.oracle.v2.QueryEMAResponse.price":
 		return x.Price != ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.GetEmaResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QueryEMAResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.oracle.v2.GetEmaResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.oracle.v2.QueryEMAResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -11591,15 +11591,15 @@ func (x *fastReflection_GetEmaResponse) Has(fd protoreflect.FieldDescriptor) boo
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_GetEmaResponse) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_QueryEMAResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "cheqd.oracle.v2.GetEmaResponse.price":
+	case "cheqd.oracle.v2.QueryEMAResponse.price":
 		x.Price = ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.GetEmaResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QueryEMAResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.oracle.v2.GetEmaResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.oracle.v2.QueryEMAResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -11609,16 +11609,16 @@ func (x *fastReflection_GetEmaResponse) Clear(fd protoreflect.FieldDescriptor) {
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_GetEmaResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryEMAResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "cheqd.oracle.v2.GetEmaResponse.price":
+	case "cheqd.oracle.v2.QueryEMAResponse.price":
 		value := x.Price
 		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.GetEmaResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QueryEMAResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.oracle.v2.GetEmaResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message cheqd.oracle.v2.QueryEMAResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -11632,15 +11632,15 @@ func (x *fastReflection_GetEmaResponse) Get(descriptor protoreflect.FieldDescrip
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_GetEmaResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_QueryEMAResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "cheqd.oracle.v2.GetEmaResponse.price":
+	case "cheqd.oracle.v2.QueryEMAResponse.price":
 		x.Price = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.GetEmaResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QueryEMAResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.oracle.v2.GetEmaResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.oracle.v2.QueryEMAResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -11654,40 +11654,40 @@ func (x *fastReflection_GetEmaResponse) Set(fd protoreflect.FieldDescriptor, val
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_GetEmaResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryEMAResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.oracle.v2.GetEmaResponse.price":
-		panic(fmt.Errorf("field price of message cheqd.oracle.v2.GetEmaResponse is not mutable"))
+	case "cheqd.oracle.v2.QueryEMAResponse.price":
+		panic(fmt.Errorf("field price of message cheqd.oracle.v2.QueryEMAResponse is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.GetEmaResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QueryEMAResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.oracle.v2.GetEmaResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.oracle.v2.QueryEMAResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_GetEmaResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_QueryEMAResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "cheqd.oracle.v2.GetEmaResponse.price":
+	case "cheqd.oracle.v2.QueryEMAResponse.price":
 		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.GetEmaResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QueryEMAResponse"))
 		}
-		panic(fmt.Errorf("message cheqd.oracle.v2.GetEmaResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message cheqd.oracle.v2.QueryEMAResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_GetEmaResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_QueryEMAResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in cheqd.oracle.v2.GetEmaResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in cheqd.oracle.v2.QueryEMAResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -11695,7 +11695,7 @@ func (x *fastReflection_GetEmaResponse) WhichOneof(d protoreflect.OneofDescripto
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_GetEmaResponse) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_QueryEMAResponse) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -11706,7 +11706,7 @@ func (x *fastReflection_GetEmaResponse) GetUnknown() protoreflect.RawFields {
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_GetEmaResponse) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_QueryEMAResponse) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -11718,7 +11718,7 @@ func (x *fastReflection_GetEmaResponse) SetUnknown(fields protoreflect.RawFields
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_GetEmaResponse) IsValid() bool {
+func (x *fastReflection_QueryEMAResponse) IsValid() bool {
 	return x != nil
 }
 
@@ -11728,9 +11728,9 @@ func (x *fastReflection_GetEmaResponse) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_GetEmaResponse) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_QueryEMAResponse) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*GetEmaResponse)
+		x := input.Message.Interface().(*QueryEMAResponse)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -11756,7 +11756,7 @@ func (x *fastReflection_GetEmaResponse) ProtoMethods() *protoiface.Methods {
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*GetEmaResponse)
+		x := input.Message.Interface().(*QueryEMAResponse)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -11793,7 +11793,7 @@ func (x *fastReflection_GetEmaResponse) ProtoMethods() *protoiface.Methods {
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*GetEmaResponse)
+		x := input.Message.Interface().(*QueryEMAResponse)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -11825,10 +11825,10 @@ func (x *fastReflection_GetEmaResponse) ProtoMethods() *protoiface.Methods {
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: GetEmaResponse: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryEMAResponse: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: GetEmaResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryEMAResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -12983,6 +12983,846 @@ func (x *fastReflection_QueryWMAResponse) ProtoMethods() *protoiface.Methods {
 	}
 }
 
+var (
+	md_QuerySMARequest       protoreflect.MessageDescriptor
+	fd_QuerySMARequest_denom protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_cheqd_oracle_v2_query_proto_init()
+	md_QuerySMARequest = File_cheqd_oracle_v2_query_proto.Messages().ByName("QuerySMARequest")
+	fd_QuerySMARequest_denom = md_QuerySMARequest.Fields().ByName("denom")
+}
+
+var _ protoreflect.Message = (*fastReflection_QuerySMARequest)(nil)
+
+type fastReflection_QuerySMARequest QuerySMARequest
+
+func (x *QuerySMARequest) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_QuerySMARequest)(x)
+}
+
+func (x *QuerySMARequest) slowProtoReflect() protoreflect.Message {
+	mi := &file_cheqd_oracle_v2_query_proto_msgTypes[30]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_QuerySMARequest_messageType fastReflection_QuerySMARequest_messageType
+var _ protoreflect.MessageType = fastReflection_QuerySMARequest_messageType{}
+
+type fastReflection_QuerySMARequest_messageType struct{}
+
+func (x fastReflection_QuerySMARequest_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_QuerySMARequest)(nil)
+}
+func (x fastReflection_QuerySMARequest_messageType) New() protoreflect.Message {
+	return new(fastReflection_QuerySMARequest)
+}
+func (x fastReflection_QuerySMARequest_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_QuerySMARequest
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_QuerySMARequest) Descriptor() protoreflect.MessageDescriptor {
+	return md_QuerySMARequest
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_QuerySMARequest) Type() protoreflect.MessageType {
+	return _fastReflection_QuerySMARequest_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_QuerySMARequest) New() protoreflect.Message {
+	return new(fastReflection_QuerySMARequest)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_QuerySMARequest) Interface() protoreflect.ProtoMessage {
+	return (*QuerySMARequest)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_QuerySMARequest) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.Denom != "" {
+		value := protoreflect.ValueOfString(x.Denom)
+		if !f(fd_QuerySMARequest_denom, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_QuerySMARequest) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "cheqd.oracle.v2.QuerySMARequest.denom":
+		return x.Denom != ""
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QuerySMARequest"))
+		}
+		panic(fmt.Errorf("message cheqd.oracle.v2.QuerySMARequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QuerySMARequest) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "cheqd.oracle.v2.QuerySMARequest.denom":
+		x.Denom = ""
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QuerySMARequest"))
+		}
+		panic(fmt.Errorf("message cheqd.oracle.v2.QuerySMARequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_QuerySMARequest) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "cheqd.oracle.v2.QuerySMARequest.denom":
+		value := x.Denom
+		return protoreflect.ValueOfString(value)
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QuerySMARequest"))
+		}
+		panic(fmt.Errorf("message cheqd.oracle.v2.QuerySMARequest does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QuerySMARequest) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "cheqd.oracle.v2.QuerySMARequest.denom":
+		x.Denom = value.Interface().(string)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QuerySMARequest"))
+		}
+		panic(fmt.Errorf("message cheqd.oracle.v2.QuerySMARequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QuerySMARequest) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "cheqd.oracle.v2.QuerySMARequest.denom":
+		panic(fmt.Errorf("field denom of message cheqd.oracle.v2.QuerySMARequest is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QuerySMARequest"))
+		}
+		panic(fmt.Errorf("message cheqd.oracle.v2.QuerySMARequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_QuerySMARequest) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "cheqd.oracle.v2.QuerySMARequest.denom":
+		return protoreflect.ValueOfString("")
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QuerySMARequest"))
+		}
+		panic(fmt.Errorf("message cheqd.oracle.v2.QuerySMARequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_QuerySMARequest) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in cheqd.oracle.v2.QuerySMARequest", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_QuerySMARequest) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QuerySMARequest) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_QuerySMARequest) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_QuerySMARequest) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*QuerySMARequest)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.Denom)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*QuerySMARequest)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.Denom) > 0 {
+			i -= len(x.Denom)
+			copy(dAtA[i:], x.Denom)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Denom)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*QuerySMARequest)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QuerySMARequest: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QuerySMARequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Denom", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Denom = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
+var (
+	md_QuerySMAResponse       protoreflect.MessageDescriptor
+	fd_QuerySMAResponse_price protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_cheqd_oracle_v2_query_proto_init()
+	md_QuerySMAResponse = File_cheqd_oracle_v2_query_proto.Messages().ByName("QuerySMAResponse")
+	fd_QuerySMAResponse_price = md_QuerySMAResponse.Fields().ByName("price")
+}
+
+var _ protoreflect.Message = (*fastReflection_QuerySMAResponse)(nil)
+
+type fastReflection_QuerySMAResponse QuerySMAResponse
+
+func (x *QuerySMAResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_QuerySMAResponse)(x)
+}
+
+func (x *QuerySMAResponse) slowProtoReflect() protoreflect.Message {
+	mi := &file_cheqd_oracle_v2_query_proto_msgTypes[31]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_QuerySMAResponse_messageType fastReflection_QuerySMAResponse_messageType
+var _ protoreflect.MessageType = fastReflection_QuerySMAResponse_messageType{}
+
+type fastReflection_QuerySMAResponse_messageType struct{}
+
+func (x fastReflection_QuerySMAResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_QuerySMAResponse)(nil)
+}
+func (x fastReflection_QuerySMAResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_QuerySMAResponse)
+}
+func (x fastReflection_QuerySMAResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_QuerySMAResponse
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_QuerySMAResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_QuerySMAResponse
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_QuerySMAResponse) Type() protoreflect.MessageType {
+	return _fastReflection_QuerySMAResponse_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_QuerySMAResponse) New() protoreflect.Message {
+	return new(fastReflection_QuerySMAResponse)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_QuerySMAResponse) Interface() protoreflect.ProtoMessage {
+	return (*QuerySMAResponse)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_QuerySMAResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.Price != "" {
+		value := protoreflect.ValueOfString(x.Price)
+		if !f(fd_QuerySMAResponse_price, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_QuerySMAResponse) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "cheqd.oracle.v2.QuerySMAResponse.price":
+		return x.Price != ""
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QuerySMAResponse"))
+		}
+		panic(fmt.Errorf("message cheqd.oracle.v2.QuerySMAResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QuerySMAResponse) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "cheqd.oracle.v2.QuerySMAResponse.price":
+		x.Price = ""
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QuerySMAResponse"))
+		}
+		panic(fmt.Errorf("message cheqd.oracle.v2.QuerySMAResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_QuerySMAResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "cheqd.oracle.v2.QuerySMAResponse.price":
+		value := x.Price
+		return protoreflect.ValueOfString(value)
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QuerySMAResponse"))
+		}
+		panic(fmt.Errorf("message cheqd.oracle.v2.QuerySMAResponse does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QuerySMAResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "cheqd.oracle.v2.QuerySMAResponse.price":
+		x.Price = value.Interface().(string)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QuerySMAResponse"))
+		}
+		panic(fmt.Errorf("message cheqd.oracle.v2.QuerySMAResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QuerySMAResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "cheqd.oracle.v2.QuerySMAResponse.price":
+		panic(fmt.Errorf("field price of message cheqd.oracle.v2.QuerySMAResponse is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QuerySMAResponse"))
+		}
+		panic(fmt.Errorf("message cheqd.oracle.v2.QuerySMAResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_QuerySMAResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "cheqd.oracle.v2.QuerySMAResponse.price":
+		return protoreflect.ValueOfString("")
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: cheqd.oracle.v2.QuerySMAResponse"))
+		}
+		panic(fmt.Errorf("message cheqd.oracle.v2.QuerySMAResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_QuerySMAResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in cheqd.oracle.v2.QuerySMAResponse", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_QuerySMAResponse) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QuerySMAResponse) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_QuerySMAResponse) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_QuerySMAResponse) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*QuerySMAResponse)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.Price)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*QuerySMAResponse)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.Price) > 0 {
+			i -= len(x.Price)
+			copy(dAtA[i:], x.Price)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Price)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*QuerySMAResponse)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QuerySMAResponse: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QuerySMAResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Price", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Price = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
 // Code generated by protoc-gen-go. DO NOT EDIT.
 // versions:
 // 	protoc-gen-go v1.27.0
@@ -13935,7 +14775,7 @@ func (x *QueryValidatorRewardSetResponse) GetValidators() *ValidatorRewardSet {
 	return nil
 }
 
-type GetEmaRequest struct {
+type QueryEMARequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -13943,8 +14783,8 @@ type GetEmaRequest struct {
 	Denom string `protobuf:"bytes,1,opt,name=denom,proto3" json:"denom,omitempty"`
 }
 
-func (x *GetEmaRequest) Reset() {
-	*x = GetEmaRequest{}
+func (x *QueryEMARequest) Reset() {
+	*x = QueryEMARequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_cheqd_oracle_v2_query_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -13952,25 +14792,25 @@ func (x *GetEmaRequest) Reset() {
 	}
 }
 
-func (x *GetEmaRequest) String() string {
+func (x *QueryEMARequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetEmaRequest) ProtoMessage() {}
+func (*QueryEMARequest) ProtoMessage() {}
 
-// Deprecated: Use GetEmaRequest.ProtoReflect.Descriptor instead.
-func (*GetEmaRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use QueryEMARequest.ProtoReflect.Descriptor instead.
+func (*QueryEMARequest) Descriptor() ([]byte, []int) {
 	return file_cheqd_oracle_v2_query_proto_rawDescGZIP(), []int{26}
 }
 
-func (x *GetEmaRequest) GetDenom() string {
+func (x *QueryEMARequest) GetDenom() string {
 	if x != nil {
 		return x.Denom
 	}
 	return ""
 }
 
-type GetEmaResponse struct {
+type QueryEMAResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -13978,8 +14818,8 @@ type GetEmaResponse struct {
 	Price string `protobuf:"bytes,1,opt,name=price,proto3" json:"price,omitempty"`
 }
 
-func (x *GetEmaResponse) Reset() {
-	*x = GetEmaResponse{}
+func (x *QueryEMAResponse) Reset() {
+	*x = QueryEMAResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_cheqd_oracle_v2_query_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -13987,18 +14827,18 @@ func (x *GetEmaResponse) Reset() {
 	}
 }
 
-func (x *GetEmaResponse) String() string {
+func (x *QueryEMAResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetEmaResponse) ProtoMessage() {}
+func (*QueryEMAResponse) ProtoMessage() {}
 
-// Deprecated: Use GetEmaResponse.ProtoReflect.Descriptor instead.
-func (*GetEmaResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use QueryEMAResponse.ProtoReflect.Descriptor instead.
+func (*QueryEMAResponse) Descriptor() ([]byte, []int) {
 	return file_cheqd_oracle_v2_query_proto_rawDescGZIP(), []int{27}
 }
 
-func (x *GetEmaResponse) GetPrice() string {
+func (x *QueryEMAResponse) GetPrice() string {
 	if x != nil {
 		return x.Price
 	}
@@ -14085,6 +14925,76 @@ func (*QueryWMAResponse) Descriptor() ([]byte, []int) {
 }
 
 func (x *QueryWMAResponse) GetPrice() string {
+	if x != nil {
+		return x.Price
+	}
+	return ""
+}
+
+type QuerySMARequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Denom string `protobuf:"bytes,1,opt,name=denom,proto3" json:"denom,omitempty"`
+}
+
+func (x *QuerySMARequest) Reset() {
+	*x = QuerySMARequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cheqd_oracle_v2_query_proto_msgTypes[30]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *QuerySMARequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QuerySMARequest) ProtoMessage() {}
+
+// Deprecated: Use QuerySMARequest.ProtoReflect.Descriptor instead.
+func (*QuerySMARequest) Descriptor() ([]byte, []int) {
+	return file_cheqd_oracle_v2_query_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *QuerySMARequest) GetDenom() string {
+	if x != nil {
+		return x.Denom
+	}
+	return ""
+}
+
+type QuerySMAResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Price string `protobuf:"bytes,1,opt,name=price,proto3" json:"price,omitempty"`
+}
+
+func (x *QuerySMAResponse) Reset() {
+	*x = QuerySMAResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cheqd_oracle_v2_query_proto_msgTypes[31]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *QuerySMAResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QuerySMAResponse) ProtoMessage() {}
+
+// Deprecated: Use QuerySMAResponse.ProtoReflect.Descriptor instead.
+func (*QuerySMAResponse) Descriptor() ([]byte, []int) {
+	return file_cheqd_oracle_v2_query_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *QuerySMAResponse) GetPrice() string {
 	if x != nil {
 		return x.Price
 	}
@@ -14226,178 +15136,191 @@ var file_cheqd_oracle_v2_query_proto_rawDesc = []byte{
 	0x0b, 0x32, 0x23, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65,
 	0x2e, 0x76, 0x32, 0x2e, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x77,
 	0x61, 0x72, 0x64, 0x53, 0x65, 0x74, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x0a, 0x76, 0x61,
-	0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x22, 0x25, 0x0a, 0x0d, 0x47, 0x65, 0x74, 0x45,
-	0x6d, 0x61, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x64, 0x65, 0x6e,
-	0x6f, 0x6d, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x22,
-	0x59, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x45, 0x6d, 0x61, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x12, 0x47, 0x0a, 0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x42, 0x31, 0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x1b, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73,
-	0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x6d, 0x61, 0x74, 0x68, 0x2e, 0x4c, 0x65, 0x67, 0x61,
-	0x63, 0x79, 0x44, 0x65, 0x63, 0xd2, 0xb4, 0x2d, 0x0a, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e,
-	0x44, 0x65, 0x63, 0x52, 0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x22, 0x6a, 0x0a, 0x0f, 0x51, 0x75,
-	0x65, 0x72, 0x79, 0x57, 0x4d, 0x41, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x14, 0x0a,
-	0x05, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x64, 0x65,
-	0x6e, 0x6f, 0x6d, 0x12, 0x1a, 0x0a, 0x08, 0x73, 0x74, 0x72, 0x61, 0x74, 0x65, 0x67, 0x79, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x73, 0x74, 0x72, 0x61, 0x74, 0x65, 0x67, 0x79, 0x12,
-	0x25, 0x0a, 0x0e, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x5f, 0x77, 0x65, 0x69, 0x67, 0x68, 0x74,
-	0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x03, 0x52, 0x0d, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x57,
-	0x65, 0x69, 0x67, 0x68, 0x74, 0x73, 0x22, 0x5b, 0x0a, 0x10, 0x51, 0x75, 0x65, 0x72, 0x79, 0x57,
-	0x4d, 0x41, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x47, 0x0a, 0x05, 0x70, 0x72,
-	0x69, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x31, 0xc8, 0xde, 0x1f, 0x00, 0xda,
-	0xde, 0x1f, 0x1b, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f,
-	0x6d, 0x61, 0x74, 0x68, 0x2e, 0x4c, 0x65, 0x67, 0x61, 0x63, 0x79, 0x44, 0x65, 0x63, 0xd2, 0xb4,
-	0x2d, 0x0a, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x44, 0x65, 0x63, 0x52, 0x05, 0x70, 0x72,
-	0x69, 0x63, 0x65, 0x32, 0x93, 0x11, 0x0a, 0x05, 0x51, 0x75, 0x65, 0x72, 0x79, 0x12, 0x99, 0x01,
-	0x0a, 0x0d, 0x45, 0x78, 0x63, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x61, 0x74, 0x65, 0x73, 0x12,
-	0x23, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76,
-	0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x45, 0x78, 0x63, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x52,
-	0x61, 0x74, 0x65, 0x73, 0x1a, 0x2b, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61,
-	0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x45, 0x78, 0x63, 0x68,
-	0x61, 0x6e, 0x67, 0x65, 0x52, 0x61, 0x74, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x22, 0x36, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x30, 0x12, 0x2e, 0x2f, 0x63, 0x68, 0x65, 0x71,
-	0x64, 0x2f, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x64, 0x65, 0x6e, 0x6f,
-	0x6d, 0x73, 0x2f, 0x65, 0x78, 0x63, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x5f, 0x72, 0x61, 0x74, 0x65,
-	0x73, 0x2f, 0x7b, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x7d, 0x12, 0xaa, 0x01, 0x0a, 0x13, 0x41, 0x63,
+	0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x22, 0x27, 0x0a, 0x0f, 0x51, 0x75, 0x65, 0x72,
+	0x79, 0x45, 0x4d, 0x41, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x64,
+	0x65, 0x6e, 0x6f, 0x6d, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x64, 0x65, 0x6e, 0x6f,
+	0x6d, 0x22, 0x5b, 0x0a, 0x10, 0x51, 0x75, 0x65, 0x72, 0x79, 0x45, 0x4d, 0x41, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x47, 0x0a, 0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x42, 0x31, 0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x1b, 0x63, 0x6f,
+	0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x6d, 0x61, 0x74, 0x68, 0x2e,
+	0x4c, 0x65, 0x67, 0x61, 0x63, 0x79, 0x44, 0x65, 0x63, 0xd2, 0xb4, 0x2d, 0x0a, 0x63, 0x6f, 0x73,
+	0x6d, 0x6f, 0x73, 0x2e, 0x44, 0x65, 0x63, 0x52, 0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x22, 0x6a,
+	0x0a, 0x0f, 0x51, 0x75, 0x65, 0x72, 0x79, 0x57, 0x4d, 0x41, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x14, 0x0a, 0x05, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x05, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x12, 0x1a, 0x0a, 0x08, 0x73, 0x74, 0x72, 0x61, 0x74,
+	0x65, 0x67, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x73, 0x74, 0x72, 0x61, 0x74,
+	0x65, 0x67, 0x79, 0x12, 0x25, 0x0a, 0x0e, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x5f, 0x77, 0x65,
+	0x69, 0x67, 0x68, 0x74, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x03, 0x52, 0x0d, 0x63, 0x75, 0x73,
+	0x74, 0x6f, 0x6d, 0x57, 0x65, 0x69, 0x67, 0x68, 0x74, 0x73, 0x22, 0x5b, 0x0a, 0x10, 0x51, 0x75,
+	0x65, 0x72, 0x79, 0x57, 0x4d, 0x41, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x47,
+	0x0a, 0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x31, 0xc8,
+	0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x1b, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b,
+	0x2e, 0x69, 0x6f, 0x2f, 0x6d, 0x61, 0x74, 0x68, 0x2e, 0x4c, 0x65, 0x67, 0x61, 0x63, 0x79, 0x44,
+	0x65, 0x63, 0xd2, 0xb4, 0x2d, 0x0a, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x44, 0x65, 0x63,
+	0x52, 0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x22, 0x27, 0x0a, 0x0f, 0x51, 0x75, 0x65, 0x72, 0x79,
+	0x53, 0x4d, 0x41, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x64, 0x65,
+	0x6e, 0x6f, 0x6d, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x64, 0x65, 0x6e, 0x6f, 0x6d,
+	0x22, 0x5b, 0x0a, 0x10, 0x51, 0x75, 0x65, 0x72, 0x79, 0x53, 0x4d, 0x41, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x47, 0x0a, 0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x42, 0x31, 0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x1b, 0x63, 0x6f, 0x73,
+	0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x6d, 0x61, 0x74, 0x68, 0x2e, 0x4c,
+	0x65, 0x67, 0x61, 0x63, 0x79, 0x44, 0x65, 0x63, 0xd2, 0xb4, 0x2d, 0x0a, 0x63, 0x6f, 0x73, 0x6d,
+	0x6f, 0x73, 0x2e, 0x44, 0x65, 0x63, 0x52, 0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x32, 0xe2, 0x11,
+	0x0a, 0x05, 0x51, 0x75, 0x65, 0x72, 0x79, 0x12, 0x99, 0x01, 0x0a, 0x0d, 0x45, 0x78, 0x63, 0x68,
+	0x61, 0x6e, 0x67, 0x65, 0x52, 0x61, 0x74, 0x65, 0x73, 0x12, 0x23, 0x2e, 0x63, 0x68, 0x65, 0x71,
+	0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72,
+	0x79, 0x45, 0x78, 0x63, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x61, 0x74, 0x65, 0x73, 0x1a, 0x2b,
+	0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32,
+	0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x45, 0x78, 0x63, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x61,
+	0x74, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x36, 0x82, 0xd3, 0xe4,
+	0x93, 0x02, 0x30, 0x12, 0x2e, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f, 0x72, 0x61, 0x63,
+	0x6c, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x73, 0x2f, 0x65, 0x78, 0x63,
+	0x68, 0x61, 0x6e, 0x67, 0x65, 0x5f, 0x72, 0x61, 0x74, 0x65, 0x73, 0x2f, 0x7b, 0x64, 0x65, 0x6e,
+	0x6f, 0x6d, 0x7d, 0x12, 0xaa, 0x01, 0x0a, 0x13, 0x41, 0x63, 0x74, 0x69, 0x76, 0x65, 0x45, 0x78,
+	0x63, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x61, 0x74, 0x65, 0x73, 0x12, 0x29, 0x2e, 0x63, 0x68,
+	0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75,
+	0x65, 0x72, 0x79, 0x41, 0x63, 0x74, 0x69, 0x76, 0x65, 0x45, 0x78, 0x63, 0x68, 0x61, 0x6e, 0x67,
+	0x65, 0x52, 0x61, 0x74, 0x65, 0x73, 0x1a, 0x31, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f,
+	0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x63,
 	0x74, 0x69, 0x76, 0x65, 0x45, 0x78, 0x63, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x61, 0x74, 0x65,
-	0x73, 0x12, 0x29, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65,
-	0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x63, 0x74, 0x69, 0x76, 0x65, 0x45,
-	0x78, 0x63, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x61, 0x74, 0x65, 0x73, 0x1a, 0x31, 0x2e, 0x63,
-	0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51,
-	0x75, 0x65, 0x72, 0x79, 0x41, 0x63, 0x74, 0x69, 0x76, 0x65, 0x45, 0x78, 0x63, 0x68, 0x61, 0x6e,
-	0x67, 0x65, 0x52, 0x61, 0x74, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
-	0x35, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x2f, 0x12, 0x2d, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f,
-	0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x73,
-	0x2f, 0x61, 0x63, 0x74, 0x69, 0x76, 0x65, 0x5f, 0x65, 0x78, 0x63, 0x68, 0x61, 0x6e, 0x67, 0x65,
-	0x5f, 0x72, 0x61, 0x74, 0x65, 0x73, 0x12, 0xa7, 0x01, 0x0a, 0x10, 0x46, 0x65, 0x65, 0x64, 0x65,
-	0x72, 0x44, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x26, 0x2e, 0x63, 0x68,
-	0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75,
-	0x65, 0x72, 0x79, 0x46, 0x65, 0x65, 0x64, 0x65, 0x72, 0x44, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x1a, 0x2e, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63,
-	0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x46, 0x65, 0x65, 0x64, 0x65,
-	0x72, 0x44, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x22, 0x3b, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x35, 0x12, 0x33, 0x2f, 0x63, 0x68,
-	0x65, 0x71, 0x64, 0x2f, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x76, 0x61,
-	0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x2f, 0x7b, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61,
-	0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x7d, 0x2f, 0x66, 0x65, 0x65, 0x64, 0x65, 0x72,
-	0x12, 0x96, 0x01, 0x0a, 0x0b, 0x4d, 0x69, 0x73, 0x73, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x65, 0x72,
-	0x12, 0x21, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e,
-	0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4d, 0x69, 0x73, 0x73, 0x43, 0x6f, 0x75, 0x6e,
-	0x74, 0x65, 0x72, 0x1a, 0x29, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63,
-	0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4d, 0x69, 0x73, 0x73, 0x43,
-	0x6f, 0x75, 0x6e, 0x74, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x39,
-	0x82, 0xd3, 0xe4, 0x93, 0x02, 0x33, 0x12, 0x31, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f,
-	0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74,
-	0x6f, 0x72, 0x73, 0x2f, 0x7b, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61,
-	0x64, 0x64, 0x72, 0x7d, 0x2f, 0x6d, 0x69, 0x73, 0x73, 0x12, 0x82, 0x01, 0x0a, 0x0b, 0x53, 0x6c,
-	0x61, 0x73, 0x68, 0x57, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x12, 0x21, 0x2e, 0x63, 0x68, 0x65, 0x71,
-	0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72,
-	0x79, 0x53, 0x6c, 0x61, 0x73, 0x68, 0x57, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x1a, 0x29, 0x2e, 0x63,
-	0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51,
-	0x75, 0x65, 0x72, 0x79, 0x53, 0x6c, 0x61, 0x73, 0x68, 0x57, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x25, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x1f, 0x12,
-	0x1d, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76,
-	0x32, 0x2f, 0x73, 0x6c, 0x61, 0x73, 0x68, 0x5f, 0x77, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x12, 0xb2,
-	0x01, 0x0a, 0x10, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x50, 0x72, 0x65, 0x76,
-	0x6f, 0x74, 0x65, 0x12, 0x26, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63,
+	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x35, 0x82, 0xd3, 0xe4, 0x93, 0x02,
+	0x2f, 0x12, 0x2d, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65,
+	0x2f, 0x76, 0x32, 0x2f, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x73, 0x2f, 0x61, 0x63, 0x74, 0x69, 0x76,
+	0x65, 0x5f, 0x65, 0x78, 0x63, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x5f, 0x72, 0x61, 0x74, 0x65, 0x73,
+	0x12, 0xa7, 0x01, 0x0a, 0x10, 0x46, 0x65, 0x65, 0x64, 0x65, 0x72, 0x44, 0x65, 0x6c, 0x65, 0x67,
+	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x26, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72,
+	0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x46, 0x65, 0x65,
+	0x64, 0x65, 0x72, 0x44, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x1a, 0x2e, 0x2e,
+	0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e,
+	0x51, 0x75, 0x65, 0x72, 0x79, 0x46, 0x65, 0x65, 0x64, 0x65, 0x72, 0x44, 0x65, 0x6c, 0x65, 0x67,
+	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x3b, 0x82,
+	0xd3, 0xe4, 0x93, 0x02, 0x35, 0x12, 0x33, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f, 0x72,
+	0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f,
+	0x72, 0x73, 0x2f, 0x7b, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64,
+	0x64, 0x72, 0x7d, 0x2f, 0x66, 0x65, 0x65, 0x64, 0x65, 0x72, 0x12, 0x96, 0x01, 0x0a, 0x0b, 0x4d,
+	0x69, 0x73, 0x73, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x65, 0x72, 0x12, 0x21, 0x2e, 0x63, 0x68, 0x65,
+	0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65,
+	0x72, 0x79, 0x4d, 0x69, 0x73, 0x73, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x65, 0x72, 0x1a, 0x29, 0x2e,
+	0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e,
+	0x51, 0x75, 0x65, 0x72, 0x79, 0x4d, 0x69, 0x73, 0x73, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x65, 0x72,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x39, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x33,
+	0x12, 0x31, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f,
+	0x76, 0x32, 0x2f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x2f, 0x7b, 0x76,
+	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x7d, 0x2f, 0x6d,
+	0x69, 0x73, 0x73, 0x12, 0x82, 0x01, 0x0a, 0x0b, 0x53, 0x6c, 0x61, 0x73, 0x68, 0x57, 0x69, 0x6e,
+	0x64, 0x6f, 0x77, 0x12, 0x21, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63,
+	0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x53, 0x6c, 0x61, 0x73, 0x68,
+	0x57, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x1a, 0x29, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f,
+	0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x53, 0x6c,
+	0x61, 0x73, 0x68, 0x57, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x22, 0x25, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x1f, 0x12, 0x1d, 0x2f, 0x63, 0x68, 0x65, 0x71,
+	0x64, 0x2f, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x73, 0x6c, 0x61, 0x73,
+	0x68, 0x5f, 0x77, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x12, 0xb2, 0x01, 0x0a, 0x10, 0x41, 0x67, 0x67,
+	0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x50, 0x72, 0x65, 0x76, 0x6f, 0x74, 0x65, 0x12, 0x26, 0x2e,
+	0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e,
+	0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x50, 0x72,
+	0x65, 0x76, 0x6f, 0x74, 0x65, 0x1a, 0x2e, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72,
+	0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x67, 0x67,
+	0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x50, 0x72, 0x65, 0x76, 0x6f, 0x74, 0x65, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x46, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x40, 0x12, 0x3e, 0x2f,
+	0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x32, 0x2f,
+	0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x2f, 0x7b, 0x76, 0x61, 0x6c, 0x69,
+	0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x7d, 0x2f, 0x61, 0x67, 0x67, 0x72,
+	0x65, 0x67, 0x61, 0x74, 0x65, 0x5f, 0x70, 0x72, 0x65, 0x76, 0x6f, 0x74, 0x65, 0x12, 0xa5, 0x01,
+	0x0a, 0x11, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x50, 0x72, 0x65, 0x76, 0x6f,
+	0x74, 0x65, 0x73, 0x12, 0x27, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63,
 	0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x67, 0x67, 0x72, 0x65,
-	0x67, 0x61, 0x74, 0x65, 0x50, 0x72, 0x65, 0x76, 0x6f, 0x74, 0x65, 0x1a, 0x2e, 0x2e, 0x63, 0x68,
-	0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75,
-	0x65, 0x72, 0x79, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x50, 0x72, 0x65, 0x76,
-	0x6f, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x46, 0x82, 0xd3, 0xe4,
-	0x93, 0x02, 0x40, 0x12, 0x3e, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f, 0x72, 0x61, 0x63,
-	0x6c, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73,
-	0x2f, 0x7b, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72,
-	0x7d, 0x2f, 0x61, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x5f, 0x70, 0x72, 0x65, 0x76,
-	0x6f, 0x74, 0x65, 0x12, 0xa5, 0x01, 0x0a, 0x11, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74,
-	0x65, 0x50, 0x72, 0x65, 0x76, 0x6f, 0x74, 0x65, 0x73, 0x12, 0x27, 0x2e, 0x63, 0x68, 0x65, 0x71,
-	0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72,
-	0x79, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x50, 0x72, 0x65, 0x76, 0x6f, 0x74,
-	0x65, 0x73, 0x1a, 0x2f, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c,
-	0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67,
-	0x61, 0x74, 0x65, 0x50, 0x72, 0x65, 0x76, 0x6f, 0x74, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x22, 0x36, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x30, 0x12, 0x2e, 0x2f, 0x63, 0x68,
-	0x65, 0x71, 0x64, 0x2f, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x76, 0x61,
-	0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x2f, 0x61, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61,
-	0x74, 0x65, 0x5f, 0x70, 0x72, 0x65, 0x76, 0x6f, 0x74, 0x65, 0x73, 0x12, 0xa6, 0x01, 0x0a, 0x0d,
-	0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x56, 0x6f, 0x74, 0x65, 0x12, 0x23, 0x2e,
-	0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e,
-	0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x56, 0x6f,
-	0x74, 0x65, 0x1a, 0x2b, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c,
-	0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67,
-	0x61, 0x74, 0x65, 0x56, 0x6f, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
-	0x43, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x3d, 0x12, 0x3b, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f,
-	0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x76, 0x61, 0x6c, 0x64, 0x69, 0x61,
-	0x74, 0x6f, 0x72, 0x73, 0x2f, 0x7b, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f,
-	0x61, 0x64, 0x64, 0x72, 0x7d, 0x2f, 0x61, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x5f,
-	0x76, 0x6f, 0x74, 0x65, 0x12, 0x99, 0x01, 0x0a, 0x0e, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61,
-	0x74, 0x65, 0x56, 0x6f, 0x74, 0x65, 0x73, 0x12, 0x24, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e,
+	0x67, 0x61, 0x74, 0x65, 0x50, 0x72, 0x65, 0x76, 0x6f, 0x74, 0x65, 0x73, 0x1a, 0x2f, 0x2e, 0x63,
+	0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51,
+	0x75, 0x65, 0x72, 0x79, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x50, 0x72, 0x65,
+	0x76, 0x6f, 0x74, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x36, 0x82,
+	0xd3, 0xe4, 0x93, 0x02, 0x30, 0x12, 0x2e, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f, 0x72,
+	0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f,
+	0x72, 0x73, 0x2f, 0x61, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x5f, 0x70, 0x72, 0x65,
+	0x76, 0x6f, 0x74, 0x65, 0x73, 0x12, 0xa6, 0x01, 0x0a, 0x0d, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67,
+	0x61, 0x74, 0x65, 0x56, 0x6f, 0x74, 0x65, 0x12, 0x23, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e,
 	0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x41,
-	0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x56, 0x6f, 0x74, 0x65, 0x73, 0x1a, 0x2c, 0x2e,
-	0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e,
-	0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x56, 0x6f,
-	0x74, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x33, 0x82, 0xd3, 0xe4,
-	0x93, 0x02, 0x2d, 0x12, 0x2b, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f, 0x72, 0x61, 0x63,
-	0x6c, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73,
-	0x2f, 0x61, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x5f, 0x76, 0x6f, 0x74, 0x65, 0x73,
-	0x12, 0x6d, 0x0a, 0x06, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x1c, 0x2e, 0x63, 0x68, 0x65,
-	0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65,
-	0x72, 0x79, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x1a, 0x24, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64,
-	0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79,
-	0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x1f,
-	0x82, 0xd3, 0xe4, 0x93, 0x02, 0x19, 0x12, 0x17, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f,
-	0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12,
-	0x7c, 0x0a, 0x07, 0x4d, 0x65, 0x64, 0x69, 0x61, 0x6e, 0x73, 0x12, 0x1d, 0x2e, 0x63, 0x68, 0x65,
-	0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65,
-	0x72, 0x79, 0x4d, 0x65, 0x64, 0x69, 0x61, 0x6e, 0x73, 0x1a, 0x25, 0x2e, 0x63, 0x68, 0x65, 0x71,
-	0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72,
-	0x79, 0x4d, 0x65, 0x64, 0x69, 0x61, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x22, 0x2b, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x25, 0x12, 0x23, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64,
-	0x2f, 0x68, 0x69, 0x73, 0x74, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x64,
-	0x65, 0x6e, 0x6f, 0x6d, 0x73, 0x2f, 0x6d, 0x65, 0x64, 0x69, 0x61, 0x6e, 0x73, 0x12, 0xa1, 0x01,
-	0x0a, 0x10, 0x4d, 0x65, 0x64, 0x69, 0x61, 0x6e, 0x44, 0x65, 0x76, 0x69, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x73, 0x12, 0x26, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c,
-	0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4d, 0x65, 0x64, 0x69, 0x61, 0x6e,
-	0x44, 0x65, 0x76, 0x69, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x1a, 0x2e, 0x2e, 0x63, 0x68, 0x65,
-	0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65,
-	0x72, 0x79, 0x4d, 0x65, 0x64, 0x69, 0x61, 0x6e, 0x44, 0x65, 0x76, 0x69, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x35, 0x82, 0xd3, 0xe4, 0x93,
-	0x02, 0x2f, 0x12, 0x2d, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x68, 0x69, 0x73, 0x74, 0x6f,
+	0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x56, 0x6f, 0x74, 0x65, 0x1a, 0x2b, 0x2e, 0x63,
+	0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51,
+	0x75, 0x65, 0x72, 0x79, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x56, 0x6f, 0x74,
+	0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x43, 0x82, 0xd3, 0xe4, 0x93, 0x02,
+	0x3d, 0x12, 0x3b, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65,
+	0x2f, 0x76, 0x32, 0x2f, 0x76, 0x61, 0x6c, 0x64, 0x69, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x2f, 0x7b,
+	0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x7d, 0x2f,
+	0x61, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x5f, 0x76, 0x6f, 0x74, 0x65, 0x12, 0x99,
+	0x01, 0x0a, 0x0e, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x56, 0x6f, 0x74, 0x65,
+	0x73, 0x12, 0x24, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65,
+	0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61,
+	0x74, 0x65, 0x56, 0x6f, 0x74, 0x65, 0x73, 0x1a, 0x2c, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e,
+	0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x41,
+	0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x56, 0x6f, 0x74, 0x65, 0x73, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x33, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x2d, 0x12, 0x2b, 0x2f,
+	0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x32, 0x2f,
+	0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x2f, 0x61, 0x67, 0x67, 0x72, 0x65,
+	0x67, 0x61, 0x74, 0x65, 0x5f, 0x76, 0x6f, 0x74, 0x65, 0x73, 0x12, 0x6d, 0x0a, 0x06, 0x50, 0x61,
+	0x72, 0x61, 0x6d, 0x73, 0x12, 0x1c, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61,
+	0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x50, 0x61, 0x72, 0x61,
+	0x6d, 0x73, 0x1a, 0x24, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c,
+	0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x1f, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x19,
+	0x12, 0x17, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f,
+	0x76, 0x32, 0x2f, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x7c, 0x0a, 0x07, 0x4d, 0x65, 0x64,
+	0x69, 0x61, 0x6e, 0x73, 0x12, 0x1d, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61,
+	0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4d, 0x65, 0x64, 0x69,
+	0x61, 0x6e, 0x73, 0x1a, 0x25, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63,
+	0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4d, 0x65, 0x64, 0x69, 0x61,
+	0x6e, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x2b, 0x82, 0xd3, 0xe4, 0x93,
+	0x02, 0x25, 0x12, 0x23, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x68, 0x69, 0x73, 0x74, 0x6f,
 	0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x32, 0x2f, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x73, 0x2f,
-	0x6d, 0x65, 0x64, 0x69, 0x61, 0x6e, 0x5f, 0x64, 0x65, 0x76, 0x69, 0x61, 0x74, 0x69, 0x6f, 0x6e,
-	0x73, 0x12, 0xaa, 0x01, 0x0a, 0x12, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x52,
-	0x65, 0x77, 0x61, 0x72, 0x64, 0x53, 0x65, 0x74, 0x12, 0x28, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64,
-	0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79,
+	0x6d, 0x65, 0x64, 0x69, 0x61, 0x6e, 0x73, 0x12, 0xa1, 0x01, 0x0a, 0x10, 0x4d, 0x65, 0x64, 0x69,
+	0x61, 0x6e, 0x44, 0x65, 0x76, 0x69, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x26, 0x2e, 0x63,
+	0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51,
+	0x75, 0x65, 0x72, 0x79, 0x4d, 0x65, 0x64, 0x69, 0x61, 0x6e, 0x44, 0x65, 0x76, 0x69, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x73, 0x1a, 0x2e, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61,
+	0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4d, 0x65, 0x64, 0x69,
+	0x61, 0x6e, 0x44, 0x65, 0x76, 0x69, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x35, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x2f, 0x12, 0x2d, 0x2f, 0x63,
+	0x68, 0x65, 0x71, 0x64, 0x2f, 0x68, 0x69, 0x73, 0x74, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f,
+	0x76, 0x32, 0x2f, 0x64, 0x65, 0x6e, 0x6f, 0x6d, 0x73, 0x2f, 0x6d, 0x65, 0x64, 0x69, 0x61, 0x6e,
+	0x5f, 0x64, 0x65, 0x76, 0x69, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0xaa, 0x01, 0x0a, 0x12,
 	0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x77, 0x61, 0x72, 0x64, 0x53,
-	0x65, 0x74, 0x1a, 0x30, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c,
+	0x65, 0x74, 0x12, 0x28, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c,
 	0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61,
-	0x74, 0x6f, 0x72, 0x52, 0x65, 0x77, 0x61, 0x72, 0x64, 0x53, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x38, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x32, 0x12, 0x30, 0x2f, 0x63,
-	0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x31, 0x2f, 0x76,
-	0x61, 0x6c, 0x64, 0x69, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x2f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61,
-	0x74, 0x6f, 0x72, 0x5f, 0x72, 0x65, 0x77, 0x61, 0x72, 0x64, 0x5f, 0x73, 0x65, 0x74, 0x12, 0x4b,
-	0x0a, 0x06, 0x47, 0x65, 0x74, 0x45, 0x6d, 0x61, 0x12, 0x1e, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64,
-	0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x47, 0x65, 0x74, 0x45, 0x6d,
-	0x61, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1f, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64,
-	0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x47, 0x65, 0x74, 0x45, 0x6d,
-	0x61, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x4c, 0x0a, 0x03, 0x57,
-	0x4d, 0x41, 0x12, 0x20, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c,
-	0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x57, 0x4d, 0x41, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61,
-	0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x57, 0x4d, 0x41, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0xc0, 0x01, 0xc8, 0xe1, 0x1e, 0x00,
-	0x0a, 0x13, 0x63, 0x6f, 0x6d, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63,
-	0x6c, 0x65, 0x2e, 0x76, 0x32, 0x42, 0x0a, 0x51, 0x75, 0x65, 0x72, 0x79, 0x50, 0x72, 0x6f, 0x74,
-	0x6f, 0x50, 0x01, 0x5a, 0x3b, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
-	0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2d, 0x6e, 0x6f, 0x64, 0x65,
-	0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x32, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f, 0x72,
-	0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x32, 0x3b, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x76, 0x32,
-	0xa2, 0x02, 0x03, 0x43, 0x4f, 0x58, 0xaa, 0x02, 0x0f, 0x43, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x4f,
-	0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x56, 0x32, 0xca, 0x02, 0x0f, 0x43, 0x68, 0x65, 0x71, 0x64,
-	0x5c, 0x4f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x5c, 0x56, 0x32, 0xe2, 0x02, 0x1b, 0x43, 0x68, 0x65,
-	0x71, 0x64, 0x5c, 0x4f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x5c, 0x56, 0x32, 0x5c, 0x47, 0x50, 0x42,
-	0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x11, 0x43, 0x68, 0x65, 0x71, 0x64,
-	0x3a, 0x3a, 0x4f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x3a, 0x3a, 0x56, 0x32, 0x62, 0x06, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x6f, 0x72, 0x52, 0x65, 0x77, 0x61, 0x72, 0x64, 0x53, 0x65, 0x74, 0x1a, 0x30, 0x2e, 0x63,
+	0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51,
+	0x75, 0x65, 0x72, 0x79, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x77,
+	0x61, 0x72, 0x64, 0x53, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x38,
+	0x82, 0xd3, 0xe4, 0x93, 0x02, 0x32, 0x12, 0x30, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f,
+	0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x31, 0x2f, 0x76, 0x61, 0x6c, 0x64, 0x69, 0x61, 0x74,
+	0x6f, 0x72, 0x73, 0x2f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x72, 0x65,
+	0x77, 0x61, 0x72, 0x64, 0x5f, 0x73, 0x65, 0x74, 0x12, 0x4c, 0x0a, 0x03, 0x45, 0x4d, 0x41, 0x12,
+	0x20, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76,
+	0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x45, 0x4d, 0x41, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x21, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65,
+	0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x45, 0x4d, 0x41, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x4c, 0x0a, 0x03, 0x57, 0x4d, 0x41, 0x12, 0x20, 0x2e,
+	0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e,
+	0x51, 0x75, 0x65, 0x72, 0x79, 0x57, 0x4d, 0x41, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x21, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76,
+	0x32, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x57, 0x4d, 0x41, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x22, 0x00, 0x12, 0x4c, 0x0a, 0x03, 0x53, 0x4d, 0x41, 0x12, 0x20, 0x2e, 0x63, 0x68,
+	0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e, 0x51, 0x75,
+	0x65, 0x72, 0x79, 0x53, 0x4d, 0x41, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e,
+	0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x2e,
+	0x51, 0x75, 0x65, 0x72, 0x79, 0x53, 0x4d, 0x41, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x00, 0x42, 0xc0, 0x01, 0xc8, 0xe1, 0x1e, 0x00, 0x0a, 0x13, 0x63, 0x6f, 0x6d, 0x2e, 0x63,
+	0x68, 0x65, 0x71, 0x64, 0x2e, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x76, 0x32, 0x42, 0x0a,
+	0x51, 0x75, 0x65, 0x72, 0x79, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x3b, 0x67, 0x69,
+	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x63,
+	0x68, 0x65, 0x71, 0x64, 0x2d, 0x6e, 0x6f, 0x64, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x32,
+	0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2f, 0x76, 0x32,
+	0x3b, 0x6f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x76, 0x32, 0xa2, 0x02, 0x03, 0x43, 0x4f, 0x58, 0xaa,
+	0x02, 0x0f, 0x43, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x4f, 0x72, 0x61, 0x63, 0x6c, 0x65, 0x2e, 0x56,
+	0x32, 0xca, 0x02, 0x0f, 0x43, 0x68, 0x65, 0x71, 0x64, 0x5c, 0x4f, 0x72, 0x61, 0x63, 0x6c, 0x65,
+	0x5c, 0x56, 0x32, 0xe2, 0x02, 0x1b, 0x43, 0x68, 0x65, 0x71, 0x64, 0x5c, 0x4f, 0x72, 0x61, 0x63,
+	0x6c, 0x65, 0x5c, 0x56, 0x32, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74,
+	0x61, 0xea, 0x02, 0x11, 0x43, 0x68, 0x65, 0x71, 0x64, 0x3a, 0x3a, 0x4f, 0x72, 0x61, 0x63, 0x6c,
+	0x65, 0x3a, 0x3a, 0x56, 0x32, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -14412,7 +15335,7 @@ func file_cheqd_oracle_v2_query_proto_rawDescGZIP() []byte {
 	return file_cheqd_oracle_v2_query_proto_rawDescData
 }
 
-var file_cheqd_oracle_v2_query_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
+var file_cheqd_oracle_v2_query_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
 var file_cheqd_oracle_v2_query_proto_goTypes = []interface{}{
 	(*QueryExchangeRates)(nil),               // 0: cheqd.oracle.v2.QueryExchangeRates
 	(*QueryExchangeRatesResponse)(nil),       // 1: cheqd.oracle.v2.QueryExchangeRatesResponse
@@ -14440,27 +15363,29 @@ var file_cheqd_oracle_v2_query_proto_goTypes = []interface{}{
 	(*QueryMedianDeviationsResponse)(nil),    // 23: cheqd.oracle.v2.QueryMedianDeviationsResponse
 	(*QueryValidatorRewardSet)(nil),          // 24: cheqd.oracle.v2.QueryValidatorRewardSet
 	(*QueryValidatorRewardSetResponse)(nil),  // 25: cheqd.oracle.v2.QueryValidatorRewardSetResponse
-	(*GetEmaRequest)(nil),                    // 26: cheqd.oracle.v2.GetEmaRequest
-	(*GetEmaResponse)(nil),                   // 27: cheqd.oracle.v2.GetEmaResponse
+	(*QueryEMARequest)(nil),                  // 26: cheqd.oracle.v2.QueryEMARequest
+	(*QueryEMAResponse)(nil),                 // 27: cheqd.oracle.v2.QueryEMAResponse
 	(*QueryWMARequest)(nil),                  // 28: cheqd.oracle.v2.QueryWMARequest
 	(*QueryWMAResponse)(nil),                 // 29: cheqd.oracle.v2.QueryWMAResponse
-	(*v1beta1.DecCoin)(nil),                  // 30: cosmos.base.v1beta1.DecCoin
-	(*AggregateExchangeRatePrevote)(nil),     // 31: cheqd.oracle.v2.AggregateExchangeRatePrevote
-	(*AggregateExchangeRateVote)(nil),        // 32: cheqd.oracle.v2.AggregateExchangeRateVote
-	(*Params)(nil),                           // 33: cheqd.oracle.v2.Params
-	(*PriceStamp)(nil),                       // 34: cheqd.oracle.v2.PriceStamp
-	(*ValidatorRewardSet)(nil),               // 35: cheqd.oracle.v2.ValidatorRewardSet
+	(*QuerySMARequest)(nil),                  // 30: cheqd.oracle.v2.QuerySMARequest
+	(*QuerySMAResponse)(nil),                 // 31: cheqd.oracle.v2.QuerySMAResponse
+	(*v1beta1.DecCoin)(nil),                  // 32: cosmos.base.v1beta1.DecCoin
+	(*AggregateExchangeRatePrevote)(nil),     // 33: cheqd.oracle.v2.AggregateExchangeRatePrevote
+	(*AggregateExchangeRateVote)(nil),        // 34: cheqd.oracle.v2.AggregateExchangeRateVote
+	(*Params)(nil),                           // 35: cheqd.oracle.v2.Params
+	(*PriceStamp)(nil),                       // 36: cheqd.oracle.v2.PriceStamp
+	(*ValidatorRewardSet)(nil),               // 37: cheqd.oracle.v2.ValidatorRewardSet
 }
 var file_cheqd_oracle_v2_query_proto_depIdxs = []int32{
-	30, // 0: cheqd.oracle.v2.QueryExchangeRatesResponse.exchange_rates:type_name -> cosmos.base.v1beta1.DecCoin
-	31, // 1: cheqd.oracle.v2.QueryAggregatePrevoteResponse.aggregate_prevote:type_name -> cheqd.oracle.v2.AggregateExchangeRatePrevote
-	31, // 2: cheqd.oracle.v2.QueryAggregatePrevotesResponse.aggregate_prevotes:type_name -> cheqd.oracle.v2.AggregateExchangeRatePrevote
-	32, // 3: cheqd.oracle.v2.QueryAggregateVoteResponse.aggregate_vote:type_name -> cheqd.oracle.v2.AggregateExchangeRateVote
-	32, // 4: cheqd.oracle.v2.QueryAggregateVotesResponse.aggregate_votes:type_name -> cheqd.oracle.v2.AggregateExchangeRateVote
-	33, // 5: cheqd.oracle.v2.QueryParamsResponse.params:type_name -> cheqd.oracle.v2.Params
-	34, // 6: cheqd.oracle.v2.QueryMediansResponse.medians:type_name -> cheqd.oracle.v2.PriceStamp
-	34, // 7: cheqd.oracle.v2.QueryMedianDeviationsResponse.median_deviations:type_name -> cheqd.oracle.v2.PriceStamp
-	35, // 8: cheqd.oracle.v2.QueryValidatorRewardSetResponse.validators:type_name -> cheqd.oracle.v2.ValidatorRewardSet
+	32, // 0: cheqd.oracle.v2.QueryExchangeRatesResponse.exchange_rates:type_name -> cosmos.base.v1beta1.DecCoin
+	33, // 1: cheqd.oracle.v2.QueryAggregatePrevoteResponse.aggregate_prevote:type_name -> cheqd.oracle.v2.AggregateExchangeRatePrevote
+	33, // 2: cheqd.oracle.v2.QueryAggregatePrevotesResponse.aggregate_prevotes:type_name -> cheqd.oracle.v2.AggregateExchangeRatePrevote
+	34, // 3: cheqd.oracle.v2.QueryAggregateVoteResponse.aggregate_vote:type_name -> cheqd.oracle.v2.AggregateExchangeRateVote
+	34, // 4: cheqd.oracle.v2.QueryAggregateVotesResponse.aggregate_votes:type_name -> cheqd.oracle.v2.AggregateExchangeRateVote
+	35, // 5: cheqd.oracle.v2.QueryParamsResponse.params:type_name -> cheqd.oracle.v2.Params
+	36, // 6: cheqd.oracle.v2.QueryMediansResponse.medians:type_name -> cheqd.oracle.v2.PriceStamp
+	36, // 7: cheqd.oracle.v2.QueryMedianDeviationsResponse.median_deviations:type_name -> cheqd.oracle.v2.PriceStamp
+	37, // 8: cheqd.oracle.v2.QueryValidatorRewardSetResponse.validators:type_name -> cheqd.oracle.v2.ValidatorRewardSet
 	0,  // 9: cheqd.oracle.v2.Query.ExchangeRates:input_type -> cheqd.oracle.v2.QueryExchangeRates
 	2,  // 10: cheqd.oracle.v2.Query.ActiveExchangeRates:input_type -> cheqd.oracle.v2.QueryActiveExchangeRates
 	4,  // 11: cheqd.oracle.v2.Query.FeederDelegation:input_type -> cheqd.oracle.v2.QueryFeederDelegation
@@ -14474,25 +15399,27 @@ var file_cheqd_oracle_v2_query_proto_depIdxs = []int32{
 	20, // 19: cheqd.oracle.v2.Query.Medians:input_type -> cheqd.oracle.v2.QueryMedians
 	22, // 20: cheqd.oracle.v2.Query.MedianDeviations:input_type -> cheqd.oracle.v2.QueryMedianDeviations
 	24, // 21: cheqd.oracle.v2.Query.ValidatorRewardSet:input_type -> cheqd.oracle.v2.QueryValidatorRewardSet
-	26, // 22: cheqd.oracle.v2.Query.GetEma:input_type -> cheqd.oracle.v2.GetEmaRequest
+	26, // 22: cheqd.oracle.v2.Query.EMA:input_type -> cheqd.oracle.v2.QueryEMARequest
 	28, // 23: cheqd.oracle.v2.Query.WMA:input_type -> cheqd.oracle.v2.QueryWMARequest
-	1,  // 24: cheqd.oracle.v2.Query.ExchangeRates:output_type -> cheqd.oracle.v2.QueryExchangeRatesResponse
-	3,  // 25: cheqd.oracle.v2.Query.ActiveExchangeRates:output_type -> cheqd.oracle.v2.QueryActiveExchangeRatesResponse
-	5,  // 26: cheqd.oracle.v2.Query.FeederDelegation:output_type -> cheqd.oracle.v2.QueryFeederDelegationResponse
-	7,  // 27: cheqd.oracle.v2.Query.MissCounter:output_type -> cheqd.oracle.v2.QueryMissCounterResponse
-	9,  // 28: cheqd.oracle.v2.Query.SlashWindow:output_type -> cheqd.oracle.v2.QuerySlashWindowResponse
-	11, // 29: cheqd.oracle.v2.Query.AggregatePrevote:output_type -> cheqd.oracle.v2.QueryAggregatePrevoteResponse
-	13, // 30: cheqd.oracle.v2.Query.AggregatePrevotes:output_type -> cheqd.oracle.v2.QueryAggregatePrevotesResponse
-	15, // 31: cheqd.oracle.v2.Query.AggregateVote:output_type -> cheqd.oracle.v2.QueryAggregateVoteResponse
-	17, // 32: cheqd.oracle.v2.Query.AggregateVotes:output_type -> cheqd.oracle.v2.QueryAggregateVotesResponse
-	19, // 33: cheqd.oracle.v2.Query.Params:output_type -> cheqd.oracle.v2.QueryParamsResponse
-	21, // 34: cheqd.oracle.v2.Query.Medians:output_type -> cheqd.oracle.v2.QueryMediansResponse
-	23, // 35: cheqd.oracle.v2.Query.MedianDeviations:output_type -> cheqd.oracle.v2.QueryMedianDeviationsResponse
-	25, // 36: cheqd.oracle.v2.Query.ValidatorRewardSet:output_type -> cheqd.oracle.v2.QueryValidatorRewardSetResponse
-	27, // 37: cheqd.oracle.v2.Query.GetEma:output_type -> cheqd.oracle.v2.GetEmaResponse
-	29, // 38: cheqd.oracle.v2.Query.WMA:output_type -> cheqd.oracle.v2.QueryWMAResponse
-	24, // [24:39] is the sub-list for method output_type
-	9,  // [9:24] is the sub-list for method input_type
+	30, // 24: cheqd.oracle.v2.Query.SMA:input_type -> cheqd.oracle.v2.QuerySMARequest
+	1,  // 25: cheqd.oracle.v2.Query.ExchangeRates:output_type -> cheqd.oracle.v2.QueryExchangeRatesResponse
+	3,  // 26: cheqd.oracle.v2.Query.ActiveExchangeRates:output_type -> cheqd.oracle.v2.QueryActiveExchangeRatesResponse
+	5,  // 27: cheqd.oracle.v2.Query.FeederDelegation:output_type -> cheqd.oracle.v2.QueryFeederDelegationResponse
+	7,  // 28: cheqd.oracle.v2.Query.MissCounter:output_type -> cheqd.oracle.v2.QueryMissCounterResponse
+	9,  // 29: cheqd.oracle.v2.Query.SlashWindow:output_type -> cheqd.oracle.v2.QuerySlashWindowResponse
+	11, // 30: cheqd.oracle.v2.Query.AggregatePrevote:output_type -> cheqd.oracle.v2.QueryAggregatePrevoteResponse
+	13, // 31: cheqd.oracle.v2.Query.AggregatePrevotes:output_type -> cheqd.oracle.v2.QueryAggregatePrevotesResponse
+	15, // 32: cheqd.oracle.v2.Query.AggregateVote:output_type -> cheqd.oracle.v2.QueryAggregateVoteResponse
+	17, // 33: cheqd.oracle.v2.Query.AggregateVotes:output_type -> cheqd.oracle.v2.QueryAggregateVotesResponse
+	19, // 34: cheqd.oracle.v2.Query.Params:output_type -> cheqd.oracle.v2.QueryParamsResponse
+	21, // 35: cheqd.oracle.v2.Query.Medians:output_type -> cheqd.oracle.v2.QueryMediansResponse
+	23, // 36: cheqd.oracle.v2.Query.MedianDeviations:output_type -> cheqd.oracle.v2.QueryMedianDeviationsResponse
+	25, // 37: cheqd.oracle.v2.Query.ValidatorRewardSet:output_type -> cheqd.oracle.v2.QueryValidatorRewardSetResponse
+	27, // 38: cheqd.oracle.v2.Query.EMA:output_type -> cheqd.oracle.v2.QueryEMAResponse
+	29, // 39: cheqd.oracle.v2.Query.WMA:output_type -> cheqd.oracle.v2.QueryWMAResponse
+	31, // 40: cheqd.oracle.v2.Query.SMA:output_type -> cheqd.oracle.v2.QuerySMAResponse
+	25, // [25:41] is the sub-list for method output_type
+	9,  // [9:25] is the sub-list for method input_type
 	9,  // [9:9] is the sub-list for extension type_name
 	9,  // [9:9] is the sub-list for extension extendee
 	0,  // [0:9] is the sub-list for field type_name
@@ -14818,7 +15745,7 @@ func file_cheqd_oracle_v2_query_proto_init() {
 			}
 		}
 		file_cheqd_oracle_v2_query_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetEmaRequest); i {
+			switch v := v.(*QueryEMARequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -14830,7 +15757,7 @@ func file_cheqd_oracle_v2_query_proto_init() {
 			}
 		}
 		file_cheqd_oracle_v2_query_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetEmaResponse); i {
+			switch v := v.(*QueryEMAResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -14865,6 +15792,30 @@ func file_cheqd_oracle_v2_query_proto_init() {
 				return nil
 			}
 		}
+		file_cheqd_oracle_v2_query_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*QuerySMARequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cheqd_oracle_v2_query_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*QuerySMAResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -14872,7 +15823,7 @@ func file_cheqd_oracle_v2_query_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_cheqd_oracle_v2_query_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   30,
+			NumMessages:   32,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

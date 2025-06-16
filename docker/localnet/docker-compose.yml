@@ -14,9 +14,9 @@ services:
         published: 9091 # gRPC-Gateway port
       - target: 26660
         published: 26660 # Prometheus metrics port
-      - target: 7171
+      - target: 7171 # Price-feeder port
         published: 7171
-    entrypoint: [ "node-start" ]
+    entrypoint: ["node-start"]
     healthcheck:
       test: curl -s http://localhost:26657/status | grep -c true
       interval: 10s
@@ -52,8 +52,8 @@ services:
       - target: 26660
         published: 26760 # Prometheus metrics port
       - target: 7171
-        published: 7172
-    entrypoint: [ "node-start" ]
+        published: 7172 # Price-feeder port
+    entrypoint: ["node-start"]
     healthcheck:
       test: curl -s http://localhost:26757/status | grep -c true
       interval: 10s
@@ -89,8 +89,8 @@ services:
       - target: 26660
         published: 26860 # Prometheus metrics port
       - target: 7171
-        published: 7173
-    entrypoint: [ "node-start" ]
+        published: 7173 # Price-feeder port
+    entrypoint: ["node-start"]
     healthcheck:
       test: curl -s http://localhost:26857/status | grep -c true
       interval: 10s
@@ -126,8 +126,8 @@ services:
       - target: 26660
         published: 26960 # Prometheus metrics port
       - target: 7171
-        published: 7174
-    entrypoint: [ "node-start" ]
+        published: 7174 # Price-feeder port
+    entrypoint: ["node-start"]
     healthcheck:
       test: curl -s http://localhost:26957/status | grep -c true
       interval: 10s
@@ -162,7 +162,7 @@ services:
         published: 9491 # gRPC-Gateway port
       - target: 26660
         published: 27060 # Prometheus metrics port
-    entrypoint: [ "node-start" ]
+    entrypoint: ["node-start"]
     healthcheck:
       test: curl -s http://localhost:27057/status | grep -c true
       interval: 10s
@@ -197,7 +197,7 @@ services:
         published: 9591 # gRPC-Gateway port
       - target: 26660
         published: 27160 # Prometheus metrics port
-    entrypoint: [ "node-start" ]
+    entrypoint: ["node-start"]
     healthcheck:
       test: curl -s http://localhost:27157/status | grep -c true
       interval: 10s

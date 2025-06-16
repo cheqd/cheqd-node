@@ -1,4 +1,3 @@
-config_dir = "ojo-provider-config"
 
 gas_adjustment = 1
 provider_timeout = "1000000s"

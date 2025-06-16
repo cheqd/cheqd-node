@@ -14,6 +14,7 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
+	"github.com/cheqd/cheqd-node/x/did/types"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -97,7 +98,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		By("submitting the json resource message")
 		tax := resourceFeeParams.Json[0]
 
-		cheqPrice, err := cli.QueryEMA("CHEQ")
+		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		cheqp := cheqPrice.Price
 		Expect(err).To(BeNil())
 
@@ -113,13 +114,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		rewardPortionInUsdToCheq, err := posthandler.ConvertToCheq(rewardPortionInUsd, cheqp)
 		Expect(err).To(BeNil())
 
-		coin := rewardPortionInUsdToCheq.AmountOf("ncheq")
+		coin := rewardPortionInUsdToCheq.AmountOf(types.BaseMinimalDenom)
 
 		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.5%
 
 		oracleReward := oracleShareRate.MulInt(coin).TruncateInt()
-		oracleRewardCoin := sdk.NewCoin("ncheq", oracleReward)
-		feeCollectorReward := sdk.NewCoin("ncheq", coin.Sub(oracleReward))
+		oracleRewardCoin := sdk.NewCoin(types.BaseMinimalDenom, oracleReward)
+		feeCollectorReward := sdk.NewCoin(types.BaseMinimalDenom, coin.Sub(oracleReward))
 
 		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
 
@@ -140,7 +141,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(taxIncheqd.AmountOf("ncheq")))
+		Expect(diff).To(Equal(taxIncheqd.AmountOf(types.BaseMinimalDenom)))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -210,7 +211,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		By("submitting the image resource message")
 		tax := resourceFeeParams.Image[0]
 
-		cheqPrice, err := cli.QueryEMA("CHEQ")
+		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		cheqp := cheqPrice.Price
 		Expect(err).To(BeNil())
 
@@ -229,13 +230,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		// Calculate oracle and fee collector rewards
-		coin := rewardPortionInUsdToCheq.AmountOf("ncheq")
+		coin := rewardPortionInUsdToCheq.AmountOf(types.BaseMinimalDenom)
 
 		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.5%
 
 		oracleReward := oracleShareRate.MulInt(coin).TruncateInt()
-		oracleRewardCoin := sdk.NewCoin("ncheq", oracleReward)
-		feeCollectorReward := sdk.NewCoin("ncheq", coin.Sub(oracleReward))
+		oracleRewardCoin := sdk.NewCoin(types.BaseMinimalDenom, oracleReward)
+		feeCollectorReward := sdk.NewCoin(types.BaseMinimalDenom, coin.Sub(oracleReward))
 
 		// Total tax amount (burn + reward)
 		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
@@ -257,7 +258,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(taxIncheqd.AmountOf("ncheq")))
+		Expect(diff).To(Equal(taxIncheqd.AmountOf(types.BaseMinimalDenom)))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -327,7 +328,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		By("submitting the default resource message")
 		tax := resourceFeeParams.Default[0]
 
-		cheqPrice, err := cli.QueryEMA("CHEQ")
+		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 
@@ -342,13 +343,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		rewardPortionCheq, err := posthandler.ConvertToCheq(rewardPortionUsd, cheqp)
 		Expect(err).To(BeNil())
 
-		coin := rewardPortionCheq.AmountOf("ncheq")
+		coin := rewardPortionCheq.AmountOf(types.BaseMinimalDenom)
 
 		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.5%
 
 		oracleReward := oracleShareRate.MulInt(coin).TruncateInt()
-		oracleRewardCoin := sdk.NewCoin("ncheq", oracleReward)
-		feeCollectorReward := sdk.NewCoin("ncheq", coin.Sub(oracleReward))
+		oracleRewardCoin := sdk.NewCoin(types.BaseMinimalDenom, oracleReward)
+		feeCollectorReward := sdk.NewCoin(types.BaseMinimalDenom, coin.Sub(oracleReward))
 
 		taxIncheqd := burnPortionCheq.Add(rewardPortionCheq...)
 
@@ -369,7 +370,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(taxIncheqd.AmountOf("ncheq")))
+		Expect(diff).To(Equal(taxIncheqd.AmountOf(types.BaseMinimalDenom)))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
