@@ -81,21 +81,21 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 					Image: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(10000000000),
+							MinAmount: util.PtrInt(10000000000),
 							MaxAmount: util.PtrInt(10000000000),
 						},
 					},
 					Json: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(4000000000),
+							MinAmount: util.PtrInt(4000000000),
 							MaxAmount: util.PtrInt(4000000000),
 						},
 					},
 					Default: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(2000000000),
+							MinAmount: util.PtrInt(2000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},
@@ -112,21 +112,21 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 					Image: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(0),
+							MinAmount: util.PtrInt(0),
 							MaxAmount: util.PtrInt(0),
 						},
 					},
 					Json: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(4000000000),
+							MinAmount: util.PtrInt(4000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},
 					Default: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(2000000000),
+							MinAmount: util.PtrInt(2000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},
@@ -143,21 +143,21 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 					Image: []didtypes.FeeRange{
 						{
 							Denom:     "wrongdenom",
-							MinAmount: sdkmath.NewInt(10000000000),
+							MinAmount: util.PtrInt(10000000000),
 							MaxAmount: util.PtrInt(10000000000),
 						},
 					},
 					Json: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(4000000000),
+							MinAmount: util.PtrInt(4000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},
 					Default: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(2000000000),
+							MinAmount: util.PtrInt(2000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},
@@ -174,21 +174,21 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 					Image: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(10000000000),
+							MinAmount: util.PtrInt(10000000000),
 							MaxAmount: util.PtrInt(10000000000),
 						},
 					},
 					Json: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(0),
+							MinAmount: util.PtrInt(0),
 							MaxAmount: util.PtrInt(0),
 						},
 					},
 					Default: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(2000000000),
+							MinAmount: util.PtrInt(2000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},
@@ -205,21 +205,21 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 					Image: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(10000000000),
+							MinAmount: util.PtrInt(10000000000),
 							MaxAmount: util.PtrInt(10000000000),
 						},
 					},
 					Json: []didtypes.FeeRange{
 						{
 							Denom:     "wrongdenom",
-							MinAmount: sdkmath.NewInt(4000000000),
+							MinAmount: util.PtrInt(4000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},
 					Default: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(2000000000),
+							MinAmount: util.PtrInt(2000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},
@@ -236,21 +236,21 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 					Image: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(10000000000),
+							MinAmount: util.PtrInt(10000000000),
 							MaxAmount: util.PtrInt(10000000000),
 						},
 					},
 					Json: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(4000000000),
+							MinAmount: util.PtrInt(4000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},
 					Default: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(2000000000),
+							MinAmount: util.PtrInt(2000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},
@@ -267,21 +267,21 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 					Image: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(10000000000),
+							MinAmount: util.PtrInt(10000000000),
 							MaxAmount: util.PtrInt(10000000000),
 						},
 					},
 					Json: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(4000000000),
+							MinAmount: util.PtrInt(4000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},
 					Default: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(2000000000),
+							MinAmount: util.PtrInt(2000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},
@@ -298,21 +298,21 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 					Image: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(10000000000),
+							MinAmount: util.PtrInt(10000000000),
 							MaxAmount: util.PtrInt(10000000000),
 						},
 					},
 					Json: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(4000000000),
+							MinAmount: util.PtrInt(4000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},
 					Default: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(2000000000),
+							MinAmount: util.PtrInt(2000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},
@@ -329,21 +329,21 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 					Image: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(10000000000),
+							MinAmount: util.PtrInt(10000000000),
 							MaxAmount: util.PtrInt(10000000000),
 						},
 					},
 					Json: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(4000000000),
+							MinAmount: util.PtrInt(4000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},
 					Default: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(2000000000),
+							MinAmount: util.PtrInt(2000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},
@@ -361,21 +361,21 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 					Image: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(10000000000),
+							MinAmount: util.PtrInt(10000000000),
 							MaxAmount: util.PtrInt(10000000000),
 						},
 					},
 					Json: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(4000000000),
+							MinAmount: util.PtrInt(4000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},
 					Default: []didtypes.FeeRange{
 						{
 							Denom:     resourcetypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(2000000000),
+							MinAmount: util.PtrInt(2000000000),
 							MaxAmount: util.PtrInt(2000000000),
 						},
 					},

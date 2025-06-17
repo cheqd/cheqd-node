@@ -16,19 +16,19 @@ func DefaultFeeParams() *FeeParams {
 		CreateDid: []FeeRange{
 			{
 				Denom:     BaseMinimalDenom,
-				MinAmount: sdkmath.NewInt(50000000000),
+				MinAmount: util.PtrInt(50000000000),
 				MaxAmount: util.PtrInt(100000000000),
 			},
 			{
 				Denom:     oracletypes.UsdDenom,
-				MinAmount: sdkmath.NewInt(1200000000000000000),
+				MinAmount: util.PtrInt(1200000000000000000),
 				MaxAmount: util.PtrInt(2000000000000000000),
 			},
 		},
 		UpdateDid: []FeeRange{
 			{
 				Denom:     BaseMinimalDenom,
-				MinAmount: sdkmath.NewInt(25000000000),
+				MinAmount: util.PtrInt(25000000000),
 				MaxAmount: nil,
 			},
 		},
@@ -36,7 +36,7 @@ func DefaultFeeParams() *FeeParams {
 		DeactivateDid: []FeeRange{
 			{
 				Denom:     BaseMinimalDenom,
-				MinAmount: sdkmath.NewInt(10000000000),
+				MinAmount: util.PtrInt(10000000000),
 				MaxAmount: util.PtrInt(20000000000),
 			},
 		},
@@ -56,80 +56,76 @@ func DefaultLegacyFeeParams() *LegacyFeeParams {
 
 // USDRange represents a fee range converted to USD for comparison
 type USDRange struct {
-	MinUSD sdkmath.LegacyDec
-	MaxUSD *sdkmath.LegacyDec // nil means no upper bound
+	MinUSD *sdkmath.Int
+	MaxUSD *sdkmath.Int
 }
 
 // convertFeeRangeToUSD converts a FeeRange to USD using oracle price
 func convertFeeRangeToUSD(ctx context.Context, oracleKeeper OracleKeeper, fr FeeRange) (USDRange, error) {
-	normalizeUSD := func(amount sdkmath.Int) sdkmath.LegacyDec {
-		// Heuristic: If value >= 1e12, likely fixed-point with 18 decimals
-		if amount.GTE(sdkmath.NewInt(1_000_000_000_000)) {
-			return sdkmath.LegacyNewDecFromInt(amount).Quo(sdkmath.LegacyNewDec(1_000_000_000_000_000_000)) // 1e18
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	var minUSD *sdkmath.Int
+	var maxUSD *sdkmath.Int
+
+	switch fr.Denom {
+	case oracletypes.UsdDenom:
+		// Assume input is in 18 decimals (e.g., 1.2 USD = 1_200_000_000_000_000_000)
+		// Convert to 6 decimals (1.2 USD = 1_200_000)
+		normalizeUSD := func(amount sdkmath.Int) sdkmath.Int {
+			return amount.Quo(sdkmath.NewInt(1_000_000_000_000)) // 1e12
 		}
-		return sdkmath.LegacyNewDecFromInt(amount)
-	}
 
-	if fr.Denom == oracletypes.UsdDenom {
-		minUSD := normalizeUSD(fr.MinAmount)
-
-		var maxUSD *sdkmath.LegacyDec
+		if fr.MinAmount != nil {
+			val := normalizeUSD(*fr.MinAmount)
+			minUSD = &val
+		}
 		if fr.MaxAmount != nil {
 			val := normalizeUSD(*fr.MaxAmount)
 			maxUSD = &val
 		}
-		// If fr.MaxAmount is nil, maxUSD remains nil (no upper bound)
 
-		return USDRange{
-			MinUSD: minUSD,
-			MaxUSD: maxUSD,
-		}, nil
-	}
-
-	if fr.Denom == BaseMinimalDenom {
-		// Get CHEQ/USD price from oracle
-		sdkCtx := sdk.UnwrapSDKContext(ctx)
+	case BaseMinimalDenom:
 		price, found := oracleKeeper.GetWMA(sdkCtx, oracletypes.CheqdSymbol, "BALANCED")
-		if !found {
-			return USDRange{}, fmt.Errorf("failed to get CHEQ/USD price")
+		if !found || !price.IsPositive() {
+			return USDRange{}, fmt.Errorf("invalid or missing CHEQ/USD price")
 		}
 
-		// Validate price is positive
-		if !price.IsPositive() {
-			return USDRange{}, fmt.Errorf("invalid CHEQ/USD price: %s", price)
+		cheqDecimals := sdkmath.NewInt(1_000_000_000) // 9 decimals for ncheq
+		usdScaleFactor := sdkmath.NewInt(1_000_000)   // 6 decimals for USD
+
+		if fr.MinAmount != nil {
+			cheqDec := sdkmath.LegacyNewDecFromInt(*fr.MinAmount).QuoInt(cheqDecimals)
+			usdValue := cheqDec.Mul(price).MulInt(usdScaleFactor)
+			val := usdValue.TruncateInt()
+			minUSD = &val
 		}
-
-		// Convert from base units (ncheq) to CHEQ, then to USD
-		// 1 CHEQ = 1e9 ncheq
-		cheqDecimals := sdkmath.LegacyNewDec(1_000_000_000) // 9 decimals
-
-		minCheq := sdkmath.LegacyNewDecFromInt(fr.MinAmount).Quo(cheqDecimals)
-		minUSD := minCheq.Mul(price)
-
-		var maxUSD *sdkmath.LegacyDec
 		if fr.MaxAmount != nil {
-			maxCheq := sdkmath.LegacyNewDecFromInt(*fr.MaxAmount).Quo(cheqDecimals)
-			val := maxCheq.Mul(price)
+			cheqDec := sdkmath.LegacyNewDecFromInt(*fr.MaxAmount).QuoInt(cheqDecimals)
+			usdValue := cheqDec.Mul(price).MulInt(usdScaleFactor)
+			val := usdValue.TruncateInt()
 			maxUSD = &val
 		}
-		// If fr.MaxAmount is nil, maxUSD remains nil (no upper bound)
 
-		return USDRange{
-			MinUSD: minUSD,
-			MaxUSD: maxUSD,
-		}, nil
+	default:
+		return USDRange{}, fmt.Errorf("unsupported denomination: %s", fr.Denom)
 	}
 
-	return USDRange{}, fmt.Errorf("unsupported denomination: %s", fr.Denom)
+	if minUSD == nil && maxUSD == nil {
+		return USDRange{}, fmt.Errorf("both MinAmount and MaxAmount cannot be nil for denom: %s", fr.Denom)
+	}
+
+	return USDRange{
+		MinUSD: minUSD,
+		MaxUSD: maxUSD,
+	}, nil
 }
 
-// validateFeeRangeOverlap validates that fee ranges for a message type have overlapping USD ranges
+// validateFeeRangeOverlap ensures all fee ranges overlap in USD for a given message type
 func validateFeeRangeOverlap(ctx context.Context, oracleKeeper OracleKeeper, msgType string, feeRanges []FeeRange) error {
 	if len(feeRanges) <= 1 {
-		return nil // No overlap validation needed for single or no ranges
+		return nil // No overlap check needed
 	}
-
-	// Convert all ranges to USD
+	// Convert all to USD
 	usdRanges := make([]USDRange, len(feeRanges))
 	for i, fr := range feeRanges {
 		usdRange, err := convertFeeRangeToUSD(ctx, oracleKeeper, fr)
@@ -139,33 +135,36 @@ func validateFeeRangeOverlap(ctx context.Context, oracleKeeper OracleKeeper, msg
 		usdRanges[i] = usdRange
 	}
 
-	// Check if all ranges have overlapping region
-	// Start with first range as the overlap candidate
+	fmt.Println("usdRanegs----------", usdRanges)
+
+	// Initialize overlap range from first range
 	overlapMin := usdRanges[0].MinUSD
 	overlapMax := usdRanges[0].MaxUSD
 
-	// For each subsequent range, find intersection
+	fmt.Println("overlapMin and overlapMax--------", overlapMin, overlapMax)
 	for i := 1; i < len(usdRanges); i++ {
-		// Update minimum to the higher of the two minimums
-		if usdRanges[i].MinUSD.GT(overlapMin) {
-			overlapMin = usdRanges[i].MinUSD
+		r := usdRanges[i]
+
+		// Update overlapMin: max(current, r.MinUSD)
+		if r.MinUSD != nil {
+			if overlapMin == nil || r.MinUSD.GT(*overlapMin) {
+				val := *r.MinUSD
+				overlapMin = &val
+			}
 		}
 
-		// Update maximum to the lower of the two maximums
-		// Handle nil (unbounded) cases
-		if usdRanges[i].MaxUSD != nil {
-			if overlapMax == nil || usdRanges[i].MaxUSD.LT(*overlapMax) {
-				val := *usdRanges[i].MaxUSD
+		// Update overlapMax: min(current, r.MaxUSD), accounting for nils
+		if r.MaxUSD != nil {
+			if overlapMax == nil || r.MaxUSD.LT(*overlapMax) {
+				val := *r.MaxUSD
 				overlapMax = &val
 			}
 		}
-		// If usdRanges[i].MaxUSD is nil but overlapMax is not, keep overlapMax
-		// If both are nil, overlapMax remains nil (unbounded)
 	}
 
-	// Check if intersection is valid
-	if overlapMax != nil && overlapMin.GT(*overlapMax) {
-		return fmt.Errorf("no overlapping fee range found for %s: ranges do not have common USD value range", msgType)
+	// Final overlap check
+	if overlapMax != nil && overlapMin != nil && overlapMin.GT(*overlapMax) {
+		return fmt.Errorf("no overlapping fee range found for %s: USD ranges do not intersect", msgType)
 	}
 
 	return nil
@@ -177,10 +176,24 @@ func validateFeeRangeList(name string, frs []FeeRange) error {
 		if f.Denom != BaseMinimalDenom && f.Denom != oracletypes.UsdDenom {
 			return fmt.Errorf("invalid denom in %s[%d]: got %s", name, i, f.Denom)
 		}
-		if f.MinAmount.IsNegative() || f.MinAmount.IsZero() {
-			return fmt.Errorf("min_amount must be non-negative in %s[%d]: got %s", name, i, f.MinAmount.String())
+
+		if f.MinAmount == nil && f.MaxAmount == nil {
+			return fmt.Errorf("at least one of min_amount or max_amount must be set in %s[%d]", name, i)
 		}
-		if f.MaxAmount != nil && f.MaxAmount.LT(f.MinAmount) {
+
+		if f.MinAmount != nil {
+			if f.MinAmount.IsNegative() || f.MinAmount.IsZero() {
+				return fmt.Errorf("min_amount must be positive if set in %s[%d]: got %s", name, i, f.MinAmount.String())
+			}
+		}
+
+		if f.MaxAmount != nil {
+			if f.MaxAmount.IsNegative() || f.MaxAmount.IsZero() {
+				return fmt.Errorf("max_amount must be positive if set in %s[%d]: got %s", name, i, f.MaxAmount.String())
+			}
+		}
+
+		if f.MinAmount != nil && f.MaxAmount != nil && f.MaxAmount.LT(*f.MinAmount) {
 			return fmt.Errorf("max_amount must be >= min_amount in %s[%d]: got max=%s, min=%s", name, i, f.MaxAmount, f.MinAmount)
 		}
 	}

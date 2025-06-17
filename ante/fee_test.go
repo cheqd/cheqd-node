@@ -324,11 +324,11 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		Expect(err).To(BeNil())
 
 		// check that supply was deflated
-		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, feeParams.CreateDid[0].MinAmount)))
+		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, *feeParams.CreateDid[0].MinAmount)))
 		Expect(supplyBeforeDeflation.Sub(supplyAfterDeflation...)).To(Equal(burnt), "Supply was not deflated")
 
 		// check that reward has been sent to the fee collector
-		reward := cheqdante.GetRewardPortion(sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, feeParams.CreateDid[0].MinAmount)), burnt)
+		reward := cheqdante.GetRewardPortion(sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, *feeParams.CreateDid[0].MinAmount)), burnt)
 
 		// calculate oracle share (0.5%)
 		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.005 = 0.5%
@@ -405,11 +405,11 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		Expect(err).To(BeNil())
 
 		// check that supply was deflated
-		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(sdk.NewCoin(feeParams.Json[0].Denom, feeParams.Json[0].MinAmount)))
+		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(sdk.NewCoin(feeParams.Json[0].Denom, *feeParams.Json[0].MinAmount)))
 		Expect(supplyBeforeDeflation.Sub(supplyAfterDeflation...)).To(Equal(burnt), "Supply was not deflated")
 
 		// reward and oracle share logic
-		reward := cheqdante.GetRewardPortion(sdk.NewCoins(sdk.NewCoin(feeParams.Json[0].Denom, feeParams.Json[0].MinAmount)), burnt)
+		reward := cheqdante.GetRewardPortion(sdk.NewCoins(sdk.NewCoin(feeParams.Json[0].Denom, *feeParams.Json[0].MinAmount)), burnt)
 		rewardAmt := reward.AmountOf(didtypes.BaseMinimalDenom) // type: math.Int
 		rewardCoin := sdk.NewCoin(didtypes.BaseMinimalDenom, rewardAmt)
 		rewardDecCoin := sdk.NewDecCoinFromCoin(rewardCoin)
@@ -1493,18 +1493,18 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
-		Expect(amount.Sub(feeParams.CreateDid[0].MinAmount).Equal(balance.Amount)).To(BeTrue(), "Tax was not subtracted from the fee payer")
+		Expect(amount.Sub(*feeParams.CreateDid[0].MinAmount).Equal(balance.Amount)).To(BeTrue(), "Tax was not subtracted from the fee payer")
 
 		// get supply after tx
 		supplyAfterDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
 		Expect(err).To(BeNil())
 
 		// check that supply was deflated
-		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, feeParams.CreateDid[0].MinAmount)))
+		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, *feeParams.CreateDid[0].MinAmount)))
 		Expect(supplyBeforeDeflation.Sub(supplyAfterDeflation...)).To(Equal(burnt), "Supply was not deflated")
 
 		// check that reward has been sent to the fee collector
-		reward := cheqdante.GetRewardPortion(sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, feeParams.CreateDid[0].MinAmount)), burnt)
+		reward := cheqdante.GetRewardPortion(sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, *feeParams.CreateDid[0].MinAmount)), burnt)
 
 		// calculate oracle share (0.5%)
 		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.005 = 0.5%
@@ -1641,18 +1641,18 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
-		Expect(amount.Sub(feeParams.CreateDid[0].MinAmount).Equal(balance.Amount)).To(BeTrue(), "Tax was not subtracted from the fee payer")
+		Expect(amount.Sub(*feeParams.CreateDid[0].MinAmount).Equal(balance.Amount)).To(BeTrue(), "Tax was not subtracted from the fee payer")
 
 		// get supply after tx
 		supplyAfterDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
 		Expect(err).To(BeNil())
 
 		// check that supply was deflated
-		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, feeParams.CreateDid[0].MinAmount)))
+		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, *feeParams.CreateDid[0].MinAmount)))
 		Expect(supplyBeforeDeflation.Sub(supplyAfterDeflation...)).To(Equal(burnt), "Supply was not deflated")
 
 		// check that reward has been sent to the fee collector
-		reward := cheqdante.GetRewardPortion(sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, feeParams.CreateDid[0].MinAmount)), burnt)
+		reward := cheqdante.GetRewardPortion(sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, *feeParams.CreateDid[0].MinAmount)), burnt)
 
 		// calculate oracle share (0.5%)
 		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.005 = 0.5%

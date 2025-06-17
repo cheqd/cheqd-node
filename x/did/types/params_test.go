@@ -98,23 +98,23 @@ var _ = Describe("MsgServer MsgUpdateParams", Ordered, func() {
 						CreateDid: []didtypes.FeeRange{
 							{
 								Denom:     didtypes.BaseMinimalDenom,
-								MinAmount: sdkmath.NewInt(10000000000),
-								MaxAmount: utils.PtrInt(30000000000),
+								MinAmount: utils.PtrInt(10_000_000_000),
+								MaxAmount: utils.PtrInt(30_000_000_000),
 							},
 							{
 								Denom:     oracletypes.UsdDenom,
-								MinAmount: sdkmath.NewInt(500_000_000_000_000_000), // 0.5 USD
-								MaxAmount: utils.PtrInt(800_000_000_000_000_000),   // 0.8 USD
+								MinAmount: utils.PtrInt(500_000_000_000_000_000), // 0.5 USD
+								MaxAmount: utils.PtrInt(800_000_000_000_000_000), // 0.8 USD
 							},
 						},
 						UpdateDid: []didtypes.FeeRange{{
 							Denom:     didtypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(25000000000),
+							MinAmount: utils.PtrInt(25000000000),
 							MaxAmount: nil,
 						}},
 						DeactivateDid: []didtypes.FeeRange{{
 							Denom:     didtypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(10000000000),
+							MinAmount: utils.PtrInt(10000000000),
 							MaxAmount: utils.PtrInt(20000000000),
 						}},
 						BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.6"),
@@ -134,22 +134,22 @@ var _ = Describe("MsgServer MsgUpdateParams", Ordered, func() {
 						CreateDid: []didtypes.FeeRange{
 							{
 								Denom:     didtypes.BaseMinimalDenom,
-								MinAmount: sdkmath.NewInt(5000000000),
+								MinAmount: utils.PtrInt(5000000000),
 								MaxAmount: utils.PtrInt(20000000000),
 							},
 							{
 								Denom:     oracletypes.UsdDenom,
-								MinAmount: sdkmath.NewInt(500_000_000_000_000_000),
+								MinAmount: utils.PtrInt(500_000_000_000_000_000),
 								MaxAmount: utils.PtrInt(1_000_000_000_000_000_000),
 							},
 						},
 						UpdateDid: []didtypes.FeeRange{{
 							Denom:     didtypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(25000000000),
+							MinAmount: utils.PtrInt(25000000000),
 						}},
 						DeactivateDid: []didtypes.FeeRange{{
 							Denom:     didtypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(10000000000),
+							MinAmount: utils.PtrInt(10000000000),
 							MaxAmount: utils.PtrInt(20000000000),
 						}},
 						BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.6"),
@@ -169,23 +169,23 @@ var _ = Describe("MsgServer MsgUpdateParams", Ordered, func() {
 						CreateDid: []didtypes.FeeRange{
 							{
 								Denom:     didtypes.BaseMinimalDenom,
-								MinAmount: sdkmath.NewInt(50000000000),
+								MinAmount: utils.PtrInt(50000000000),
 								MaxAmount: utils.PtrInt(100000000000),
 							},
 							{
 								Denom:     oracletypes.UsdDenom,
-								MinAmount: sdkmath.NewInt(1200000000000000000),
+								MinAmount: utils.PtrInt(1200000000000000000),
 								MaxAmount: utils.PtrInt(2000000000000000000),
 							},
 						},
 						UpdateDid: []didtypes.FeeRange{{
 							Denom:     didtypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(25000000000),
+							MinAmount: utils.PtrInt(25000000000),
 							MaxAmount: nil,
 						}},
 						DeactivateDid: []didtypes.FeeRange{{
 							Denom:     didtypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(10000000000),
+							MinAmount: utils.PtrInt(10000000000),
 							MaxAmount: utils.PtrInt(20000000000),
 						}},
 						BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.5"),
@@ -204,18 +204,18 @@ var _ = Describe("MsgServer MsgUpdateParams", Ordered, func() {
 						CreateDid: []didtypes.FeeRange{
 							{
 								Denom:     didtypes.BaseMinimalDenom,
-								MinAmount: sdkmath.NewInt(50000000000),
+								MinAmount: utils.PtrInt(50000000000),
 								MaxAmount: utils.PtrInt(100000000000),
 							},
 						},
 						UpdateDid: []didtypes.FeeRange{{
 							Denom:     didtypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(25000000000),
+							MinAmount: utils.PtrInt(25000000000),
 							MaxAmount: nil,
 						}},
 						DeactivateDid: []didtypes.FeeRange{{
 							Denom:     didtypes.BaseMinimalDenom,
-							MinAmount: sdkmath.NewInt(10000000000),
+							MinAmount: utils.PtrInt(10000000000),
 							MaxAmount: utils.PtrInt(20000000000),
 						}},
 						BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.5"),

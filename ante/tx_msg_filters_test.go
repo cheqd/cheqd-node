@@ -22,42 +22,42 @@ var _ = Describe("TxMsgFilters", func() {
 			ante.MsgCreateDidDoc: []didtypes.FeeRange{
 				{
 					Denom:     didtypes.BaseMinimalDenom,
-					MinAmount: math.NewInt(didtypes.DefaultCreateDidTxFee),
+					MinAmount: util.PtrInt(didtypes.DefaultCreateDidTxFee),
 					MaxAmount: util.PtrInt(100e9),
 				},
 			},
 			ante.MsgUpdateDidDoc: []didtypes.FeeRange{
 				{
 					Denom:     didtypes.BaseMinimalDenom,
-					MinAmount: math.NewInt(didtypes.DefaultUpdateDidTxFee),
+					MinAmount: util.PtrInt(didtypes.DefaultUpdateDidTxFee),
 					MaxAmount: util.PtrInt(100e9),
 				},
 			},
 			ante.MsgDeactivateDidDoc: []didtypes.FeeRange{
 				{
 					Denom:     didtypes.BaseMinimalDenom,
-					MinAmount: math.NewInt(didtypes.DefaultDeactivateDidTxFee),
+					MinAmount: util.PtrInt(didtypes.DefaultDeactivateDidTxFee),
 					MaxAmount: util.PtrInt(100e9),
 				},
 			},
 			ante.MsgCreateResourceDefault: []didtypes.FeeRange{
 				{
 					Denom:     didtypes.BaseMinimalDenom,
-					MinAmount: math.NewInt(resourcetypes.DefaultCreateResourceDefaultFee),
+					MinAmount: util.PtrInt(resourcetypes.DefaultCreateResourceDefaultFee),
 					MaxAmount: util.PtrInt(100e9),
 				},
 			},
 			ante.MsgCreateResourceImage: []didtypes.FeeRange{
 				{
 					Denom:     didtypes.BaseMinimalDenom,
-					MinAmount: math.NewInt(resourcetypes.DefaultCreateResourceImageFee),
+					MinAmount: util.PtrInt(resourcetypes.DefaultCreateResourceImageFee),
 					MaxAmount: util.PtrInt(100e9),
 				},
 			},
 			ante.MsgCreateResourceJSON: []didtypes.FeeRange{
 				{
 					Denom:     didtypes.BaseMinimalDenom,
-					MinAmount: math.NewInt(resourcetypes.DefaultCreateResourceJSONFee),
+					MinAmount: util.PtrInt(resourcetypes.DefaultCreateResourceJSONFee),
 					MaxAmount: util.PtrInt(100e9),
 				},
 			},
