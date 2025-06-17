@@ -306,7 +306,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("submitting the json resource message with double the tax")
 		tax := resourceFeeParams.Json[0]
-		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.MinAmount.Mul(sdkmath.NewInt(2)))
+		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.MaxAmount.Mul(sdkmath.NewInt(2)))
 		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -322,8 +322,8 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(tax.MinAmount).NotTo(BeNil())
-		Expect(diff).To(Equal(*tax.MinAmount))
+		Expect(tax.MaxAmount).NotTo(BeNil())
+		Expect(diff).To(Equal(*tax.MaxAmount))
 	})
 
 	It("should not charge more than tax in create resource image message - case: fixed fee", func() {
@@ -341,7 +341,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("submitting the image resource message with double the tax")
 		tax := resourceFeeParams.Image[0]
-		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.MinAmount.Mul(sdkmath.NewInt(2)))
+		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.MaxAmount.Mul(sdkmath.NewInt(2)))
 		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -357,8 +357,8 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(tax.MinAmount).NotTo(BeNil())
-		Expect(diff).To(Equal(*tax.MinAmount))
+		Expect(tax.MaxAmount).NotTo(BeNil())
+		Expect(diff).To(Equal(*tax.MaxAmount))
 	})
 
 	It("should not charge more than tax in create resource default message - case: fixed fee", func() {
@@ -376,7 +376,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("submitting the default resource message with double the tax")
 		tax := resourceFeeParams.Default[0]
-		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.MinAmount.Mul(sdkmath.NewInt(2)))
+		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.MaxAmount.Mul(sdkmath.NewInt(2)))
 		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -392,7 +392,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(tax.MinAmount).ToNot(BeNil())
-		Expect(diff.Equal(*tax.MinAmount)).To(BeTrue())
+		Expect(tax.MaxAmount).ToNot(BeNil())
+		Expect(diff).To(Equal(*tax.MaxAmount))
 	})
 })

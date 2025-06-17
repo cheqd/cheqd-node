@@ -422,175 +422,149 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			},
 		))
 	})
-
 	It("should tax create resource json message with feegrant - case: fixed fee", func() {
-		By("preparing the create resource json message")
 		resourceID := uuid.NewString()
-		resourceName := "TestResource"
-		resourceVersion := "1.0"
-		resourceType := "TestType"
 		resourceFile, err := testdata.CreateTestJson(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
-		By("creating a feegrant")
+		tax := resourceFeeParams.Json[0]
+
 		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
-		By("querying the fee granter account balance before the transaction")
 		granterBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
-		By("querying the fee grantee account balance before the transaction")
 		granteeBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
-		By("submitting a create resource json message")
-		tax := resourceFeeParams.Json[0]
+		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		Expect(err).To(BeNil())
+		fees, err := ante.GetFeeForMsg(resourceFeeParams.Json, cheqPrice.Price)
+		Expect(err).To(BeNil())
+
 		resp, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
-			Name:         resourceName,
-			Version:      resourceVersion,
-			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom)))
+			Name:         "TestResource",
+			Version:      "1.0",
+			ResourceType: "TestType",
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
-		By("querying the fee granter account balance after the transaction")
 		granterBalanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
-		By("querying the fee grantee account balance after the transaction")
 		granteeBalanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
-		By("checking the granter balance difference")
-		Expect(tax.MinAmount).ToNot(BeNil())
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(*tax.MinAmount))
+		Expect(diff).To(Equal(fees.AmountOf(resourcetypes.BaseMinimalDenom)))
 
-		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
 		Expect(diff.IsZero()).To(BeTrue())
 
-		By("revoking the feegrant")
 		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should tax create resource image with feegrant - case: fixed fee", func() {
-		By("preparing the create resource image message")
 		resourceID := uuid.NewString()
-		resourceName := "TestResource"
-		resourceVersion := "1.0"
-		resourceType := "TestType"
 		resourceFile, err := testdata.CreateTestImage(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
-		By("creating a feegrant")
+		tax := resourceFeeParams.Image[0]
 		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
-		By("querying the fee granter account balance before the transaction")
 		granterBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
-		By("querying the fee grantee account balance before the transaction")
 		granteeBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
-		By("submitting a create resource image message")
-		tax := resourceFeeParams.Image[0]
+		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		Expect(err).To(BeNil())
+		fees, err := ante.GetFeeForMsg(resourceFeeParams.Image, cheqPrice.Price)
+		Expect(err).To(BeNil())
+
 		resp, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
-			Name:         resourceName,
-			Version:      resourceVersion,
-			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom)))
+			Name:         "TestResource",
+			Version:      "1.0",
+			ResourceType: "TestType",
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
-		By("querying the fee granter account balance after the transaction")
 		granterBalanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
-		By("querying the fee grantee account balance after the transaction")
 		granteeBalanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
-		By("checking the granter balance difference")
-		Expect(tax.MinAmount).ToNot(BeNil())
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(*tax.MinAmount))
+		Expect(diff).To(Equal(fees.AmountOf(resourcetypes.BaseMinimalDenom)))
 
-		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
 		Expect(diff.IsZero()).To(BeTrue())
 
-		By("revoking the feegrant")
 		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should tax create resource default with feegrant - case: fixed fee", func() {
-		By("preparing the create resource default message")
 		resourceID := uuid.NewString()
-		resourceName := "TestResource"
-		resourceVersion := "1.0"
-		resourceType := "TestType"
 		resourceFile, err := testdata.CreateTestDefault(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
-		By("creating a feegrant")
 		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
-		By("querying the fee granter account balance before the transaction")
 		granterBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
-		By("querying the fee grantee account balance before the transaction")
 		granteeBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
-		By("submitting a create resource default message")
 		tax := resourceFeeParams.Default[0]
+		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		Expect(err).To(BeNil())
+		fees, err := ante.GetFeeForMsg(resourceFeeParams.Default, cheqPrice.Price)
+		Expect(err).To(BeNil())
+
 		resp, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
-			Name:         resourceName,
-			Version:      resourceVersion,
-			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom)))
+			Name:         "TestResource",
+			Version:      "1.0",
+			ResourceType: "TestType",
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
-		By("querying the fee granter account balance after the transaction")
 		granterBalanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
-		By("querying the fee grantee account balance after the transaction")
 		granteeBalanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
-		By("checking the granter balance difference")
-		Expect(tax.MinAmount).ToNot(BeNil())
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(*tax.MinAmount))
+		Expect(diff).To(Equal(fees.AmountOf(resourcetypes.BaseMinimalDenom)))
 
-		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
 		Expect(diff.IsZero()).To(BeTrue())
 
-		By("revoking the feegrant")
 		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
+
 })
