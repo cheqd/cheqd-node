@@ -1,8 +1,6 @@
 package types_test
 
 import (
-	"testing"
-
 	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -17,11 +15,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
-
-func TestTypes(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "Cheqd DID Module - MsgUpdateParams Suite")
-}
 
 type KeeperTestSuite struct {
 	app         *cheqdapp.TestApp
