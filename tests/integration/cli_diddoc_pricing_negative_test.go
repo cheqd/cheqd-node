@@ -266,7 +266,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the deactivate diddoc message with double the tax")
-		tax := feeParams.DeactivateDid[0].MinAmount
+		tax := feeParams.DeactivateDid[0].MaxAmount
 		doubleTax := sdk.NewCoin(types.BaseMinimalDenom, tax.Mul(sdkmath.NewInt(2)))
 		res, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_5, helpers.GenerateFees(doubleTax.String()))
 		Expect(err).To(BeNil())
@@ -277,7 +277,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		Expect(err).To(BeNil())
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(tax))
+		Expect(diff).To(Equal(*tax))
 	})
 
 	It("should not succeed in create diddoc create message - case: fixed fee, insufficient funds", func() {
