@@ -322,7 +322,8 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(tax.MinAmount))
+		Expect(tax.MinAmount).NotTo(BeNil())
+		Expect(diff).To(Equal(*tax.MinAmount))
 	})
 
 	It("should not charge more than tax in create resource image message - case: fixed fee", func() {
@@ -356,7 +357,8 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(tax.MinAmount))
+		Expect(tax.MinAmount).NotTo(BeNil())
+		Expect(diff).To(Equal(*tax.MinAmount))
 	})
 
 	It("should not charge more than tax in create resource default message - case: fixed fee", func() {
@@ -390,6 +392,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(tax.MinAmount))
+		Expect(tax.MinAmount).ToNot(BeNil())
+		Expect(diff.Equal(*tax.MinAmount)).To(BeTrue())
 	})
 })

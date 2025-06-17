@@ -466,8 +466,9 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("checking the granter balance difference")
+		Expect(tax.MinAmount).ToNot(BeNil())
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(tax.MinAmount))
+		Expect(diff).To(Equal(*tax.MinAmount))
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
@@ -522,8 +523,9 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("checking the granter balance difference")
+		Expect(tax.MinAmount).ToNot(BeNil())
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(tax.MinAmount))
+		Expect(diff).To(Equal(*tax.MinAmount))
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
@@ -578,8 +580,9 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("checking the granter balance difference")
+		Expect(tax.MinAmount).ToNot(BeNil())
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(tax.MinAmount))
+		Expect(diff).To(Equal(*tax.MinAmount))
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
