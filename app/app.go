@@ -333,6 +333,7 @@ func New(
 	// baseAppOptions = append(baseAppOptions, prepareOpt)
 
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName).String()
+	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
 
 	bApp := baseapp.NewBaseApp(Name, logger, db, txConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
