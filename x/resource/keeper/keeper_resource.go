@@ -27,9 +27,9 @@ func (k Keeper) SetResourceCount(ctx context.Context, count uint64) error {
 	return k.ResourceCount.Set(ctx, count)
 }
 
-func (k Keeper) AddNewResourceVersion(ctx context.Context, resource *types.ResourceWithMetadata) error {
+func (k Keeper) AddNewResourceVersion(ctx context.Context, resource *types.ResourceWithMetadata, previousVersionResourceId string) error {
 	// Find previous version and upgrade backward and forward version links
-	previousResourceVersionHeader, found, err := k.GetLastResourceVersionMetadata(ctx, resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType, resource.Metadata.PreviousVersionId)
+	previousResourceVersionHeader, found, err := k.GetLastResourceVersionMetadata(ctx, resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType, previousVersionResourceId)
 	if err != nil {
 		return err
 	}
@@ -140,10 +140,10 @@ func (k Keeper) GetResourceCollection(ctx context.Context, collectionID string) 
 	return resources, nil
 }
 
-func (k Keeper) GetLastResourceVersionMetadata(ctx context.Context, collectionID, name, resourceType string, previousVersionId string) (types.Metadata, bool, error) {
-	// Case 1: Use provided previousVersionId
-	if previousVersionId != "" {
-		lastVersion, err := k.ResourceMetadata.Get(ctx, collections.Join(collectionID, previousVersionId))
+func (k Keeper) GetLastResourceVersionMetadata(ctx context.Context, collectionID, name, resourceType string, previousVersionResourceId string) (types.Metadata, bool, error) {
+	// Case 1: Use provided previousVersionResourceId
+	if previousVersionResourceId != "" {
+		lastVersion, err := k.ResourceMetadata.Get(ctx, collections.Join(collectionID, previousVersionResourceId))
 		if err != nil {
 			return types.Metadata{}, false, err
 		}

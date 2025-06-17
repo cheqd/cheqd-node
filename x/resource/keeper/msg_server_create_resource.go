@@ -78,7 +78,7 @@ func (k msgServer) CreateResource(goCtx context.Context, msg *types.MsgCreateRes
 	resource.Metadata.AlsoKnownAs = append(resource.Metadata.AlsoKnownAs, &defaultAlternativeURL)
 
 	// Persist resource
-	err = k.AddNewResourceVersion(goCtx, &resource)
+	err = k.AddNewResourceVersion(goCtx, &resource, msg.Payload.PreviousVersionResourceId)
 	if err != nil {
 		return nil, types.ErrInternal.Wrap(err.Error())
 	}

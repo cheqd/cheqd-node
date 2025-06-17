@@ -131,12 +131,12 @@ var _ = Describe("Create Resource Tests", func() {
 
 			// Use the created resource as previous
 			msg2 := resourcetypes.MsgCreateResourcePayload{
-				CollectionId:      alice.CollectionID,
-				Id:                uuid.NewString(),
-				Name:              existingResource.Resource.Name,
-				ResourceType:      CLSchemaType,
-				Data:              []byte(SchemaData),
-				PreviousVersionId: msg1.Id,
+				CollectionId:              alice.CollectionID,
+				Id:                        uuid.NewString(),
+				Name:                      existingResource.Resource.Name,
+				ResourceType:              CLSchemaType,
+				Data:                      []byte(SchemaData),
+				PreviousVersionResourceId: msg1.Id,
 			}
 
 			_, err = setup.CreateResource(&msg2, []didsetup.SignInput{alice.SignInput})

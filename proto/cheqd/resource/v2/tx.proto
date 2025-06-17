@@ -87,13 +87,13 @@ message MsgCreateResourcePayload {
     (gogoproto.nullable) = true
   ];
 
-  // previousVersionId is a latest known version of the resource if exists.
+  // previousVersionResourceId is the identifier of the resource to be updated.
   // Format: <string>
   // Stored as a string. OPTIONAL.
   //
   // Example: 1.0.0, v2.1.0
-  string previous_version_id = 8 [
-    (gogoproto.jsontag) = "previousVersionId",
+  string previous_version_resource_id = 8 [
+    (gogoproto.jsontag) = "previousVersionResourceId",
     (gogoproto.nullable) = true
   ];
 }

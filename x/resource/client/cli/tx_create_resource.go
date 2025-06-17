@@ -45,7 +45,8 @@ Example payload file:
                 "uri": "https://example.com/alternative-uri",
                 "description": "http-url"
             }
-        ]
+        ],
+		"previousVersionResourceId": "<human-readable resource id of the previous version>"
     },
     "signInputs": [
         {
