@@ -104,15 +104,15 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 			expErr:    false,
 			expErrMsg: "",
 		}),
-	Entry("invalid create_did amount 0",
+	Entry("invalid create_did amount ",
 		TestCaseUpdateParams{
-			name: "invalid create_did amount 0",
+			name: "invalid create_did amount i.e nil",
 			input: &didtypes.MsgUpdateParams{
 				Params: didtypes.FeeParams{
 					CreateDid: []didtypes.FeeRange{{
 						Denom:     didtypes.BaseMinimalDenom,
-						MinAmount: util.PtrInt(0),
-						MaxAmount: util.PtrInt(0),
+						MinAmount: nil,
+						MaxAmount: nil,
 					}},
 					UpdateDid: []didtypes.FeeRange{{
 						Denom:     didtypes.BaseMinimalDenom,
@@ -128,7 +128,7 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 				},
 			},
 			expErr:    true,
-			expErrMsg: "min_amount must be non-negative",
+			expErrMsg: "at least one of min_amount or max_amount must be set",
 		}),
 	Entry("invalid create_did denom",
 		TestCaseUpdateParams{
@@ -156,9 +156,9 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 			expErr:    true,
 			expErrMsg: "invalid denom",
 		}),
-	Entry("invalid update_did amount 0",
+	Entry("invalid update_did amount ",
 		TestCaseUpdateParams{
-			name: "invalid update_did amount 0",
+			name: "invalid update_did amount i.e nil ",
 			input: &didtypes.MsgUpdateParams{
 				Params: didtypes.FeeParams{
 					CreateDid: []didtypes.FeeRange{{
@@ -168,8 +168,8 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 					}},
 					UpdateDid: []didtypes.FeeRange{{
 						Denom:     didtypes.BaseMinimalDenom,
-						MinAmount: util.PtrInt(0),
-						MaxAmount: util.PtrInt(0),
+						MinAmount: nil,
+						MaxAmount: nil,
 					}},
 					DeactivateDid: []didtypes.FeeRange{{
 						Denom:     didtypes.BaseMinimalDenom,
@@ -180,7 +180,7 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 				},
 			},
 			expErr:    true,
-			expErrMsg: "min_amount must be non-negative",
+			expErrMsg: "at least one of min_amount or max_amount must be set",
 		}),
 	Entry("invalid update_did denom",
 		TestCaseUpdateParams{
@@ -208,9 +208,9 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 			expErr:    true,
 			expErrMsg: "invalid denom",
 		}),
-	Entry("invalid deactivate_did amount 0",
+	Entry("invalid deactivate_did amount",
 		TestCaseUpdateParams{
-			name: "invalid deactivate_did amount 0",
+			name: "invalid deactivate_did amount i.e nil ",
 			input: &didtypes.MsgUpdateParams{
 				Params: didtypes.FeeParams{
 					CreateDid: []didtypes.FeeRange{{
@@ -225,14 +225,14 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 					}},
 					DeactivateDid: []didtypes.FeeRange{{
 						Denom:     didtypes.BaseMinimalDenom,
-						MinAmount: util.PtrInt(0),
-						MaxAmount: util.PtrInt(0),
+						MinAmount: nil,
+						MaxAmount: nil,
 					}},
 					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.6"),
 				},
 			},
 			expErr:    true,
-			expErrMsg: "min_amount must be non-negative",
+			expErrMsg: "at least one of min_amount or max_amount must be set",
 		}),
 	Entry("invalid deactivate_did denom",
 		TestCaseUpdateParams{

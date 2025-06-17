@@ -135,13 +135,10 @@ func validateFeeRangeOverlap(ctx context.Context, oracleKeeper OracleKeeper, msg
 		usdRanges[i] = usdRange
 	}
 
-	fmt.Println("usdRanegs----------", usdRanges)
-
 	// Initialize overlap range from first range
 	overlapMin := usdRanges[0].MinUSD
 	overlapMax := usdRanges[0].MaxUSD
 
-	fmt.Println("overlapMin and overlapMax--------", overlapMin, overlapMax)
 	for i := 1; i < len(usdRanges); i++ {
 		r := usdRanges[i]
 
