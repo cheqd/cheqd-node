@@ -133,10 +133,7 @@ type MsgCreateResourcePayload struct {
 	// also_known_as is a list of URIs that can be used to get the resource.
 	AlsoKnownAs []*AlternativeUri `protobuf:"bytes,7,rep,name=also_known_as,json=alsoKnownAs,proto3" json:"resourceAlternativeUri"`
 	// previousVersionResourceId is the identifier of the resource to be updated.
-	// Format: <string>
-	// Stored as a string. OPTIONAL.
-	//
-	// Example: 1.0.0, v2.1.0
+	// Format: <uuid>
 	PreviousVersionResourceId string `protobuf:"bytes,8,opt,name=previous_version_resource_id,json=previousVersionResourceId,proto3" json:"previousVersionResourceId"`
 }
 

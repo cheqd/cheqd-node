@@ -46,7 +46,7 @@ Example payload file:
                 "description": "http-url"
             }
         ],
-		"previousVersionResourceId": "<human-readable resource id of the previous version>"
+		"previousVersionResourceId": "<uuid id of the previous version>"
     },
     "signInputs": [
         {

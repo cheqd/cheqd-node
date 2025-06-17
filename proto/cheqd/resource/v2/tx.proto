@@ -88,10 +88,7 @@ message MsgCreateResourcePayload {
   ];
 
   // previousVersionResourceId is the identifier of the resource to be updated.
-  // Format: <string>
-  // Stored as a string. OPTIONAL.
-  //
-  // Example: 1.0.0, v2.1.0
+  // Format: <uuid>
   string previous_version_resource_id = 8 [
     (gogoproto.jsontag) = "previousVersionResourceId",
     (gogoproto.nullable) = true

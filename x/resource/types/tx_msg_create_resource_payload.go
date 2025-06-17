@@ -44,7 +44,6 @@ func (msg MsgCreateResourcePayload) Validate() error {
 		validation.Field(&msg.ResourceType, validation.Required, validation.Length(1, 64)),
 		validation.Field(&msg.AlsoKnownAs, validation.Each(ValidAlternativeURI())),
 		validation.Field(&msg.Data, validation.Required, validation.Length(1, 2*1024*1024)), // 2MB
-		validation.Field(&msg.PreviousVersionResourceId, didtypes.IsUUID()),
 	)
 }
 
