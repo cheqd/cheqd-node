@@ -215,16 +215,18 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 		return nil, errors.New("fee ranges empty")
 	}
 
-	// Fallback: If CHEQ price is not available, return ncheq fixed fee
+	// Fallback: If CHEQ price is not available, return ncheq fixed fee// Fallback: If CHEQ price is not available, return ncheq fixed fee
 	if cheqEmaPrice.IsZero() {
 		for _, fr := range feeRanges {
-			if fr.Denom == oracletypes.CheqdDenom {
-				if fr.MinAmount != nil {
-					return sdk.NewCoins(sdk.NewCoin(oracletypes.CheqdDenom, *fr.MinAmount)), nil
-				}
-				if fr.MaxAmount != nil {
-					return sdk.NewCoins(sdk.NewCoin(oracletypes.CheqdDenom, *fr.MaxAmount)), nil
-				}
+			if fr.Denom != oracletypes.CheqdDenom {
+				continue
+			}
+			switch {
+			case fr.MinAmount != nil:
+				return sdk.NewCoins(sdk.NewCoin(oracletypes.CheqdDenom, *fr.MinAmount)), nil
+			case fr.MaxAmount != nil:
+				return sdk.NewCoins(sdk.NewCoin(oracletypes.CheqdDenom, *fr.MaxAmount)), nil
+			default:
 				return nil, errors.New("cheq price not available and no valid fee fallback")
 			}
 		}
