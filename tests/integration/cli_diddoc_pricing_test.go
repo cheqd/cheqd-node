@@ -416,7 +416,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		By("checking the granter balance difference")
 		tax := feeParams.CreateDid[0].MinAmount
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff.GTE(tax)).To(BeTrue())
+		Expect(diff.GTE(*tax)).To(BeTrue())
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
@@ -479,7 +479,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		By("checking the granter balance difference")
 		tax := feeParams.UpdateDid[0].MinAmount
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff.GTE(tax)).To(BeTrue())
+		Expect(diff.GTE(*tax)).To(BeTrue())
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
