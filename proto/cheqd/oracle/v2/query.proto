@@ -82,11 +82,17 @@ service Query {
     option (google.api.http).get = "/cheqd/oracle/v1/valdiators/validator_reward_set";
   }
 
-  rpc EMA(QueryEMARequest) returns (QueryEMAResponse) {}
+  rpc EMA(QueryEMARequest) returns (QueryEMAResponse) {
+    option (google.api.http).get = "/cheqd/oracle/v2/ema/{denom}";
+  }
 
-  rpc WMA(QueryWMARequest) returns (QueryWMAResponse) {}
+  rpc WMA(QueryWMARequest) returns (QueryWMAResponse) {
+    option (google.api.http).get = "/cheqd/oracle/v2/wma/{denom}/{strategy}";
+  }
 
-  rpc SMA(QuerySMARequest) returns (QuerySMAResponse) {}
+  rpc SMA(QuerySMARequest) returns (QuerySMAResponse) {
+    option (google.api.http).get = "/cheqd/oracle/v2/sma/{denom}";
+  }
 }
 
 // QueryExchangeRates is the request type for the Query/ExchangeRate RPC
