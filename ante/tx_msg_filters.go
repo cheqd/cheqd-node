@@ -214,8 +214,7 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 	if len(feeRanges) == 0 {
 		return nil, errors.New("fee ranges empty")
 	}
-
-	// Fallback: If CHEQ price is not available, return ncheq fixed fee// Fallback: If CHEQ price is not available, return ncheq fixed fee
+	// Fallback: If CHEQ price is not available, return ncheq fixed fee
 	if cheqEmaPrice.IsZero() {
 		for _, fr := range feeRanges {
 			if fr.Denom != oracletypes.CheqdDenom {
@@ -291,26 +290,34 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 		return nil, errors.New("no valid fee ranges could be converted")
 	}
 
-	// Step 2: Find overlapping USD range
-	overlapMin := ranges[0].minUSD
-	overlapMax := ranges[0].maxUSD
+	// Step 2: Find overlapping USD range (support free-ranging)
+	var overlapMin *sdkmath.Int
+	var overlapMax *sdkmath.Int
 
-	for _, r := range ranges[1:] {
-		if r.minUSD != nil && r.minUSD.GT(*overlapMin) {
+	for i, r := range ranges {
+		if i == 0 {
 			overlapMin = r.minUSD
-		}
-		if r.maxUSD != nil {
-			if overlapMax == nil || r.maxUSD.LT(*overlapMax) {
-				overlapMax = r.maxUSD
+			overlapMax = r.maxUSD
+		} else {
+			if r.minUSD != nil {
+				if overlapMin == nil || r.minUSD.GT(*overlapMin) {
+					overlapMin = r.minUSD
+				}
+			}
+			if r.maxUSD != nil {
+				if overlapMax == nil || r.maxUSD.LT(*overlapMax) {
+					overlapMax = r.maxUSD
+				}
 			}
 		}
 	}
 
-	if overlapMin == nil || (overlapMax != nil && overlapMin.GT(*overlapMax)) {
+	// Reject only if defined overlap is invalid
+	if overlapMin != nil && overlapMax != nil && overlapMin.GT(*overlapMax) {
 		return nil, errors.New("no valid overlapping USD range")
 	}
 
-	// Step 3: Prefer USD denom if available
+	// Step 3: Pick preferred range (prefer USD if available)
 	var chosen usdRange
 	for _, r := range ranges {
 		if r.denom == oracletypes.UsdDenom {
@@ -322,23 +329,31 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 		chosen = ranges[0]
 	}
 
-	// Step 4: Compute final fee amount
+	// Step 4: Pick target USD value to convert
+	var usdToUse *sdkmath.Int
+	if overlapMin != nil {
+		usdToUse = overlapMin
+	} else if overlapMax != nil {
+		usdToUse = overlapMax
+	} else {
+		return nil, errors.New("cannot determine fee: no min or max USD bound")
+	}
+
 	var finalAmount sdkmath.Int
 	switch chosen.denom {
 	case oracletypes.CheqdDenom:
-		overlapDec := sdkmath.LegacyNewDecFromInt(*overlapMin)
-		cheqAmount := overlapDec.Quo(cheqEmaPrice).MulInt(cheqScale).TruncateInt()
+		overlapDec := sdkmath.LegacyNewDecFromInt(*usdToUse)
+		cheqAmount := overlapDec.Quo(cheqEmaPrice).MulInt(cheqScale).QuoInt(usdScale).TruncateInt()
 		finalAmount = cheqAmount
 
 	case oracletypes.UsdDenom:
-		// Convert back to 18 decimals
-		finalAmount = overlapMin.Mul(usdFrom18To6)
+		finalAmount = usdToUse.Mul(usdFrom18To6)
 
 	default:
 		return nil, fmt.Errorf("unsupported denom selected: %s", chosen.denom)
 	}
 
-	// Step 5: Clamp to allowed min/max
+	// Step 5: Clamp to original coin range
 	if chosen.minCoin != nil && finalAmount.LT(*chosen.minCoin) {
 		finalAmount = *chosen.minCoin
 	} else if chosen.maxCoin != nil && finalAmount.GT(*chosen.maxCoin) {

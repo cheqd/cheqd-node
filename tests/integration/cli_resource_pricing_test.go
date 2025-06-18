@@ -450,7 +450,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			Name:         "TestResource",
 			Version:      "1.0",
 			ResourceType: "TestType",
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom)))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -498,7 +498,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			Name:         "TestResource",
 			Version:      "1.0",
 			ResourceType: "TestType",
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom)))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -546,7 +546,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			Name:         "TestResource",
 			Version:      "1.0",
 			ResourceType: "TestType",
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom)))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
