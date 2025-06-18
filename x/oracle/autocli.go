@@ -1,8 +1,6 @@
 package oracle
 
 import (
-	"strings"
-
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 	oraclev2 "github.com/cheqd/cheqd-node/api/v2/cheqd/oracle/v2"
 )
@@ -14,22 +12,11 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 			RpcCommandOptions: []*autocliv1.RpcCommandOptions{
 				{
 					RpcMethod: "ExchangeRates",
-					Use:       "exchange-rates",
-					Short:     "Query the exchange rates",
-					Long: strings.TrimSpace(`
-Query the current exchange rates of assets based on USD.
-You can find the current list of active denoms by running
-
-$ cheqd-noded query oracle exchange-rates
-`),
-				},
-				{
-					RpcMethod: "ExchangeRates",
 					Use:       "exchange-rates [denom]",
 					Short:     "Query the exchange rate for a specific denom",
 					Long:      "Query the current exchange rate of a specific asset based on USD.",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
-						{ProtoField: "denom"},
+						{ProtoField: "denom", Optional: true},
 					},
 				},
 				{
