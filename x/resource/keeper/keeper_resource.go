@@ -29,10 +29,7 @@ func (k Keeper) SetResourceCount(ctx context.Context, count uint64) error {
 
 func (k Keeper) AddNewResourceVersion(ctx context.Context, resource *types.ResourceWithMetadata) error {
 	// Find previous version and upgrade backward and forward version links
-	previousResourceVersionHeader, found, err := k.GetLastResourceVersionMetadata(ctx, resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType)
-	if err != nil {
-		return err
-	}
+	previousResourceVersionHeader, found, _ := k.GetLastResourceVersionMetadata(ctx, resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType)
 	if found {
 		// Set links
 		previousResourceVersionHeader.NextVersionId = resource.Metadata.Id
@@ -45,15 +42,7 @@ func (k Keeper) AddNewResourceVersion(ctx context.Context, resource *types.Resou
 		}
 	}
 
-	err = k.SetResource(ctx, resource)
-	if err != nil {
-		return err
-	}
-
-	// Update the latest resource version
-	LatestResourceVersionKey := collections.Join3(resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType)
-	err = k.LatestResourceVersion.Set(ctx, LatestResourceVersionKey, resource.Metadata.Id)
-	return err
+	return k.SetResource(ctx, resource)
 }
 
 // SetResource create or update a specific resource in the store
@@ -75,6 +64,12 @@ func (k Keeper) SetResource(ctx context.Context, resource *types.ResourceWithMet
 
 	// Set metadata
 	if err := k.ResourceMetadata.Set(ctx, collections.Join(resource.Metadata.CollectionId, resource.Metadata.Id), *resource.Metadata); err != nil {
+		return err
+	}
+
+	// Set the latest resource version
+	latestResourceVersionKey := collections.Join3(resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType)
+	if err = k.LatestResourceVersion.Set(ctx, latestResourceVersionKey, resource.Metadata.Id); err != nil {
 		return err
 	}
 
