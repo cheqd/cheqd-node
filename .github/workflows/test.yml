@@ -235,10 +235,31 @@ jobs:
           name: report-pre-upgrade.xml
           path: report-pre-upgrade.xml
 
+      - name: Restart network using new node version (upgrade-v4-latest)
+        working-directory: ./tests/upgrade/integration
+        run: |
+          bash scripts/upgrade_v4.sh
+
+      - name: Verifying docker processes
+        working-directory: ./tests/upgrade/integration
+        run: |
+          docker ps -a
+      
+      - name: Run pre-upgrade-v4_2 tests
+        working-directory: ./tests/upgrade/integration/v4
+        run: |
+          ginkgo -r --race --tags upgrade_integration --focus-file pre_upgrade_v4_2_test.go --keep-going --trace --junit-report ../../../../report-pre-upgrade-v4_2.xml
+
+      - name: Upload pre-upgrade-v4_2 tests result
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-pre-upgrade-v4_2.xml
+          path: report-pre-upgrade-v4_2.xml
+
       - name: Restart network using new node version (build-latest)
         working-directory: ./tests/upgrade/integration
         run: |
-          bash scripts/upgrade.sh
+          bash scripts/upgrade_v4_2.sh
 
       - name: Verifying docker processes
         working-directory: ./tests/upgrade/integration
