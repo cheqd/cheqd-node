@@ -294,20 +294,15 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 	var overlapMin *sdkmath.Int
 	var overlapMax *sdkmath.Int
 
-	for i, r := range ranges {
-		if i == 0 {
-			overlapMin = r.minUSD
-			overlapMax = r.maxUSD
-		} else {
-			if r.minUSD != nil {
-				if overlapMin == nil || r.minUSD.GT(*overlapMin) {
-					overlapMin = r.minUSD
-				}
+	for _, r := range ranges {
+		if r.minUSD != nil {
+			if overlapMin == nil || r.minUSD.GT(*overlapMin) {
+				overlapMin = r.minUSD
 			}
-			if r.maxUSD != nil {
-				if overlapMax == nil || r.maxUSD.LT(*overlapMax) {
-					overlapMax = r.maxUSD
-				}
+		}
+		if r.maxUSD != nil {
+			if overlapMax == nil || r.maxUSD.LT(*overlapMax) {
+				overlapMax = r.maxUSD
 			}
 		}
 	}
@@ -331,11 +326,12 @@ func GetFeeForMsg(feeRanges []didtypes.FeeRange, cheqEmaPrice sdkmath.LegacyDec)
 
 	// Step 4: Pick target USD value to convert
 	var usdToUse *sdkmath.Int
-	if overlapMin != nil {
+	switch {
+	case overlapMin != nil:
 		usdToUse = overlapMin
-	} else if overlapMax != nil {
+	case overlapMax != nil:
 		usdToUse = overlapMax
-	} else {
+	default:
 		return nil, errors.New("cannot determine fee: no min or max USD bound")
 	}
 
