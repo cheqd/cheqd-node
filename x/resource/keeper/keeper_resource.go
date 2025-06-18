@@ -29,7 +29,10 @@ func (k Keeper) SetResourceCount(ctx context.Context, count uint64) error {
 
 func (k Keeper) AddNewResourceVersion(ctx context.Context, resource *types.ResourceWithMetadata) error {
 	// Find previous version and upgrade backward and forward version links
-	previousResourceVersionHeader, found, _ := k.GetLastResourceVersionMetadata(ctx, resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType)
+	previousResourceVersionHeader, found, err := k.GetLastResourceVersionMetadata(ctx, resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType)
+	if err != nil {
+		return err
+	}
 	if found {
 		// Set links
 		previousResourceVersionHeader.NextVersionId = resource.Metadata.Id
@@ -146,6 +149,9 @@ func (k Keeper) GetLastResourceVersionMetadata(ctx context.Context, collectionID
 	latestResourceVersionKey := collections.Join3(collectionID, name, resourceType)
 	latestResourceVersion, err := k.LatestResourceVersion.Get(ctx, latestResourceVersionKey)
 	if err != nil {
+		if errors.IsOf(err, collections.ErrNotFound) {
+			return types.Metadata{}, false, nil
+		}
 		return types.Metadata{}, false, err
 	}
 
