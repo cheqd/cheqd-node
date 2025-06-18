@@ -24,6 +24,7 @@ func MigrateStore(ctx sdk.Context, storeService corestoretypes.KVStoreService, l
 	cdc codec.BinaryCodec, countCollection collections.Item[uint64],
 	metadataCollection collections.Map[collections.Pair[string, string], types.Metadata],
 	dataCollection collections.Map[collections.Pair[string, string], []byte],
+	latestResourceVersionCollection collections.Map[collections.Triple[string, string, string], string],
 ) error {
 	store := storeService.OpenKVStore(ctx)
 	if err := migrateParams(ctx, store, legacySubspace, cdc); err != nil {
@@ -36,7 +37,7 @@ func MigrateStore(ctx sdk.Context, storeService corestoretypes.KVStoreService, l
 		return err
 	}
 
-	return migrateResources(ctx, kvStore, cdc, metadataCollection, dataCollection)
+	return migrateResources(ctx, kvStore, cdc, metadataCollection, dataCollection, latestResourceVersionCollection)
 }
 
 func migrateParams(ctx sdk.Context, store corestoretypes.KVStore, legacySubspace exported.Subspace, cdc codec.BinaryCodec) error {
@@ -73,6 +74,7 @@ func migrateResourceCount(ctx sdk.Context, store storetypes.KVStore, countCollec
 func migrateResources(ctx sdk.Context, store storetypes.KVStore, cdc codec.BinaryCodec,
 	metadataCollection collections.Map[collections.Pair[string, string], types.Metadata],
 	dataCollection collections.Map[collections.Pair[string, string], []byte],
+	latestResourceVersionCollection collections.Map[collections.Triple[string, string, string], string],
 ) error {
 	iterator := storetypes.KVStorePrefixIterator(store, []byte(types.ResourceMetadataKey))
 
@@ -94,6 +96,12 @@ func migrateResources(ctx sdk.Context, store storetypes.KVStore, cdc codec.Binar
 			}
 			// delete old record
 			store.Delete(dataKey)
+		}
+
+		if metadata.NextVersionId == "" {
+			if err := latestResourceVersionCollection.Set(ctx, collections.Join3(metadata.CollectionId, metadata.Name, metadata.ResourceType), metadata.Id); err != nil {
+				return err
+			}
 		}
 
 		// delete old record
