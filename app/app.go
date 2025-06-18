@@ -1399,10 +1399,17 @@ func (app *App) RegisterUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
 		upgradeV4.UpgradeName,
 		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+		},
+	)
+	app.UpgradeKeeper.SetUpgradeHandler(
+		upgradeV4.MinorUpgradeName,
+		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			migrations, err := app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
 			if err != nil {
 				return migrations, err
 			}
+
 			sdkCtx := sdk.UnwrapSDKContext(ctx)
 
 			currentParams, err := app.ConsensusParamsKeeper.ParamsStore.Get(sdkCtx)
@@ -1446,6 +1453,16 @@ func (app *App) setupUpgradeStoreLoaders() {
 		storeUpgrades := storetypes.StoreUpgrades{
 			Added: []string{
 				circuittypes.ModuleName,
+			},
+		}
+
+		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	}
+
+	if upgradeInfo.Name == upgradeV4.MinorUpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		storeUpgrades := storetypes.StoreUpgrades{
+			Added: []string{
 				oracletypes.ModuleName,
 			},
 		}
