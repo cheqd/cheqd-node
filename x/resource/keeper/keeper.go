@@ -86,7 +86,7 @@ func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSp
 		LatestResourceVersion: collections.NewMap(
 			sb,
 			collections.NewPrefix(types.ResourceLatestVersionKey),
-			"latest_resource",
+			"resource_latest_version",
 			collections.TripleKeyCodec(collections.StringKey, collections.StringKey, collections.StringKey),
 			collections.StringValue,
 		),

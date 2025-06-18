@@ -65,7 +65,7 @@ func TestMigrate(t *testing.T) {
 	latestResourceVersionCollection := collections.NewMap(
 		sb,
 		collections.NewPrefix(types.ResourceLatestVersionKey),
-		"latest_resource_version",
+		"resource_latest_version",
 		collections.TripleKeyCodec(collections.StringKey, collections.StringKey, collections.StringKey),
 		collections.StringValue,
 	)
