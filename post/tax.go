@@ -326,9 +326,11 @@ func (td TaxDecorator) distributeRewards(ctx sdk.Context, rewards sdk.Coins) err
 		return nil
 	}
 
+	fmt.Println("rewards distribute------------", rewards)
 	oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.005 = 0.5%
 	oracleRewards, feeCollectorRewards := SplitRewardsByRatio(rewards, oracleShareRate)
 
+	fmt.Println("oraclerewads and feecollectorRewards--------", oracleRewards, feeCollectorRewards)
 	if !oracleRewards.IsZero() {
 		if err := td.bankKeeper.SendCoinsFromModuleToModule(ctx, didtypes.ModuleName, oracletypes.ModuleName, oracleRewards); err != nil {
 			return err
@@ -395,6 +397,7 @@ func (td *TaxDecorator) handleTaxableTransaction(
 
 	// Let ConvertToCheq handle missing/zero price gracefully
 	if onlyNativeDenom {
+		fmt.Println("onlyNativeDenom----------", onlyNativeDenom, cheqPrice)
 		if err := td.processNativeDenomTax(ctx, feeTx, simulate, rewards, burn, tx, &convertedRewards, &convertedBurn, cheqPrice); err != nil {
 			return err
 		}
@@ -411,6 +414,8 @@ func (td *TaxDecorator) handleTaxableTransaction(
 			return fmt.Errorf("failed to convert burn to ncheq: %w", err)
 		}
 	}
+
+	fmt.Println("convertedRewards--------------", convertedRewards)
 
 	// Common logic
 	if err := td.distributeRewards(ctx, convertedRewards); err != nil {
@@ -444,7 +449,7 @@ func (td *TaxDecorator) processNativeDenomTax(
 	if err := td.validateTax(feeTx.GetFee(), simulate); err != nil {
 		return err
 	}
-
+	fmt.Println("burn and rewards are---------", burn, rewards)
 	tax := rewards.Add(burn...)
 	feePayer, err := td.getFeePayer(ctx, feeTx, tax, tx.GetMsgs())
 	if err != nil {
@@ -458,13 +463,16 @@ func (td *TaxDecorator) processNativeDenomTax(
 	if err != nil {
 		return err
 	}
+	fmt.Println("converted Rewards-----------", convertedRewards, convertedBurn)
 	tax = convertedRewards.Add(*convertedBurn...)
+	fmt.Println("fees deducted from the feepayer is----------", tax)
 	return td.deductTaxFromFeePayer(ctx, feePayer, tax)
 }
 
 func ConvertToCheq(coins sdk.Coins, cheqPrice math.LegacyDec) (sdk.Coins, error) {
 	// If all coins are already in ncheq, return them directly
 	if coins.DenomsSubsetOf(sdk.NewCoins(sdk.NewCoin(oracletypes.CheqdDenom, math.ZeroInt()))) {
+		fmt.Println("returned from here--------------", coins)
 		return coins, nil
 	}
 
