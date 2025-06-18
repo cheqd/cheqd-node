@@ -95,10 +95,10 @@ func (AppModuleBasic) GetTxCmd() *cobra.Command {
 	return cli.GetTxCmd()
 }
 
-// // GetQueryCmd returns the x/oracle module's root query command.
-// func (AppModuleBasic) GetQueryCmd() *cobra.Command {
-// 	return cli.GetQueryCmd()
-// }
+// GetQueryCmd returns the x/oracle module's root query command.
+func (AppModuleBasic) GetQueryCmd() *cobra.Command {
+	return cli.GetQueryCmd()
+}
 
 // AppModule implements the AppModule interface for the x/oracle module.
 type AppModule struct {

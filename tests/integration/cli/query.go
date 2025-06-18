@@ -305,7 +305,7 @@ func QueryAggregateVote(validatorAddr string) (*oracletypes.QueryAggregateVoteRe
 
 // QueryAggregatePrevote queries the aggregate prevote for a validator
 func QueryAggregatePrevote(validatorAddr string) (*oracletypes.QueryAggregatePrevoteResponse, error) {
-	res, err := Query("oracle", "aggregate-prevote", validatorAddr)
+	res, err := Query("oracle", "aggregate-prevotes", validatorAddr)
 	if err != nil {
 		return nil, err
 	}
