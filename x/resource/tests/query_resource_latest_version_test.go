@@ -30,6 +30,16 @@ var _ = Describe("Query LatestResourceVersion", func() {
 		Expect(resp.Resource.Metadata.Id).To(Equal(resource.Resource.Id))
 	})
 
+	It("Works with different composed forms", func() {
+		resource := setup.CreateSimpleResource(alice.CollectionID, SchemaData, "Résourcℯ", CLSchemaType, []didsetup.SignInput{alice.SignInput})
+		resp, err := setup.QueryLatestResourceVersion(alice.CollectionID, "Résourcℯ", CLSchemaType)
+		Expect(err).To(BeNil())
+		Expect(resp.Resource.Metadata.Id).To(Equal(resource.Resource.Id))
+
+		_, err = setup.QueryLatestResourceVersion(alice.CollectionID, "Resource", CLSchemaType)
+		Expect(err.Error()).To(ContainSubstring("not found"))
+	})
+
 	It("Returns error if resource does not exist", func() {
 		nonExistingResource := uuid.NewString()
 
@@ -39,6 +49,16 @@ var _ = Describe("Query LatestResourceVersion", func() {
 
 	It("Returns error if resource index keys have trailing spaces", func() {
 		_, err := setup.QueryLatestResourceVersion(alice.CollectionID, "  Resource 1%  ", CLSchemaType)
+		Expect(err.Error()).To(ContainSubstring("not found"))
+	})
+
+	It("Returns error if resource index keys have different composed forms", func() {
+		_, err := setup.QueryLatestResourceVersion(alice.CollectionID, "Résourcℯ 1%", CLSchemaType)
+		Expect(err.Error()).To(ContainSubstring("not found"))
+	})
+
+	It("Returns error if resource index keys have no spaces", func() {
+		_, err := setup.QueryLatestResourceVersion(alice.CollectionID, "Resource1%", CLSchemaType)
 		Expect(err.Error()).To(ContainSubstring("not found"))
 	})
 
