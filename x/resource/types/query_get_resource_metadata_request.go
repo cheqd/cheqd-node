@@ -9,6 +9,4 @@ func (query *QueryResourceMetadataRequest) Normalize() {
 
 func (query *QueryLatestResourceVersionMetadataRequest) Normalize() {
 	query.CollectionId = utils.NormalizeID(query.CollectionId)
-	query.Name = utils.NormalizeID(query.Name)
-	query.ResourceType = utils.NormalizeID(query.ResourceType)
 }

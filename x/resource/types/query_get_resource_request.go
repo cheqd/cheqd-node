@@ -11,6 +11,4 @@ func (query *QueryResourceRequest) Normalize() {
 
 func (query *QueryLatestResourceVersionRequest) Normalize() {
 	query.CollectionId = utils.NormalizeID(query.CollectionId)
-	query.Name = utils.NormalizeID(query.Name)
-	query.ResourceType = utils.NormalizeID(query.ResourceType)
 }
