@@ -108,10 +108,14 @@ var _ = Describe("TxMsgFilters", func() {
 
 				ncheqPrice := math.LegacyMustNewDecFromStr("0.016")
 				// calculate portions
-				fee, err := ante.GetFeeForMsg(ante.TaxableMsgFees[ante.MsgCreateResourceImage], ncheqPrice)
+				amount := math.NewInt(int64(resourcetypes.DefaultCreateResourceImageFee))
+
+				userFee := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount))
+
+				fee, err := ante.GetFeeForMsg(userFee, ante.TaxableMsgFees[ante.MsgCreateResourceImage], ncheqPrice, nil)
 				Expect(err).To(BeNil())
 
-				reward, burn, ok, err := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice)
+				reward, burn, ok, err := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice, userFee, nil)
 				Expect(err).To(BeNil())
 				Expect(ok).To(BeTrue())
 				Expect(reward).To(Equal(ante.GetRewardPortion(fee, ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee))))
@@ -155,11 +159,14 @@ var _ = Describe("TxMsgFilters", func() {
 					Signatures: signatures,
 				}
 
+				amount := math.NewInt(int64(resourcetypes.DefaultCreateResourceJSONFee))
+
+				userFee := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount))
 				ncheqPrice := math.LegacyMustNewDecFromStr("0.016")
-				fee, err := ante.GetFeeForMsg(ante.TaxableMsgFees[ante.MsgCreateResourceJSON], ncheqPrice)
+				fee, err := ante.GetFeeForMsg(userFee, ante.TaxableMsgFees[ante.MsgCreateResourceJSON], ncheqPrice, nil)
 				Expect(err).To(BeNil())
 				// calculate portions
-				reward, burn, ok, err := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice)
+				reward, burn, ok, err := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice, userFee, nil)
 				Expect(err).To(BeNil())
 
 				Expect(ok).To(BeTrue())
@@ -205,13 +212,16 @@ var _ = Describe("TxMsgFilters", func() {
 					},
 					Signatures: signatures,
 				}
+				amount := math.NewInt(int64(resourcetypes.DefaultCreateResourceDefaultFee))
+
+				userFee := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount))
 
 				ncheqPrice := math.LegacyMustNewDecFromStr("0.016")
-				fee, err := ante.GetFeeForMsg(ante.TaxableMsgFees[ante.MsgCreateResourceDefault], ncheqPrice)
+				fee, err := ante.GetFeeForMsg(userFee, ante.TaxableMsgFees[ante.MsgCreateResourceDefault], ncheqPrice, nil)
 				Expect(err).To(BeNil())
 
 				// calculate portions
-				reward, burn, ok, err := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice)
+				reward, burn, ok, err := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice, userFee, nil)
 				Expect(err).To(BeNil())
 
 				Expect(ok).To(BeTrue())

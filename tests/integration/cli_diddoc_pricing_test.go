@@ -78,7 +78,8 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
-		convertedFees, err := ante.GetFeeForMsg(feeParams.CreateDid, cheqp)
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
+		convertedFees, err := ante.GetFeeForMsg(userFee, feeParams.CreateDid, cheqp, nil)
 		Expect(err).To(BeNil())
 		burnPotionInUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
 		rewardPortionInUsd := helpers.GetRewardPortion(convertedFees, burnPotionInUsd)
@@ -99,7 +100,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom))
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -165,7 +166,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 	})
 	It("should tax update diddoc message - case: fixed fee", func() {
 		By("submitting a create diddoc message")
-		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -194,8 +195,8 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
-
-		convertedFees, err := ante.GetFeeForMsg(feeParams.UpdateDid, cheqp)
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MinAmount))
+		convertedFees, err := ante.GetFeeForMsg(userFee, feeParams.UpdateDid, cheqp, nil)
 		Expect(err).To(BeNil())
 		burnPotionInUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
 		rewardPortionInUsd := helpers.GetRewardPortion(convertedFees, burnPotionInUsd)
@@ -280,7 +281,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 	})
 	It("should tax deactivate diddoc message - case: fixed fee", func() {
 		By("submitting a create diddoc message")
-		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -299,7 +300,8 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
-		convertedFees, err := ante.GetFeeForMsg(feeParams.DeactivateDid, cheqp)
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MinAmount))
+		convertedFees, err := ante.GetFeeForMsg(userFee, feeParams.DeactivateDid, cheqp, nil)
 		Expect(err).To(BeNil())
 		burnPotionInUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
 		rewardPortionInUsd := helpers.GetRewardPortion(convertedFees, burnPotionInUsd)
@@ -400,7 +402,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting a create diddoc message")
-		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom)))
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom)))
 		Expect(err).To(BeNil())
 
 		Expect(resp.Code).To(BeEquivalentTo(0))
@@ -414,10 +416,19 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("checking the granter balance difference")
-		tax := feeParams.CreateDid[0].MinAmount
+		tax := feeParams.CreateDid[0].MaxAmount
+		userFee := sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, *tax))
+		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		Expect(err).To(BeNil())
+		cheqp := cheqPrice.Price
+		convertedFees, err := ante.GetFeeForMsg(userFee, feeParams.UpdateDid, cheqp, nil)
+		convertedFeesinCheq, err := posthandler.ConvertToCheq(convertedFees, cheqPrice.Price)
+		Expect(err).To(BeNil())
+
+		Expect(err).To(BeNil())
 		Expect(tax).ToNot(BeNil())
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff.GTE(*tax)).To(BeTrue())
+		Expect(diff.Sub(convertedFeesinCheq.AmountOf(types.BaseMinimalDenom)).Abs().LTE(math.NewInt(1))).To(BeTrue(), "difference exceeds 1ncheq")
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
@@ -432,7 +443,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 	It("should tax update diddoc message with feegrant - case: fixed fee", func() {
 		By("submitting a create diddoc message")
-		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -479,9 +490,16 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("checking the granter balance difference")
 		tax := feeParams.UpdateDid[0].MinAmount
+		userFee := sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, *tax))
+		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		Expect(err).To(BeNil())
+		cheqp := cheqPrice.Price
+		convertedFees, err := ante.GetFeeForMsg(userFee, feeParams.UpdateDid, cheqp, nil)
+		convertedFeesinCheq, err := posthandler.ConvertToCheq(convertedFees, cheqPrice.Price)
+		Expect(err).To(BeNil())
 		Expect(tax).ToNot(BeNil())
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff.GTE(*tax)).To(BeTrue())
+		Expect(diff.GTE(convertedFeesinCheq.AmountOf(types.BaseMinimalDenom))).To(BeTrue())
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
@@ -495,7 +513,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 	It("should tax deactivate diddoc message with feegrant - case: fixed fee", func() {
 		By("submitting a create diddoc message")
-		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -522,10 +540,14 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
-		convertedFees, err := ante.GetFeeForMsg(feeParams.DeactivateDid, cheqp)
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MinAmount))
+		FeeforMsg, err := ante.GetFeeForMsg(userFee, feeParams.DeactivateDid, cheqp, nil)
 		Expect(err).To(BeNil())
-		burnPotionInUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
-		rewardPortionInUsd := helpers.GetRewardPortion(convertedFees, burnPotionInUsd)
+		convertedFees, err := posthandler.ConvertToCheq(FeeforMsg, cheqp)
+		Expect(err).To(BeNil())
+
+		burnPotionInUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, FeeforMsg)
+		rewardPortionInUsd := helpers.GetRewardPortion(FeeforMsg, burnPotionInUsd)
 
 		burnPotionInUsdToCheq, err := posthandler.ConvertToCheq(burnPotionInUsd, cheqp)
 		Expect(err).To(BeNil())
@@ -557,7 +579,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("checking the granter balance difference")
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(taxIncheqd.AmountOf(types.BaseMinimalDenom)))
+		Expect(diff).To(Equal(convertedFees.AmountOf(types.BaseMinimalDenom)))
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)

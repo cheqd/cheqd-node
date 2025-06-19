@@ -68,7 +68,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 
 		versionID := uuid.NewString()
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -194,7 +194,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 
 		versionID := uuid.NewString()
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -320,7 +320,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 
 		versionID := uuid.NewString()
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -465,7 +465,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 
 		versionID := uuid.NewString()
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -596,7 +596,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 
 		versionID := uuid.NewString()
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -678,7 +678,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 
 		versionID1 := uuid.NewString()
 
-		res1, err := cli.CreateDidDoc(tmpDir, payload1, signInputs1, versionID1, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
+		res1, err := cli.CreateDidDoc(tmpDir, payload1, signInputs1, versionID1, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res1.Code).To(BeEquivalentTo(0))
 
@@ -709,7 +709,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 
 		versionID2 := uuid.NewString()
 
-		res2, err := cli.CreateDidDoc(tmpDir, payload2, signInputs2, versionID2, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
+		res2, err := cli.CreateDidDoc(tmpDir, payload2, signInputs2, versionID2, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res2.Code).To(BeEquivalentTo(0))
 
@@ -772,7 +772,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 
 		versionID1 := uuid.NewString()
 
-		res1, err := cli.CreateDidDoc(tmpDir, payload1, signInputs1, versionID1, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
+		res1, err := cli.CreateDidDoc(tmpDir, payload1, signInputs1, versionID1, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res1.Code).To(BeEquivalentTo(0))
 
@@ -822,7 +822,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 
 		versionID2 := uuid.NewString()
 
-		res2, err := cli.CreateDidDoc(tmpDir, payload2, signInputs2, versionID2, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
+		res2, err := cli.CreateDidDoc(tmpDir, payload2, signInputs2, versionID2, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res2.Code).To(BeEquivalentTo(0))
 
@@ -899,7 +899,7 @@ var _ = Describe("cheqd cli - positive did", func() {
 
 		versionID := uuid.NewString()
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MinAmount.String()+feeParams.CreateDid[0].Denom))
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})

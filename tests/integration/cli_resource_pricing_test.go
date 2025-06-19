@@ -4,6 +4,7 @@ package integration
 
 import (
 	"crypto/ed25519"
+	"fmt"
 
 	"cosmossdk.io/math"
 	"github.com/cheqd/cheqd-node/ante"
@@ -15,7 +16,6 @@ import (
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/cheqd/cheqd-node/x/did/types"
-	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/google/uuid"
@@ -25,7 +25,7 @@ import (
 
 var _ = Describe("cheqd cli - positive resource pricing", func() {
 	var tmpDir string
-	var didFeeParams didtypes.FeeParams
+	var didFeeParams types.FeeParams
 	var resourceFeeParams resourcetypes.FeeParams
 	var collectionID string
 	var signInputs []didcli.SignInput
@@ -76,7 +76,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		}
 
 		// Submit the DID Doc
-		resp, err := cli.CreateDidDoc(tmpDir, didPayload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(didFeeParams.CreateDid[0].MinAmount.String()+didFeeParams.CreateDid[0].Denom))
+		resp, err := cli.CreateDidDoc(tmpDir, didPayload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(didFeeParams.CreateDid[0].MaxAmount.String()+didFeeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 	})
@@ -101,8 +101,11 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		cheqp := cheqPrice.Price
 		Expect(err).To(BeNil())
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MinAmount))
 
-		convertedFees, err := ante.GetFeeForMsg(resourceFeeParams.Json, cheqp)
+		convertedFees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Json, cheqp, nil)
+		Expect(err).To(BeNil())
+		convertedFeesToCheq, err := posthandler.ConvertToCheq(convertedFees, cheqp)
 		Expect(err).To(BeNil())
 
 		burnPotionInUsd := helpers.GetBurnFeePortion(resourceFeeParams.BurnFactor, convertedFees)
@@ -124,6 +127,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
 
+		fmt.Println("convertedFees--------", convertedFees)
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -132,6 +136,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			ResourceType: resourceType,
 		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom))
 		Expect(err).To(BeNil())
+		fmt.Println("res----------6", res)
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		By("querying the altered account balance")
@@ -141,7 +146,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(taxIncheqd.AmountOf(types.BaseMinimalDenom)))
+		Expect(diff).To(Equal(convertedFeesToCheq.AmountOf(types.BaseMinimalDenom)))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -215,9 +220,11 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		cheqp := cheqPrice.Price
 		Expect(err).To(BeNil())
 
-		// Calculate fee portions in USD
-		convertedFees, err := ante.GetFeeForMsg(resourceFeeParams.Image, cheqp)
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MinAmount))
+
+		convertedFees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Image, cheqp, nil)
 		Expect(err).To(BeNil())
+		// Calculate fee portions in USD
 
 		burnPotionInUsd := helpers.GetBurnFeePortion(resourceFeeParams.BurnFactor, convertedFees)
 		rewardPortionInUsd := helpers.GetRewardPortion(convertedFees, burnPotionInUsd)
@@ -332,15 +339,18 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 
-		convertedFees, err := ante.GetFeeForMsg(resourceFeeParams.Default, cheqp)
-		Expect(err).To(BeNil())
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MinAmount))
 
+		convertedFees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Default, cheqp, nil)
+		Expect(err).To(BeNil())
 		burnPortionUsd := helpers.GetBurnFeePortion(resourceFeeParams.BurnFactor, convertedFees)
 		rewardPortionUsd := helpers.GetRewardPortion(convertedFees, burnPortionUsd)
 
 		burnPortionCheq, err := posthandler.ConvertToCheq(burnPortionUsd, cheqp)
 		Expect(err).To(BeNil())
 		rewardPortionCheq, err := posthandler.ConvertToCheq(rewardPortionUsd, cheqp)
+		Expect(err).To(BeNil())
+		finalPrice, err := posthandler.ConvertToCheq(convertedFees, cheqp)
 		Expect(err).To(BeNil())
 
 		coin := rewardPortionCheq.AmountOf(types.BaseMinimalDenom)
@@ -370,7 +380,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(taxIncheqd.AmountOf(types.BaseMinimalDenom)))
+		Expect(diff).To(Equal(finalPrice.AmountOf(types.BaseMinimalDenom)))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -441,7 +451,15 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		Expect(err).To(BeNil())
-		fees, err := ante.GetFeeForMsg(resourceFeeParams.Json, cheqPrice.Price)
+
+		cheqp := cheqPrice.Price
+
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MinAmount))
+
+		fees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Json, cheqp, nil)
+
+		Expect(err).To(BeNil())
+		convertedFee, err := posthandler.ConvertToCheq(fees, cheqp)
 		Expect(err).To(BeNil())
 
 		resp, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
@@ -461,7 +479,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(fees.AmountOf(resourcetypes.BaseMinimalDenom)))
+		Expect(diff).To(Equal(convertedFee.AmountOf(types.BaseMinimalDenom)))
 
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
 		Expect(diff.IsZero()).To(BeTrue())
@@ -489,7 +507,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		Expect(err).To(BeNil())
-		fees, err := ante.GetFeeForMsg(resourceFeeParams.Image, cheqPrice.Price)
+		cheqp := cheqPrice.Price
+
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MinAmount))
+
+		fees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Image, cheqp, nil)
+		Expect(err).To(BeNil())
+		convertedFee, err := posthandler.ConvertToCheq(fees, cheqp)
 		Expect(err).To(BeNil())
 
 		resp, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
@@ -499,6 +523,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			Version:      "1.0",
 			ResourceType: "TestType",
 		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom)))
+
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -509,7 +534,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(fees.AmountOf(resourcetypes.BaseMinimalDenom)))
+		Expect(diff).To(Equal(convertedFee.AmountOf(resourcetypes.BaseMinimalDenom)))
 
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
 		Expect(diff.IsZero()).To(BeTrue())
@@ -537,7 +562,13 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		tax := resourceFeeParams.Default[0]
 		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		Expect(err).To(BeNil())
-		fees, err := ante.GetFeeForMsg(resourceFeeParams.Default, cheqPrice.Price)
+		cheqp := cheqPrice.Price
+
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MinAmount))
+
+		fees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Default, cheqp, nil)
+		Expect(err).To(BeNil())
+		convertedFee, err := posthandler.ConvertToCheq(fees, cheqp)
 		Expect(err).To(BeNil())
 
 		resp, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
@@ -557,7 +588,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(fees.AmountOf(resourcetypes.BaseMinimalDenom)))
+		Expect(diff).To(Equal(convertedFee.AmountOf(resourcetypes.BaseMinimalDenom)))
 
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
 		Expect(diff.IsZero()).To(BeTrue())
@@ -566,5 +597,4 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
-
 })

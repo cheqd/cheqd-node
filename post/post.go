@@ -4,6 +4,7 @@ import (
 	cheqdante "github.com/cheqd/cheqd-node/ante"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+	feeabskeeper "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/keeper"
 )
 
 // HandlerOptions are the options required for constructing a default post handler
@@ -15,12 +16,13 @@ type HandlerOptions struct {
 	ResourceKeeper  cheqdante.ResourceKeeper
 	FeeMarketKeeper FeeMarketKeeper
 	OracleKeeper    cheqdante.OracleKeeper
+	FeeabsKeeper    feeabskeeper.Keeper
 }
 
 // NewPostHandler returns a default post handler
 func NewPostHandler(options HandlerOptions) (sdk.PostHandler, error) {
 	postDecorators := []sdk.PostDecorator{
-		NewTaxDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.DidKeeper, options.ResourceKeeper, options.FeeMarketKeeper, options.OracleKeeper),
+		NewTaxDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.DidKeeper, options.ResourceKeeper, options.FeeMarketKeeper, options.OracleKeeper, options.FeeabsKeeper),
 	}
 	return sdk.ChainPostDecorators(postDecorators...), nil
 }
