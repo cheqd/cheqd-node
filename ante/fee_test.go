@@ -1476,7 +1476,6 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		amount := math.NewInt(90_000_000_000)
 		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, sdk.NewCoins(sdk.NewCoin(ibcDenom, amount)))
 		Expect(err).To(BeNil())
-		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, ibcDenom)
 		err = testutil.FundModuleAccount(s.ctx, s.app.BankKeeper, types.ModuleName, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
@@ -1498,7 +1497,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		Expect(err).To(BeNil())
 
 		// check balance of fee payer
-		balance = s.app.BankKeeper.GetBalance(s.ctx, addr1, ibcDenom)
+		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, ibcDenom)
 		cheqPrice, _ := s.app.OracleKeeper.GetEMA(s.ctx, didtypes.BaseDenom)
 		hostconfig, _ := s.app.FeeabsKeeper.GetHostZoneConfig(s.ctx, ibcDenom)
 		nativeFee, err := s.app.FeeabsKeeper.CalculateNativeFromIBCCoins(s.ctx, feeAmount, hostconfig)
