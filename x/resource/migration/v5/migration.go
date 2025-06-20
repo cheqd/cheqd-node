@@ -9,13 +9,13 @@ import (
 )
 
 func MigrateStore(ctx sdk.Context, storeService corestoretypes.KVStoreService,
-	cdc codec.BinaryCodec) error {
+	cdc codec.BinaryCodec,
+) error {
 	store := storeService.OpenKVStore(ctx)
 	return migrateParams(store, cdc)
 }
 
 func migrateParams(store corestoretypes.KVStore, cdc codec.BinaryCodec) error {
-
 	var legacyParams types.LegacyFeeParams
 
 	bz, err := store.Get(types.ParamStoreKeyFeeParams)
