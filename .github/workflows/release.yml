@@ -177,7 +177,7 @@ jobs:
 
   release-docker:
     name: "Release Docker image"
-    needs: [ build-docker ]
+    needs: [ release-guard, build-docker ]
     runs-on: ubuntu-24.04
     # Only run if release-guard outputs EXECUTE_RELEASE=true
     if: needs.release-guard.outputs.EXECUTE_RELEASE == 'true'
