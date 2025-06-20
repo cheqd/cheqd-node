@@ -136,14 +136,23 @@ jobs:
           buf_token: ${{ secrets.BUF_TOKEN }}
           draft: ${{ github.ref_name != 'main'}}
 
-  release-docker:
-    name: "Docker image"
+  build-docker:
+    name: "Build Docker image"
     needs: [ super-lint, release-guard ]
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.runs-on }}
     # Only run if release-guard outputs EXECUTE_RELEASE=true
     if: needs.release-guard.outputs.EXECUTE_RELEASE == 'true'
     env:
       IMAGE_NAME: ${{ github.repository }}
+    
+    strategy:
+      matrix:
+        arch: [amd64, arm64]
+        include:
+          - arch: amd64
+            runs-on: ubuntu-24.04
+          - arch: arm64
+            runs-on: ubuntu-24.04-arm
 
     steps:
       - uses: actions/checkout@v4
@@ -154,6 +163,42 @@ jobs:
         uses: docker/setup-buildx-action@v3
         id: buildx
         with:
+          version: latest
+
+      - name: Build and cache image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          platforms: linux/${{ matrix.arch }}
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=docker-release-${{ matrix.arch }}
+          cache-to: type=gha,scope=docker-release-${{ matrix.arch }},mode=max
+
+  release-docker:
+    name: "Release Docker image"
+    needs: [ build-docker ]
+    runs-on: ubuntu-24.04
+    # Only run if release-guard outputs EXECUTE_RELEASE=true
+    if: needs.release-guard.outputs.EXECUTE_RELEASE == 'true'
+    env:
+      IMAGE_NAME: ${{ github.repository }}
+    environment:
+      name: production
+      url: https://did-registrar.cheqd.net/api-docs
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        id: buildx
+        with:
+          install: true
           version: latest
 
       - name: Login to GitHub Container Registry
@@ -179,14 +224,15 @@ jobs:
             org.opencontainers.image.created={{date 'dddd, MMMM Do YYYY, h:mm:ss a'}}
             org.opencontainers.image.documentation="https://docs.cheqd.io/node"
 
-      - name: Build and push image
+      - name: Build image with labels
         uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/Dockerfile
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=min
+          cache-from: |
+            type=gha,scope=docker-release-amd64
+            type=gha,scope=docker-release-arm64
