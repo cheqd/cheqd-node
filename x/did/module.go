@@ -134,7 +134,7 @@ func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, subspace exported.Subsp
 // introduced by the module. To avoid wrong/empty versions, the initial version
 // should be set to 1.
 func (am AppModule) ConsensusVersion() uint64 {
-	return 5
+	return 6
 }
 
 // Name returns the cheqd module's name.
@@ -152,6 +152,9 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 
 	if err := cfg.RegisterMigration(types.ModuleName, 4, m.Migrate4to5); err != nil {
 		panic(fmt.Sprintf("failed to migrate x/did from version 4 to 5: %v", err))
+	}
+	if err := cfg.RegisterMigration(types.ModuleName, 5, m.Migrate5to6); err != nil {
+		panic(fmt.Sprintf("failed to migrate x/did from version 5 to 6: %v", err))
 	}
 }
 
