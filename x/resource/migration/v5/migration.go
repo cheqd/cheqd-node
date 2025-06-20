@@ -37,7 +37,6 @@ func migrateParams(store corestoretypes.KVStore, cdc codec.BinaryCodec) error {
 				MaxAmount: util.PtrInt(legacyParams.Image.Amount.Mul(math.NewInt(2)).Int64()),
 			},
 			{
-
 				Denom:     oracletypes.UsdDenom,
 				MinAmount: util.PtrInt(280_000_000_000_000_000),
 				MaxAmount: util.PtrInt(280_000_000_000_000_000),
