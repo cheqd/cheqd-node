@@ -23,7 +23,7 @@
       },
       {
         "name": "cheqd",
-        "version": 5
+        "version": 6
       },
       {
         "name": "circuit",
@@ -99,7 +99,7 @@
       },
       {
         "name": "resource",
-        "version": 4
+        "version": 5
       },
       {
         "name": "slashing",
