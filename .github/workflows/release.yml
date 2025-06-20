@@ -172,8 +172,6 @@ jobs:
           file: docker/Dockerfile
           platforms: linux/${{ matrix.arch }}
           push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=docker-release-${{ matrix.arch }}
           cache-to: type=gha,scope=docker-release-${{ matrix.arch }},mode=max
 
