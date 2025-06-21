@@ -421,24 +421,26 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
-		convertedFees, err := ante.GetFeeForMsg(userFee, feeParams.UpdateDid, cheqp, nil)
-		convertedFeesinCheq, err := posthandler.ConvertToCheq(convertedFees, cheqPrice.Price)
+		convertedFees, err := ante.GetFeeForMsg(userFee, feeParams.CreateDid, cheqp, nil)
+		Expect(err).To(BeNil())
+		convertedFeesInCheq, err := posthandler.ConvertToCheq(convertedFees, cheqPrice.Price)
 		Expect(err).To(BeNil())
 
-		Expect(err).To(BeNil())
-		Expect(tax).ToNot(BeNil())
+		burnPortionCheq := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFeesInCheq)
+		rewardPortionCheq := helpers.GetRewardPortion(convertedFeesInCheq, burnPortionCheq)
+
+		totalTax := burnPortionCheq.Add(rewardPortionCheq...)
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff.Sub(convertedFeesinCheq.AmountOf(types.BaseMinimalDenom)).Abs().LTE(math.NewInt(1))).To(BeTrue(), "difference exceeds 1ncheq")
 
+		Expect(diff).To(Equal(totalTax.AmountOf(types.BaseMinimalDenom)))
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
 		Expect(diff.IsZero()).To(BeTrue())
 
 		By("revoking the feegrant")
 		res, err = cli.RevokeFeeGrant(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
-
 		Expect(err).To(BeNil())
-		Expect(resp.Code).To(BeEquivalentTo(0))
+		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
 	It("should tax update diddoc message with feegrant - case: fixed fee", func() {

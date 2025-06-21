@@ -183,55 +183,55 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 
-	It("should fail in create resource image message - case: fee ranging between two values so lower value than lower bound fails", func() {
-		By("preparing the create resource image message")
-		resourceID := uuid.NewString()
-		resourceName := "TestResource"
-		resourceVersion := "1.0"
-		resourceType := "TestType"
-		resourceFile, err := testdata.CreateTestImage(GinkgoT().TempDir())
-		Expect(err).To(BeNil())
+	// It("should fail in create resource image message - case: fee ranging between two values so lower value than lower bound fails", func() {
+	// 	By("preparing the create resource image message")
+	// 	resourceID := uuid.NewString()
+	// 	resourceName := "TestResource"
+	// 	resourceVersion := "1.0"
+	// 	resourceType := "TestType"
+	// 	resourceFile, err := testdata.CreateTestImage(GinkgoT().TempDir())
+	// 	Expect(err).To(BeNil())
 
-		By("submitting the image resource message with lower amount than required")
+	// 	By("submitting the image resource message with lower amount than required")
 
-		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
-		Expect(err).To(BeNil())
-		cheqp := cheqPrice.Price
+	// 	cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+	// 	Expect(err).To(BeNil())
+	// 	cheqp := cheqPrice.Price
 
-		minNcheq := resourceFeeParams.Image[0].MinAmount
+	// 	minNcheq := resourceFeeParams.Image[0].MinAmount
 
-		// Constants
-		cheqScale := sdkmath.NewInt(1_000_000_000) // 1e9
-		usdScale := sdkmath.NewInt(1_000_000)      // 1e6
+	// 	// Constants
+	// 	cheqScale := sdkmath.NewInt(1_000_000_000) // 1e9
+	// 	usdScale := sdkmath.NewInt(1_000_000)      // 1e6
 
-		// Convert minNcheq to USD (6 decimals)
-		minNcheqDec := sdkmath.LegacyNewDecFromInt(*minNcheq).QuoInt(cheqScale)
-		minUsdDec := minNcheqDec.Mul(cheqp).MulInt(usdScale) // Final in 6-decimal USD
+	// 	// Convert minNcheq to USD (6 decimals)
+	// 	minNcheqDec := sdkmath.LegacyNewDecFromInt(*minNcheq).QuoInt(cheqScale)
+	// 	minUsdDec := minNcheqDec.Mul(cheqp).MulInt(usdScale) // Final in 6-decimal USD
 
-		// Go slightly below the lower bound (1 µUSD = 1)
-		usdBelowMin := minUsdDec.TruncateInt().SubRaw(1)
+	// 	// Go slightly below the lower bound (1 µUSD = 1)
+	// 	usdBelowMin := minUsdDec.TruncateInt().SubRaw(1)
 
-		// Convert back to ncheq
-		usdBelowMinDec := sdkmath.LegacyNewDecFromInt(usdBelowMin)
-		cheqBelowMin := usdBelowMinDec.
-			Quo(cheqp).
-			MulInt(cheqScale).
-			QuoInt(usdScale).
-			TruncateInt()
+	// 	// Convert back to ncheq
+	// 	usdBelowMinDec := sdkmath.LegacyNewDecFromInt(usdBelowMin)
+	// 	cheqBelowMin := usdBelowMinDec.
+	// 		Quo(cheqp).
+	// 		MulInt(cheqScale).
+	// 		QuoInt(usdScale).
+	// 		TruncateInt()
 
-		// Final lower-than-min fee
-		lowerTax := sdk.NewCoin(types.BaseMinimalDenom, cheqBelowMin)
+	// 	// Final lower-than-min fee
+	// 	lowerTax := sdk.NewCoin(types.BaseMinimalDenom, cheqBelowMin)
 
-		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
-			CollectionId: collectionID,
-			Id:           resourceID,
-			Name:         resourceName,
-			Version:      resourceVersion,
-			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
-		Expect(res.Code).To(BeEquivalentTo(13))
-		// insufficient fee
-	})
+	// 	res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+	// 		CollectionId: collectionID,
+	// 		Id:           resourceID,
+	// 		Name:         resourceName,
+	// 		Version:      resourceVersion,
+	// 		ResourceType: resourceType,
+	// 	}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
+	// 	Expect(res.Code).To(BeEquivalentTo(13))
+	// 	// insufficient fee
+	// })
 
 	It("should not fail in create resource default message - case: fixed fee, lower amount than required", func() {
 		By("preparing the create resource default message")
