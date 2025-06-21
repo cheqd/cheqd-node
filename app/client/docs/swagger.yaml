@@ -39,39 +39,66 @@ paths:
                 type: object
                 properties:
                   createDid:
-                    description: 'Default: 50 CHEQ or 50000000000ncheq'
-                    title: Fixed fee for creating a DID
-                    type: object
-                    properties:
-                      denom:
-                        type: string
-                      amount:
-                        type: string
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                          title: Denomination of the token (e.g., "ncheq")
+                        minAmount:
+                          type: string
+                          title: >-
+                            Minimum fee amount allowed (stored as string for
+                            large values)
+                        maxAmount:
+                          type: string
+                          title: >-
+                            Maximum fee amount allowed (stored as string for
+                            large values)
+                    title: Range-based fee for creating a DID
                   updateDid:
-                    description: 'Default: 25 CHEQ or 25000000000ncheq'
-                    title: Fixed fee for updating a DID
-                    type: object
-                    properties:
-                      denom:
-                        type: string
-                      amount:
-                        type: string
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                          title: Denomination of the token (e.g., "ncheq")
+                        minAmount:
+                          type: string
+                          title: >-
+                            Minimum fee amount allowed (stored as string for
+                            large values)
+                        maxAmount:
+                          type: string
+                          title: >-
+                            Maximum fee amount allowed (stored as string for
+                            large values)
+                    title: Range-based fee for updating a DID
                   deactivateDid:
-                    description: 'Default: 10 CHEQ or 10000000000ncheq'
-                    title: Fixed fee for deactivating a DID
-                    type: object
-                    properties:
-                      denom:
-                        type: string
-                      amount:
-                        type: string
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                          title: Denomination of the token (e.g., "ncheq")
+                        minAmount:
+                          type: string
+                          title: >-
+                            Minimum fee amount allowed (stored as string for
+                            large values)
+                        maxAmount:
+                          type: string
+                          title: >-
+                            Maximum fee amount allowed (stored as string for
+                            large values)
+                    title: Range-based fee for deactivating a DID
                   burnFactor:
                     type: string
                     description: 'Default: 0.5 (50%)'
                     title: Percentage of the fixed fee that will be burned
-                title: >-
-                  FeeParams defines the parameters for the cheqd DID module
-                  fixed fee
             description: >-
               QueryParamsResponse is the response type for the Query/Params RPC
               method.
@@ -972,38 +999,71 @@ paths:
                 type: object
                 properties:
                   image:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                          title: Denomination of the token (e.g., "ncheq")
+                        minAmount:
+                          type: string
+                          title: >-
+                            Minimum fee amount allowed (stored as string for
+                            large values)
+                        maxAmount:
+                          type: string
+                          title: >-
+                            Maximum fee amount allowed (stored as string for
+                            large values)
                     description: 'Default: 10 CHEQ or 10000000000ncheq'
                     title: >-
                       Fixed fee for creating a resource with media type
                       'image/*'
-                    type: object
-                    properties:
-                      denom:
-                        type: string
-                      amount:
-                        type: string
                   json:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                          title: Denomination of the token (e.g., "ncheq")
+                        minAmount:
+                          type: string
+                          title: >-
+                            Minimum fee amount allowed (stored as string for
+                            large values)
+                        maxAmount:
+                          type: string
+                          title: >-
+                            Maximum fee amount allowed (stored as string for
+                            large values)
                     description: 'Default: 2.5 CHEQ or 2500000000ncheq'
                     title: >-
                       Fixed fee for creating a resource with media type
                       'application/json'
-                    type: object
-                    properties:
-                      denom:
-                        type: string
-                      amount:
-                        type: string
                   default:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                          title: Denomination of the token (e.g., "ncheq")
+                        minAmount:
+                          type: string
+                          title: >-
+                            Minimum fee amount allowed (stored as string for
+                            large values)
+                        maxAmount:
+                          type: string
+                          title: >-
+                            Maximum fee amount allowed (stored as string for
+                            large values)
                     description: 'Default: 5 CHEQ or 5000000000ncheq'
                     title: >-
                       Fixed fee for creating a resource with all other media
                       types
-                    type: object
-                    properties:
-                      denom:
-                        type: string
-                      amount:
-                        type: string
                   burnFactor:
                     type: string
                     description: 'Default: 0.5 (50%)'

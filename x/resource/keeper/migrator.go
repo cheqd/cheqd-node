@@ -3,6 +3,8 @@ package keeper
 import (
 	"github.com/cheqd/cheqd-node/x/resource/exported"
 	v4 "github.com/cheqd/cheqd-node/x/resource/migration/v4"
+	v5 "github.com/cheqd/cheqd-node/x/resource/migration/v5"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -23,4 +25,8 @@ func NewMigrator(k Keeper, ss exported.Subspace) Migrator {
 func (m Migrator) Migrate3to4(ctx sdk.Context) error {
 	return v4.MigrateStore(ctx, m.keeper.storeService, m.legacySubspace, m.keeper.cdc,
 		m.keeper.ResourceCount, m.keeper.ResourceMetadata, m.keeper.ResourceData)
+}
+
+func (m Migrator) Migrate4to5(ctx sdk.Context) error {
+	return v5.MigrateStore(ctx, m.keeper.storeService, m.keeper.cdc)
 }

@@ -7,11 +7,14 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
 	cheqdante "github.com/cheqd/cheqd-node/ante"
+	"github.com/cheqd/cheqd-node/util"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	feeabskeeper "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/keeper"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
@@ -23,10 +26,12 @@ type TaxDecorator struct {
 	didKeeper       cheqdante.DidKeeper
 	resourceKeeper  cheqdante.ResourceKeeper
 	feemarketKeeper FeeMarketKeeper
+	oracleKeeper    cheqdante.OracleKeeper
+	feeabsKeeper    feeabskeeper.Keeper
 }
 
 // NewTaxDecorator returns a new taxDecorator
-func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper, fmk FeeMarketKeeper) TaxDecorator {
+func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper, fmk FeeMarketKeeper, ok cheqdante.OracleKeeper, fak feeabskeeper.Keeper) TaxDecorator {
 	return TaxDecorator{
 		accountKeeper:   ak,
 		bankKeeper:      bk,
@@ -34,6 +39,8 @@ func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeepe
 		didKeeper:       dk,
 		resourceKeeper:  rk,
 		feemarketKeeper: fmk,
+		oracleKeeper:    ok,
+		feeabsKeeper:    fak,
 	}
 }
 
@@ -99,7 +106,6 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 			break
 		}
 	}
-
 	var feeCoins sdk.Coins
 
 	// if IBC Denom fetch the balance of did module.
@@ -110,7 +116,6 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 		feeBal := td.bankKeeper.GetBalance(ctx, addr, nativeDenom)
 		feeCoins = sdk.NewCoins(feeBal)
 	}
-
 	gas := ctx.GasMeter().GasConsumed() // use context gas consumed
 
 	if len(feeCoins) == 0 && !simulate {
@@ -245,8 +250,8 @@ func (td TaxDecorator) isTaxable(ctx sdk.Context, sdkTx sdk.Tx) (rewards sdk.Coi
 	taxable = cheqdante.IsTaxableTxLite(feeTx)
 	if taxable {
 		// run full validation
-		_, rewards, burn = cheqdante.IsTaxableTx(ctx, td.didKeeper, td.resourceKeeper, feeTx)
-		return rewards, burn, taxable, nil
+		_, rewards, burn, err = cheqdante.IsTaxableTx(ctx, td.didKeeper, td.resourceKeeper, feeTx, td.oracleKeeper, td.feeabsKeeper)
+		return rewards, burn, taxable, err
 	}
 
 	return rewards, burn, taxable, err
@@ -320,12 +325,44 @@ func (td TaxDecorator) deductTaxFromFeePayer(ctx sdk.Context, acc sdk.AccountI, 
 
 // distributeRewards distributes rewards to the fee collector
 func (td TaxDecorator) distributeRewards(ctx sdk.Context, rewards sdk.Coins) error {
-	// move rewards to fee collector
-	err := td.bankKeeper.SendCoinsFromModuleToModule(ctx, didtypes.ModuleName, types.FeeCollectorName, rewards)
-	if err != nil {
-		return err
+	if rewards.IsZero() {
+		return nil
+	}
+
+	oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.005 = 0.5%
+	oracleRewards, feeCollectorRewards := SplitRewardsByRatio(rewards, oracleShareRate)
+
+	if !oracleRewards.IsZero() {
+		if err := td.bankKeeper.SendCoinsFromModuleToModule(ctx, didtypes.ModuleName, oracletypes.ModuleName, oracleRewards); err != nil {
+			return err
+		}
+	}
+	if !feeCollectorRewards.IsZero() {
+		if err := td.bankKeeper.SendCoinsFromModuleToModule(ctx, didtypes.ModuleName, types.FeeCollectorName, feeCollectorRewards); err != nil {
+			return err
+		}
 	}
 	return nil
+}
+
+// SplitRewardsByRatio splits the input rewards by a share ratio.
+// It returns two sdk.Coins:  and remainingShare.
+func SplitRewardsByRatio(rewards sdk.Coins, ratio math.LegacyDec) (oracleRewards sdk.Coins, feeCollectorRewards sdk.Coins) {
+	oracleRewards = sdk.NewCoins()
+	feeCollectorRewards = sdk.NewCoins()
+
+	for _, coin := range rewards {
+		portion := ratio.MulInt(coin.Amount).TruncateInt()
+		rest := coin.Amount.Sub(portion)
+
+		if portion.IsPositive() {
+			oracleRewards = oracleRewards.Add(sdk.NewCoin(coin.Denom, portion))
+		}
+		if rest.IsPositive() {
+			feeCollectorRewards = feeCollectorRewards.Add(sdk.NewCoin(coin.Denom, rest))
+		}
+	}
+	return
 }
 
 // burnFees burns fees from the module account
@@ -345,52 +382,118 @@ func (td *TaxDecorator) handleTaxableTransaction(
 	rewards, burn sdk.Coins,
 	tx sdk.Tx,
 ) error {
+	var (
+		convertedRewards sdk.Coins
+		convertedBurn    sdk.Coins
+	)
+
 	params, err := td.feemarketKeeper.GetParams(ctx)
 	if err != nil {
 		return err
 	}
-
 	nativeDenom := params.FeeDenom
+	onlyNativeDenom := td.isOnlyNativeDenom(feeTx.GetFee(), nativeDenom)
 
-	// Check if fees contain only the native denom, if it is IBC denom fee abs logic applies.
-	// The fees will be deducted from the fee payer and the tokens already sent to did module account.
-	onlyNativeDenom := true
-	for _, fee := range feeTx.GetFee() {
-		if fee.Denom != nativeDenom {
-			// If any other token besides the native denom is present, set the flag to false
-			onlyNativeDenom = false
-			break
-		}
-	}
+	cheqPrice, _ := td.oracleKeeper.GetEMA(ctx, oracletypes.CheqdSymbol)
 
-	// if the fees are only in native denom then fee-abs logic won't be applied and deduct the fees from fee payer.
+	// Let ConvertToCheq handle missing/zero price gracefully
 	if onlyNativeDenom {
-		// Validate the tax
-		if err := td.validateTax(feeTx.GetFee(), simulate); err != nil {
+		if err := td.processNativeDenomTax(ctx, feeTx, simulate, rewards, burn, tx, &convertedRewards, &convertedBurn, cheqPrice); err != nil {
 			return err
+		}
+	} else {
+		var err error
+
+		convertedRewards, err = ConvertToCheq(rewards, cheqPrice)
+		if err != nil {
+			return fmt.Errorf("failed to convert rewards to ncheq: %w", err)
 		}
 
-		// Get fee payer and check if fee grant exists
-		tax := rewards.Add(burn...)
-		feePayer, err := td.getFeePayer(ctx, feeTx, tax, tx.GetMsgs())
+		convertedBurn, err = ConvertToCheq(burn, cheqPrice)
 		if err != nil {
-			return err
-		}
-		// Deduct tax from fee payer
-		if err := td.deductTaxFromFeePayer(ctx, feePayer, tax); err != nil {
-			return err
+			return fmt.Errorf("failed to convert burn to ncheq: %w", err)
 		}
 	}
 
-	// Distribute rewards to fee collector
-	if err := td.distributeRewards(ctx, rewards); err != nil {
+	// Common logic
+	if err := td.distributeRewards(ctx, convertedRewards); err != nil {
 		return err
 	}
-
-	// Burn the tax portion
-	if err := td.burnFees(ctx, burn); err != nil {
+	if err := td.burnFees(ctx, convertedBurn); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (td *TaxDecorator) isOnlyNativeDenom(fees sdk.Coins, nativeDenom string) bool {
+	for _, fee := range fees {
+		if fee.Denom != nativeDenom {
+			return false
+		}
+	}
+	return true
+}
+
+func (td *TaxDecorator) processNativeDenomTax(
+	ctx sdk.Context,
+	feeTx sdk.FeeTx,
+	simulate bool,
+	rewards, burn sdk.Coins,
+	tx sdk.Tx,
+	convertedRewards, convertedBurn *sdk.Coins,
+	cheqPrice math.LegacyDec,
+) error {
+	if err := td.validateTax(feeTx.GetFee(), simulate); err != nil {
+		return err
+	}
+	tax := rewards.Add(burn...)
+	feePayer, err := td.getFeePayer(ctx, feeTx, tax, tx.GetMsgs())
+	if err != nil {
+		return err
+	}
+	*convertedRewards, err = ConvertToCheq(rewards, cheqPrice)
+	if err != nil {
+		return err
+	}
+	*convertedBurn, err = ConvertToCheq(sdk.NewCoins(burn...), cheqPrice)
+	if err != nil {
+		return err
+	}
+	tax = convertedRewards.Add(*convertedBurn...)
+	return td.deductTaxFromFeePayer(ctx, feePayer, tax)
+}
+
+func ConvertToCheq(coins sdk.Coins, cheqPrice math.LegacyDec) (sdk.Coins, error) {
+	// If all coins are already in ncheq, return them directly
+	if coins.DenomsSubsetOf(sdk.NewCoins(sdk.NewCoin(oracletypes.CheqdDenom, math.ZeroInt()))) {
+		fmt.Println("returned from here--------------", coins)
+		return coins, nil
+	}
+
+	converted := sdk.NewCoins()
+
+	for _, coin := range coins {
+		switch coin.Denom {
+		case oracletypes.UsdDenom:
+			if cheqPrice.IsZero() {
+				return nil, fmt.Errorf("cannot convert USD to ncheq: CHEQ price unavailable")
+			}
+
+			// Convert: USD (18 decimals) → CHEQ → ncheq (9 decimals)
+			usdAmount := coin.Amount.ToLegacyDec().QuoInt64(util.UsdExponent)
+			ncheqAmount := usdAmount.Quo(cheqPrice).MulInt64(1e9).TruncateInt()
+
+			converted = converted.Add(sdk.NewCoin(oracletypes.CheqdDenom, ncheqAmount))
+
+		case oracletypes.CheqdDenom: // "ncheq"
+			// Already in target denom
+			converted = converted.Add(coin)
+
+		default:
+			return nil, fmt.Errorf("unexpected denom: %s", coin.Denom)
+		}
+	}
+
+	return converted, nil
 }

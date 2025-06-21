@@ -3,6 +3,7 @@ package types
 import (
 	context "context"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	connectiontypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
@@ -29,4 +30,9 @@ type PortKeeper interface {
 type ChannelKeeper interface {
 	GetChannel(ctx context.Context, srcPort, srcChan string) (channel channeltypes.Channel, found bool)
 	GetNextSequenceSend(ctx context.Context, portID, channelID string) (uint64, bool)
+}
+
+// OracleKeeper defines the expected oracle keeper interface
+type OracleKeeper interface {
+	GetWMA(ctx sdk.Context, symbol, strategy string) (sdkmath.LegacyDec, bool)
 }

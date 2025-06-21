@@ -7,11 +7,11 @@ import (
 var ParamStoreKey = []byte("feeparams")
 
 func ParamKeyTable() paramtypes.KeyTable {
-	return paramtypes.NewKeyTable().RegisterParamSet(&FeeParams{})
+	return paramtypes.NewKeyTable().RegisterParamSet(&LegacyFeeParams{})
 }
 
-func (tfp *FeeParams) ParamSetPairs() paramtypes.ParamSetPairs {
+func (tfp *LegacyFeeParams) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
-		paramtypes.NewParamSetPair(ParamStoreKey, &FeeParams{}, validateFeeParams),
+		paramtypes.NewParamSetPair(ParamStoreKey, tfp, validateFeeParams),
 	}
 }

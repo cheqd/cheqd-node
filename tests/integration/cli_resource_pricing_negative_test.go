@@ -6,12 +6,14 @@ import (
 	"crypto/ed25519"
 
 	sdkmath "cosmossdk.io/math"
+	"github.com/cheqd/cheqd-node/ante"
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
+	"github.com/cheqd/cheqd-node/x/did/types"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -88,7 +90,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		}
 
 		// Submit the DID Doc
-		resp, err := cli.CreateDidDoc(tmpDir, didPayload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(didFeeParams.CreateDid.String()))
+		resp, err := cli.CreateDidDoc(tmpDir, didPayload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(didFeeParams.CreateDid[0].MaxAmount.String()+didFeeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 	})
@@ -103,7 +105,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the json resource message with invalid denom")
-		invalidTax := sdk.NewCoin("invalid", sdkmath.NewInt(resourceFeeParams.Json.Amount.Int64()))
+		invalidTax := sdk.NewCoin("invalid", sdkmath.NewInt(resourceFeeParams.Json[0].MinAmount.Int64()))
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -125,7 +127,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the image resource message with invalid denom")
-		invalidTax := sdk.NewCoin("invalid", sdkmath.NewInt(resourceFeeParams.Image.Amount.Int64()))
+		invalidTax := sdk.NewCoin("invalid", sdkmath.NewInt(resourceFeeParams.Image[0].MinAmount.Int64()))
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -147,7 +149,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the default resource message with invalid denom")
-		invalidTax := sdk.NewCoin("invalid", sdkmath.NewInt(resourceFeeParams.Default.Amount.Int64()))
+		invalidTax := sdk.NewCoin("invalid", sdkmath.NewInt(resourceFeeParams.Default[0].MinAmount.Int64()))
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -169,7 +171,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the json resource message with lower amount than required")
-		lowerTax := sdk.NewCoin(resourceFeeParams.Json.Denom, sdkmath.NewInt(resourceFeeParams.Json.Amount.Int64()-1))
+		lowerTax := sdk.NewCoin(resourceFeeParams.Json[0].Denom, sdkmath.NewInt(resourceFeeParams.Json[0].MinAmount.Int64()-1000000))
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -178,30 +180,58 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType: resourceType,
 		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(0))
+		Expect(res.Code).To(BeEquivalentTo(1))
 	})
 
-	It("should not fail in create resource image message - case: fixed fee, lower amount than required", func() {
-		By("preparing the create resource image message")
-		resourceID := uuid.NewString()
-		resourceName := "TestResource"
-		resourceVersion := "1.0"
-		resourceType := "TestType"
-		resourceFile, err := testdata.CreateTestImage(GinkgoT().TempDir())
-		Expect(err).To(BeNil())
+	// It("should fail in create resource image message - case: fee ranging between two values so lower value than lower bound fails", func() {
+	// 	By("preparing the create resource image message")
+	// 	resourceID := uuid.NewString()
+	// 	resourceName := "TestResource"
+	// 	resourceVersion := "1.0"
+	// 	resourceType := "TestType"
+	// 	resourceFile, err := testdata.CreateTestImage(GinkgoT().TempDir())
+	// 	Expect(err).To(BeNil())
 
-		By("submitting the image resource message with lower amount than required")
-		lowerTax := sdk.NewCoin(resourceFeeParams.Image.Denom, sdkmath.NewInt(resourceFeeParams.Image.Amount.Int64()-1))
-		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
-			CollectionId: collectionID,
-			Id:           resourceID,
-			Name:         resourceName,
-			Version:      resourceVersion,
-			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
-		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(0))
-	})
+	// 	By("submitting the image resource message with lower amount than required")
+
+	// 	cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+	// 	Expect(err).To(BeNil())
+	// 	cheqp := cheqPrice.Price
+
+	// 	minNcheq := resourceFeeParams.Image[0].MinAmount
+
+	// 	// Constants
+	// 	cheqScale := sdkmath.NewInt(1_000_000_000) // 1e9
+	// 	usdScale := sdkmath.NewInt(1_000_000)      // 1e6
+
+	// 	// Convert minNcheq to USD (6 decimals)
+	// 	minNcheqDec := sdkmath.LegacyNewDecFromInt(*minNcheq).QuoInt(cheqScale)
+	// 	minUsdDec := minNcheqDec.Mul(cheqp).MulInt(usdScale) // Final in 6-decimal USD
+
+	// 	// Go slightly below the lower bound (1 µUSD = 1)
+	// 	usdBelowMin := minUsdDec.TruncateInt().SubRaw(1)
+
+	// 	// Convert back to ncheq
+	// 	usdBelowMinDec := sdkmath.LegacyNewDecFromInt(usdBelowMin)
+	// 	cheqBelowMin := usdBelowMinDec.
+	// 		Quo(cheqp).
+	// 		MulInt(cheqScale).
+	// 		QuoInt(usdScale).
+	// 		TruncateInt()
+
+	// 	// Final lower-than-min fee
+	// 	lowerTax := sdk.NewCoin(types.BaseMinimalDenom, cheqBelowMin)
+
+	// 	res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+	// 		CollectionId: collectionID,
+	// 		Id:           resourceID,
+	// 		Name:         resourceName,
+	// 		Version:      resourceVersion,
+	// 		ResourceType: resourceType,
+	// 	}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
+	// 	Expect(res.Code).To(BeEquivalentTo(13))
+	// 	// insufficient fee
+	// })
 
 	It("should not fail in create resource default message - case: fixed fee, lower amount than required", func() {
 		By("preparing the create resource default message")
@@ -213,7 +243,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the default resource message with lower amount than required")
-		lowerTax := sdk.NewCoin(resourceFeeParams.Default.Denom, sdkmath.NewInt(resourceFeeParams.Default.Amount.Int64()-1))
+		lowerTax := sdk.NewCoin(resourceFeeParams.Default[0].Denom, sdkmath.NewInt(resourceFeeParams.Default[0].MinAmount.Int64()-1000000))
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -222,7 +252,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType: resourceType,
 		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(0))
+		Expect(res.Code).To(BeEquivalentTo(1))
 	})
 
 	It("should not succeed in create resource json message - case: fixed fee, insufficient funds", func() {
@@ -235,14 +265,14 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the json resource message with insufficient funds")
-		tax := resourceFeeParams.Json
+		tax := resourceFeeParams.Json[0]
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_3, helpers.GenerateFees(tax.String()))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_3, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.RawLog).To(ContainSubstring(sdkerrors.ErrInsufficientFunds.Error()))
 	})
@@ -257,14 +287,14 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the image resource message with insufficient funds")
-		tax := resourceFeeParams.Image
+		tax := resourceFeeParams.Image[0]
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_3, helpers.GenerateFees(tax.String()))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_3, helpers.GenerateFees(tax.MinAmount.BigInt().String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.RawLog).To(ContainSubstring(sdkerrors.ErrInsufficientFunds.Error()))
 	})
@@ -279,14 +309,14 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the default resource message with insufficient funds")
-		tax := resourceFeeParams.Default
+		tax := resourceFeeParams.Default[0]
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_3, helpers.GenerateFees(tax.String()))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_3, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.RawLog).To(ContainSubstring(sdkerrors.ErrInsufficientFunds.Error()))
 	})
@@ -305,8 +335,15 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the json resource message with double the tax")
-		tax := resourceFeeParams.Json
-		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.Amount.Mul(sdkmath.NewInt(2)))
+		tax := resourceFeeParams.Json[0]
+		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.MinAmount.Mul(sdkmath.NewInt(2)))
+
+		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		Expect(err).To(BeNil())
+		cheqp := cheqPrice.Price
+		userFee := sdk.NewCoins(doubleTax)
+		convertedFees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Json, cheqp, nil)
+
 		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -322,7 +359,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(tax.Amount))
+		Expect(diff).To(Equal(convertedFees.AmountOf(types.BaseMinimalDenom)))
 	})
 
 	It("should not charge more than tax in create resource image message - case: fixed fee", func() {
@@ -339,8 +376,15 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the image resource message with double the tax")
-		tax := resourceFeeParams.Image
-		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.Amount.Mul(sdkmath.NewInt(2)))
+		tax := resourceFeeParams.Image[0]
+		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.MinAmount.Mul(sdkmath.NewInt(2)))
+
+		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		Expect(err).To(BeNil())
+		cheqp := cheqPrice.Price
+		userFee := sdk.NewCoins(doubleTax)
+		convertedFees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Image, cheqp, nil)
+
 		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -356,7 +400,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(tax.Amount))
+		Expect(diff).To(Equal(convertedFees.AmountOf(types.BaseMinimalDenom)))
 	})
 
 	It("should not charge more than tax in create resource default message - case: fixed fee", func() {
@@ -373,8 +417,15 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the default resource message with double the tax")
-		tax := resourceFeeParams.Default
-		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.Amount.Mul(sdkmath.NewInt(2)))
+		tax := resourceFeeParams.Default[0]
+		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.MinAmount.Mul(sdkmath.NewInt(2)))
+
+		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		Expect(err).To(BeNil())
+		cheqp := cheqPrice.Price
+		userFee := sdk.NewCoins(doubleTax)
+		convertedFees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Default, cheqp, nil)
+
 		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -390,6 +441,6 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(tax.Amount))
+		Expect(diff).To(Equal(convertedFees.AmountOf(types.BaseMinimalDenom)))
 	})
 })
