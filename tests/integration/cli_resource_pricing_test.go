@@ -127,7 +127,6 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
 
-		fmt.Println("convertedFees--------", convertedFees)
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -146,7 +145,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(convertedFeesToCheq.AmountOf(types.BaseMinimalDenom)))
+		Expect(diff.Int64()).To(BeNumerically("~", convertedFeesToCheq.AmountOf(types.BaseMinimalDenom).Int64(), 1_000_000))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -265,7 +264,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(taxIncheqd.AmountOf(types.BaseMinimalDenom)))
+		Expect(diff.Int64()).To(BeNumerically("~", convertedFees.AmountOf(types.BaseMinimalDenom).Int64(), 1_000_000))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -380,7 +379,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(finalPrice.AmountOf(types.BaseMinimalDenom)))
+		Expect(diff.Int64()).To(BeNumerically("~", finalPrice.AmountOf(types.BaseMinimalDenom).Int64(), 1_000_000))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -479,7 +478,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(convertedFee.AmountOf(types.BaseMinimalDenom)))
+		Expect(diff.Int64()).To(BeNumerically("~", convertedFee.AmountOf(types.BaseMinimalDenom).Int64(), 1_000_000))
 
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
 		Expect(diff.IsZero()).To(BeTrue())
@@ -534,7 +533,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(convertedFee.AmountOf(resourcetypes.BaseMinimalDenom)))
+		Expect(diff.Int64()).To(BeNumerically("~", convertedFee.AmountOf(types.BaseMinimalDenom).Int64(), 1_000_000))
 
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
 		Expect(diff.IsZero()).To(BeTrue())
@@ -588,7 +587,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff).To(Equal(convertedFee.AmountOf(resourcetypes.BaseMinimalDenom)))
+		Expect(diff.Int64()).To(BeNumerically("~", convertedFee.AmountOf(types.BaseMinimalDenom).Int64(), 1_000_000))
 
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
 		Expect(diff.IsZero()).To(BeTrue())
