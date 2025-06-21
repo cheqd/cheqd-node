@@ -142,7 +142,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		Expect(res.Code).To(BeEquivalentTo(1))
 	})
 
-	It("should not fail in update diddoc message - case: fixed fee, lower amount than required", func() {
+	It("should fail in update diddoc message - case: fixed fee, lower amount than required", func() {
 		By("submitting the create diddoc message")
 		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
 		Expect(err).To(BeNil())
