@@ -138,10 +138,10 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 
 	It("should not fail in create diddoc message - case: fixed fee, lower amount than required", func() {
 		By("submitting create diddoc message with lower amount than required")
-		lowerTax := sdk.NewCoin(feeParams.CreateDid[0].Denom, sdkmath.NewInt(feeParams.CreateDid[0].MaxAmount.Int64()-1))
+		lowerTax := sdk.NewCoin(feeParams.CreateDid[0].Denom, sdkmath.NewInt(feeParams.CreateDid[0].MaxAmount.Int64()-1000000))
 		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(0))
+		Expect(res.Code).To(BeEquivalentTo(1))
 	})
 
 	It("should not fail in update diddoc message - case: fixed fee, lower amount than required", func() {
@@ -187,7 +187,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		lowerTax := sdk.NewCoin(feeParams.DeactivateDid[0].Denom, sdkmath.NewInt(feeParams.DeactivateDid[0].MinAmount.Int64()-1000000))
 		res, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_5, helpers.GenerateFees(lowerTax.String()))
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(0))
+		Expect(res.Code).To(BeEquivalentTo(1))
 	})
 
 	It("should not charge more than tax for update diddoc message - case: fixed fee", func() {
