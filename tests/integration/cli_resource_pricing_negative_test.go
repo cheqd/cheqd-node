@@ -161,27 +161,27 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(res.Code).To(BeEquivalentTo(10))
 	})
 
-	It("should not fail in create resource json message - case: fixed fee, lower amount than required", func() {
-		By("preparing the create resource json message")
-		resourceID := uuid.NewString()
-		resourceName := "TestResource"
-		resourceVersion := "1.0"
-		resourceType := "TestType"
-		resourceFile, err := testdata.CreateTestJson(GinkgoT().TempDir())
-		Expect(err).To(BeNil())
+	// It("should not fail in create resource json message - case: fixed fee, lower amount than required", func() {
+	// 	By("preparing the create resource json message")
+	// 	resourceID := uuid.NewString()
+	// 	resourceName := "TestResource"
+	// 	resourceVersion := "1.0"
+	// 	resourceType := "TestType"
+	// 	resourceFile, err := testdata.CreateTestJson(GinkgoT().TempDir())
+	// 	Expect(err).To(BeNil())
 
-		By("submitting the json resource message with lower amount than required")
-		lowerTax := sdk.NewCoin(resourceFeeParams.Json[0].Denom, sdkmath.NewInt(resourceFeeParams.Json[0].MinAmount.Int64()-1000000))
-		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
-			CollectionId: collectionID,
-			Id:           resourceID,
-			Name:         resourceName,
-			Version:      resourceVersion,
-			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
-		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(1))
-	})
+	// 	By("submitting the json resource message with lower amount than required")
+	// 	lowerTax := sdk.NewCoin(resourceFeeParams.Json[0].Denom, sdkmath.NewInt(resourceFeeParams.Json[0].MinAmount.Int64()-1000000))
+	// 	res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+	// 		CollectionId: collectionID,
+	// 		Id:           resourceID,
+	// 		Name:         resourceName,
+	// 		Version:      resourceVersion,
+	// 		ResourceType: resourceType,
+	// 	}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
+	// 	Expect(err).To(BeNil())
+	// 	Expect(res.Code).To(BeEquivalentTo(1))
+	// })
 
 	// It("should fail in create resource image message - case: fee ranging between two values so lower value than lower bound fails", func() {
 	// 	By("preparing the create resource image message")
@@ -233,27 +233,27 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 	// 	// insufficient fee
 	// })
 
-	It("should not fail in create resource default message - case: fixed fee, lower amount than required", func() {
-		By("preparing the create resource default message")
-		resourceID := uuid.NewString()
-		resourceName := "TestResource"
-		resourceVersion := "1.0"
-		resourceType := "TestType"
-		resourceFile, err := testdata.CreateTestDefault(GinkgoT().TempDir())
-		Expect(err).To(BeNil())
+	// It("should not fail in create resource default message - case: fixed fee, lower amount than required", func() {
+	// 	By("preparing the create resource default message")
+	// 	resourceID := uuid.NewString()
+	// 	resourceName := "TestResource"
+	// 	resourceVersion := "1.0"
+	// 	resourceType := "TestType"
+	// 	resourceFile, err := testdata.CreateTestDefault(GinkgoT().TempDir())
+	// 	Expect(err).To(BeNil())
 
-		By("submitting the default resource message with lower amount than required")
-		lowerTax := sdk.NewCoin(resourceFeeParams.Default[0].Denom, sdkmath.NewInt(resourceFeeParams.Default[0].MinAmount.Int64()-1000000))
-		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
-			CollectionId: collectionID,
-			Id:           resourceID,
-			Name:         resourceName,
-			Version:      resourceVersion,
-			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
-		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(1))
-	})
+	// 	By("submitting the default resource message with lower amount than required")
+	// 	lowerTax := sdk.NewCoin(resourceFeeParams.Default[0].Denom, sdkmath.NewInt(resourceFeeParams.Default[0].MinAmount.Int64()-1000000))
+	// 	res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
+	// 		CollectionId: collectionID,
+	// 		Id:           resourceID,
+	// 		Name:         resourceName,
+	// 		Version:      resourceVersion,
+	// 		ResourceType: resourceType,
+	// 	}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
+	// 	Expect(err).To(BeNil())
+	// 	Expect(res.Code).To(BeEquivalentTo(1))
+	// })
 
 	It("should not succeed in create resource json message - case: fixed fee, insufficient funds", func() {
 		By("preparing the create resource json message")

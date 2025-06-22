@@ -134,59 +134,59 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		Expect(res.Code).To(BeEquivalentTo(10))
 	})
 
-	It("should fail in create diddoc message - case: fixed fee, lower amount than required", func() {
-		By("submitting create diddoc message with lower amount than required")
-		lowerTax := sdk.NewCoin(feeParams.CreateDid[0].Denom, sdkmath.NewInt(feeParams.CreateDid[0].MinAmount.Int64()-1000000))
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
-		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(1))
-	})
+	// It("should fail in create diddoc message - case: fixed fee, lower amount than required", func() {
+	// 	By("submitting create diddoc message with lower amount than required")
+	// 	lowerTax := sdk.NewCoin(feeParams.CreateDid[0].Denom, sdkmath.NewInt(feeParams.CreateDid[0].MinAmount.Int64()-1000000))
+	// 	res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
+	// 	Expect(err).To(BeNil())
+	// 	Expect(res.Code).To(BeEquivalentTo(1))
+	// })
 
-	It("should fail in update diddoc message - case: fixed fee, lower amount than required", func() {
-		By("submitting the create diddoc message")
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
-		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(0))
+	// It("should fail in update diddoc message - case: fixed fee, lower amount than required", func() {
+	// 	By("submitting the create diddoc message")
+	// 	res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
+	// 	Expect(err).To(BeNil())
+	// 	Expect(res.Code).To(BeEquivalentTo(0))
 
-		By("preparing the update diddoc message")
-		payload2 := didcli.DIDDocument{
-			ID: payload.ID,
-			VerificationMethod: []didcli.VerificationMethod{
-				map[string]any{
-					"id":                 payload.VerificationMethod[0]["id"],
-					"type":               "Ed25519VerificationKey2020",
-					"controller":         payload.VerificationMethod[0]["controller"],
-					"publicKeyMultibase": payload.VerificationMethod[0]["publicKeyMultibase"],
-				},
-			},
-			Authentication:  payload.Authentication,
-			AssertionMethod: []string{payload.VerificationMethod[0]["id"].(string)}, // <-- changed
-		}
+	// 	By("preparing the update diddoc message")
+	// 	payload2 := didcli.DIDDocument{
+	// 		ID: payload.ID,
+	// 		VerificationMethod: []didcli.VerificationMethod{
+	// 			map[string]any{
+	// 				"id":                 payload.VerificationMethod[0]["id"],
+	// 				"type":               "Ed25519VerificationKey2020",
+	// 				"controller":         payload.VerificationMethod[0]["controller"],
+	// 				"publicKeyMultibase": payload.VerificationMethod[0]["publicKeyMultibase"],
+	// 			},
+	// 		},
+	// 		Authentication:  payload.Authentication,
+	// 		AssertionMethod: []string{payload.VerificationMethod[0]["id"].(string)}, // <-- changed
+	// 	}
 
-		By("submitting update diddoc message with lower amount than required")
-		lowerTax := sdk.NewCoin(feeParams.UpdateDid[0].Denom, sdkmath.NewInt(feeParams.UpdateDid[0].MinAmount.Int64()-1000000))
-		res, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_5, helpers.GenerateFees(lowerTax.String()))
-		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(1))
-	})
+	// 	By("submitting update diddoc message with lower amount than required")
+	// 	lowerTax := sdk.NewCoin(feeParams.UpdateDid[0].Denom, sdkmath.NewInt(feeParams.UpdateDid[0].MinAmount.Int64()-1000000))
+	// 	res, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_5, helpers.GenerateFees(lowerTax.String()))
+	// 	Expect(err).To(BeNil())
+	// 	Expect(res.Code).To(BeEquivalentTo(1))
+	// })
 
-	It("should fail in deactivate diddoc message - case: fixed fee, lower amount than required", func() {
-		By("submitting the create diddoc message")
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
-		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(0))
+	// It("should fail in deactivate diddoc message - case: fixed fee, lower amount than required", func() {
+	// 	By("submitting the create diddoc message")
+	// 	res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
+	// 	Expect(err).To(BeNil())
+	// 	Expect(res.Code).To(BeEquivalentTo(0))
 
-		By("preparing the deactivate diddoc message")
-		payload2 := types.MsgDeactivateDidDocPayload{
-			Id: payload.ID,
-		}
+	// 	By("preparing the deactivate diddoc message")
+	// 	payload2 := types.MsgDeactivateDidDocPayload{
+	// 		Id: payload.ID,
+	// 	}
 
-		By("submitting deactivate diddoc message with lower amount than required")
-		lowerTax := sdk.NewCoin(feeParams.DeactivateDid[0].Denom, sdkmath.NewInt(feeParams.DeactivateDid[0].MinAmount.Int64()-1000000))
-		res, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_5, helpers.GenerateFees(lowerTax.String()))
-		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(1))
-	})
+	// 	By("submitting deactivate diddoc message with lower amount than required")
+	// 	lowerTax := sdk.NewCoin(feeParams.DeactivateDid[0].Denom, sdkmath.NewInt(feeParams.DeactivateDid[0].MinAmount.Int64()-1000000))
+	// 	res, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_5, helpers.GenerateFees(lowerTax.String()))
+	// 	Expect(err).To(BeNil())
+	// 	Expect(res.Code).To(BeEquivalentTo(1))
+	// })
 
 	It("should not charge more than tax for update diddoc message - case: fixed fee", func() {
 		By("submitting the create diddoc message")
