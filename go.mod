@@ -22,6 +22,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
+	github.com/joho/godotenv v1.5.1
 	github.com/lestrrat-go/jwx v1.2.31
 	github.com/mr-tron/base58 v1.2.0
 	github.com/multiformats/go-multibase v0.2.0
@@ -46,7 +47,6 @@ require (
 	github.com/creachadair/atomicfile v0.3.3 // indirect
 	github.com/creachadair/tomledit v0.0.26 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.uber.org/automaxprocs v1.6.0 // indirect
 )
