@@ -32,6 +32,9 @@ type Keeper struct {
 	// ResourceData stores resource data by collection ID and resource ID
 	ResourceData collections.Map[collections.Pair[string, string], []byte]
 
+	// ResourceID of the latest resource version
+	LatestResourceVersion collections.Map[collections.Triple[string, string, string], string]
+
 	// the address capable of executing a MsgUpdateParams message. Typically, this
 	// should be the x/resource module account.
 	authority string
@@ -78,6 +81,14 @@ func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSp
 			"resource_data",
 			collections.PairKeyCodec(collections.StringKey, collections.StringKey),
 			collections.BytesValue,
+		),
+
+		LatestResourceVersion: collections.NewMap(
+			sb,
+			collections.NewPrefix(types.ResourceLatestVersionKey),
+			"resource_latest_version",
+			collections.TripleKeyCodec(collections.StringKey, collections.StringKey, collections.StringKey),
+			collections.StringValue,
 		),
 		ParamsStore: collections.NewItem(
 			sb,

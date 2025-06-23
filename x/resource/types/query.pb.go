@@ -247,6 +247,254 @@ func (m *QueryResourceMetadataResponse) GetResource() *Metadata {
 	return nil
 }
 
+// QueryLatestResourceVersionRequest is the request type for the Query/Resource RPC method
+type QueryLatestResourceVersionRequest struct {
+	// collection_id is an identifier of the DidDocument the resource belongs to.
+	// Format: <unique-identifier>
+	//
+	// Examples:
+	// - c82f2b02-bdab-4dd7-b833-3e143745d612
+	// - wGHEXrZvJxR8vw5P3UWH1j
+	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
+	// name is a human-readable name for the Resource. Defined client-side.
+	// Does not change between different versions.
+	// Example: PassportSchema, EducationTrustRegistry
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"resourceName"`
+	// resource_type is a Resource type that identifies what the Resource is. Defined client-side.
+	// This is NOT the same as the resource's media type.
+	// Example: AnonCredsSchema, StatusList2021
+	ResourceType string `protobuf:"bytes,3,opt,name=resource_type,json=resourceType,proto3" json:"resourceType"`
+}
+
+func (m *QueryLatestResourceVersionRequest) Reset()         { *m = QueryLatestResourceVersionRequest{} }
+func (m *QueryLatestResourceVersionRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryLatestResourceVersionRequest) ProtoMessage()    {}
+func (*QueryLatestResourceVersionRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_14284472e64722d9, []int{4}
+}
+func (m *QueryLatestResourceVersionRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryLatestResourceVersionRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryLatestResourceVersionRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryLatestResourceVersionRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryLatestResourceVersionRequest.Merge(m, src)
+}
+func (m *QueryLatestResourceVersionRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryLatestResourceVersionRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryLatestResourceVersionRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryLatestResourceVersionRequest proto.InternalMessageInfo
+
+func (m *QueryLatestResourceVersionRequest) GetCollectionId() string {
+	if m != nil {
+		return m.CollectionId
+	}
+	return ""
+}
+
+func (m *QueryLatestResourceVersionRequest) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *QueryLatestResourceVersionRequest) GetResourceType() string {
+	if m != nil {
+		return m.ResourceType
+	}
+	return ""
+}
+
+// QueryLatestResourceVersionResponse is the response type for the Query/Resource RPC method
+type QueryLatestResourceVersionResponse struct {
+	// Successful resolution of the resource returns the following:
+	// - resource is the requested resource
+	// - metadata is the resource metadata associated with the requested resource
+	Resource *ResourceWithMetadata `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
+}
+
+func (m *QueryLatestResourceVersionResponse) Reset()         { *m = QueryLatestResourceVersionResponse{} }
+func (m *QueryLatestResourceVersionResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryLatestResourceVersionResponse) ProtoMessage()    {}
+func (*QueryLatestResourceVersionResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_14284472e64722d9, []int{5}
+}
+func (m *QueryLatestResourceVersionResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryLatestResourceVersionResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryLatestResourceVersionResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryLatestResourceVersionResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryLatestResourceVersionResponse.Merge(m, src)
+}
+func (m *QueryLatestResourceVersionResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryLatestResourceVersionResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryLatestResourceVersionResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryLatestResourceVersionResponse proto.InternalMessageInfo
+
+func (m *QueryLatestResourceVersionResponse) GetResource() *ResourceWithMetadata {
+	if m != nil {
+		return m.Resource
+	}
+	return nil
+}
+
+// QueryLatestResourceVersionMetadataRequest is the request type for the Query/ResourceMetadata RPC method
+type QueryLatestResourceVersionMetadataRequest struct {
+	// collection_id is an identifier of the DidDocument the resource belongs to.
+	// Format: <unique-identifier>
+	//
+	// Examples:
+	// - c82f2b02-bdab-4dd7-b833-3e143745d612
+	// - wGHEXrZvJxR8vw5P3UWH1j
+	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
+	// name is a human-readable name for the Resource. Defined client-side.
+	// Does not change between different versions.
+	// Example: PassportSchema, EducationTrustRegistry
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"resourceName"`
+	// resource_type is a Resource type that identifies what the Resource is. Defined client-side.
+	// This is NOT the same as the resource's media type.
+	// Example: AnonCredsSchema, StatusList2021
+	ResourceType string `protobuf:"bytes,3,opt,name=resource_type,json=resourceType,proto3" json:"resourceType"`
+}
+
+func (m *QueryLatestResourceVersionMetadataRequest) Reset() {
+	*m = QueryLatestResourceVersionMetadataRequest{}
+}
+func (m *QueryLatestResourceVersionMetadataRequest) String() string {
+	return proto.CompactTextString(m)
+}
+func (*QueryLatestResourceVersionMetadataRequest) ProtoMessage() {}
+func (*QueryLatestResourceVersionMetadataRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_14284472e64722d9, []int{6}
+}
+func (m *QueryLatestResourceVersionMetadataRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryLatestResourceVersionMetadataRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryLatestResourceVersionMetadataRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryLatestResourceVersionMetadataRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryLatestResourceVersionMetadataRequest.Merge(m, src)
+}
+func (m *QueryLatestResourceVersionMetadataRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryLatestResourceVersionMetadataRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryLatestResourceVersionMetadataRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryLatestResourceVersionMetadataRequest proto.InternalMessageInfo
+
+func (m *QueryLatestResourceVersionMetadataRequest) GetCollectionId() string {
+	if m != nil {
+		return m.CollectionId
+	}
+	return ""
+}
+
+func (m *QueryLatestResourceVersionMetadataRequest) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *QueryLatestResourceVersionMetadataRequest) GetResourceType() string {
+	if m != nil {
+		return m.ResourceType
+	}
+	return ""
+}
+
+// QueryLatestResourceVersionMetadataResponse is the response type for the Query/ResourceMetadata RPC method
+type QueryLatestResourceVersionMetadataResponse struct {
+	// resource is the requested resource metadata
+	Resource *Metadata `protobuf:"bytes,1,opt,name=resource,proto3" json:"linkedResourceMetadata"`
+}
+
+func (m *QueryLatestResourceVersionMetadataResponse) Reset() {
+	*m = QueryLatestResourceVersionMetadataResponse{}
+}
+func (m *QueryLatestResourceVersionMetadataResponse) String() string {
+	return proto.CompactTextString(m)
+}
+func (*QueryLatestResourceVersionMetadataResponse) ProtoMessage() {}
+func (*QueryLatestResourceVersionMetadataResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_14284472e64722d9, []int{7}
+}
+func (m *QueryLatestResourceVersionMetadataResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryLatestResourceVersionMetadataResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryLatestResourceVersionMetadataResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryLatestResourceVersionMetadataResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryLatestResourceVersionMetadataResponse.Merge(m, src)
+}
+func (m *QueryLatestResourceVersionMetadataResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryLatestResourceVersionMetadataResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryLatestResourceVersionMetadataResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryLatestResourceVersionMetadataResponse proto.InternalMessageInfo
+
+func (m *QueryLatestResourceVersionMetadataResponse) GetResource() *Metadata {
+	if m != nil {
+		return m.Resource
+	}
+	return nil
+}
+
 // QueryCollectionResourcesRequest is the request type for the Query/CollectionResources RPC method
 type QueryCollectionResourcesRequest struct {
 	// collection_id is an identifier of the DidDocument the resource belongs to.
@@ -264,7 +512,7 @@ func (m *QueryCollectionResourcesRequest) Reset()         { *m = QueryCollection
 func (m *QueryCollectionResourcesRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryCollectionResourcesRequest) ProtoMessage()    {}
 func (*QueryCollectionResourcesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_14284472e64722d9, []int{4}
+	return fileDescriptor_14284472e64722d9, []int{8}
 }
 func (m *QueryCollectionResourcesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -319,7 +567,7 @@ func (m *QueryCollectionResourcesResponse) Reset()         { *m = QueryCollectio
 func (m *QueryCollectionResourcesResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryCollectionResourcesResponse) ProtoMessage()    {}
 func (*QueryCollectionResourcesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_14284472e64722d9, []int{5}
+	return fileDescriptor_14284472e64722d9, []int{9}
 }
 func (m *QueryCollectionResourcesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -370,7 +618,7 @@ func (m *QueryParamsRequest) Reset()         { *m = QueryParamsRequest{} }
 func (m *QueryParamsRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryParamsRequest) ProtoMessage()    {}
 func (*QueryParamsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_14284472e64722d9, []int{6}
+	return fileDescriptor_14284472e64722d9, []int{10}
 }
 func (m *QueryParamsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -409,7 +657,7 @@ func (m *QueryParamsResponse) Reset()         { *m = QueryParamsResponse{} }
 func (m *QueryParamsResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryParamsResponse) ProtoMessage()    {}
 func (*QueryParamsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_14284472e64722d9, []int{7}
+	return fileDescriptor_14284472e64722d9, []int{11}
 }
 func (m *QueryParamsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -450,6 +698,10 @@ func init() {
 	proto.RegisterType((*QueryResourceResponse)(nil), "cheqd.resource.v2.QueryResourceResponse")
 	proto.RegisterType((*QueryResourceMetadataRequest)(nil), "cheqd.resource.v2.QueryResourceMetadataRequest")
 	proto.RegisterType((*QueryResourceMetadataResponse)(nil), "cheqd.resource.v2.QueryResourceMetadataResponse")
+	proto.RegisterType((*QueryLatestResourceVersionRequest)(nil), "cheqd.resource.v2.QueryLatestResourceVersionRequest")
+	proto.RegisterType((*QueryLatestResourceVersionResponse)(nil), "cheqd.resource.v2.QueryLatestResourceVersionResponse")
+	proto.RegisterType((*QueryLatestResourceVersionMetadataRequest)(nil), "cheqd.resource.v2.QueryLatestResourceVersionMetadataRequest")
+	proto.RegisterType((*QueryLatestResourceVersionMetadataResponse)(nil), "cheqd.resource.v2.QueryLatestResourceVersionMetadataResponse")
 	proto.RegisterType((*QueryCollectionResourcesRequest)(nil), "cheqd.resource.v2.QueryCollectionResourcesRequest")
 	proto.RegisterType((*QueryCollectionResourcesResponse)(nil), "cheqd.resource.v2.QueryCollectionResourcesResponse")
 	proto.RegisterType((*QueryParamsRequest)(nil), "cheqd.resource.v2.QueryParamsRequest")
@@ -519,6 +771,10 @@ type QueryClient interface {
 	Resource(ctx context.Context, in *QueryResourceRequest, opts ...grpc.CallOption) (*QueryResourceResponse, error)
 	// Fetch only metadata for a specific resource
 	ResourceMetadata(ctx context.Context, in *QueryResourceMetadataRequest, opts ...grpc.CallOption) (*QueryResourceMetadataResponse, error)
+	// Fetch latest version for a specific resource (without metadata)
+	LatestResourceVersion(ctx context.Context, in *QueryLatestResourceVersionRequest, opts ...grpc.CallOption) (*QueryLatestResourceVersionResponse, error)
+	// Fetch metadata of the latest version for a specific resource
+	LatestResourceVersionMetadata(ctx context.Context, in *QueryLatestResourceVersionMetadataRequest, opts ...grpc.CallOption) (*QueryLatestResourceVersionMetadataResponse, error)
 	// Fetch metadata for all resources in a collection
 	CollectionResources(ctx context.Context, in *QueryCollectionResourcesRequest, opts ...grpc.CallOption) (*QueryCollectionResourcesResponse, error)
 	// Params queries params of the resource module.
@@ -551,6 +807,24 @@ func (c *queryClient) ResourceMetadata(ctx context.Context, in *QueryResourceMet
 	return out, nil
 }
 
+func (c *queryClient) LatestResourceVersion(ctx context.Context, in *QueryLatestResourceVersionRequest, opts ...grpc.CallOption) (*QueryLatestResourceVersionResponse, error) {
+	out := new(QueryLatestResourceVersionResponse)
+	err := c.cc.Invoke(ctx, "/cheqd.resource.v2.Query/LatestResourceVersion", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) LatestResourceVersionMetadata(ctx context.Context, in *QueryLatestResourceVersionMetadataRequest, opts ...grpc.CallOption) (*QueryLatestResourceVersionMetadataResponse, error) {
+	out := new(QueryLatestResourceVersionMetadataResponse)
+	err := c.cc.Invoke(ctx, "/cheqd.resource.v2.Query/LatestResourceVersionMetadata", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *queryClient) CollectionResources(ctx context.Context, in *QueryCollectionResourcesRequest, opts ...grpc.CallOption) (*QueryCollectionResourcesResponse, error) {
 	out := new(QueryCollectionResourcesResponse)
 	err := c.cc.Invoke(ctx, "/cheqd.resource.v2.Query/CollectionResources", in, out, opts...)
@@ -575,6 +849,10 @@ type QueryServer interface {
 	Resource(context.Context, *QueryResourceRequest) (*QueryResourceResponse, error)
 	// Fetch only metadata for a specific resource
 	ResourceMetadata(context.Context, *QueryResourceMetadataRequest) (*QueryResourceMetadataResponse, error)
+	// Fetch latest version for a specific resource (without metadata)
+	LatestResourceVersion(context.Context, *QueryLatestResourceVersionRequest) (*QueryLatestResourceVersionResponse, error)
+	// Fetch metadata of the latest version for a specific resource
+	LatestResourceVersionMetadata(context.Context, *QueryLatestResourceVersionMetadataRequest) (*QueryLatestResourceVersionMetadataResponse, error)
 	// Fetch metadata for all resources in a collection
 	CollectionResources(context.Context, *QueryCollectionResourcesRequest) (*QueryCollectionResourcesResponse, error)
 	// Params queries params of the resource module.
@@ -590,6 +868,12 @@ func (*UnimplementedQueryServer) Resource(ctx context.Context, req *QueryResourc
 }
 func (*UnimplementedQueryServer) ResourceMetadata(ctx context.Context, req *QueryResourceMetadataRequest) (*QueryResourceMetadataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResourceMetadata not implemented")
+}
+func (*UnimplementedQueryServer) LatestResourceVersion(ctx context.Context, req *QueryLatestResourceVersionRequest) (*QueryLatestResourceVersionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LatestResourceVersion not implemented")
+}
+func (*UnimplementedQueryServer) LatestResourceVersionMetadata(ctx context.Context, req *QueryLatestResourceVersionMetadataRequest) (*QueryLatestResourceVersionMetadataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LatestResourceVersionMetadata not implemented")
 }
 func (*UnimplementedQueryServer) CollectionResources(ctx context.Context, req *QueryCollectionResourcesRequest) (*QueryCollectionResourcesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CollectionResources not implemented")
@@ -634,6 +918,42 @@ func _Query_ResourceMetadata_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(QueryServer).ResourceMetadata(ctx, req.(*QueryResourceMetadataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_LatestResourceVersion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryLatestResourceVersionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).LatestResourceVersion(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cheqd.resource.v2.Query/LatestResourceVersion",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).LatestResourceVersion(ctx, req.(*QueryLatestResourceVersionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_LatestResourceVersionMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryLatestResourceVersionMetadataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).LatestResourceVersionMetadata(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cheqd.resource.v2.Query/LatestResourceVersionMetadata",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).LatestResourceVersionMetadata(ctx, req.(*QueryLatestResourceVersionMetadataRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -685,6 +1005,14 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ResourceMetadata",
 			Handler:    _Query_ResourceMetadata_Handler,
+		},
+		{
+			MethodName: "LatestResourceVersion",
+			Handler:    _Query_LatestResourceVersion_Handler,
+		},
+		{
+			MethodName: "LatestResourceVersionMetadata",
+			Handler:    _Query_LatestResourceVersionMetadata_Handler,
 		},
 		{
 			MethodName: "CollectionResources",
@@ -824,6 +1152,164 @@ func (m *QueryResourceMetadataResponse) MarshalTo(dAtA []byte) (int, error) {
 }
 
 func (m *QueryResourceMetadataResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Resource != nil {
+		{
+			size, err := m.Resource.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryLatestResourceVersionRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryLatestResourceVersionRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryLatestResourceVersionRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.ResourceType) > 0 {
+		i -= len(m.ResourceType)
+		copy(dAtA[i:], m.ResourceType)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.ResourceType)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.CollectionId) > 0 {
+		i -= len(m.CollectionId)
+		copy(dAtA[i:], m.CollectionId)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.CollectionId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryLatestResourceVersionResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryLatestResourceVersionResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryLatestResourceVersionResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Resource != nil {
+		{
+			size, err := m.Resource.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryLatestResourceVersionMetadataRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryLatestResourceVersionMetadataRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryLatestResourceVersionMetadataRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.ResourceType) > 0 {
+		i -= len(m.ResourceType)
+		copy(dAtA[i:], m.ResourceType)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.ResourceType)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.CollectionId) > 0 {
+		i -= len(m.CollectionId)
+		copy(dAtA[i:], m.CollectionId)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.CollectionId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryLatestResourceVersionMetadataResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryLatestResourceVersionMetadataResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryLatestResourceVersionMetadataResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1049,6 +1535,74 @@ func (m *QueryResourceMetadataRequest) Size() (n int) {
 }
 
 func (m *QueryResourceMetadataResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Resource != nil {
+		l = m.Resource.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryLatestResourceVersionRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.CollectionId)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	l = len(m.ResourceType)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryLatestResourceVersionResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Resource != nil {
+		l = m.Resource.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryLatestResourceVersionMetadataRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.CollectionId)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	l = len(m.ResourceType)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryLatestResourceVersionMetadataResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1464,6 +2018,470 @@ func (m *QueryResourceMetadataResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: QueryResourceMetadataResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Resource", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Resource == nil {
+				m.Resource = &Metadata{}
+			}
+			if err := m.Resource.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryLatestResourceVersionRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryLatestResourceVersionRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryLatestResourceVersionRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CollectionId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ResourceType", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ResourceType = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryLatestResourceVersionResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryLatestResourceVersionResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryLatestResourceVersionResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Resource", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Resource == nil {
+				m.Resource = &ResourceWithMetadata{}
+			}
+			if err := m.Resource.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryLatestResourceVersionMetadataRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryLatestResourceVersionMetadataRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryLatestResourceVersionMetadataRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CollectionId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ResourceType", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ResourceType = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryLatestResourceVersionMetadataResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryLatestResourceVersionMetadataResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryLatestResourceVersionMetadataResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

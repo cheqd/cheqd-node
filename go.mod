@@ -56,8 +56,7 @@ require (
 	github.com/justinas/alice v1.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/ojo-network/ojo v0.4.0-rc1.0.20240912201233-2af60de6026b // indirect
-	github.com/rs/xid v1.6.0 // indirect
-	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
+	github.com/rs/xid v1.6.0 // indirect	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.uber.org/automaxprocs v1.6.0 // indirect
 )
 

@@ -19,10 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Query_Resource_FullMethodName            = "/cheqd.resource.v2.Query/Resource"
-	Query_ResourceMetadata_FullMethodName    = "/cheqd.resource.v2.Query/ResourceMetadata"
-	Query_CollectionResources_FullMethodName = "/cheqd.resource.v2.Query/CollectionResources"
-	Query_Params_FullMethodName              = "/cheqd.resource.v2.Query/Params"
+	Query_Resource_FullMethodName                      = "/cheqd.resource.v2.Query/Resource"
+	Query_ResourceMetadata_FullMethodName              = "/cheqd.resource.v2.Query/ResourceMetadata"
+	Query_LatestResourceVersion_FullMethodName         = "/cheqd.resource.v2.Query/LatestResourceVersion"
+	Query_LatestResourceVersionMetadata_FullMethodName = "/cheqd.resource.v2.Query/LatestResourceVersionMetadata"
+	Query_CollectionResources_FullMethodName           = "/cheqd.resource.v2.Query/CollectionResources"
+	Query_Params_FullMethodName                        = "/cheqd.resource.v2.Query/Params"
 )
 
 // QueryClient is the client API for Query service.
@@ -35,6 +37,10 @@ type QueryClient interface {
 	Resource(ctx context.Context, in *QueryResourceRequest, opts ...grpc.CallOption) (*QueryResourceResponse, error)
 	// Fetch only metadata for a specific resource
 	ResourceMetadata(ctx context.Context, in *QueryResourceMetadataRequest, opts ...grpc.CallOption) (*QueryResourceMetadataResponse, error)
+	// Fetch latest version for a specific resource (without metadata)
+	LatestResourceVersion(ctx context.Context, in *QueryLatestResourceVersionRequest, opts ...grpc.CallOption) (*QueryLatestResourceVersionResponse, error)
+	// Fetch metadata of the latest version for a specific resource
+	LatestResourceVersionMetadata(ctx context.Context, in *QueryLatestResourceVersionMetadataRequest, opts ...grpc.CallOption) (*QueryLatestResourceVersionMetadataResponse, error)
 	// Fetch metadata for all resources in a collection
 	CollectionResources(ctx context.Context, in *QueryCollectionResourcesRequest, opts ...grpc.CallOption) (*QueryCollectionResourcesResponse, error)
 	// Params queries params of the resource module.
@@ -63,6 +69,26 @@ func (c *queryClient) ResourceMetadata(ctx context.Context, in *QueryResourceMet
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(QueryResourceMetadataResponse)
 	err := c.cc.Invoke(ctx, Query_ResourceMetadata_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) LatestResourceVersion(ctx context.Context, in *QueryLatestResourceVersionRequest, opts ...grpc.CallOption) (*QueryLatestResourceVersionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryLatestResourceVersionResponse)
+	err := c.cc.Invoke(ctx, Query_LatestResourceVersion_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) LatestResourceVersionMetadata(ctx context.Context, in *QueryLatestResourceVersionMetadataRequest, opts ...grpc.CallOption) (*QueryLatestResourceVersionMetadataResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryLatestResourceVersionMetadataResponse)
+	err := c.cc.Invoke(ctx, Query_LatestResourceVersionMetadata_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -99,6 +125,10 @@ type QueryServer interface {
 	Resource(context.Context, *QueryResourceRequest) (*QueryResourceResponse, error)
 	// Fetch only metadata for a specific resource
 	ResourceMetadata(context.Context, *QueryResourceMetadataRequest) (*QueryResourceMetadataResponse, error)
+	// Fetch latest version for a specific resource (without metadata)
+	LatestResourceVersion(context.Context, *QueryLatestResourceVersionRequest) (*QueryLatestResourceVersionResponse, error)
+	// Fetch metadata of the latest version for a specific resource
+	LatestResourceVersionMetadata(context.Context, *QueryLatestResourceVersionMetadataRequest) (*QueryLatestResourceVersionMetadataResponse, error)
 	// Fetch metadata for all resources in a collection
 	CollectionResources(context.Context, *QueryCollectionResourcesRequest) (*QueryCollectionResourcesResponse, error)
 	// Params queries params of the resource module.
@@ -118,6 +148,12 @@ func (UnimplementedQueryServer) Resource(context.Context, *QueryResourceRequest)
 }
 func (UnimplementedQueryServer) ResourceMetadata(context.Context, *QueryResourceMetadataRequest) (*QueryResourceMetadataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResourceMetadata not implemented")
+}
+func (UnimplementedQueryServer) LatestResourceVersion(context.Context, *QueryLatestResourceVersionRequest) (*QueryLatestResourceVersionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LatestResourceVersion not implemented")
+}
+func (UnimplementedQueryServer) LatestResourceVersionMetadata(context.Context, *QueryLatestResourceVersionMetadataRequest) (*QueryLatestResourceVersionMetadataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LatestResourceVersionMetadata not implemented")
 }
 func (UnimplementedQueryServer) CollectionResources(context.Context, *QueryCollectionResourcesRequest) (*QueryCollectionResourcesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CollectionResources not implemented")
@@ -182,6 +218,42 @@ func _Query_ResourceMetadata_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_LatestResourceVersion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryLatestResourceVersionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).LatestResourceVersion(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_LatestResourceVersion_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).LatestResourceVersion(ctx, req.(*QueryLatestResourceVersionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_LatestResourceVersionMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryLatestResourceVersionMetadataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).LatestResourceVersionMetadata(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_LatestResourceVersionMetadata_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).LatestResourceVersionMetadata(ctx, req.(*QueryLatestResourceVersionMetadataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Query_CollectionResources_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(QueryCollectionResourcesRequest)
 	if err := dec(in); err != nil {
@@ -232,6 +304,14 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ResourceMetadata",
 			Handler:    _Query_ResourceMetadata_Handler,
+		},
+		{
+			MethodName: "LatestResourceVersion",
+			Handler:    _Query_LatestResourceVersion_Handler,
+		},
+		{
+			MethodName: "LatestResourceVersionMetadata",
+			Handler:    _Query_LatestResourceVersionMetadata_Handler,
 		},
 		{
 			MethodName: "CollectionResources",

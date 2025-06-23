@@ -62,6 +62,13 @@ func TestMigrate(t *testing.T) {
 		collections.PairKeyCodec(collections.StringKey, collections.StringKey),
 		collections.BytesValue,
 	)
+	latestResourceVersionCollection := collections.NewMap(
+		sb,
+		collections.NewPrefix(types.ResourceLatestVersionKey),
+		"resource_latest_version",
+		collections.TripleKeyCodec(collections.StringKey, collections.StringKey, collections.StringKey),
+		collections.StringValue,
+	)
 
 	// set count key in old store
 	var countValue uint64 = 5
@@ -81,7 +88,7 @@ func TestMigrate(t *testing.T) {
 
 	legacySubspace := newMockSubspace(*types.DefaultLegacyFeeParams())
 	require.NoError(t, v4.MigrateStore(ctx, runtime.NewKVStoreService(storeKey), legacySubspace, cdc,
-		countCollection, metadataCollection, dataCollection))
+		countCollection, metadataCollection, dataCollection, latestResourceVersionCollection))
 
 	var res types.LegacyFeeParams
 	bz, err := store.Get(types.ParamStoreKeyFeeParams)
