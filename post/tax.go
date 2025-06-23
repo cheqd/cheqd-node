@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
+	errors "cosmossdk.io/errors"
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
 	cheqdante "github.com/cheqd/cheqd-node/ante"
@@ -15,6 +16,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	feeabskeeper "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/keeper"
+	feeabstypes "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/types"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
@@ -413,6 +415,22 @@ func (td *TaxDecorator) handleTaxableTransaction(
 		if err != nil {
 			return fmt.Errorf("failed to convert burn to ncheq: %w", err)
 		}
+
+		userFee := feeTx.GetFee()
+		if userFee.IsZero() {
+			return err
+		}
+		denom := userFee[0].Denom
+		hostChainConfig, found := td.feeabsKeeper.GetHostZoneConfig(ctx, denom)
+
+		if !found {
+			return err
+		}
+		totalTax := convertedRewards.Add(convertedBurn...)
+
+		if err := td.processNonNativeDenomTax(ctx, tx, simulate, feeTx, hostChainConfig, totalTax); err != nil {
+			return err
+		}
 	}
 
 	// Common logic
@@ -464,10 +482,116 @@ func (td *TaxDecorator) processNativeDenomTax(
 	return td.deductTaxFromFeePayer(ctx, feePayer, tax)
 }
 
+func (td *TaxDecorator) processNonNativeDenomTax(ctx sdk.Context, tx sdk.Tx, simulate bool, feeTx sdk.FeeTx, hostChainConfig feeabstypes.HostChainFeeAbsConfig, nativeFeeTax sdk.Coins) error {
+	if hostChainConfig.Status == feeabstypes.HostChainFeeAbsStatus_FROZEN {
+		return errors.Wrap(feeabstypes.ErrHostZoneFrozen, "cannot deduct fee as host zone is frozen")
+	}
+
+	// if hostChainConfig.Status == feeabstypes.HostChainFeeAbsStatus_OUTDATED {
+	// 	return ctx, sdkerrors.Wrap(feeabstypes.ErrHostZoneOutdated, "cannot deduct fee as host zone is outdated")
+	// }
+	fee := feeTx.GetFee()
+	feePayer := feeTx.FeePayer()
+	feeGranter := feeTx.FeeGranter()
+
+	feeAbstractionPayer := feePayer
+	// if feegranter set deduct fee from feegranter account.
+	// this works with only when feegrant enabled.
+	if feeGranter != nil {
+		if td.feegrantKeeper == nil {
+			return errors.Wrap(sdkerrors.ErrInvalidRequest, "fee grants are not enabled")
+		} else if !bytes.Equal(feeGranter, feePayer) {
+			err := td.feegrantKeeper.UseGrantedFees(ctx, feeGranter, feePayer, fee, tx.GetMsgs())
+			if err != nil {
+				return errors.Wrapf(err, "%s not allowed to pay fees from %s", feeGranter, feePayer)
+			}
+		}
+
+		feeAbstractionPayer = feeGranter
+	}
+
+	deductFeesFrom := td.feeabsKeeper.GetFeeAbsModuleAddress()
+	deductFeesFromAcc := td.accountKeeper.GetAccount(ctx, deductFeesFrom)
+	if deductFeesFromAcc == nil {
+		return errors.Wrapf(sdkerrors.ErrUnknownAddress, "fee abstraction didn't set : %s does not exist", deductFeesFrom)
+	}
+
+	// calculate the native token can be swapped from ibc token
+	if len(fee) != 1 {
+		return errors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid ibc token: %s", fee)
+	}
+
+	ibcFeetax, err := CalculateIBCCoinsFromNative(ctx, nativeFeeTax, hostChainConfig, td.feeabsKeeper)
+	if err != nil {
+		return err
+	}
+
+	// deduct the fees
+	if !feeTx.GetFee().IsZero() {
+		err := td.bankKeeper.SendCoinsFromAccountToModule(ctx, sdk.AccAddress(feeAbstractionPayer), feeabstypes.ModuleName, ibcFeetax)
+		if err != nil {
+			return err
+		}
+		err = DeductFees(td.bankKeeper, ctx, deductFeesFrom, nativeFeeTax)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+func CalculateIBCCoinsFromNative(ctx sdk.Context, nativeCoins sdk.Coins, chainConfig feeabstypes.HostChainFeeAbsConfig, feeabskeeper feeabskeeper.Keeper) (sdk.Coins, error) {
+	// Support only 1 native denom at a time
+	if len(nativeCoins) != 1 {
+		return nil, errors.Wrapf(sdkerrors.ErrInvalidCoins, "expected single native coin, got: %s", nativeCoins)
+	}
+
+	nativeCoin := nativeCoins[0]
+
+	// Get TWAP rate: ibcDenom price in native denom
+	twapRate, err := feeabskeeper.GetTwapRate(ctx, chainConfig.IbcDenom)
+	if err != nil {
+		return nil, err
+	}
+
+	if twapRate.IsZero() {
+		return nil, errors.Wrapf(sdkerrors.ErrInvalidRequest, "zero twap rate for denom %s", chainConfig.IbcDenom)
+	}
+
+	// inverse: ibcAmount = nativeAmount / twapRate
+	ibcAmount := math.LegacyNewDecFromInt(nativeCoin.Amount).Quo(twapRate).TruncateInt()
+
+	// Create and return the IBC coin
+	ibcCoin := sdk.NewCoin(chainConfig.IbcDenom, ibcAmount)
+
+	ibcCoins := sdk.NewCoins(ibcCoin)
+	if ibcCoins.Len() != 1 {
+		return nil, feeabstypes.ErrInvalidIBCFees
+	}
+
+	ibcDenom := ibcCoins[0].Denom
+	if !feeabskeeper.HasHostZoneConfig(ctx, ibcDenom) {
+		return nil, feeabstypes.ErrHostZoneConfigNotFound
+	}
+	return sdk.NewCoins(ibcCoin), nil
+}
+
+// DeductFees deducts fees from the given account.
+func DeductFees(bankKeeper types.BankKeeper, ctx sdk.Context, accAddress sdk.AccAddress, fees sdk.Coins) error {
+	if err := fees.Validate(); err != nil {
+		return errors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount: %s", fees)
+	}
+
+	if err := bankKeeper.SendCoinsFromAccountToModule(ctx, accAddress, didtypes.ModuleName, fees); err != nil {
+		return errors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
+	}
+
+	return nil
+}
+
 func ConvertToCheq(coins sdk.Coins, cheqPrice math.LegacyDec) (sdk.Coins, error) {
 	// If all coins are already in ncheq, return them directly
 	if coins.DenomsSubsetOf(sdk.NewCoins(sdk.NewCoin(oracletypes.CheqdDenom, math.ZeroInt()))) {
-		fmt.Println("returned from here--------------", coins)
 		return coins, nil
 	}
 

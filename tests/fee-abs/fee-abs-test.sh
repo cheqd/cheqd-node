@@ -251,15 +251,17 @@ RES=$(docker compose exec cheqd cheqd-noded tx feeabs fund 200000000000000000nch
 assert_tx_successful "${RES}"
 
 info "wait for exchange rate to be updated"
-sleep 600
+sleep 120
 
 info "pay fees using osmo in cheqd (recursively)"
 # shellcheck disable=SC2034
-for i in {1..20}; do
-  RES=$(docker compose exec cheqd cheqd-noded tx bank send cheqd-user "$CHEQD_RELAYER_ADDRESS" 50000000ncheq --fees 20000000ibc/ED07A3391A112B175915CD8FAF43A2DA8E4790EDE12566649D0C2F97716B8518 --chain-id cheqd -y --keyring-backend test)
+for i in {1..5}; do
+  RES=$(docker compose exec cheqd cheqd-noded tx bank send cheqd-user "$CHEQD_RELAYER_ADDRESS" 50000000ncheq --fees 2000000000ibc/ED07A3391A112B175915CD8FAF43A2DA8E4790EDE12566649D0C2F97716B8518 --chain-id cheqd -y --keyring-backend test)
   exit_if_tx_successful "${RES}"
   sleep 6
 done
+
+assert_tx_successful "${RES}"
 
 info "test CHEQ/USDC exchange rate received"
 { docker compose exec cheqd cheqd-noded q feeabs osmo-arithmetic-twap ibc/A1A6E963EBFE83F5BA5785DD7804B388C1FD50F4F3BF30C14A66A1FC48500F3E && info "Received cheq/usdc exchange rate"; } || { err "Failed to get cheqd/usdc exchange rate"; exit 1; }
