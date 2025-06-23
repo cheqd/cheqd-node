@@ -40,29 +40,29 @@ var _ = Describe("Query LatestResourceVersion", func() {
 		Expect(err.Error()).To(ContainSubstring("not found"))
 	})
 
-	It("Returns error if resource does not exist", func() {
+	It("Returns error (not found) if resource does not exist", func() {
 		nonExistingResource := uuid.NewString()
 
 		_, err := setup.QueryLatestResourceVersion(alice.CollectionID, nonExistingResource, CLSchemaType)
 		Expect(err.Error()).To(ContainSubstring("not found"))
 	})
 
-	It("Returns error if resource index keys have trailing spaces", func() {
+	It("Returns error (not found) if resource index keys have trailing spaces", func() {
 		_, err := setup.QueryLatestResourceVersion(alice.CollectionID, "  Resource 1%  ", CLSchemaType)
 		Expect(err.Error()).To(ContainSubstring("not found"))
 	})
 
-	It("Returns error if resource index keys have different composed forms", func() {
+	It("Returns error (not found) if resource index keys have different composed forms", func() {
 		_, err := setup.QueryLatestResourceVersion(alice.CollectionID, "Résourcℯ 1%", CLSchemaType)
 		Expect(err.Error()).To(ContainSubstring("not found"))
 	})
 
-	It("Returns error if resource index keys have no spaces", func() {
+	It("Returns error (not found) if resource index keys have no spaces", func() {
 		_, err := setup.QueryLatestResourceVersion(alice.CollectionID, "Resource1%", CLSchemaType)
 		Expect(err.Error()).To(ContainSubstring("not found"))
 	})
 
-	It("Returns error if collection does not exist", func() {
+	It("Returns error (did doc not found) if collection does not exist", func() {
 		nonExistingCollection := didsetup.GenerateDID(didsetup.Base58_16bytes)
 
 		_, err := setup.QueryLatestResourceVersion(nonExistingCollection, "Resource 1%", CLSchemaType)
