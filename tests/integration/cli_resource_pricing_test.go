@@ -4,7 +4,6 @@ package integration
 
 import (
 	"crypto/ed25519"
-	"fmt"
 
 	"cosmossdk.io/math"
 	"github.com/cheqd/cheqd-node/ante"
@@ -101,7 +100,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		cheqp := cheqPrice.Price
 		Expect(err).To(BeNil())
-		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MinAmount))
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
 
 		convertedFees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Json, cheqp, nil)
 		Expect(err).To(BeNil())
@@ -133,9 +132,8 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom))
 		Expect(err).To(BeNil())
-		fmt.Println("res----------6", res)
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		By("querying the altered account balance")
@@ -219,7 +217,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		cheqp := cheqPrice.Price
 		Expect(err).To(BeNil())
 
-		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MinAmount))
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
 
 		convertedFees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Image, cheqp, nil)
 		Expect(err).To(BeNil())
@@ -253,7 +251,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -338,7 +336,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 
-		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MinAmount))
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
 
 		convertedFees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Default, cheqp, nil)
 		Expect(err).To(BeNil())
@@ -368,7 +366,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -453,7 +451,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		cheqp := cheqPrice.Price
 
-		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MinAmount))
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
 
 		fees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Json, cheqp, nil)
 
@@ -467,7 +465,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			Name:         "TestResource",
 			Version:      "1.0",
 			ResourceType: "TestType",
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom)))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -508,7 +506,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 
-		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MinAmount))
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
 
 		fees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Image, cheqp, nil)
 		Expect(err).To(BeNil())
@@ -521,7 +519,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			Name:         "TestResource",
 			Version:      "1.0",
 			ResourceType: "TestType",
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom)))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom)))
 
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
@@ -563,7 +561,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 
-		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MinAmount))
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
 
 		fees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Default, cheqp, nil)
 		Expect(err).To(BeNil())
@@ -576,7 +574,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			Name:         "TestResource",
 			Version:      "1.0",
 			ResourceType: "TestType",
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MinAmount.String()+tax.Denom)))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
