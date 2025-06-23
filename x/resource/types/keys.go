@@ -18,8 +18,9 @@ const (
 )
 
 const (
-	ResourceMetadataKey = "resource-metadata:"
-	ResourceDataKey     = "resource-data:"
-	ResourceCountKey    = "resource-count:"
-	ResourcePortIDKey   = "resource-port-id:"
+	ResourceMetadataKey      = "resource-metadata:"
+	ResourceDataKey          = "resource-data:"
+	ResourceCountKey         = "resource-count:"
+	ResourcePortIDKey        = "resource-port-id:"
+	ResourceLatestVersionKey = "resource-latest-version:"
 )

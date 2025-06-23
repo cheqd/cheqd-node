@@ -24,7 +24,7 @@ func NewMigrator(k Keeper, ss exported.Subspace) Migrator {
 
 func (m Migrator) Migrate3to4(ctx sdk.Context) error {
 	return v4.MigrateStore(ctx, m.keeper.storeService, m.legacySubspace, m.keeper.cdc,
-		m.keeper.ResourceCount, m.keeper.ResourceMetadata, m.keeper.ResourceData)
+		m.keeper.ResourceCount, m.keeper.ResourceMetadata, m.keeper.ResourceData, m.keeper.LatestResourceVersion)
 }
 
 func (m Migrator) Migrate4to5(ctx sdk.Context) error {
