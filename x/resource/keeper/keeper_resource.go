@@ -29,11 +29,11 @@ func (k Keeper) SetResourceCount(ctx context.Context, count uint64) error {
 
 func (k Keeper) AddNewResourceVersion(ctx context.Context, resource *types.ResourceWithMetadata) error {
 	// Find previous version and upgrade backward and forward version links
-	previousResourceVersionHeader, found, err := k.GetLastResourceVersionMetadata(ctx, resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType)
-	if err != nil {
+	previousResourceVersionHeader, err := k.GetLatestResourceVersionMetadata(ctx, resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType)
+	if err != nil && !errors.IsOf(err, collections.ErrNotFound) {
 		return err
 	}
-	if found {
+	if previousResourceVersionHeader.Id != "" {
 		// Set links
 		previousResourceVersionHeader.NextVersionId = resource.Metadata.Id
 		resource.Metadata.PreviousVersionId = previousResourceVersionHeader.Id
@@ -45,8 +45,7 @@ func (k Keeper) AddNewResourceVersion(ctx context.Context, resource *types.Resou
 		}
 	}
 
-	err = k.SetResource(ctx, resource)
-	return err
+	return k.SetResource(ctx, resource)
 }
 
 // SetResource create or update a specific resource in the store
@@ -68,6 +67,12 @@ func (k Keeper) SetResource(ctx context.Context, resource *types.ResourceWithMet
 
 	// Set metadata
 	if err := k.ResourceMetadata.Set(ctx, collections.Join(resource.Metadata.CollectionId, resource.Metadata.Id), *resource.Metadata); err != nil {
+		return err
+	}
+
+	// Set the latest resource version
+	latestResourceVersionKey := collections.Join3(resource.Metadata.CollectionId, resource.Metadata.Name, resource.Metadata.ResourceType)
+	if err = k.LatestResourceVersion.Set(ctx, latestResourceVersionKey, resource.Metadata.Id); err != nil {
 		return err
 	}
 
@@ -140,24 +145,34 @@ func (k Keeper) GetResourceCollection(ctx context.Context, collectionID string) 
 	return resources, nil
 }
 
-func (k Keeper) GetLastResourceVersionMetadata(ctx context.Context, collectionID, name, resourceType string) (types.Metadata, bool, error) {
-	var lastVersion types.Metadata
-	found := false
-
-	rng := collections.NewPrefixedPairRange[string, string](collectionID)
-	err := k.ResourceMetadata.Walk(ctx, rng, func(_ collections.Pair[string, string], metadata types.Metadata) (bool, error) {
-		if metadata.Name == name && metadata.ResourceType == resourceType && metadata.NextVersionId == "" {
-			lastVersion = metadata
-			found = true
-			return true, nil // Stop iteration as we found what we need
-		}
-		return false, nil // Continue iteration
-	})
+func (k Keeper) GetLatestResourceVersionMetadata(ctx context.Context, collectionID, name, resourceType string) (types.Metadata, error) {
+	latestResourceVersionKey := collections.Join3(collectionID, name, resourceType)
+	latestResourceVersion, err := k.LatestResourceVersion.Get(ctx, latestResourceVersionKey)
 	if err != nil {
-		return types.Metadata{}, false, err
+		return types.Metadata{}, err
 	}
 
-	return lastVersion, found, nil
+	latestResourceMetadata, err := k.ResourceMetadata.Get(ctx, collections.Join(collectionID, latestResourceVersion))
+	if err != nil {
+		return types.Metadata{}, err
+	}
+
+	return latestResourceMetadata, nil
+}
+
+func (k Keeper) GetLatestResourceVersion(ctx context.Context, collectionID, name, resourceType string) (types.ResourceWithMetadata, error) {
+	latestResourceVersionKey := collections.Join3(collectionID, name, resourceType)
+	latestResourceVersion, err := k.LatestResourceVersion.Get(ctx, latestResourceVersionKey)
+	if err != nil {
+		return types.ResourceWithMetadata{}, err
+	}
+
+	latestResource, err := k.GetResource(ctx, collectionID, latestResourceVersion)
+	if err != nil {
+		return types.ResourceWithMetadata{}, err
+	}
+
+	return latestResource, nil
 }
 
 // UpdateResourceMetadata update the metadata of a resource. Returns an error if the resource doesn't exist
