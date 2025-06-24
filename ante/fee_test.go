@@ -273,11 +273,13 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 	})
 	It("TaxableTx Lifecycle - DID: MsgCreateDidDoc", func() {
 		// keys and addresses
+		s.app.OracleKeeper.SetAverage(s.ctx, oraclekeeper.KeyWMAWithStrategy(didtypes.BaseDenom, string(oraclekeeper.WmaStrategyBalanced)), math.LegacyMustNewDecFromStr("0.016"))
+
 		priv1, _, addr1 := testdata.KeyTestPubAddr()
 
 		// msg and signatures
 		msg := SandboxDidDoc()
-		feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(50_000_000_000)))
+		feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(75_000_000_000)))
 
 		gasLimit := testdata.NewTestGasLimit()
 		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
@@ -318,18 +320,18 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
-		Expect(amount.Sub(math.NewInt(feeParams.CreateDid[0].MinAmount.Int64()))).To(Equal(balance.Amount), "Tax was not subtracted from the fee payer")
+		Expect(amount.Sub(feeAmount.AmountOf(didtypes.BaseMinimalDenom))).To(Equal(balance.Amount), "Tax was not subtracted from the fee payer")
 
 		// get supply after tx
 		supplyAfterDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
 		Expect(err).To(BeNil())
 
 		// check that supply was deflated
-		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, *feeParams.CreateDid[0].MinAmount)))
+		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(feeAmount...))
 		Expect(supplyBeforeDeflation.Sub(supplyAfterDeflation...)).To(Equal(burnt), "Supply was not deflated")
 
 		// check that reward has been sent to the fee collector
-		reward := cheqdante.GetRewardPortion(sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, *feeParams.CreateDid[0].MinAmount)), burnt)
+		reward := cheqdante.GetRewardPortion(sdk.NewCoins(feeAmount...), burnt)
 
 		// calculate oracle share (0.5%)
 		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.005 = 0.5%
@@ -352,7 +354,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 	})
 
 	It("TaxableTx Lifecycle - DLR: MsgCreateResource JSON", func() {
-		s.app.OracleKeeper.SetAverage(s.ctx, oraclekeeper.KeyEMA(didtypes.BaseDenom), math.LegacyMustNewDecFromStr("0.016"))
+		s.app.OracleKeeper.SetAverage(s.ctx, oraclekeeper.KeyWMAWithStrategy(didtypes.BaseDenom, string(oraclekeeper.WmaStrategyBalanced)), math.LegacyMustNewDecFromStr("0.016"))
 
 		// keys and addresses
 		priv1, _, addr1 := testdata.KeyTestPubAddr()
@@ -1619,13 +1621,15 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 	})
 
 	It("Ensure taxable txn working fine after integrating the fee-abs", func() {
+		s.app.OracleKeeper.SetAverage(s.ctx, oraclekeeper.KeyWMAWithStrategy(didtypes.BaseDenom, string(oraclekeeper.WmaStrategyBalanced)), math.LegacyMustNewDecFromStr("0.016"))
+
 		anteHandler := sdk.ChainAnteDecorators(decorators...)
 
 		priv1, _, addr1 := testdata.KeyTestPubAddr()
 
 		// msg and signatures
 		msg := SandboxDidDoc()
-		feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(50_000_000_000)))
+		feeAmount := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(100000000000)))
 		gasLimit := testdata.NewTestGasLimit()
 		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
 		s.txBuilder.SetFeeAmount(feeAmount)
@@ -1639,7 +1643,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		// set account with sufficient funds
 		acc := s.app.AccountKeeper.NewAccountWithAddress(s.ctx, addr1)
 		s.app.AccountKeeper.SetAccount(s.ctx, acc)
-		amount := math.NewInt(50_000_000_000)
+		amount := math.NewInt(200000000000)
 		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
@@ -1662,18 +1666,18 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, didtypes.BaseMinimalDenom)
-		Expect(amount.Sub(*feeParams.CreateDid[0].MinAmount).Equal(balance.Amount)).To(BeTrue(), "Tax was not subtracted from the fee payer")
+		Expect(amount.Sub(*feeParams.CreateDid[0].MaxAmount).Equal(balance.Amount)).To(BeTrue(), "Tax was not subtracted from the fee payer")
 
 		// get supply after tx
 		supplyAfterDeflation, _, err := s.app.BankKeeper.GetPaginatedTotalSupply(s.ctx, &query.PageRequest{})
 		Expect(err).To(BeNil())
 
 		// check that supply was deflated
-		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, *feeParams.CreateDid[0].MinAmount)))
+		burnt := cheqdante.GetBurnFeePortion(feeParams.BurnFactor, sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, *feeParams.CreateDid[0].MaxAmount)))
 		Expect(supplyBeforeDeflation.Sub(supplyAfterDeflation...)).To(Equal(burnt), "Supply was not deflated")
 
 		// check that reward has been sent to the fee collector
-		reward := cheqdante.GetRewardPortion(sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, *feeParams.CreateDid[0].MinAmount)), burnt)
+		reward := cheqdante.GetRewardPortion(sdk.NewCoins(sdk.NewCoin(feeParams.CreateDid[0].Denom, *feeParams.CreateDid[0].MaxAmount)), burnt)
 
 		// calculate oracle share (0.5%)
 		oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.005 = 0.5%
