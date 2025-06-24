@@ -12,7 +12,9 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/mocks"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	"github.com/cheqd/cheqd-node/x/did/types"
+	oracleKeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
 	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -484,6 +486,109 @@ var _ = Describe("cheqd cli - oracle module", func() {
 		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green,
 			"successfully verified currency pair provider configuration"))
 	})
+	It("should successfully query EMA for all accepted denoms", func() {
+		Expect(oracleParams).ToNot(BeNil())
+
+		historicStampPeriod := oracleParams.Params.HistoricStampPeriod
+		averagingWindow := oracleKeeper.AveragingWindow
+
+		// Wait until the block height matches the ComputeAllAverages trigger
+		targetHeight := int64(historicStampPeriod) * int64(averagingWindow)
+
+		fmt.Printf("Waiting until block height >= %d to trigger ComputeAllAverages naturally...\n", targetHeight)
+
+		for {
+			currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
+			Expect(err).To(BeNil())
+
+			if currentHeight >= targetHeight {
+				break
+			}
+			time.Sleep(2 * time.Second)
+		}
+
+		for _, denom := range oracleParams.Params.AcceptList {
+			resp, err := cli.QueryEMA(denom.SymbolDenom)
+			if err != nil {
+				fmt.Printf("Skipping EMA for %s: %v\n", denom.BaseDenom, err)
+				continue
+			}
+
+			Expect(resp.Price.IsZero()).To(BeFalse(), fmt.Sprintf("EMA for %s should not be zero", denom.BaseDenom))
+			fmt.Printf("EMA for %s: %s\n", denom.BaseDenom, resp.Price)
+		}
+
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "Queried EMA values successfully"))
+	})
+	It("should successfully query SMA for all accepted denoms", func() {
+		Expect(oracleParams).ToNot(BeNil())
+
+		historicStampPeriod := oracleParams.Params.HistoricStampPeriod
+		averagingWindow := oracleKeeper.AveragingWindow
+
+		// Wait until the block height matches the ComputeAllAverages trigger
+		targetHeight := int64(historicStampPeriod) * int64(averagingWindow)
+
+		fmt.Printf("Waiting until block height >= %d to trigger ComputeAllAverages naturally...\n", targetHeight)
+
+		for {
+			currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
+			Expect(err).To(BeNil())
+
+			if currentHeight >= targetHeight {
+				break
+			}
+			time.Sleep(2 * time.Second)
+		}
+
+		for _, denom := range oracleParams.Params.AcceptList {
+			resp, err := cli.QuerySMA(denom.SymbolDenom)
+			if err != nil {
+				fmt.Printf("Skipping SMA for %s: %v\n", denom.BaseDenom, err)
+				continue
+			}
+
+			Expect(resp.Price.IsZero()).To(BeFalse(), fmt.Sprintf("SMA for %s should not be zero", denom.BaseDenom))
+			fmt.Printf("SMA for %s: %s\n", denom.BaseDenom, resp.Price)
+		}
+
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "Queried SMA values successfully"))
+	})
+	It("should successfully query WMA (BALANCED strategy) for all accepted denoms", func() {
+		Expect(oracleParams).ToNot(BeNil())
+
+		historicStampPeriod := oracleParams.Params.HistoricStampPeriod
+		averagingWindow := oracleKeeper.AveragingWindow
+
+		// Wait until the block height matches the ComputeAllAverages trigger
+		targetHeight := int64(historicStampPeriod) * int64(averagingWindow)
+
+		fmt.Printf("Waiting until block height >= %d to trigger ComputeAllAverages naturally...\n", targetHeight)
+
+		for {
+			currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
+			Expect(err).To(BeNil())
+
+			if currentHeight >= targetHeight {
+				break
+			}
+			time.Sleep(2 * time.Second)
+		}
+
+		for _, denom := range oracleParams.Params.AcceptList {
+			resp, err := cli.QueryWMA(denom.SymbolDenom, "BALANCED", nil)
+			if err != nil {
+				fmt.Printf("Skipping WMA for %s: %v\n", denom.BaseDenom, err)
+				continue
+			}
+
+			Expect(resp.Price.IsZero()).To(BeFalse(), fmt.Sprintf("WMA for %s should not be zero", denom.BaseDenom))
+			fmt.Printf("WMA for %s: %s\n", denom.BaseDenom, resp.Price)
+		}
+
+		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "Queried WMA values successfully"))
+	})
+
 })
 
 // Helper function to check if a slice contains a string

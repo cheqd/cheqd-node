@@ -343,7 +343,7 @@ func CmdQueryWMA() *cobra.Command {
 
 	cmd.Flags().String("strategy", "BALANCED", "WMA strategy: BALANCED | OLDEST | RECENT | CUSTOM")
 	cmd.Flags().String("weights", "", "Custom weights (comma-separated, e.g. 10,9,8...)")
-
+	flags.AddQueryFlagsToCmd(cmd)
 	return cmd
 }
 

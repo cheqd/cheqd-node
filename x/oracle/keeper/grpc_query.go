@@ -384,9 +384,9 @@ func (q Querier) SMA(ctx context.Context, req *types.QuerySMARequest) (*types.Qu
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	price, present := q.GetEMA(sdkCtx, req.Denom)
+	price, present := q.GetSMA(sdkCtx, req.Denom)
 	if !present {
-		return nil, errors.New("ema not present")
+		return nil, errors.New("sma not present")
 	}
 	return &types.QuerySMAResponse{
 		Price: price,
