@@ -27,6 +27,16 @@ const (
 
 	TaxableMsgFeeCount
 )
+const (
+	cheqExponent = 9
+	usdExponent  = 6
+)
+
+var (
+	cheqScale    = sdkmath.NewIntFromUint64(uint64(math.Pow10(cheqExponent)))
+	usdScale     = sdkmath.NewIntFromUint64(uint64(math.Pow10(usdExponent)))
+	usdFrom18To6 = sdkmath.NewInt(1_000_000_000_000) // 1e12
+)
 
 const (
 	BurnFactorDid int = iota
@@ -234,16 +244,16 @@ func GetFeeForMsg(txFee sdk.Coins, feeRanges []didtypes.FeeRange, cheqEmaPrice s
 	// for fixed fees
 	for _, fr := range feeRanges {
 		if fr.MinAmount != nil && fr.MaxAmount != nil && fr.MinAmount.Equal(*fr.MaxAmount) {
-			expectedFee := sdk.NewCoin(fr.Denom, *fr.MinAmount)
+			FixedFee := sdk.NewCoin(fr.Denom, *fr.MinAmount)
 
 			if txFee.AmountOf(fr.Denom).IsPositive() {
-				if !txFee.AmountOf(fr.Denom).GTE(expectedFee.Amount) {
-					return nil, fmt.Errorf("invalid fixed fee: expected at least %s, got %s", expectedFee, txFee)
+				if !txFee.AmountOf(fr.Denom).GTE(FixedFee.Amount) {
+					return nil, fmt.Errorf("invalid fixed fee: expected at least %s, got %s", FixedFee, txFee)
 				}
-				return sdk.NewCoins(expectedFee), nil
+				return sdk.NewCoins(FixedFee), nil
 			}
 
-			return validateCrossDenomFixedFee(txFee, expectedFee, cheqEmaPrice, nativeFees, fr.Denom)
+			return validateCrossDenomFixedFee(txFee, FixedFee, cheqEmaPrice, nativeFees, fr.Denom)
 		}
 	}
 
@@ -251,14 +261,6 @@ func GetFeeForMsg(txFee sdk.Coins, feeRanges []didtypes.FeeRange, cheqEmaPrice s
 	if cheqEmaPrice.IsZero() {
 		return getFallbackFee(txFee, feeRanges)
 	}
-
-	// Setup
-	const cheqExponent = 9
-	const usdExponent = 6
-
-	cheqScale := sdkmath.NewIntFromUint64(uint64(math.Pow10(cheqExponent)))
-	usdScale := sdkmath.NewIntFromUint64(uint64(math.Pow10(usdExponent)))
-	usdFrom18To6 := sdkmath.NewInt(1_000_000_000_000) // 1e12
 
 	var ranges []usdRange
 
@@ -346,11 +348,6 @@ func GetFeeForMsg(txFee sdk.Coins, feeRanges []didtypes.FeeRange, cheqEmaPrice s
 			usd := cheqDec.Mul(cheqEmaPrice).MulInt(usdScale)
 			usd1 := usd.TruncateInt()
 			userUsdAmount = &usd1
-			handled = true
-
-		case oracletypes.UsdDenom:
-			val := coin.Amount.Quo(usdFrom18To6)
-			userUsdAmount = &val
 			handled = true
 		}
 	}
@@ -441,10 +438,10 @@ func getFallbackFee(txFee sdk.Coins, feeRanges []didtypes.FeeRange) (sdk.Coins, 
 
 func validateCrossDenomFixedFee(
 	txFee sdk.Coins,
-	expectedFee sdk.Coin,
+	FixedFee sdk.Coin,
 	cheqEmaPrice sdkmath.LegacyDec,
 	nativeFees sdk.Coins,
-	feeDenom string,
+	FixedfeeDenom string,
 ) (sdk.Coins, error) {
 	const cheqExponent = 9
 	const usdExponent = 6
@@ -458,57 +455,45 @@ func validateCrossDenomFixedFee(
 				return nil, errors.New("cannot verify cross-denom fixed fee: cheq price not available")
 			}
 
-			usdAmount := sdkmath.LegacyNewDecFromInt(expectedFee.Amount).QuoInt(sdkmath.NewInt(1_000_000_000_000)) // 1e18 → 1e6
+			usdAmount := sdkmath.LegacyNewDecFromInt(FixedFee.Amount).QuoInt(sdkmath.NewInt(1_000_000_000_000)) // 1e18 → 1e6
 			requiredCheq := usdAmount.Quo(cheqEmaPrice).MulInt(cheqScale).QuoInt(usdScale).TruncateInt()
 
 			if coin.Amount.LT(requiredCheq) {
 				return nil, fmt.Errorf("insufficient ncheq: need at least %s, got %s", requiredCheq, coin.Amount)
 			}
 			return sdk.NewCoins(sdk.NewCoin(coin.Denom, requiredCheq)), nil
-
-		case oracletypes.UsdDenom:
-			if cheqEmaPrice.IsZero() {
-				return nil, errors.New("cannot verify cross-denom fixed fee: cheq price not available")
-			}
-
-			cheqAmountDec := sdkmath.LegacyNewDecFromInt(expectedFee.Amount).QuoInt(cheqScale)
-			requiredUsd := cheqAmountDec.Mul(cheqEmaPrice).MulInt(usdScale).TruncateInt()
-
-			userUsd := coin.Amount.Quo(sdkmath.NewInt(1_000_000_000_000)) // 1e18 → 1e6
-
-			if userUsd.LT(requiredUsd) {
-				return nil, fmt.Errorf("insufficient usd: need at least %s, got %s", requiredUsd, userUsd)
-			}
-			return sdk.NewCoins(sdk.NewCoin(coin.Denom, requiredUsd.Mul(sdkmath.NewInt(1_000_000_000_000)))), nil
-
 		default:
 			// Handle IBC-denom equivalents via nativeFee
 			nativeCoin := nativeFees.AmountOf(oracletypes.CheqdDenom)
 			if nativeCoin.IsZero() {
 				return nil, fmt.Errorf("unsupported cross-denom fixed fee: user paid %s", coin.Denom)
 			}
-			if cheqEmaPrice.IsZero() {
-				return nil, errors.New("cannot verify fixed fee for IBC denom: cheq price not available")
-			}
-
-			switch feeDenom {
+			switch FixedfeeDenom {
 			case oracletypes.UsdDenom:
-				usdAmount := sdkmath.LegacyNewDecFromInt(expectedFee.Amount).QuoInt(sdkmath.NewInt(1_000_000_000_000)) // 1e18 → 1e6
-				requiredCheq := usdAmount.Quo(cheqEmaPrice).MulInt(cheqScale).QuoInt(usdScale).TruncateInt()
-
-				if nativeCoin.LT(requiredCheq) {
-					return nil, fmt.Errorf("insufficient IBC-equivalent ncheq: required %s, got %s", requiredCheq, nativeCoin)
+				if cheqEmaPrice.IsZero() {
+					return nil, errors.New("cannot verify fixed fee for IBC denom: cheq price not available")
 				}
-				return sdk.NewCoins(sdk.NewCoin(oracletypes.CheqdDenom, requiredCheq)), nil
+
+				// Step 1: Convert nativeCoin (e.g., ncheq) into USD
+				nativeDec := sdkmath.LegacyNewDecFromInt(nativeCoin)
+				nativeUsd := nativeDec.QuoInt(cheqScale).Mul(cheqEmaPrice).MulInt(usdScale).TruncateInt() // in µUSD
+
+				// Step 2: Convert required USD fee to µUSD
+				requiredUsd := sdkmath.LegacyNewDecFromInt(FixedFee.Amount).QuoInt(sdkmath.NewInt(usdFrom18To6.Int64())).TruncateInt() // 18-dec → 6-dec
+
+				// Step 3: Compare
+				if nativeUsd.LT(requiredUsd) {
+					return nil, fmt.Errorf("insufficient fee: requires ≥ %s µUSD, got %s µUSD (via %s)", requiredUsd, nativeUsd, nativeCoin)
+				}
 
 			case oracletypes.CheqdDenom:
-				if nativeCoin.LT(expectedFee.Amount) {
-					return nil, fmt.Errorf("insufficient IBC-equivalent ncheq: expected %s, got %s", expectedFee.Amount, nativeCoin)
+				if nativeCoin.LT(FixedFee.Amount) {
+					return nil, fmt.Errorf("insufficient IBC-equivalent ncheq: expected %s, got %s", FixedFee.Amount, nativeCoin)
 				}
-				return sdk.NewCoins(expectedFee), nil
+				return sdk.NewCoins(FixedFee), nil
 			}
 
-			return nil, fmt.Errorf("unsupported fixed fee denom %s for IBC conversion", feeDenom)
+			return nil, fmt.Errorf("unsupported fixed fee denom %s for IBC conversion", FixedfeeDenom)
 		}
 	}
 

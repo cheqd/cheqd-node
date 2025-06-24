@@ -480,3 +480,18 @@ func QueryEMA(denom string) (*oracletypes.QueryEMAResponse, error) {
 
 	return &resp, nil
 }
+
+func QuerySMA(denom string) (*oracletypes.QuerySMAResponse, error) {
+	res, err := Query("oracle", "sma", denom)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp oracletypes.QuerySMAResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling exchange rate response: %w", err)
+	}
+
+	return &resp, nil
+}

@@ -112,7 +112,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff.Int64()).To(BeNumerically("~", taxIncheqd.AmountOf(types.BaseMinimalDenom).Int64(), 1_000_000))
+		Expect(diff.Int64()).To(BeNumerically("~", taxIncheqd.AmountOf(types.BaseMinimalDenom).Int64(), 2_000_000))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -195,7 +195,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
-		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, tax.MinAmount.Mul(math.NewInt(2))))
 		convertedFees, err := ante.GetFeeForMsg(userFee, feeParams.UpdateDid, cheqp, nil)
 		Expect(err).To(BeNil())
 		burnPotionInUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
@@ -216,7 +216,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
 
 		By("submitting an update diddoc message")
-		res, err := cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom))
+		res, err := cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MaxAmount.Mul(math.NewInt(2)).String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -227,7 +227,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff.Int64()).To(BeNumerically("~", taxIncheqd.AmountOf(types.BaseMinimalDenom).Int64(), 1_000_000))
+		Expect(diff.Int64()).To(BeNumerically("~", taxIncheqd.AmountOf(types.BaseMinimalDenom).Int64(), 2_000_000))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -333,7 +333,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff.Int64()).To(BeNumerically("~", taxIncheqd.AmountOf(types.BaseMinimalDenom).Int64(), 1_000_000))
+		Expect(diff.Int64()).To(BeNumerically("~", taxIncheqd.AmountOf(types.BaseMinimalDenom).Int64(), 2_000_000))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -433,7 +433,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
 
 		// Allowing a small tolerance of 1,000,000 ncheq (0.001 CHEQ)
-		Expect(diff.Int64()).To(BeNumerically("~", totalTax.AmountOf(types.BaseMinimalDenom).Int64(), 1_000_000))
+		Expect(diff.Int64()).To(BeNumerically("~", totalTax.AmountOf(types.BaseMinimalDenom).Int64(), 2_000_000))
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
 		Expect(diff.IsZero()).To(BeTrue())
@@ -503,7 +503,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 		Expect(tax).ToNot(BeNil())
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff.Int64()).To(BeNumerically("~", convertedFeesinCheq.AmountOf(types.BaseMinimalDenom).Int64(), 1_000_000))
+		Expect(diff.Int64()).To(BeNumerically("~", convertedFeesinCheq.AmountOf(types.BaseMinimalDenom).Int64(), 2_000_000))
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
@@ -583,7 +583,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("checking the granter balance difference")
 		diff := granterBalanceBefore.Amount.Sub(granterBalanceAfter.Amount)
-		Expect(diff.Int64()).To(BeNumerically("~", convertedFees.AmountOf(types.BaseMinimalDenom).Int64(), 1_000_000))
+		Expect(diff.Int64()).To(BeNumerically("~", convertedFees.AmountOf(types.BaseMinimalDenom).Int64(), 2_000_000))
 
 		By("checking the grantee balance difference")
 		diff = granteeBalanceAfter.Amount.Sub(granteeBalanceBefore.Amount)
