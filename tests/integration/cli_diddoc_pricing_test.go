@@ -216,7 +216,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
 
 		By("submitting an update diddoc message")
-		res, err := cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MaxAmount.Mul(math.NewInt(2)).String()+tax.Denom))
+		res, err := cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MinAmount.Mul(math.NewInt(2)).String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
