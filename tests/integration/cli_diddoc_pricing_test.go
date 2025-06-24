@@ -14,6 +14,7 @@ import (
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/cheqd/cheqd-node/x/did/types"
+	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/google/uuid"
 
@@ -75,7 +76,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("submitting a create diddoc message")
 		tax := feeParams.CreateDid[0]
-		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
@@ -192,7 +193,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("fetching CHEQ price and calculating expected tax")
 		tax := feeParams.UpdateDid[0]
-		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, tax.MinAmount.Mul(math.NewInt(2))))
@@ -297,7 +298,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("fetching cheq EMA price and computing fees")
 		tax := feeParams.DeactivateDid[0]
-		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
@@ -418,7 +419,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		By("checking the granter balance difference")
 		tax := feeParams.CreateDid[0].MaxAmount
 		userFee := sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, *tax))
-		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 		convertedFees, err := ante.GetFeeForMsg(userFee, feeParams.CreateDid, cheqp, nil)
@@ -494,7 +495,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		By("checking the granter balance difference")
 		tax := feeParams.UpdateDid[0].MinAmount
 		userFee := sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, *tax))
-		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 		convertedFees, err := ante.GetFeeForMsg(userFee, feeParams.UpdateDid, cheqp, nil)
@@ -541,7 +542,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		By("fetching cheq EMA price and computing fees")
 		tax := feeParams.DeactivateDid[0]
-		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))

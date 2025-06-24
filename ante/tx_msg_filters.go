@@ -9,6 +9,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
 	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	resourceutils "github.com/cheqd/cheqd-node/x/resource/utils"
@@ -182,7 +183,7 @@ func checkFeeParamsFromSubspace(ctx sdk.Context, didKeeper DidKeeper, resourceKe
 }
 
 func IsTaxableTx(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKeeper, tx sdk.Tx, oracleKeeper OracleKeeper, feeabsKeeper feeabskeeper.Keeper) (bool, sdk.Coins, sdk.Coins, error) {
-	ncheqPrice, exist := oracleKeeper.GetEMA(ctx, oracletypes.CheqdSymbol)
+	ncheqPrice, exist := oracleKeeper.GetWMA(ctx, oracletypes.CheqdSymbol, string(oraclekeeper.WmaStrategyBalanced))
 	if !exist {
 		// fallback to fixed fee range in ncheq if defined
 		ncheqPrice = sdkmath.LegacyZeroDec() // zero value, GetFeeForMsg will handle fallback

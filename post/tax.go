@@ -9,6 +9,7 @@ import (
 	cheqdante "github.com/cheqd/cheqd-node/ante"
 	"github.com/cheqd/cheqd-node/util"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
 	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -395,8 +396,10 @@ func (td *TaxDecorator) handleTaxableTransaction(
 	nativeDenom := params.FeeDenom
 	onlyNativeDenom := td.isOnlyNativeDenom(feeTx.GetFee(), nativeDenom)
 
-	cheqPrice, _ := td.oracleKeeper.GetEMA(ctx, oracletypes.CheqdSymbol)
-
+	cheqPrice, found := td.oracleKeeper.GetWMA(ctx, oracletypes.CheqdSymbol, string(oraclekeeper.WmaStrategyBalanced))
+	if !found {
+		return err
+	}
 	if onlyNativeDenom {
 		err := td.processNativeDenomTax(ctx, feeTx, simulate, rewards, burn, tx, &convertedRewards, &convertedBurn, cheqPrice)
 		if err != nil {

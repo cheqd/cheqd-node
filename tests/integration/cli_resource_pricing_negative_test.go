@@ -15,6 +15,7 @@ import (
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -194,7 +195,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 	// 	By("submitting the image resource message with lower amount than required")
 
-	// 	cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+	// 	cheqPrice, err := cli.QueryWMA(types.BaseDenom)
 	// 	Expect(err).To(BeNil())
 	// 	cheqp := cheqPrice.Price
 
@@ -338,7 +339,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		tax := resourceFeeParams.Json[0]
 		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.MaxAmount.Mul(sdkmath.NewInt(2)))
 
-		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 		userFee := sdk.NewCoins(doubleTax)
@@ -379,7 +380,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		tax := resourceFeeParams.Image[0]
 		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.MaxAmount.Mul(sdkmath.NewInt(2)))
 
-		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 		userFee := sdk.NewCoins(doubleTax)
@@ -420,12 +421,12 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		tax := resourceFeeParams.Default[0]
 		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.MaxAmount.Mul(sdkmath.NewInt(2)))
 
-		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 		userFee := sdk.NewCoins(doubleTax)
 		convertedFees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Default, cheqp, nil)
-
+		Expect(err).To(BeNil())
 		_, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,

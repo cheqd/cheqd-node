@@ -1447,7 +1447,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 	})
 
 	It("Ensure to convert the IBC Denom to native fee for taxable txn", func() {
-		s.app.OracleKeeper.SetAverage(s.ctx, oraclekeeper.KeyEMA(didtypes.BaseDenom), math.LegacyMustNewDecFromStr("0.016"))
+		s.app.OracleKeeper.SetAverage(s.ctx, oraclekeeper.KeyWMAWithStrategy(didtypes.BaseDenom, string(oraclekeeper.WmaStrategyBalanced)), math.LegacyMustNewDecFromStr("0.016"))
 		err := s.app.FeeabsKeeper.SetHostZoneConfig(s.ctx, mockHostZoneConfig)
 		Expect(err).ToNot(HaveOccurred())
 		ibcDenom := "ibcfee"
@@ -1498,7 +1498,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 
 		// check balance of fee payer
 		balance := s.app.BankKeeper.GetBalance(s.ctx, addr1, ibcDenom)
-		cheqPrice, _ := s.app.OracleKeeper.GetEMA(s.ctx, didtypes.BaseDenom)
+		cheqPrice, _ := s.app.OracleKeeper.GetWMA(s.ctx, didtypes.BaseDenom, string(oraclekeeper.WmaStrategyBalanced))
 		hostconfig, _ := s.app.FeeabsKeeper.GetHostZoneConfig(s.ctx, ibcDenom)
 		nativeFee, err := s.app.FeeabsKeeper.CalculateNativeFromIBCCoins(s.ctx, feeAmount, hostconfig)
 		Expect(err).To(BeNil())

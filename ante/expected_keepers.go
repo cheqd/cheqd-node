@@ -44,4 +44,5 @@ type FeeMarketKeeper interface {
 type OracleKeeper interface {
 	GetEMA(ctx sdk.Context, denom string) (math.LegacyDec, bool)
 	GetExchangeRate(ctx sdk.Context, denom string) (math.LegacyDec, error)
+	GetWMA(ctx sdk.Context, denom string, strategy string) (math.LegacyDec, bool)
 }

@@ -15,6 +15,7 @@ import (
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/cheqd/cheqd-node/x/did/types"
+	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/google/uuid"
@@ -97,7 +98,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		By("submitting the json resource message")
 		tax := resourceFeeParams.Json[0]
 
-		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		cheqp := cheqPrice.Price
 		Expect(err).To(BeNil())
 		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
@@ -213,7 +214,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		By("submitting the image resource message")
 		tax := resourceFeeParams.Image[0]
 
-		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		cheqp := cheqPrice.Price
 		Expect(err).To(BeNil())
 
@@ -332,7 +333,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		By("submitting the default resource message")
 		tax := resourceFeeParams.Default[0]
 
-		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 
@@ -446,7 +447,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		granteeBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
-		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 
 		cheqp := cheqPrice.Price
@@ -502,7 +503,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		granteeBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
-		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 
@@ -557,7 +558,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		tax := resourceFeeParams.Default[0]
-		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 

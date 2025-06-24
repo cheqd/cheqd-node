@@ -15,6 +15,7 @@ import (
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
 	"github.com/cheqd/cheqd-node/x/did/types"
+	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
 	"github.com/google/uuid"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -217,7 +218,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 
 		By("fetching cheq EMA price and computing fees")
 		tax := feeParams.UpdateDid[0]
-		cheqPrice, err := cli.QueryEMA(types.BaseDenom)
+		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 		doubleTax := sdk.NewCoin(types.BaseMinimalDenom, tax.MinAmount.Mul(sdkmath.NewInt(2)))
@@ -268,7 +269,8 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		By("submitting the deactivate diddoc message with double the tax")
 		tax := feeParams.DeactivateDid[0].MinAmount
 		doubleTax := sdk.NewCoin(types.BaseMinimalDenom, tax.Mul(sdkmath.NewInt(2)))
-		price, err := cli.QueryEMA(types.BaseDenom)
+		price, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
+
 		Expect(err).To(BeNil())
 		userFee := sdk.NewCoins(doubleTax)
 		fees, err := ante.GetFeeForMsg(userFee, feeParams.DeactivateDid, price.Price, nil)

@@ -13,6 +13,7 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	"github.com/cheqd/cheqd-node/x/did/types"
 	oracleKeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
+	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
 	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -576,7 +577,7 @@ var _ = Describe("cheqd cli - oracle module", func() {
 		}
 
 		for _, denom := range oracleParams.Params.AcceptList {
-			resp, err := cli.QueryWMA(denom.SymbolDenom, "BALANCED", nil)
+			resp, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 			if err != nil {
 				fmt.Printf("Skipping WMA for %s: %v\n", denom.BaseDenom, err)
 				continue
@@ -588,7 +589,6 @@ var _ = Describe("cheqd cli - oracle module", func() {
 
 		AddReportEntry("Integration", fmt.Sprintf("%sPositive: %s", cli.Green, "Queried WMA values successfully"))
 	})
-
 })
 
 // Helper function to check if a slice contains a string

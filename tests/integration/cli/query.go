@@ -466,13 +466,13 @@ func parseAmount(amount string) (int64, error) {
 	return value, nil
 }
 
-func QueryEMA(denom string) (*oracletypes.QueryEMAResponse, error) {
+func QueryEMA(denom string) (*oracletypes.QueryWMAResponse, error) {
 	res, err := Query("oracle", "ema", denom)
 	if err != nil {
 		return nil, err
 	}
 
-	var resp oracletypes.QueryEMAResponse
+	var resp oracletypes.QueryWMAResponse
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshaling exchange rate response: %w", err)
