@@ -38,8 +38,8 @@ func migrateParams(store corestoretypes.KVStore, cdc codec.BinaryCodec) error {
 			},
 			{
 				Denom:     oracletypes.UsdDenom,
-				MinAmount: util.PtrInt(140000000000000000),
-				MaxAmount: util.PtrInt(140000000000000000),
+				MinAmount: util.PtrInt(138642928023700520),
+				MaxAmount: util.PtrInt(138642928023700520),
 			},
 		},
 		Json: []didtypes.FeeRange{
@@ -50,8 +50,8 @@ func migrateParams(store corestoretypes.KVStore, cdc codec.BinaryCodec) error {
 			},
 			{
 				Denom:     oracletypes.UsdDenom,
-				MinAmount: util.PtrInt(35000000000000000),
-				MaxAmount: util.PtrInt(35000000000000000),
+				MinAmount: util.PtrInt(34660732005925130),
+				MaxAmount: util.PtrInt(34660732005925130),
 			},
 		},
 		Default: []didtypes.FeeRange{
@@ -62,8 +62,8 @@ func migrateParams(store corestoretypes.KVStore, cdc codec.BinaryCodec) error {
 			},
 			{
 				Denom:     oracletypes.UsdDenom,
-				MinAmount: util.PtrInt(70000000000000000),
-				MaxAmount: util.PtrInt(70000000000000000),
+				MinAmount: util.PtrInt(69321464011850260),
+				MaxAmount: util.PtrInt(69321464011850260),
 			},
 		},
 		BurnFactor: legacyParams.BurnFactor,
