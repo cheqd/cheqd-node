@@ -171,7 +171,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the json resource message with lower amount than required")
-		lowerTax := sdk.NewCoin(resourceFeeParams.Json[0].Denom, sdkmath.NewInt(resourceFeeParams.Json[0].MinAmount.Int64()-10000000))
+		lowerTax := sdk.NewCoin(resourceFeeParams.Json[0].Denom, sdkmath.NewInt(resourceFeeParams.Json[0].MinAmount.Int64()-100000000))
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
