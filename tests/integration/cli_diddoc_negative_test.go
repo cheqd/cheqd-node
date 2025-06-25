@@ -6,6 +6,7 @@ import (
 	"crypto/ed25519"
 	"fmt"
 
+	"cosmossdk.io/math"
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
 	helpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
@@ -214,7 +215,8 @@ var _ = Describe("cheqd cli - negative did", func() {
 			AssertionMethod: []string{keyId},
 		}
 
-		res, err = cli.UpdateDidDoc(tmpDir, updatedPayload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid[0].MinAmount.String()+feeParams.UpdateDid[0].Denom))
+		fees := feeParams.UpdateDid[0].MinAmount.Mul(math.NewInt(2))
+		res, err = cli.UpdateDidDoc(tmpDir, updatedPayload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(fees.String()+feeParams.UpdateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -403,13 +405,14 @@ var _ = Describe("cheqd cli - negative did", func() {
 		Expect(err).ToNot(BeNil())
 
 		// Finally, update the DID Doc
-		res, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, signInputsAugmented, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid[0].MinAmount.String()+feeParams.UpdateDid[0].Denom))
+
+		res, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, signInputsAugmented, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(fees.String()+feeParams.UpdateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.Purple, "cannot update diddoc with an unchanged payload"))
 		// Fail to update the DID Doc with an unchanged payload
-		_, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, signInputsAugmented, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid[0].MinAmount.String()+feeParams.UpdateDid[0].Denom))
+		_, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, signInputsAugmented, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(fees.String()+feeParams.UpdateDid[0].Denom))
 		Expect(err).To(BeNil()) // TODO: Decide if this should be an error, if the DID Doc is unchanged
 	})
 

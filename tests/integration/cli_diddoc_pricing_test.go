@@ -479,8 +479,10 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		granteeBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, types.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
+		fees := feeParams.UpdateDid[0].MinAmount.Mul(math.NewInt(2))
+
 		By("submitting an update diddoc message")
-		resp, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(feeParams.UpdateDid[0].MinAmount.String()+feeParams.UpdateDid[0].Denom)))
+		resp, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(fees.String()+feeParams.UpdateDid[0].Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -493,8 +495,8 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("checking the granter balance difference")
-		tax := feeParams.UpdateDid[0].MinAmount
-		userFee := sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, *tax))
+		tax := feeParams.UpdateDid[0].MinAmount.Mul(math.NewInt(2))
+		userFee := sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, tax))
 		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
