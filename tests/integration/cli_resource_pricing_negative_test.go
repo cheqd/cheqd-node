@@ -13,7 +13,6 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	didcli "github.com/cheqd/cheqd-node/x/did/client/cli"
 	testsetup "github.com/cheqd/cheqd-node/x/did/tests/setup"
-	"github.com/cheqd/cheqd-node/x/did/types"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -172,7 +171,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the json resource message with lower amount than required")
-		lowerTax := sdk.NewCoin(resourceFeeParams.Json[0].Denom, sdkmath.NewInt(resourceFeeParams.Json[0].MinAmount.Int64()-1000000))
+		lowerTax := sdk.NewCoin(resourceFeeParams.Json[0].Denom, sdkmath.NewInt(resourceFeeParams.Json[0].MinAmount.Int64()-10000000))
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -194,7 +193,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the image resource message with lower amount than required")
-		lowerTax := sdk.NewCoin(resourceFeeParams.Image[0].Denom, sdkmath.NewInt(resourceFeeParams.Image[0].MinAmount.Int64()-1000000))
+		lowerTax := sdk.NewCoin(resourceFeeParams.Image[0].Denom, sdkmath.NewInt(resourceFeeParams.Image[0].MinAmount.Int64()-100000000))
 
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
@@ -217,7 +216,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting the default resource message with lower amount than required")
-		lowerTax := sdk.NewCoin(resourceFeeParams.Default[0].Denom, sdkmath.NewInt(resourceFeeParams.Default[0].MinAmount.Int64()-1000000))
+		lowerTax := sdk.NewCoin(resourceFeeParams.Default[0].Denom, sdkmath.NewInt(resourceFeeParams.Default[0].MinAmount.Int64()-100000000))
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -312,7 +311,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		tax := resourceFeeParams.Json[0]
 		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.MaxAmount.Mul(sdkmath.NewInt(2)))
 
-		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
+		cheqPrice, err := cli.QueryWMA(didtypes.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 		userFee := sdk.NewCoins(doubleTax)
@@ -334,7 +333,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(convertedFees.AmountOf(types.BaseMinimalDenom)))
+		Expect(diff).To(Equal(convertedFees.AmountOf(didtypes.BaseMinimalDenom)))
 	})
 
 	It("should not charge more than tax in create resource image message - case: fixed fee", func() {
@@ -354,7 +353,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		tax := resourceFeeParams.Image[0]
 		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.MaxAmount.Mul(sdkmath.NewInt(2)))
 
-		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
+		cheqPrice, err := cli.QueryWMA(didtypes.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 		userFee := sdk.NewCoins(doubleTax)
@@ -376,7 +375,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(convertedFees.AmountOf(types.BaseMinimalDenom)))
+		Expect(diff).To(Equal(convertedFees.AmountOf(didtypes.BaseMinimalDenom)))
 	})
 
 	It("should not charge more than tax in create resource default message - case: fixed fee", func() {
@@ -396,7 +395,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		tax := resourceFeeParams.Default[0]
 		doubleTax := sdk.NewCoin(resourcetypes.BaseMinimalDenom, tax.MaxAmount.Mul(sdkmath.NewInt(2)))
 
-		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
+		cheqPrice, err := cli.QueryWMA(didtypes.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 		userFee := sdk.NewCoins(doubleTax)
@@ -417,6 +416,6 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(convertedFees.AmountOf(types.BaseMinimalDenom)))
+		Expect(diff).To(Equal(convertedFees.AmountOf(didtypes.BaseMinimalDenom)))
 	})
 })
