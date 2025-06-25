@@ -318,7 +318,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		}
 
 		By("submitting update diddoc message with insufficient funds")
-		tax := feeParams.UpdateDid[0].MinAmount
+		tax := feeParams.UpdateDid[0].MaxAmount
 		res, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_6, helpers.GenerateFees(tax.String()+feeParams.UpdateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res.RawLog).To(ContainSubstring(sdkerrors.ErrInsufficientFunds.Error()))
@@ -336,7 +336,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		}
 
 		By("submitting deactivate diddoc message with insufficient funds")
-		tax := feeParams.DeactivateDid[0].MinAmount
+		tax := feeParams.DeactivateDid[0].MaxAmount
 		res, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_6, helpers.GenerateFees(tax.String()+feeParams.DeactivateDid[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res.RawLog).To(ContainSubstring(sdkerrors.ErrInsufficientFunds.Error()))
