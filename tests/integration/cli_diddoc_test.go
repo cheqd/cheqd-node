@@ -109,8 +109,6 @@ var _ = Describe("cheqd cli - positive did", func() {
 		fees := feeParams.UpdateDid[0].MinAmount.Mul(math.NewInt(2))
 
 		res2, err := cli.UpdateDidDoc(tmpDir, payload2, signInputs2, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(fees.String()+feeParams.UpdateDid[0].Denom))
-
-		fmt.Println("Res----------", res2)
 		Expect(err).To(BeNil())
 		Expect(res2.Code).To(BeEquivalentTo(0))
 
@@ -241,7 +239,6 @@ var _ = Describe("cheqd cli - positive did", func() {
 		fees := feeParams.UpdateDid[0].MinAmount.Mul(math.NewInt(2))
 
 		res2, err := cli.UpdateDidDoc(tmpDir, payload2, signInputs2, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(fees.String()+feeParams.UpdateDid[0].Denom))
-		fmt.Println("res2--------", res2)
 		Expect(err).To(BeNil())
 		Expect(res2.Code).To(BeEquivalentTo(0))
 
@@ -367,7 +364,6 @@ var _ = Describe("cheqd cli - positive did", func() {
 		fees := feeParams.UpdateDid[0].MinAmount.Mul(math.NewInt(2))
 
 		res2, err := cli.UpdateDidDoc(tmpDir, payload2, signInputs2, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(fees.String()+feeParams.UpdateDid[0].Denom))
-		fmt.Println("Res------------", res2)
 		Expect(err).To(BeNil())
 		Expect(res2.Code).To(BeEquivalentTo(0))
 
@@ -510,7 +506,6 @@ var _ = Describe("cheqd cli - positive did", func() {
 		fees := feeParams.UpdateDid[0].MinAmount.Mul(math.NewInt(2))
 
 		res2, err := cli.UpdateDidDoc(tmpDir, payload2, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(fees.String()+feeParams.UpdateDid[0].Denom))
-		fmt.Println("res--------------", res2)
 		Expect(err).To(BeNil())
 		Expect(res2.Code).To(BeEquivalentTo(0))
 
@@ -626,7 +621,6 @@ var _ = Describe("cheqd cli - positive did", func() {
 		fees := feeParams.UpdateDid[0].MinAmount.Mul(math.NewInt(2))
 
 		res2, err := cli.UpdateDidDoc(tmpDir, payload2, signInputs, versionID2, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(fees.String()+feeParams.UpdateDid[0].Denom))
-		fmt.Println("res----------------", res2)
 		Expect(err).To(BeNil())
 		Expect(res2.Code).To(BeEquivalentTo(0))
 

@@ -4,7 +4,6 @@ package integration
 
 import (
 	"crypto/ed25519"
-	"fmt"
 
 	"cosmossdk.io/math"
 	"github.com/cheqd/cheqd-node/ante"
@@ -295,7 +294,6 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		By("querying the fee payer account balance before the transaction")
 		balanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, types.BaseMinimalDenom)
 		Expect(err).To(BeNil())
-		fmt.Println("balanceBefore--------", balanceBefore)
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
 
 		By("fetching cheq EMA price and computing fees")
@@ -309,7 +307,6 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		burnPotionInUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
 		rewardPortionInUsd := helpers.GetRewardPortion(convertedFees, burnPotionInUsd)
 
-		fmt.Println("convertedFees------------", convertedFees)
 		burnPotionInUsdToCheq, err := posthandler.ConvertToCheq(burnPotionInUsd, cheqp)
 		Expect(err).To(BeNil())
 
@@ -324,8 +321,6 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		feeCollectorReward := sdk.NewCoin(types.BaseMinimalDenom, coin.Sub(oracleReward))
 
 		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
-		fmt.Println("taxInCheqd------------", taxIncheqd)
-		fmt.Println("tax------------", tax.MaxAmount)
 		By("submitting a deactivate diddoc message")
 		res, err := cli.DeactivateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom))
 		Expect(err).To(BeNil())
@@ -334,13 +329,11 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		By("querying the altered account balance")
 		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_4_ADDR, types.BaseMinimalDenom)
 		Expect(err).To(BeNil())
-		fmt.Println("balanceAfter--------", balanceAfter)
 
 		Expect(balanceAfter.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		fmt.Println("the diff is------------000", diff)
 		Expect(diff.Int64()).To(BeNumerically("~", taxIncheqd.AmountOf(types.BaseMinimalDenom).Int64(), 2_000_000))
 
 		By("exporting a readable tx event log")
