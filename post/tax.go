@@ -479,11 +479,7 @@ func (td *TaxDecorator) processNativeDenomTax(
 	if err := td.validateTax(feeTx.GetFee(), simulate); err != nil {
 		return err
 	}
-	tax := rewards.Add(burn...)
-	feePayer, err := td.getFeePayer(ctx, feeTx, tax, tx.GetMsgs())
-	if err != nil {
-		return err
-	}
+	var err error
 	*convertedRewards, err = ConvertToCheq(rewards, cheqPrice)
 	if err != nil {
 		return err
@@ -492,7 +488,11 @@ func (td *TaxDecorator) processNativeDenomTax(
 	if err != nil {
 		return err
 	}
-	tax = convertedRewards.Add(*convertedBurn...)
+	tax := convertedRewards.Add(*convertedBurn...)
+	feePayer, err := td.getFeePayer(ctx, feeTx, tax, tx.GetMsgs())
+	if err != nil {
+		return err
+	}
 	return td.deductTaxFromFeePayer(ctx, feePayer, tax)
 }
 
