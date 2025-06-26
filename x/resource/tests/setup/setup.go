@@ -158,7 +158,7 @@ func Setup() TestSetup {
 	resourceKeeper := keeper.NewKeeper(cdc, runtime.NewKVStoreService(keys[types.StoreKey]),
 		getSubspace(types.ModuleName, paramsKeeper),
 		&portKeeper,
-		scopedResourceKeeper, authority)
+		scopedResourceKeeper, authority, OracleKeeper)
 
 	ibcModule := resource.NewIBCModule(*resourceKeeper)
 
@@ -174,7 +174,7 @@ func Setup() TestSetup {
 	didMsgServer := didkeeper.NewMsgServer(*didKeeper)
 	didQueryServer := didkeeper.NewQueryServer(*didKeeper)
 
-	msgServer := keeper.NewMsgServer(*resourceKeeper, *didKeeper, OracleKeeper)
+	msgServer := keeper.NewMsgServer(*resourceKeeper, *didKeeper)
 	queryServer := keeper.NewQueryServer(*resourceKeeper, *didKeeper)
 
 	params := stakingtypes.DefaultParams()

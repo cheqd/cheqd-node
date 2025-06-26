@@ -12,6 +12,7 @@ import (
 	"time"
 
 	upgradetypes "cosmossdk.io/x/upgrade/types"
+	resourcev2 "github.com/cheqd/cheqd-node/api/v2/cheqd/resource/v2"
 	didv2 "github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -183,6 +184,11 @@ func MakeCodecWithExtendedRegistry() codec.Codec {
 		&govtypesv1.MsgExecLegacyContent{},
 		&didv2.MsgBurn{},
 		&didv2.MsgMint{},
+		&didv2.MsgUpdateParams{},
+	)
+	interfaceRegistry.RegisterImplementations(
+		(*sdk.Msg)(nil),
+		&resourcev2.MsgUpdateParams{},
 	)
 
 	return codec.NewProtoCodec(interfaceRegistry)

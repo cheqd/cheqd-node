@@ -2,11 +2,14 @@ package cli
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	upgradetypes "cosmossdk.io/x/upgrade/types"
+	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -170,3 +173,50 @@ func QueryDid(did string, container string) (didtypes.QueryDidDocResponse, error
 
 	return resp, nil
 }
+
+func QueryWMA(denom string, strategy string, customWeights []int64, container string) (*oracletypes.QueryWMAResponse, error) {
+	// Base CLI args
+	args := []string{denom, "--strategy", strategy}
+
+	// Only add weights if strategy is CUSTOM
+	if strings.ToUpper(strategy) == "CUSTOM" {
+		if len(customWeights) == 0 {
+			return nil, fmt.Errorf("custom weights must be provided for CUSTOM strategy")
+		}
+
+		var weightsStr []string
+		for _, w := range customWeights {
+			weightsStr = append(weightsStr, fmt.Sprintf("%d", w))
+		}
+		args = append(args, "--weights", strings.Join(weightsStr, ","))
+	}
+
+	// Run CLI query
+	res, err := Query(container, CliBinaryName, "oracle", "wma", args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to run WMA query: %w", err)
+	}
+	var resp oracletypes.QueryWMAResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling WMA response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+func QueryOracleParams(container string) (oracletypes.QueryParamsResponse, error) {
+	res, err := Query(container, CliBinaryName, "oracle", "params")
+	if err != nil {
+		return oracletypes.QueryParamsResponse{}, err
+	}
+
+	var resp oracletypes.QueryParamsResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return oracletypes.QueryParamsResponse{}, err
+	}
+
+	return resp, nil
+}
+

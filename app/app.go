@@ -712,15 +712,6 @@ func New(
 		AddRoute(icahosttypes.SubModuleName, icaHostStack).
 		AddRoute(feeabstypes.ModuleName, feeabsIBCModule)
 
-	// x/resource
-	app.ResourceKeeper = *resourcekeeper.NewKeeper(
-		appCodec, runtime.NewKVStoreService(keys[resourcetypes.StoreKey]),
-		app.GetSubspace(resourcetypes.ModuleName),
-		app.IBCKeeper.PortKeeper,
-		scopedResourceKeeper,
-		authority,
-	)
-
 	// create the resource IBC stack
 	var resourceIbcStack porttypes.IBCModule
 	resourceIbcStack = resource.NewIBCModule(app.ResourceKeeper)
@@ -756,6 +747,16 @@ func New(
 		distrtypes.ModuleName,
 		cast.ToBool(appOpts.Get("telemetry.enabled")),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
+	// x/resource
+	app.ResourceKeeper = *resourcekeeper.NewKeeper(
+		appCodec, runtime.NewKVStoreService(keys[resourcetypes.StoreKey]),
+		app.GetSubspace(resourcetypes.ModuleName),
+		app.IBCKeeper.PortKeeper,
+		scopedResourceKeeper,
+		authority,
+		app.OracleKeeper,
 	)
 	app.DidKeeper = *didkeeper.NewKeeper(
 		appCodec, runtime.NewKVStoreService(keys[didtypes.StoreKey]),

@@ -455,12 +455,11 @@ func validateCrossDenomFixedFee(
 			if cheqEmaPrice.IsZero() {
 				return nil, errors.New("cannot verify cross-denom fixed fee: cheq price not available")
 			}
-
-			usdAmount := sdkmath.LegacyNewDecFromInt(fixedFee.Amount).QuoInt(sdkmath.NewInt(1_000_000_000_000)) // 1e18 → 1e6
+			usdAmount := sdkmath.LegacyNewDecFromInt(fixedFee.Amount).QuoInt(usdFrom18To6) // 1e18 → 1e6
 			requiredCheq := usdAmount.Quo(cheqEmaPrice).MulInt(cheqScale).QuoInt(usdScale).TruncateInt()
 
 			if coin.Amount.LT(requiredCheq) {
-				return nil, fmt.Errorf("insufficient ncheq: need at least %s, got %s", requiredCheq, coin.Amount)
+				return nil, fmt.Errorf("insufficient fee: need at least %s, got %s", requiredCheq, coin.Amount)
 			}
 			return sdk.NewCoins(sdk.NewCoin(coin.Denom, requiredCheq)), nil
 		default:

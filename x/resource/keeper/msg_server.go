@@ -5,7 +5,6 @@ import (
 
 	"cosmossdk.io/errors"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
-	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
@@ -13,8 +12,7 @@ import (
 
 type msgServer struct {
 	Keeper
-	didKeeper    didkeeper.Keeper
-	oracelKeeper oraclekeeper.Keeper
+	didKeeper didkeeper.Keeper
 }
 
 // NewMsgServerImpl returns an implementation of the x/auth MsgServer interface.
@@ -26,11 +24,10 @@ func NewMsgServerImpl(keeper Keeper, didKeeper didkeeper.Keeper) types.MsgServer
 }
 
 // NewMsgServer returns an implementation of the MsgServer interface for the provided Keeper.
-func NewMsgServer(keeper Keeper, cheqdKeeper didkeeper.Keeper, oracleKeeper oraclekeeper.Keeper) types.MsgServer {
+func NewMsgServer(keeper Keeper, cheqdKeeper didkeeper.Keeper) types.MsgServer {
 	return &msgServer{
-		Keeper:       keeper,
-		didKeeper:    cheqdKeeper,
-		oracelKeeper: oracleKeeper,
+		Keeper:    keeper,
+		didKeeper: cheqdKeeper,
 	}
 }
 
@@ -40,8 +37,7 @@ func (k msgServer) UpdateParams(goCtx context.Context, req *types.MsgUpdateParam
 	if k.authority != req.Authority {
 		return nil, errors.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", k.authority, req.Authority)
 	}
-
-	if err := req.Params.ValidateWithOracle(goCtx, k.oracelKeeper); err != nil {
+	if err := req.Params.ValidateWithOracle(goCtx, k.Keeper.oracleKeeper); err != nil {
 		return nil, err
 	}
 

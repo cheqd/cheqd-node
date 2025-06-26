@@ -15,7 +15,7 @@ import (
 )
 
 func NewHandler(k keeper.Keeper, cheqdKeeper didkeeper.Keeper, oracleKeeper oracleKeeper.Keeper) baseapp.MsgServiceHandler {
-	msgServer := keeper.NewMsgServer(k, cheqdKeeper, oracleKeeper)
+	msgServer := keeper.NewMsgServer(k, cheqdKeeper)
 
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
