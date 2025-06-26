@@ -6,7 +6,6 @@ import (
 	"time"
 
 	upgradetypes "cosmossdk.io/x/upgrade/types"
-	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	integrationhelpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
@@ -197,7 +196,7 @@ func QueryWMA(denom string, strategy string, customWeights []int64, container st
 		return nil, fmt.Errorf("failed to run WMA query: %w", err)
 	}
 	var resp oracletypes.QueryWMAResponse
-	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	err = integrationhelpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshaling WMA response: %w", err)
 	}
@@ -212,11 +211,10 @@ func QueryOracleParams(container string) (oracletypes.QueryParamsResponse, error
 	}
 
 	var resp oracletypes.QueryParamsResponse
-	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	err = integrationhelpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
 		return oracletypes.QueryParamsResponse{}, err
 	}
 
 	return resp, nil
 }
-

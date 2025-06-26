@@ -135,7 +135,7 @@ var _ = Describe("Integration - update the did params", func() {
 		outPath := "update-did-fee-params.json"
 		jsonBytes, err := json.MarshalIndent(proposal, "", "  ")
 		Expect(err).To(BeNil())
-		err = os.WriteFile(outPath, jsonBytes, 0644)
+		err = os.WriteFile(outPath, jsonBytes, 0o644)
 		Expect(err).To(BeNil())
 		fmt.Printf("Fee params proposal written to: %s\n", outPath)
 	})
@@ -329,7 +329,7 @@ var _ = Describe("Integration - update resource params", func() {
 		outPath := "update-resource-fee-params.json"
 		jsonBytes, err := json.MarshalIndent(proposal, "", "  ")
 		Expect(err).To(BeNil())
-		err = os.WriteFile(outPath, jsonBytes, 0644)
+		err = os.WriteFile(outPath, jsonBytes, 0o644)
 		Expect(err).To(BeNil())
 		fmt.Printf("Fee params proposal written to: %s\n", outPath)
 	})

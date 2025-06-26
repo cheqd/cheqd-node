@@ -13,9 +13,7 @@ import (
 )
 
 var _ = Describe("Upgrade - Fee parameter change proposal", func() {
-	var (
-		Proposal_id string
-	)
+	var Proposal_id string
 	It("should wait for node catching up", func() {
 		By("pinging the node status until catching up is flagged as false")
 		err := cli.WaitForCaughtUp(cli.Validator0, cli.CliBinaryName, cli.VotingPeriod*6)
