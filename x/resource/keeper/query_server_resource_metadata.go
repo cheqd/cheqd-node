@@ -41,3 +41,34 @@ func (q queryServer) ResourceMetadata(c context.Context, req *types.QueryResourc
 		Resource: &metadata,
 	}, nil
 }
+
+func (q queryServer) LatestResourceVersionMetadata(c context.Context, req *types.QueryLatestResourceVersionMetadataRequest) (*types.QueryLatestResourceVersionMetadataResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	req.Normalize()
+
+	// Validate corresponding DIDDoc exists
+	namespace, err := q.didKeeper.GetDidNamespace(c)
+	if err != nil {
+		return nil, err
+	}
+	did := didutils.JoinDID(didtypes.DidMethod, namespace, req.CollectionId)
+	hasDidDoc, err := q.didKeeper.HasDidDoc(c, did)
+	if err != nil {
+		return nil, err
+	}
+	if !hasDidDoc {
+		return nil, didtypes.ErrDidDocNotFound.Wrap(did)
+	}
+
+	metadata, err := q.GetLatestResourceVersionMetadata(c, req.CollectionId, req.Name, req.ResourceType)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryLatestResourceVersionMetadataResponse{
+		Resource: &metadata,
+	}, nil
+}

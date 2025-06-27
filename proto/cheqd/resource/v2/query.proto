@@ -23,6 +23,16 @@ service Query {
     option (google.api.http).get = "/cheqd/resource/v2/{collection_id}/resources/{id}/metadata";
   }
 
+  // Fetch latest version for a specific resource (without metadata)
+  rpc LatestResourceVersion(QueryLatestResourceVersionRequest) returns (QueryLatestResourceVersionResponse) {
+    option (google.api.http) = {get: "/cheqd/resource/v2/{collection_id}/resources/{name}/{resource_type}"};
+  }
+
+  // Fetch metadata of the latest version for a specific resource
+  rpc LatestResourceVersionMetadata(QueryLatestResourceVersionMetadataRequest) returns (QueryLatestResourceVersionMetadataResponse) {
+    option (google.api.http) = {get: "/cheqd/resource/v2/{collection_id}/resources/{name}/{resource_type}/metadata"};
+  }
+
   // Fetch metadata for all resources in a collection
   rpc CollectionResources(QueryCollectionResourcesRequest) returns (QueryCollectionResourcesResponse) {
     option (google.api.http).get = "/cheqd/resource/v2/{collection_id}/metadata";
@@ -74,6 +84,62 @@ message QueryResourceMetadataRequest {
 
 // QueryResourceMetadataResponse is the response type for the Query/ResourceMetadata RPC method
 message QueryResourceMetadataResponse {
+  // resource is the requested resource metadata
+  Metadata resource = 1 [(gogoproto.jsontag) = "linkedResourceMetadata"];
+}
+
+// QueryLatestResourceVersionRequest is the request type for the Query/Resource RPC method
+message QueryLatestResourceVersionRequest {
+  // collection_id is an identifier of the DidDocument the resource belongs to.
+  // Format: <unique-identifier>
+  //
+  // Examples:
+  // - c82f2b02-bdab-4dd7-b833-3e143745d612
+  // - wGHEXrZvJxR8vw5P3UWH1j
+  string collection_id = 1;
+
+  // name is a human-readable name for the Resource. Defined client-side.
+  // Does not change between different versions.
+  // Example: PassportSchema, EducationTrustRegistry
+  string name = 2 [(gogoproto.jsontag) = "resourceName"];
+
+  // resource_type is a Resource type that identifies what the Resource is. Defined client-side.
+  // This is NOT the same as the resource's media type.
+  // Example: AnonCredsSchema, StatusList2021
+  string resource_type = 3 [(gogoproto.jsontag) = "resourceType"];
+}
+
+// QueryLatestResourceVersionResponse is the response type for the Query/Resource RPC method
+message QueryLatestResourceVersionResponse {
+  // Successful resolution of the resource returns the following:
+  // - resource is the requested resource
+  // - metadata is the resource metadata associated with the requested resource
+  ResourceWithMetadata resource = 1;
+}
+
+// QueryLatestResourceVersionMetadataRequest is the request type for the Query/ResourceMetadata RPC method
+message QueryLatestResourceVersionMetadataRequest {
+  // collection_id is an identifier of the DidDocument the resource belongs to.
+  // Format: <unique-identifier>
+  //
+  // Examples:
+  // - c82f2b02-bdab-4dd7-b833-3e143745d612
+  // - wGHEXrZvJxR8vw5P3UWH1j
+  string collection_id = 1;
+
+  // name is a human-readable name for the Resource. Defined client-side.
+  // Does not change between different versions.
+  // Example: PassportSchema, EducationTrustRegistry
+  string name = 2 [(gogoproto.jsontag) = "resourceName"];
+
+  // resource_type is a Resource type that identifies what the Resource is. Defined client-side.
+  // This is NOT the same as the resource's media type.
+  // Example: AnonCredsSchema, StatusList2021
+  string resource_type = 3 [(gogoproto.jsontag) = "resourceType"];
+}
+
+// QueryLatestResourceVersionMetadataResponse is the response type for the Query/ResourceMetadata RPC method
+message QueryLatestResourceVersionMetadataResponse {
   // resource is the requested resource metadata
   Metadata resource = 1 [(gogoproto.jsontag) = "linkedResourceMetadata"];
 }
