@@ -479,12 +479,14 @@ func validateCrossDenomFixedFee(
 				nativeUsd := nativeDec.QuoInt(cheqScale).Mul(cheqEmaPrice).MulInt(usdScale).TruncateInt() // in µUSD
 
 				// Step 2: Convert required USD fee to µUSD
-				requiredUsd := sdkmath.LegacyNewDecFromInt(fixedFee.Amount).QuoInt(sdkmath.NewInt(usdFrom18To6.Int64())).TruncateInt() // 18-dec → 6-dec
+				requiredUsd := sdkmath.LegacyNewDecFromInt(fixedFee.Amount).QuoInt(usdFrom18To6).TruncateInt() // 18-dec → 6-dec
 
 				// Step 3: Compare
 				if nativeUsd.LT(requiredUsd) {
 					return nil, fmt.Errorf("insufficient fee: requires ≥ %s µUSD, got %s µUSD (via %s)", requiredUsd, nativeUsd, nativeCoin)
 				}
+
+				return sdk.NewCoins(sdk.NewCoin(oracletypes.CheqdDenom, nativeCoin)), nil
 
 			case oracletypes.CheqdDenom:
 				if nativeCoin.LT(fixedFee.Amount) {
