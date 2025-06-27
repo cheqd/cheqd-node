@@ -3,11 +3,11 @@ package ante
 import (
 	"errors"
 	"fmt"
-	"math"
 	"strings"
 
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
+	"github.com/cheqd/cheqd-node/util"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
 	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
@@ -27,17 +27,6 @@ const (
 	MsgCreateResourceJSON
 
 	TaxableMsgFeeCount
-)
-
-const (
-	cheqExponent = 9
-	usdExponent  = 6
-)
-
-var (
-	cheqScale    = sdkmath.NewIntFromUint64(uint64(math.Pow10(cheqExponent)))
-	usdScale     = sdkmath.NewIntFromUint64(uint64(math.Pow10(usdExponent)))
-	usdFrom18To6 = sdkmath.NewInt(1_000_000_000_000) // 1e12
 )
 
 const (
@@ -277,20 +266,20 @@ func GetFeeForMsg(txFee sdk.Coins, feeRanges []didtypes.FeeRange, cheqEmaPrice s
 		switch fr.Denom {
 		case oracletypes.CheqdDenom:
 			if fr.MinAmount != nil {
-				usd := sdkmath.LegacyNewDecFromInt(*fr.MinAmount).QuoInt(cheqScale).Mul(cheqEmaPrice).MulInt(usdScale).TruncateInt()
+				usd := sdkmath.LegacyNewDecFromInt(*fr.MinAmount).QuoInt(util.CheqScale).Mul(cheqEmaPrice).MulInt(util.UsdScale).TruncateInt()
 				minUSD = &usd
 			}
 			if fr.MaxAmount != nil {
-				usd := sdkmath.LegacyNewDecFromInt(*fr.MaxAmount).QuoInt(cheqScale).Mul(cheqEmaPrice).MulInt(usdScale).TruncateInt()
+				usd := sdkmath.LegacyNewDecFromInt(*fr.MaxAmount).QuoInt(util.CheqScale).Mul(cheqEmaPrice).MulInt(util.UsdScale).TruncateInt()
 				maxUSD = &usd
 			}
 		case oracletypes.UsdDenom:
 			if fr.MinAmount != nil {
-				val := fr.MinAmount.Quo(usdFrom18To6)
+				val := fr.MinAmount.Quo(util.UsdFrom18To6)
 				minUSD = &val
 			}
 			if fr.MaxAmount != nil {
-				val := fr.MaxAmount.Quo(usdFrom18To6)
+				val := fr.MaxAmount.Quo(util.UsdFrom18To6)
 				maxUSD = &val
 			}
 		default:
@@ -345,11 +334,12 @@ func GetFeeForMsg(txFee sdk.Coins, feeRanges []didtypes.FeeRange, cheqEmaPrice s
 
 	for _, coin := range txFee {
 		if coin.Denom == oracletypes.CheqdDenom {
-			cheqDec := sdkmath.LegacyNewDecFromInt(coin.Amount).QuoInt(cheqScale)
-			usd := cheqDec.Mul(cheqEmaPrice).MulInt(usdScale)
+			cheqDec := sdkmath.LegacyNewDecFromInt(coin.Amount).QuoInt(util.CheqScale)
+			usd := cheqDec.Mul(cheqEmaPrice).MulInt(util.UsdScale)
 			usdVal := usd.TruncateInt()
 			userUsdAmount = &usdVal
 			handled = true
+			break
 		}
 	}
 
@@ -360,8 +350,8 @@ func GetFeeForMsg(txFee sdk.Coins, feeRanges []didtypes.FeeRange, cheqEmaPrice s
 			return nil, fmt.Errorf("unexpected native denom: %s", nativeCoin.Denom)
 		}
 
-		cheqDec := sdkmath.LegacyNewDecFromInt(nativeCoin.Amount).QuoInt(cheqScale)
-		usd := cheqDec.Mul(cheqEmaPrice).MulInt(usdScale)
+		cheqDec := sdkmath.LegacyNewDecFromInt(nativeCoin.Amount).QuoInt(util.CheqScale)
+		usd := cheqDec.Mul(cheqEmaPrice).MulInt(util.UsdScale)
 		usd1 := usd.TruncateInt()
 		userUsdAmount = &usd1
 		handled = true
@@ -391,14 +381,14 @@ func GetFeeForMsg(txFee sdk.Coins, feeRanges []didtypes.FeeRange, cheqEmaPrice s
 	case oracletypes.CheqdDenom:
 		cheqAmt := sdkmath.LegacyNewDecFromInt(effectiveUsd).
 			Quo(cheqEmaPrice).
-			MulInt(cheqScale).
-			QuoInt(usdScale).
+			MulInt(util.CheqScale).
+			QuoInt(util.UsdScale).
 			TruncateInt()
 		finalAmount = cheqAmt
 		finalDenom = oracletypes.CheqdDenom
 
 	case oracletypes.UsdDenom:
-		finalAmount = effectiveUsd.Mul(usdFrom18To6)
+		finalAmount = effectiveUsd.Mul(util.UsdFrom18To6)
 		finalDenom = oracletypes.UsdDenom
 
 	default:
@@ -444,19 +434,14 @@ func validateCrossDenomFixedFee(
 	nativeFees sdk.Coins,
 	fixedfeeDenom string,
 ) (sdk.Coins, error) {
-	const cheqExponent = 9
-	const usdExponent = 6
-	cheqScale := sdkmath.NewIntFromUint64(uint64(math.Pow10(cheqExponent)))
-	usdScale := sdkmath.NewIntFromUint64(uint64(math.Pow10(usdExponent)))
-
 	for _, coin := range txFee {
 		switch coin.Denom {
 		case oracletypes.CheqdDenom:
 			if cheqEmaPrice.IsZero() {
 				return nil, errors.New("cannot verify cross-denom fixed fee: cheq price not available")
 			}
-			usdAmount := sdkmath.LegacyNewDecFromInt(fixedFee.Amount).QuoInt(usdFrom18To6) // 1e18 → 1e6
-			requiredCheq := usdAmount.Quo(cheqEmaPrice).MulInt(cheqScale).QuoInt(usdScale).TruncateInt()
+			usdAmount := sdkmath.LegacyNewDecFromInt(fixedFee.Amount).QuoInt(util.UsdFrom18To6) // 1e18 → 1e6
+			requiredCheq := usdAmount.Quo(cheqEmaPrice).MulInt(util.CheqScale).QuoInt(util.UsdScale).TruncateInt()
 
 			if coin.Amount.LT(requiredCheq) {
 				return nil, fmt.Errorf("insufficient fee: need at least %s, got %s", requiredCheq, coin.Amount)
@@ -476,10 +461,10 @@ func validateCrossDenomFixedFee(
 
 				// Step 1: Convert nativeCoin (e.g., ncheq) into USD
 				nativeDec := sdkmath.LegacyNewDecFromInt(nativeCoin)
-				nativeUsd := nativeDec.QuoInt(cheqScale).Mul(cheqEmaPrice).MulInt(usdScale).TruncateInt() // in µUSD
+				nativeUsd := nativeDec.QuoInt(util.CheqScale).Mul(cheqEmaPrice).MulInt(util.UsdScale).TruncateInt() // in µUSD
 
 				// Step 2: Convert required USD fee to µUSD
-				requiredUsd := sdkmath.LegacyNewDecFromInt(fixedFee.Amount).QuoInt(usdFrom18To6).TruncateInt() // 18-dec → 6-dec
+				requiredUsd := sdkmath.LegacyNewDecFromInt(fixedFee.Amount).QuoInt(util.UsdFrom18To6).TruncateInt() // 18-dec → 6-dec
 
 				// Step 3: Compare
 				if nativeUsd.LT(requiredUsd) {

@@ -605,7 +605,6 @@ func DeductFees(bankKeeper types.BankKeeper, ctx sdk.Context, accAddress sdk.Acc
 }
 
 func ConvertToCheq(coins sdk.Coins, cheqPrice math.LegacyDec) (sdk.Coins, error) {
-	// If all coins are already in ncheq, return them directly
 	if coins.DenomsSubsetOf(sdk.NewCoins(sdk.NewCoin(oracletypes.CheqdDenom, math.ZeroInt()))) {
 		return coins, nil
 	}
@@ -619,14 +618,13 @@ func ConvertToCheq(coins sdk.Coins, cheqPrice math.LegacyDec) (sdk.Coins, error)
 				return nil, fmt.Errorf("cannot convert USD to ncheq: CHEQ price unavailable")
 			}
 
-			// Convert: USD (18 decimals) → CHEQ → ncheq (9 decimals)
-			usdAmount := coin.Amount.ToLegacyDec().QuoInt64(util.UsdExponent)
-			ncheqAmount := usdAmount.Quo(cheqPrice).MulInt64(1e9).TruncateInt()
+			// Convert: USD (1e18) → CHEQ → ncheq (1e9)
+			usdAmount := coin.Amount.ToLegacyDec().Quo(math.LegacyNewDecFromInt(util.UsdExponent))
+			ncheqAmount := usdAmount.Quo(cheqPrice).MulInt64(util.CheqScale.Int64()).TruncateInt()
 
 			converted = converted.Add(sdk.NewCoin(oracletypes.CheqdDenom, ncheqAmount))
 
-		case oracletypes.CheqdDenom: // "ncheq"
-			// Already in target denom
+		case oracletypes.CheqdDenom:
 			converted = converted.Add(coin)
 
 		default:
