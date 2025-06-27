@@ -19,6 +19,7 @@ type Keeper struct {
 	storeService store.KVStoreService
 	paramSpace   types.ParamSubspace
 	portKeeper   types.PortKeeper
+	oracleKeeper types.OracleKeeper
 	scopedKeeper exported.ScopedKeeper
 	Schema       collections.Schema
 
@@ -42,7 +43,7 @@ type Keeper struct {
 	ParamsStore collections.Item[types.FeeParams]
 }
 
-func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSpace types.ParamSubspace, portKeeper types.PortKeeper, scopedKeeper exported.ScopedKeeper, authority string) *Keeper {
+func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSpace types.ParamSubspace, portKeeper types.PortKeeper, scopedKeeper exported.ScopedKeeper, authority string, ok types.OracleKeeper) *Keeper {
 	sb := collections.NewSchemaBuilder(storeService)
 	// Define the port collection
 
@@ -96,6 +97,7 @@ func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSp
 			"params",
 			codec.CollValue[types.FeeParams](cdc),
 		),
+		oracleKeeper: ok,
 	}
 
 	// Build the schema

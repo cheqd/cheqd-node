@@ -24,6 +24,7 @@ import (
 	feegrantmodule "cosmossdk.io/x/feegrant/module"
 	"cosmossdk.io/x/upgrade"
 
+	"github.com/cheqd/cheqd-node/x/oracle"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/testutil/mock"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
@@ -226,6 +227,7 @@ func TestRunMigrations(t *testing.T) {
 					"interchainaccounts": ica.AppModule{}.ConsensusVersion(),
 					"interchainquery":    icq.AppModule{}.ConsensusVersion(),
 					"transfer":           transfer.AppModule{}.ConsensusVersion(),
+					"oracle":             oracle.AppModule{}.ConsensusVersion(),
 				},
 			)
 			if tc.expRunErr {

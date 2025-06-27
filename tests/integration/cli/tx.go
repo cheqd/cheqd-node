@@ -183,3 +183,23 @@ func VoteProposalTx(from, option, id string, feeParams []string) (sdk.TxResponse
 func SendTokensTx(from, to, amount string, feeParams []string) (sdk.TxResponse, error) {
 	return Tx("bank", "send", from, feeParams, from, to, amount)
 }
+
+// DelegateFeederAddress delegates a feeder address for a validator
+func DelegateFeedConsent(validatorAddr, feederAddr, account string, fees []string) (sdk.TxResponse, error) {
+	return Tx("oracle", "delegate-feed-consent", account, fees, validatorAddr, feederAddr)
+}
+
+// // DelegateFeedConsent executes the delegate-feed-consent transaction command
+// func DelegateFeedConsent(operatorAddr, feederAddr, from string, feeParams []string) (sdk.TxResponse, error) {
+// 	return Tx(ModuleName, "delegate-feed-consent", from, feeParams, operatorAddr, feederAddr)
+// }
+
+// AggregateExchangeRatePrevote executes the exchange-rate-prevote transaction command
+func AggregateExchangeRatePrevote(hash string, validatorAddr, from string, feeParams []string) (sdk.TxResponse, error) {
+	return Tx("oracle", "exchange-rate-prevote", from, feeParams, hash, validatorAddr)
+}
+
+// AggregateExchangeRateVote executes the exchange-rate-vote transaction command
+func AggregateExchangeRateVote(salt string, exchangeRates string, validatorAddr, from string, feeParams []string) (sdk.TxResponse, error) {
+	return Tx("oracle", "exchange-rate-vote", from, feeParams, salt, exchangeRates, validatorAddr)
+}
