@@ -66,6 +66,7 @@ func DefaultUSDParams() *FeeParams {
 		BurnFactor: sdkmath.LegacyMustNewDecFromStr(DefaultBurnFactor),
 	}
 }
+
 func DefaultLegacyFeeParams() *LegacyFeeParams {
 	return &LegacyFeeParams{
 		Image:      sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceImageFee)),
