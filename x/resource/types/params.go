@@ -39,6 +39,33 @@ func DefaultFeeParams() *FeeParams {
 	}
 }
 
+// DefaultFeeParams returns default cheqd module tx fee parameters
+func DefaultUSDParams() *FeeParams {
+	return &FeeParams{
+		Image: []didtypes.FeeRange{
+			{
+				Denom:     oracletypes.UsdDenom,
+				MinAmount: util.PtrInt(100000000000000000),
+				MaxAmount: util.PtrInt(100000000000000000),
+			},
+		},
+		Json: []didtypes.FeeRange{
+			{
+				Denom:     oracletypes.UsdDenom,
+				MinAmount: util.PtrInt(400000000000000000),
+				MaxAmount: util.PtrInt(400000000000000000),
+			},
+		},
+		Default: []didtypes.FeeRange{
+			{
+				Denom:     oracletypes.UsdDenom,
+				MinAmount: util.PtrInt(200000000000000000),
+				MaxAmount: util.PtrInt(200000000000000000),
+			},
+		},
+		BurnFactor: sdkmath.LegacyMustNewDecFromStr(DefaultBurnFactor),
+	}
+}
 func DefaultLegacyFeeParams() *LegacyFeeParams {
 	return &LegacyFeeParams{
 		Image:      sdk.NewCoin(BaseMinimalDenom, sdkmath.NewInt(DefaultCreateResourceImageFee)),

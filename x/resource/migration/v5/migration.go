@@ -2,14 +2,9 @@ package v5
 
 import (
 	corestoretypes "cosmossdk.io/core/store"
-	"cosmossdk.io/math"
-	"github.com/cheqd/cheqd-node/util"
-	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	"github.com/cheqd/cheqd-node/x/resource/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 )
 
 func MigrateStore(ctx sdk.Context, storeService corestoretypes.KVStoreService,
@@ -29,44 +24,13 @@ func migrateParams(store corestoretypes.KVStore, cdc codec.BinaryCodec) error {
 	cdc.MustUnmarshal(bz, &legacyParams)
 
 	// Now convert legacy to new format
+	usdParams := types.DefaultUSDParams()
+
 	newParams := types.FeeParams{
-		Image: []didtypes.FeeRange{
-			{
-				Denom:     legacyParams.Image.Denom,
-				MinAmount: &legacyParams.Image.Amount,
-				MaxAmount: util.PtrInt(legacyParams.Image.Amount.Mul(math.NewInt(2)).Int64()),
-			},
-			{
-				Denom:     oracletypes.UsdDenom,
-				MinAmount: util.PtrInt(138642928023700520),
-				MaxAmount: util.PtrInt(138642928023700520),
-			},
-		},
-		Json: []didtypes.FeeRange{
-			{
-				Denom:     legacyParams.Json.Denom,
-				MinAmount: &legacyParams.Json.Amount,
-				MaxAmount: util.PtrInt(legacyParams.Json.Amount.Mul(math.NewInt(2)).Int64()),
-			},
-			{
-				Denom:     oracletypes.UsdDenom,
-				MinAmount: util.PtrInt(34660732005925130),
-				MaxAmount: util.PtrInt(34660732005925130),
-			},
-		},
-		Default: []didtypes.FeeRange{
-			{
-				Denom:     legacyParams.Default.Denom,
-				MinAmount: &legacyParams.Default.Amount,
-				MaxAmount: util.PtrInt(legacyParams.Default.Amount.Mul(math.NewInt(2)).Int64()),
-			},
-			{
-				Denom:     oracletypes.UsdDenom,
-				MinAmount: util.PtrInt(69321464011850260),
-				MaxAmount: util.PtrInt(69321464011850260),
-			},
-		},
 		BurnFactor: legacyParams.BurnFactor,
+		Default:    usdParams.Default,
+		Json:       usdParams.Json,
+		Image:      usdParams.Image,
 	}
 
 	// Marshal and write

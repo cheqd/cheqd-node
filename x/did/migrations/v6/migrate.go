@@ -3,11 +3,8 @@ package v6
 import (
 	"cosmossdk.io/collections"
 	corestoretypes "cosmossdk.io/core/store"
-	"cosmossdk.io/math"
-	"github.com/cheqd/cheqd-node/util"
 	"github.com/cheqd/cheqd-node/x/did/exported"
 	"github.com/cheqd/cheqd-node/x/did/types"
-	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -29,45 +26,14 @@ func migrateParams(store corestoretypes.KVStore, cdc codec.BinaryCodec) error {
 	}
 	cdc.MustUnmarshal(bz, &legacyParams)
 
+	usdParams := types.DefaultUSDParams()
+
 	// Now convert legacy to new format
 	newParams := types.FeeParams{
-		CreateDid: []types.FeeRange{
-			{
-				Denom:     legacyParams.CreateDid.Denom,
-				MinAmount: &legacyParams.CreateDid.Amount,
-				MaxAmount: util.PtrInt(legacyParams.CreateDid.Amount.Mul(math.NewInt(2)).Int64()),
-			},
-			{
-				Denom:     oracletypes.UsdDenom,
-				MinAmount: util.PtrInt(693214640118502600),
-				MaxAmount: util.PtrInt(693214640118502600),
-			},
-		},
-		UpdateDid: []types.FeeRange{
-			{
-				Denom:     legacyParams.CreateDid.Denom,
-				MinAmount: &legacyParams.UpdateDid.Amount,
-				MaxAmount: util.PtrInt(legacyParams.UpdateDid.Amount.Mul(math.NewInt(2)).Int64()),
-			},
-			{
-				Denom:     oracletypes.UsdDenom,
-				MinAmount: util.PtrInt(346607320059251300),
-				MaxAmount: util.PtrInt(346607320059251300),
-			},
-		},
-		DeactivateDid: []types.FeeRange{
-			{
-				Denom:     legacyParams.DeactivateDid.Denom,
-				MinAmount: &legacyParams.DeactivateDid.Amount,
-				MaxAmount: util.PtrInt(legacyParams.DeactivateDid.Amount.Mul(math.NewInt(2)).Int64()),
-			},
-			{
-				Denom:     oracletypes.UsdDenom,
-				MinAmount: util.PtrInt(138642928023700520),
-				MaxAmount: util.PtrInt(138642928023700520),
-			},
-		},
-		BurnFactor: legacyParams.BurnFactor,
+		CreateDid:     usdParams.CreateDid,
+		UpdateDid:     usdParams.UpdateDid,
+		DeactivateDid: usdParams.DeactivateDid,
+		BurnFactor:    legacyParams.BurnFactor,
 	}
 
 	// Marshal and write to the new store
