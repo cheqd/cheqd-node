@@ -19,11 +19,6 @@ func DefaultFeeParams() *FeeParams {
 				MinAmount: util.PtrInt(50000000000),
 				MaxAmount: util.PtrInt(100000000000),
 			},
-			{
-				Denom:     oracletypes.UsdDenom,
-				MinAmount: util.PtrInt(1200000000000000000),
-				MaxAmount: util.PtrInt(2000000000000000000),
-			},
 		},
 		UpdateDid: []FeeRange{
 			{
