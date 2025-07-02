@@ -183,9 +183,6 @@ jobs:
     if: needs.release-guard.outputs.EXECUTE_RELEASE == 'true'
     env:
       IMAGE_NAME: ${{ github.repository }}
-    environment:
-      name: production
-      url: https://did-registrar.cheqd.net/api-docs
 
     steps:
       - uses: actions/checkout@v4
