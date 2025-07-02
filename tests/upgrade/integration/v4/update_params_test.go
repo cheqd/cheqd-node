@@ -31,34 +31,49 @@ var _ = Describe("Integration - update the did params", func() {
 
 	It("Wait for CHEQ price", func() {
 		By("querying oracle params")
-		var err error
 		oracleParamsResp, err := cli.QueryOracleParams(cli.Validator0)
 		Expect(err).To(BeNil())
 		oracleParams = &oracleParamsResp
 
-		// Wait for ComputeAllAverages to naturally trigger
 		historicStampPeriod := oracleParams.Params.HistoricStampPeriod
 		averagingWindow := oraclekeeper.AveragingWindow
-		targetHeight := int64(historicStampPeriod) * int64(averagingWindow)
+		initialTargetHeight := int64(historicStampPeriod) * int64(averagingWindow)
 
-		fmt.Printf("Waiting until block height ≥ %d to trigger ComputeAllAverages...\n", targetHeight)
+		waitUntilHeight := func(targetHeight int64) {
+			fmt.Printf("Waiting until block height ≥ %d to trigger ComputeAllAverages...\n", targetHeight)
+			for {
+				currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
+				Expect(err).To(BeNil())
 
-		for {
-			currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
-			Expect(err).To(BeNil())
-
-			if currentHeight >= targetHeight {
-				fmt.Printf("Reached block height %d — proceeding...\n", currentHeight)
-				break
+				if currentHeight >= targetHeight {
+					fmt.Printf("Reached block height %d — proceeding...\n", currentHeight)
+					break
+				}
+				fmt.Printf("  → Current height: %d (waiting for %d)\n", currentHeight, targetHeight)
+				time.Sleep(2 * time.Second)
 			}
-
-			fmt.Printf("  → Current height: %d (waiting for %d)\n", currentHeight, targetHeight)
-			time.Sleep(2 * time.Second)
 		}
 
-		By("querying updated WMA oracle price")
-		wmaRes, err := cli.QueryWMA(didtypes.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil, cli.Validator0)
+		tryQueryWMA := func() (*oracletypes.QueryWMAResponse, error) {
+			return cli.QueryWMA(didtypes.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil, cli.Validator0)
+		}
+
+		waitUntilHeight(initialTargetHeight)
+
+		By("trying to query WMA price after first round")
+		wmaRes, err := tryQueryWMA()
+		if err != nil || wmaRes.Price.IsZero() {
+			fmt.Println("WMA price not available or zero — waiting for second round...")
+
+			secondTargetHeight := initialTargetHeight * 2
+			waitUntilHeight(secondTargetHeight)
+
+			wmaRes, err = tryQueryWMA()
+		}
+
 		Expect(err).To(BeNil())
+		Expect(wmaRes.Price.IsZero()).To(BeFalse())
+
 		wmaPrice = wmaRes.Price
 	})
 

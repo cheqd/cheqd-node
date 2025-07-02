@@ -94,7 +94,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json[0].MinAmount.String()+resourceFeeParams.Json[0].Denom))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json[0].MaxAmount.String()+resourceFeeParams.Json[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -137,7 +137,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			Name:         nextResourceName,
 			Version:      nextResourceVersion,
 			ResourceType: nextResourceType,
-		}, signInputs, nextResourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json[0].MinAmount.String()+resourceFeeParams.Json[0].Denom))
+		}, signInputs, nextResourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json[0].MaxAmount.String()+resourceFeeParams.Json[0].Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
