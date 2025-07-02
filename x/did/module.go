@@ -95,11 +95,6 @@ func (a AppModuleBasic) GetTxCmd() *cobra.Command {
 	return cli.GetTxCmd()
 }
 
-// // GetQueryCmd returns the cheqd module's root query command.
-// func (AppModuleBasic) GetQueryCmd() *cobra.Command {
-// 	return cli.GetQueryCmd()
-// }
-
 // ----------------------------------------------------------------------------
 // AppModule
 // ----------------------------------------------------------------------------

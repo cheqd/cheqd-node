@@ -55,7 +55,7 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					RpcMethod: "Burn",
 					Use:       "burn [amount] [flags]",
 					Short:     "Burn tokens from an address",
-					Long:      "",
+					Long:      "Burn tokens from an addres",
 					Example:   "",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
 						{ProtoField: "amount"},
@@ -68,8 +68,20 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				{
 					RpcMethod: "Mint",
 					Skip:      true, // skipped because authority gated
+				}, {
+					RpcMethod: "CreateDidDoc",
+					Skip:      true, // skipped as we have the custom command
+				},
+				{
+					RpcMethod: "UpdateDidDoc",
+					Skip:      true, // skipped as we have the custom command
+				},
+				{
+					RpcMethod: "DeactivateDidDoc",
+					Skip:      true, // skipped as we have the custom command
 				},
 			},
+			EnhanceCustomCommand: true,
 		},
 	}
 }
