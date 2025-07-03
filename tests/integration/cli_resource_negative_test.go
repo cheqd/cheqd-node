@@ -101,8 +101,7 @@ var _ = Describe("cheqd cli - negative resource", func() {
 				PrivKey:              privateKey2,
 			},
 		}
-				// Fail to create a resource in non-existing collection
-
+		// Fail to create a resource in non-existing collection
 
 		useMin := false
 		fee, err := cli.ResolveFeeFromParams(resourceFeeParams.Json, useMin)

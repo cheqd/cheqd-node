@@ -210,67 +210,53 @@ func AggregateExchangeRateVote(salt string, exchangeRates string, validatorAddr,
 }
 
 func ResolveFeeFromParams(feeRanges []types.FeeRange, useMin bool) (sdk.Coin, error) {
-	for _, fee := range feeRanges {
-		if fee.Denom == types.BaseMinimalDenom {
-			var amount *math.Int
-
-			if useMin {
-				if fee.MinAmount != nil {
-					amount = fee.MinAmount
-				} else if fee.MaxAmount != nil {
-					amount = fee.MaxAmount
-				}
-			} else {
-				if fee.MaxAmount != nil {
-					amount = fee.MaxAmount
-				} else if fee.MinAmount != nil {
-					amount = fee.MinAmount
-				}
+	getFeeAmount := func(fee types.FeeRange) *math.Int {
+		if useMin {
+			if fee.MinAmount != nil {
+				return fee.MinAmount
 			}
-
-			if amount == nil {
-				return sdk.Coin{}, fmt.Errorf("both MinAmount and MaxAmount are nil for %s", fee.Denom)
+			return fee.MaxAmount
+		} else {
+			if fee.MaxAmount != nil {
+				return fee.MaxAmount
 			}
-
-			return sdk.NewCoin(types.BaseMinimalDenom, *amount), nil
+			return fee.MinAmount
 		}
 	}
 
-	// USD fallback
+	// 1. Try native (ncheq) fee
 	for _, fee := range feeRanges {
-		if fee.Denom == oracletypes.UsdDenom {
-			price, err := QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
-			if err != nil {
-				return sdk.Coin{}, fmt.Errorf("failed to query WMA price: %w", err)
-			}
-
-			var amount *math.Int
-
-			if useMin {
-				if fee.MinAmount != nil {
-					amount = fee.MinAmount
-				} else if fee.MaxAmount != nil {
-					amount = fee.MaxAmount
-				}
-			} else {
-				if fee.MaxAmount != nil {
-					amount = fee.MaxAmount
-				} else if fee.MinAmount != nil {
-					amount = fee.MinAmount
-				}
-			}
-
-			if amount == nil {
-				return sdk.Coin{}, fmt.Errorf("both MinAmount and MaxAmount are nil for %s", fee.Denom)
-			}
-
-			converted, err := ConvertUsdToCheq(*amount, price.Price)
-			if err != nil {
-				return sdk.Coin{}, fmt.Errorf("failed to convert usd to ncheq: %w", err)
-			}
-
-			return sdk.NewCoin(types.BaseMinimalDenom, converted), nil
+		if fee.Denom != types.BaseMinimalDenom {
+			continue
 		}
+		amount := getFeeAmount(fee)
+		if amount == nil {
+			return sdk.Coin{}, fmt.Errorf("both MinAmount and MaxAmount are nil for %s", fee.Denom)
+		}
+		return sdk.NewCoin(types.BaseMinimalDenom, *amount), nil
+	}
+
+	// 2. Try USD fallback
+	for _, fee := range feeRanges {
+		if fee.Denom != oracletypes.UsdDenom {
+			continue
+		}
+
+		price, err := QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
+		if err != nil {
+			return sdk.Coin{}, fmt.Errorf("failed to query WMA price: %w", err)
+		}
+
+		amount := getFeeAmount(fee)
+		if amount == nil {
+			return sdk.Coin{}, fmt.Errorf("both MinAmount and MaxAmount are nil for %s", fee.Denom)
+		}
+
+		converted, err := ConvertUsdToCheq(*amount, price.Price)
+		if err != nil {
+			return sdk.Coin{}, fmt.Errorf("failed to convert usd to ncheq: %w", err)
+		}
+		return sdk.NewCoin(types.BaseMinimalDenom, converted), nil
 	}
 
 	return sdk.Coin{}, fmt.Errorf("no valid fee param found with ncheq or usd denom")
