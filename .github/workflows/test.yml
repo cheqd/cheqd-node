@@ -244,7 +244,7 @@ jobs:
         working-directory: ./tests/upgrade/integration
         run: |
           docker ps -a
-      
+
       - name: Run pre-upgrade-v4_2 tests
         working-directory: ./tests/upgrade/integration/v4
         run: |
@@ -265,7 +265,7 @@ jobs:
         working-directory: ./tests/upgrade/integration
         run: |
           docker ps -a
-      
+
       - name: Download binary artifact (build-latest)
         uses: actions/download-artifact@v4
         id: download
@@ -286,7 +286,13 @@ jobs:
         with:
           name: report-post-upgrade.xml
           path: report-post-upgrade.xml
-          
+
+      - name: Run integration tests on upgraded network with the DefalutUSDParams
+        working-directory: ./tests/integration
+        run: |
+          ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --skip-file cli_defi_test.go --skip-file cli_defi_negative_test.go
+      
+      
       - name: Run post-upgrade param_change_proposal_test
         working-directory: ./tests/upgrade/integration/v4
         run: |

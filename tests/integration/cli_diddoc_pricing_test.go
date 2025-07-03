@@ -75,11 +75,13 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
 
 		By("submitting a create diddoc message")
-		tax := feeParams.CreateDid[0]
+		useMin := false
+		feeInNCheq, err := cli.ResolveFeeFromParams(feeParams.CreateDid, useMin)
+		Expect(err).To(BeNil())
 		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
-		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
+		userFee := sdk.NewCoins(sdk.NewCoin(feeInNCheq.Denom, feeInNCheq.Amount))
 		convertedFees, err := ante.GetFeeForMsg(userFee, feeParams.CreateDid, cheqp, nil)
 		Expect(err).To(BeNil())
 		burnPotionInUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
@@ -101,7 +103,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom))
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -167,7 +169,10 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 	})
 	It("should tax update diddoc message - case: fixed fee", func() {
 		By("submitting a create diddoc message")
-		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
+		useMin := false
+		feeInNCheq, err := cli.ResolveFeeFromParams(feeParams.CreateDid, useMin)
+		Expect(err).To(BeNil())
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -192,11 +197,13 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
 
 		By("fetching CHEQ price and calculating expected tax")
-		tax := feeParams.UpdateDid[0]
+		useMin = true
+		feeInNCheq, err = cli.ResolveFeeFromParams(feeParams.UpdateDid, useMin)
+		Expect(err).To(BeNil())
 		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
-		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, tax.MinAmount.Mul(math.NewInt(2))))
+		userFee := sdk.NewCoins(sdk.NewCoin(feeInNCheq.Denom, feeInNCheq.Amount.Mul(math.NewInt(2))))
 		convertedFees, err := ante.GetFeeForMsg(userFee, feeParams.UpdateDid, cheqp, nil)
 		Expect(err).To(BeNil())
 		burnPotionInUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
@@ -217,7 +224,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
 
 		By("submitting an update diddoc message")
-		res, err := cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MinAmount.Mul(math.NewInt(2)).String()+tax.Denom))
+		res, err := cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeInNCheq.Amount.Mul(math.NewInt(2)).String()+feeInNCheq.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -282,7 +289,10 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 	})
 	It("should tax deactivate diddoc message - case: fixed fee", func() {
 		By("submitting a create diddoc message")
-		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
+		useMin := false
+		feeInNCheq, err := cli.ResolveFeeFromParams(feeParams.CreateDid, useMin)
+		Expect(err).To(BeNil())
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -297,11 +307,13 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(types.BaseMinimalDenom))
 
 		By("fetching cheq EMA price and computing fees")
-		tax := feeParams.DeactivateDid[0]
+		useMin = false
+		feeInNCheq, err = cli.ResolveFeeFromParams(feeParams.DeactivateDid, useMin)
+		Expect(err).To(BeNil())
 		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
-		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
+		userFee := sdk.NewCoins(sdk.NewCoin(feeInNCheq.Denom, feeInNCheq.Amount))
 		convertedFees, err := ante.GetFeeForMsg(userFee, feeParams.DeactivateDid, cheqp, nil)
 		Expect(err).To(BeNil())
 		burnPotionInUsd := helpers.GetBurnFeePortion(feeParams.BurnFactor, convertedFees)
@@ -322,7 +334,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
 		By("submitting a deactivate diddoc message")
-		res, err := cli.DeactivateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom))
+		res, err := cli.DeactivateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -403,7 +415,10 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("submitting a create diddoc message")
-		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom)))
+		useMin := false
+		feeInNCheq, err := cli.ResolveFeeFromParams(feeParams.CreateDid, useMin)
+		Expect(err).To(BeNil())
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom)))
 		Expect(err).To(BeNil())
 
 		Expect(resp.Code).To(BeEquivalentTo(0))
@@ -417,8 +432,10 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("checking the granter balance difference")
-		tax := feeParams.CreateDid[0].MaxAmount
-		userFee := sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, *tax))
+		useMin = false
+		feeInNCheq, err = cli.ResolveFeeFromParams(feeParams.CreateDid, useMin)
+		Expect(err).To(BeNil())
+		userFee := sdk.NewCoins(sdk.NewCoin(feeInNCheq.Denom, feeInNCheq.Amount))
 		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
@@ -447,7 +464,10 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 	It("should tax update diddoc message with feegrant - case: fixed fee", func() {
 		By("submitting a create diddoc message")
-		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
+		useMin := false
+		feeInNCheq, err := cli.ResolveFeeFromParams(feeParams.CreateDid, useMin)
+		Expect(err).To(BeNil())
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -479,10 +499,13 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		granteeBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, types.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
-		fees := feeParams.UpdateDid[0].MinAmount.Mul(math.NewInt(2))
+		useMin = true
+		feeInNCheq, err = cli.ResolveFeeFromParams(feeParams.UpdateDid, useMin)
+		Expect(err).To(BeNil())
+		fees := feeInNCheq.Amount.Mul(math.NewInt(2))
 
 		By("submitting an update diddoc message")
-		resp, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(fees.String()+feeParams.UpdateDid[0].Denom)))
+		resp, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(fees.String()+feeInNCheq.Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -495,8 +518,9 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("checking the granter balance difference")
-		tax := feeParams.UpdateDid[0].MinAmount.Mul(math.NewInt(2))
-		userFee := sdk.NewCoins(sdk.NewCoin(types.BaseMinimalDenom, tax))
+		tax := feeInNCheq.Amount.Mul(math.NewInt(2))
+
+		userFee := sdk.NewCoins(sdk.NewCoin(feeInNCheq.Denom, tax))
 		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
@@ -520,7 +544,10 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 
 	It("should tax deactivate diddoc message with feegrant - case: fixed fee", func() {
 		By("submitting a create diddoc message")
-		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeParams.CreateDid[0].MaxAmount.String()+feeParams.CreateDid[0].Denom))
+		useMin := true
+		feeInNCheq, err := cli.ResolveFeeFromParams(feeParams.CreateDid, useMin)
+		Expect(err).To(BeNil())
+		resp, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -543,11 +570,13 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		Expect(err).To(BeNil())
 
 		By("fetching cheq EMA price and computing fees")
-		tax := feeParams.DeactivateDid[0]
+		useMin = false
+		feeInNCheq, err = cli.ResolveFeeFromParams(feeParams.DeactivateDid, useMin)
+		Expect(err).To(BeNil())
 		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
-		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
+		userFee := sdk.NewCoins(sdk.NewCoin(feeInNCheq.Denom, feeInNCheq.Amount))
 		FeeforMsg, err := ante.GetFeeForMsg(userFee, feeParams.DeactivateDid, cheqp, nil)
 		Expect(err).To(BeNil())
 		convertedFees, err := posthandler.ConvertToCheq(FeeforMsg, cheqp)
@@ -572,7 +601,7 @@ var _ = Describe("cheqd cli - positive diddoc pricing", func() {
 		taxIncheqd := burnPotionInUsdToCheq.Add(rewardPortionInUsdToCheq...)
 
 		By("submitting a deactivate diddoc message")
-		resp, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom)))
+		resp, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 

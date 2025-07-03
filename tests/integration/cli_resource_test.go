@@ -73,8 +73,10 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		}
 
 		versionID := uuid.NewString()
-
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(didFeeParams.CreateDid[0].MaxAmount.String()+didFeeParams.CreateDid[0].Denom))
+		useMin := false
+		tax, err := cli.ResolveFeeFromParams(didFeeParams.CreateDid, useMin)
+		Expect(err).To(BeNil())
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, versionID, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(tax.Amount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -88,13 +90,17 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		resourceFile, err := testdata.CreateTestJson(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
+		useMin = false
+		tax, err = cli.ResolveFeeFromParams(resourceFeeParams.Json, useMin)
+		Expect(err).To(BeNil())
+
 		res, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json[0].MaxAmount.String()+resourceFeeParams.Json[0].Denom))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(tax.Amount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -137,7 +143,7 @@ var _ = Describe("cheqd cli - positive resource", func() {
 			Name:         nextResourceName,
 			Version:      nextResourceVersion,
 			ResourceType: nextResourceType,
-		}, signInputs, nextResourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json[0].MaxAmount.String()+resourceFeeParams.Json[0].Denom))
+		}, signInputs, nextResourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(tax.Amount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -198,7 +204,10 @@ var _ = Describe("cheqd cli - positive resource", func() {
 
 		versionID = uuid.NewString()
 
-		res, err = cli.CreateDidDoc(tmpDir, secondPayload, secondSignInputs, versionID, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(didFeeParams.CreateDid[0].MaxAmount.String()+didFeeParams.CreateDid[0].Denom))
+		useMin = false
+		tax, err = cli.ResolveFeeFromParams(didFeeParams.CreateDid, useMin)
+		Expect(err).To(BeNil())
+		res, err = cli.CreateDidDoc(tmpDir, secondPayload, secondSignInputs, versionID, testdata.BASE_ACCOUNT_2, helpers.GenerateFees(tax.Amount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -210,13 +219,17 @@ var _ = Describe("cheqd cli - positive resource", func() {
 		secondResourceFile, err := testdata.CreateTestJson(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
+		useMin = true
+		tax, err = cli.ResolveFeeFromParams(resourceFeeParams.Json, useMin)
+		Expect(err).To(BeNil())
+
 		res, err = cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: secondCollectionId,
 			Id:           secondResourceId,
 			Name:         secondResourceName,
 			Version:      secondResourceVersion,
 			ResourceType: secondResourceType,
-		}, secondSignInputs, secondResourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(resourceFeeParams.Json[0].MinAmount.String()+resourceFeeParams.Json[0].Denom))
+		}, secondSignInputs, secondResourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFees(tax.Amount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 

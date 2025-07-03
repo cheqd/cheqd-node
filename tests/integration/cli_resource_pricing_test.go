@@ -76,7 +76,10 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		}
 
 		// Submit the DID Doc
-		resp, err := cli.CreateDidDoc(tmpDir, didPayload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(didFeeParams.CreateDid[0].MaxAmount.String()+didFeeParams.CreateDid[0].Denom))
+		useMin := false
+		tax, err := cli.ResolveFeeFromParams(didFeeParams.CreateDid, useMin)
+		Expect(err).To(BeNil())
+		resp, err := cli.CreateDidDoc(tmpDir, didPayload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.Amount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 	})
@@ -96,12 +99,15 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
 		By("submitting the json resource message")
-		tax := resourceFeeParams.Json[0]
+
+		useMin := false
+		tax, err := cli.ResolveFeeFromParams(resourceFeeParams.Json, useMin)
+		Expect(err).To(BeNil())
 
 		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		cheqp := cheqPrice.Price
 		Expect(err).To(BeNil())
-		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, tax.Amount))
 
 		convertedFees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Json, cheqp, nil)
 		Expect(err).To(BeNil())
@@ -133,7 +139,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.Amount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -212,16 +218,23 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
 		By("submitting the image resource message")
-		tax := resourceFeeParams.Image[0]
+
+		useMin := false
+		tax, err := cli.ResolveFeeFromParams(resourceFeeParams.Image, useMin)
+		Expect(err).To(BeNil())
 
 		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		cheqp := cheqPrice.Price
 		Expect(err).To(BeNil())
 
-		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, tax.Amount))
 
 		convertedFees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Image, cheqp, nil)
 		Expect(err).To(BeNil())
+
+		convertedFeesIncheq, err := posthandler.ConvertToCheq(convertedFees, cheqp)
+		Expect(err).To(BeNil())
+
 		// Calculate fee portions in USD
 
 		burnPotionInUsd := helpers.GetBurnFeePortion(resourceFeeParams.BurnFactor, convertedFees)
@@ -252,7 +265,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.Amount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -263,7 +276,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff.Int64()).To(BeNumerically("~", convertedFees.AmountOf(types.BaseMinimalDenom).Int64(), 2_000_000))
+		Expect(diff.Int64()).To(BeNumerically("~", convertedFeesIncheq.AmountOf(types.BaseMinimalDenom).Int64(), 2_000_000))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
@@ -331,13 +344,15 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(balanceBefore.Denom).To(BeEquivalentTo(resourcetypes.BaseMinimalDenom))
 
 		By("submitting the default resource message")
-		tax := resourceFeeParams.Default[0]
+		useMin := false
+		tax, err := cli.ResolveFeeFromParams(resourceFeeParams.Default, useMin)
+		Expect(err).To(BeNil())
 
 		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 
-		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, tax.Amount))
 
 		convertedFees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Default, cheqp, nil)
 		Expect(err).To(BeNil())
@@ -367,7 +382,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			Name:         resourceName,
 			Version:      resourceVersion,
 			ResourceType: resourceType,
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(tax.Amount.String()+tax.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -435,7 +450,9 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		resourceFile, err := testdata.CreateTestJson(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
-		tax := resourceFeeParams.Json[0]
+		useMin := false
+		tax, err := cli.ResolveFeeFromParams(resourceFeeParams.Json, useMin)
+		Expect(err).To(BeNil())
 
 		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
 		Expect(err).To(BeNil())
@@ -452,7 +469,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		cheqp := cheqPrice.Price
 
-		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, tax.Amount))
 
 		fees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Json, cheqp, nil)
 
@@ -466,7 +483,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			Name:         "TestResource",
 			Version:      "1.0",
 			ResourceType: "TestType",
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom)))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.Amount.String()+tax.Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 
@@ -492,7 +509,10 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		resourceFile, err := testdata.CreateTestImage(GinkgoT().TempDir())
 		Expect(err).To(BeNil())
 
-		tax := resourceFeeParams.Image[0]
+		useMin := false
+		tax, err := cli.ResolveFeeFromParams(resourceFeeParams.Image, useMin)
+		Expect(err).To(BeNil())
+
 		res, err := cli.GrantFees(testdata.BASE_ACCOUNT_4_ADDR, testdata.BASE_ACCOUNT_1_ADDR, cli.CliGasParams)
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
@@ -507,7 +527,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 
-		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, tax.Amount))
 
 		fees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Image, cheqp, nil)
 		Expect(err).To(BeNil())
@@ -520,7 +540,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			Name:         "TestResource",
 			Version:      "1.0",
 			ResourceType: "TestType",
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom)))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.Amount.String()+tax.Denom)))
 
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
@@ -557,12 +577,15 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 		granteeBalanceBefore, err := cli.QueryBalance(testdata.BASE_ACCOUNT_1_ADDR, resourcetypes.BaseMinimalDenom)
 		Expect(err).To(BeNil())
 
-		tax := resourceFeeParams.Default[0]
+		useMin := false
+		tax, err := cli.ResolveFeeFromParams(resourceFeeParams.Default, useMin)
+		Expect(err).To(BeNil())
+
 		cheqPrice, err := cli.QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
 		Expect(err).To(BeNil())
 		cheqp := cheqPrice.Price
 
-		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, *tax.MaxAmount))
+		userFee := sdk.NewCoins(sdk.NewCoin(tax.Denom, tax.Amount))
 
 		fees, err := ante.GetFeeForMsg(userFee, resourceFeeParams.Default, cheqp, nil)
 		Expect(err).To(BeNil())
@@ -575,7 +598,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 			Name:         "TestResource",
 			Version:      "1.0",
 			ResourceType: "TestType",
-		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.MaxAmount.String()+tax.Denom)))
+		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_1, helpers.GenerateFeeGranter(testdata.BASE_ACCOUNT_4_ADDR, helpers.GenerateFees(tax.Amount.String()+tax.Denom)))
 		Expect(err).To(BeNil())
 		Expect(resp.Code).To(BeEquivalentTo(0))
 

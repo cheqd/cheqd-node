@@ -4,10 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"cosmossdk.io/math"
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
+	"github.com/cheqd/cheqd-node/util"
 	"github.com/cheqd/cheqd-node/x/did/client/cli"
 	"github.com/cheqd/cheqd-node/x/did/types"
+	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
+	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
+
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -202,4 +207,82 @@ func AggregateExchangeRatePrevote(hash string, validatorAddr, from string, feePa
 // AggregateExchangeRateVote executes the exchange-rate-vote transaction command
 func AggregateExchangeRateVote(salt string, exchangeRates string, validatorAddr, from string, feeParams []string) (sdk.TxResponse, error) {
 	return Tx("oracle", "exchange-rate-vote", from, feeParams, salt, exchangeRates, validatorAddr)
+}
+
+func ResolveFeeFromParams(feeRanges []types.FeeRange, useMin bool) (sdk.Coin, error) {
+	for _, fee := range feeRanges {
+		if fee.Denom == types.BaseMinimalDenom {
+			var amount *math.Int
+
+			if useMin {
+				if fee.MinAmount != nil {
+					amount = fee.MinAmount
+				} else if fee.MaxAmount != nil {
+					amount = fee.MaxAmount
+				}
+			} else {
+				if fee.MaxAmount != nil {
+					amount = fee.MaxAmount
+				} else if fee.MinAmount != nil {
+					amount = fee.MinAmount
+				}
+			}
+
+			if amount == nil {
+				return sdk.Coin{}, fmt.Errorf("both MinAmount and MaxAmount are nil for %s", fee.Denom)
+			}
+
+			return sdk.NewCoin(types.BaseMinimalDenom, *amount), nil
+		}
+	}
+
+	// USD fallback
+	for _, fee := range feeRanges {
+		if fee.Denom == oracletypes.UsdDenom {
+			price, err := QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
+			if err != nil {
+				return sdk.Coin{}, fmt.Errorf("failed to query WMA price: %w", err)
+			}
+
+			var amount *math.Int
+
+			if useMin {
+				if fee.MinAmount != nil {
+					amount = fee.MinAmount
+				} else if fee.MaxAmount != nil {
+					amount = fee.MaxAmount
+				}
+			} else {
+				if fee.MaxAmount != nil {
+					amount = fee.MaxAmount
+				} else if fee.MinAmount != nil {
+					amount = fee.MinAmount
+				}
+			}
+
+			if amount == nil {
+				return sdk.Coin{}, fmt.Errorf("both MinAmount and MaxAmount are nil for %s", fee.Denom)
+			}
+
+			converted, err := ConvertUsdToCheq(*amount, price.Price)
+			if err != nil {
+				return sdk.Coin{}, fmt.Errorf("failed to convert usd to ncheq: %w", err)
+			}
+
+			return sdk.NewCoin(types.BaseMinimalDenom, converted), nil
+		}
+	}
+
+	return sdk.Coin{}, fmt.Errorf("no valid fee param found with ncheq or usd denom")
+}
+
+func ConvertUsdToCheq(usdAmt math.Int, cheqPrice math.LegacyDec) (math.Int, error) {
+	if cheqPrice.IsZero() {
+		return math.ZeroInt(), fmt.Errorf("cheq price is zero")
+	}
+
+	// Convert: 1e18 usd → 1e0 → 1e9 ncheq
+	usdDec := math.LegacyNewDecFromInt(usdAmt).Quo(math.LegacyNewDecFromInt(util.UsdExponent)) // convert from 1e18 scale
+	ncheqDec := usdDec.Quo(cheqPrice).MulInt64(util.CheqScale.Int64())                         // convert to 1e9 scale
+	return ncheqDec.TruncateInt(), nil
 }
