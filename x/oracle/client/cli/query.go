@@ -36,6 +36,7 @@ func GetQueryCmd() *cobra.Command {
 		CmdQueryEMA(),
 		CmdQueryWMA(),
 		CmdQuerySMA(),
+		CmdConvertUSDCtoCHEQ(),
 	)
 
 	return cmd
@@ -363,6 +364,74 @@ func CmdQuerySMA() *cobra.Command {
 			req := &types.QuerySMARequest{Denom: denom}
 			res, err := queryClient.SMA(cmd.Context(), req)
 			return cli.PrintOrErr(res, err, clientCtx)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+func CmdConvertUSDCtoCHEQ() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "convert-usdc-to-cheq [amount] [ma_type] [wma_strategy] [custom_weights]",
+		Short: "Convert USD (1e18 scale) to ncheq using MA (SMA, EMA, or WMA)",
+		Long: strings.TrimSpace(`
+Convert a USD amount (in 1e18 scale) to ncheq using a selected moving average type (sma, ema, or wma).
+
+Examples:
+  cheqd-noded query oracle convert-usdc-to-cheq 2000000000000000000usd ema
+  cheqd-noded query oracle convert-usdc-to-cheq 1000000000000000000usd wma RECENT
+  cheqd-noded query oracle convert-usdc-to-cheq 3000000000000000000usd wma CUSTOM 1,2,3
+		`),
+		Args: cobra.MinimumNArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			req := types.ConvertUSDCtoCHEQRequest{
+				Amount: args[0],
+				MaType: strings.ToLower(args[1]),
+			}
+
+			switch req.MaType {
+			case "sma", "ema":
+				// no extra args needed
+			case "wma":
+				if len(args) < 3 {
+					return fmt.Errorf("WMA strategy is required when ma_type is wma")
+				}
+				req.WmaStrategy = strings.ToUpper(args[2])
+
+				switch req.WmaStrategy {
+				case "RECENT", "OLDEST", "BALANCED":
+				case "CUSTOM":
+					if len(args) < 4 {
+						return fmt.Errorf("custom weights are required when using WMA CUSTOM strategy")
+					}
+					weightsStr := strings.Split(args[3], ",")
+					for _, w := range weightsStr {
+						val, err := strconv.ParseInt(strings.TrimSpace(w), 10, 32)
+						if err != nil {
+							return fmt.Errorf("invalid custom weight: %s", w)
+						}
+						req.CustomWeights = append(req.CustomWeights, int32(val))
+					}
+				default:
+					return fmt.Errorf("invalid WMA strategy: %s — must be RECENT, OLDEST, BALANCED or CUSTOM", req.WmaStrategy)
+				}
+			default:
+				return fmt.Errorf("invalid MA type: %s — must be sma, ema or wma", req.MaType)
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			resp, err := queryClient.ConvertUSDCtoCHEQ(cmd.Context(), &req)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(resp)
 		},
 	}
 

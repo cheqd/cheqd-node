@@ -35,6 +35,7 @@ const (
 	Query_EMA_FullMethodName                 = "/cheqd.oracle.v2.Query/EMA"
 	Query_WMA_FullMethodName                 = "/cheqd.oracle.v2.Query/WMA"
 	Query_SMA_FullMethodName                 = "/cheqd.oracle.v2.Query/SMA"
+	Query_ConvertUSDCtoCHEQ_FullMethodName   = "/cheqd.oracle.v2.Query/ConvertUSDCtoCHEQ"
 )
 
 // QueryClient is the client API for Query service.
@@ -77,6 +78,7 @@ type QueryClient interface {
 	EMA(ctx context.Context, in *QueryEMARequest, opts ...grpc.CallOption) (*QueryEMAResponse, error)
 	WMA(ctx context.Context, in *QueryWMARequest, opts ...grpc.CallOption) (*QueryWMAResponse, error)
 	SMA(ctx context.Context, in *QuerySMARequest, opts ...grpc.CallOption) (*QuerySMAResponse, error)
+	ConvertUSDCtoCHEQ(ctx context.Context, in *ConvertUSDCtoCHEQRequest, opts ...grpc.CallOption) (*ConvertUSDCtoCHEQResponse, error)
 }
 
 type queryClient struct {
@@ -247,6 +249,16 @@ func (c *queryClient) SMA(ctx context.Context, in *QuerySMARequest, opts ...grpc
 	return out, nil
 }
 
+func (c *queryClient) ConvertUSDCtoCHEQ(ctx context.Context, in *ConvertUSDCtoCHEQRequest, opts ...grpc.CallOption) (*ConvertUSDCtoCHEQResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConvertUSDCtoCHEQResponse)
+	err := c.cc.Invoke(ctx, Query_ConvertUSDCtoCHEQ_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility.
@@ -287,6 +299,7 @@ type QueryServer interface {
 	EMA(context.Context, *QueryEMARequest) (*QueryEMAResponse, error)
 	WMA(context.Context, *QueryWMARequest) (*QueryWMAResponse, error)
 	SMA(context.Context, *QuerySMARequest) (*QuerySMAResponse, error)
+	ConvertUSDCtoCHEQ(context.Context, *ConvertUSDCtoCHEQRequest) (*ConvertUSDCtoCHEQResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -344,6 +357,9 @@ func (UnimplementedQueryServer) WMA(context.Context, *QueryWMARequest) (*QueryWM
 }
 func (UnimplementedQueryServer) SMA(context.Context, *QuerySMARequest) (*QuerySMAResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SMA not implemented")
+}
+func (UnimplementedQueryServer) ConvertUSDCtoCHEQ(context.Context, *ConvertUSDCtoCHEQRequest) (*ConvertUSDCtoCHEQResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConvertUSDCtoCHEQ not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 func (UnimplementedQueryServer) testEmbeddedByValue()               {}
@@ -654,6 +670,24 @@ func _Query_SMA_Handler(srv interface{}, ctx context.Context, dec func(interface
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_ConvertUSDCtoCHEQ_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConvertUSDCtoCHEQRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).ConvertUSDCtoCHEQ(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_ConvertUSDCtoCHEQ_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).ConvertUSDCtoCHEQ(ctx, req.(*ConvertUSDCtoCHEQRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -724,6 +758,10 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SMA",
 			Handler:    _Query_SMA_Handler,
+		},
+		{
+			MethodName: "ConvertUSDCtoCHEQ",
+			Handler:    _Query_ConvertUSDCtoCHEQ_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

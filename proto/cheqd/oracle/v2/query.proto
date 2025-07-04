@@ -93,6 +93,12 @@ service Query {
   rpc SMA(QuerySMARequest) returns (QuerySMAResponse) {
     option (google.api.http).get = "/cheqd/oracle/v2/sma/{denom}";
   }
+
+   rpc ConvertUSDCtoCHEQ(ConvertUSDCtoCHEQRequest) returns (ConvertUSDCtoCHEQResponse){
+     option (google.api.http) = {
+      get: "/cheqd/oracle/v2/convert_usdc_to_cheq"
+    };
+  }
 }
 
 // QueryExchangeRates is the request type for the Query/ExchangeRate RPC
@@ -319,4 +325,15 @@ message QuerySMAResponse {
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
+}
+
+message ConvertUSDCtoCHEQRequest {
+  string amount = 1;            // e.g., "1000000usdc"
+  string ma_type = 2;           // "sma", "ema", or "wma"
+  string wma_strategy = 3;      // "daily", "hourly", "custom" (optional unless wma is chosen)
+  repeated int32 custom_weights = 4; // only used if strategy == custom
+}
+
+message ConvertUSDCtoCHEQResponse {
+  string amount = 1; // e.g., "25000000ncheq"
 }

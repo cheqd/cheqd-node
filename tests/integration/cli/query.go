@@ -526,3 +526,40 @@ func QueryWMA(denom string, strategy string, customWeights []int64) (*oracletype
 
 	return &resp, nil
 }
+
+func QueryConvertUSDCtoCHEQ(amount string, maType string, wmaStrategy string, customWeights []int64) (*oracletypes.ConvertUSDCtoCHEQResponse, error) {
+	// Base CLI args
+	args := []string{amount, maType}
+
+	if strings.ToLower(maType) == "wma" {
+		if wmaStrategy == "" {
+			return nil, fmt.Errorf("wma_strategy must be provided when ma_type is 'wma'")
+		}
+		args = append(args, wmaStrategy)
+
+		if strings.ToUpper(wmaStrategy) == "CUSTOM" {
+			if len(customWeights) == 0 {
+				return nil, fmt.Errorf("custom weights must be provided for CUSTOM strategy")
+			}
+			var weightsStr []string
+			for _, w := range customWeights {
+				weightsStr = append(weightsStr, fmt.Sprintf("%d", w))
+			}
+			args = append(args, strings.Join(weightsStr, ","))
+		}
+	}
+
+	// Run CLI query
+	res, err := Query("oracle", "convert-usdc-to-cheq", args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to run convert-usdc-to-cheq query: %w", err)
+	}
+
+	var resp oracletypes.ConvertUSDCtoCHEQResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling ConvertUSDCtoCHEQ response: %w", err)
+	}
+
+	return &resp, nil
+}

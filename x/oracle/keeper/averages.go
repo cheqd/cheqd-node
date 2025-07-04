@@ -217,3 +217,32 @@ func IsValidWmaStrategy(s string) bool {
 		return false
 	}
 }
+
+func (k Keeper) GetPriceHistory(ctx sdk.Context, denom string) []math.LegacyDec {
+	store := ctx.KVStore(k.storeKey)
+	currentBlock := util.SafeInt64ToUint64(ctx.BlockHeight())
+
+	prices, err := CalculateHistoricPrices(ctx, store, denom, currentBlock, k)
+	if err != nil {
+		ctx.Logger().Error("Failed to fetch price history", "denom", denom, "error", err)
+		return nil
+	}
+	return prices
+}
+
+func (k Keeper) GetCustomWMA(ctx sdk.Context, denom string, weights []int32) (math.LegacyDec, error) {
+	prices := k.GetPriceHistory(ctx, denom)
+	if len(prices) == 0 {
+		return math.LegacyZeroDec(), fmt.Errorf("no price history for %s", denom)
+	}
+	if len(prices) != len(weights) {
+		return math.LegacyZeroDec(), fmt.Errorf("weights length %d ≠ prices %d", len(weights), len(prices))
+	}
+
+	wInt64 := make([]int64, len(weights))
+	for i, w := range weights {
+		wInt64[i] = int64(w)
+	}
+
+	return CalculateWMA(prices, "CUSTOM", wInt64), nil
+}
