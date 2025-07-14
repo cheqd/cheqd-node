@@ -350,7 +350,7 @@ class Installer():
                 with request.urlopen(COSMOVISOR_SERVICE_TEMPLATE) as response:
                     # Replace the values for environment variables in the template file
                     s = re.sub(
-                        r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY})',
+                        r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY}|{DAEMON_DOWNLOAD_MUST_HAVE_CHECKSUM}|{DAEMON_SHUTDOWN_GRACE})',
                         lambda m: {'{CHEQD_ROOT_DIR}': self.cheqd_root_dir,
                                 '{DEFAULT_BINARY_NAME}': DEFAULT_BINARY_NAME,
                                 '{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}':  self.interviewer.daemon_allow_download_binaries,
@@ -380,7 +380,7 @@ class Installer():
                 with request.urlopen(COSMOVISOR_CONFIG_TEMPLATE) as response:
                     # Replace the values for environment variables in the template file
                     s = re.sub(
-                        r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY})',
+                        r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY}|{DAEMON_DOWNLOAD_MUST_HAVE_CHECKSUM}|{DAEMON_SHUTDOWN_GRACE})',
                         lambda m: {'{CHEQD_ROOT_DIR}': self.cheqd_root_dir,
                                 '{DEFAULT_BINARY_NAME}': DEFAULT_BINARY_NAME,
                                 '{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}':  self.interviewer.daemon_allow_download_binaries,
@@ -478,7 +478,9 @@ class Installer():
             # Setup cheqd-noded environment variables
             # These are independent of Cosmovisor environment variables
             # Set them regardless of whether Cosmovisor is used or not
+            logging.info("Setting cheqd-noded environment variables...")
             self.set_cheqd_env_vars()
+            logging.info("Finished setting cheqd-noded environment variables")
 
             # Configure cheqd-noded settings
             # This edits the config.toml and app.toml files
@@ -898,6 +900,7 @@ class Installer():
         # Applicable for both standalone and Cosmovisor installations
         # Only environment variables that are required required for transactions are set here
         try:
+            logging.info("Starting to set cheqd-noded environment variables...")
             # If RPC port is set, set to user-specified value
             if self.interviewer.rpc_port:
                 self.set_environment_variable("CHEQD_NODED_NODE", f"tcp://localhost:{self.interviewer.rpc_port}")
@@ -910,6 +913,18 @@ class Installer():
                 self.set_environment_variable("CHEQD_NODED_CHAIN_ID", TESTNET_CHAIN_ID)
             elif self.interviewer.chain == "mainnet":
                 self.set_environment_variable("CHEQD_NODED_CHAIN_ID", MAINNET_CHAIN_ID)
+
+            # Proceed with Cosmovisor-specific environment variables
+            if self.interviewer.is_cosmovisor_needed:
+                self.set_environment_variable("DAEMON_HOME", self.cheqd_root_dir)
+                self.set_environment_variable("DAEMON_NAME", DEFAULT_BINARY_NAME)
+                self.set_environment_variable("DAEMON_ALLOW_DOWNLOAD_BINARIES", self.interviewer.daemon_allow_download_binaries)
+                self.set_environment_variable("DAEMON_RESTART_AFTER_UPGRADE", self.interviewer.daemon_restart_after_upgrade)
+                self.set_environment_variable("DAEMON_POLL_INTERVAL", DEFAULT_DAEMON_POLL_INTERVAL)
+                self.set_environment_variable("UNSAFE_SKIP_BACKUP", DEFAULT_UNSAFE_SKIP_BACKUP)
+                self.set_environment_variable("DAEMON_DOWNLOAD_MUST_HAVE_CHECKSUM", DAEMON_DOWNLOAD_MUST_HAVE_CHECKSUM)
+                self.set_environment_variable("DAEMON_SHUTDOWN_GRACE", DAEMON_SHUTDOWN_GRACE)
+
         except Exception as e:
             logging.exception(f"Failed to set environment variables for cheqd-noded. Reason: {e}")
             raise
@@ -970,6 +985,74 @@ class Installer():
             else:
                 logging.debug(f"{self.cheqd_user_bashrc_path} doesn't exist. Skipped adding {env_var_name} to the file...")
 
+            # Check if the cheqd user's default shell is fish
+            try:
+                import pwd
+                cheqd_user_info = pwd.getpwnam(DEFAULT_CHEQD_USER)
+                cheqd_user_shell = cheqd_user_info.pw_shell
+                fish_detected = 'fish' in cheqd_user_shell
+                
+                if fish_detected:
+                    # Set environment variable for fish shell
+                    fish_config_dir = os.path.join(self.cheqd_home_dir, ".config", "fish")
+                    fish_config_file = os.path.join(fish_config_dir, "config.fish")
+                    
+                    # Create fish config directory if it doesn't exist
+                    os.makedirs(fish_config_dir, exist_ok=True)
+                    
+                    # Read existing config or create new one
+                    lines = []
+                    if os.path.exists(fish_config_file):
+                        with open(fish_config_file, "r") as f:
+                            lines = f.readlines()
+                    
+                    # Check if interactive block exists
+                    interactive_block_start = -1
+                    interactive_block_end = -1
+                    for i, line in enumerate(lines):
+                        if line.strip() == "if status is-interactive":
+                            interactive_block_start = i
+                        elif line.strip() == "end" and interactive_block_start != -1:
+                            interactive_block_end = i
+                            break
+                    
+                    # Prepare the fish environment variable line
+                    fish_line = f"    set -gx {env_var_name} {env_var_value}\n"
+                    
+                    # Update or add the environment variable
+                    updated = False
+                    new_lines = []
+                    
+                    for i, line in enumerate(lines):
+                        if line.strip().startswith(f"set -gx {env_var_name} "):
+                            new_lines.append(fish_line)
+                            updated = True
+                        else:
+                            new_lines.append(line)
+                    
+                    # If not updated, add to interactive block or create one
+                    if not updated:
+                        if interactive_block_start != -1 and interactive_block_end != -1:
+                            # Insert into existing interactive block
+                            new_lines.insert(interactive_block_end, fish_line)
+                        else:
+                            # Create new interactive block
+                            new_lines.extend([
+                                "if status is-interactive\n",
+                                "    # Commands to run in interactive sessions can go here\n",
+                                fish_line,
+                                "end\n"
+                            ])
+                    
+                    # Write the updated config
+                    with open(fish_config_file, "w") as f:
+                        f.writelines(new_lines)
+                    
+                    logging.debug(f"Set {env_var_name} for fish shell in {fish_config_file}")
+                    
+            except (KeyError, ImportError) as e:
+                logging.warning(f"Could not determine cheqd user shell or set fish config: {e}")
+
         except Exception as e:
             logging.exception(f"Failed to set environment variable {env_var_name}. Reason: {e}")
             raise
@@ -994,7 +1077,7 @@ class Installer():
                 if not os.path.exists(os.path.join(self.cheqd_config_dir, 'priv_validator_key.json')):
                     # Initialize the node
                     logging.info(f"Initializing {self.cheqd_root_dir} directory")
-                    self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'cheqd-noded init {self.interviewer.moniker}'")
+                    self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'cheqd-noded init {self.interviewer.moniker} --chain-id {TESTNET_CHAIN_ID if self.interviewer.chain == 'testnet' else MAINNET_CHAIN_ID}'")
                 else:
                     logging.debug(f"Validator key already exists in {self.cheqd_config_dir}. Skipping cheqd-noded init...")
 
@@ -1028,6 +1111,22 @@ class Installer():
                 search_and_replace(rpc_default_value, new_rpc_default_value, config_toml_path)
             else:
                 logging.debug("Skipping cheqd-noded init as setup is not needed")
+
+            # Download genesis.json from GitHub repository if chain is set
+            # For fresh installs, chain is always set
+            # For upgrades, chain is only set if user chose to check genesis.json
+            if self.interviewer.chain and is_valid_url(genesis_url):
+                logging.info(f"Downloading genesis file for {self.interviewer.chain} from GitHub repository")
+                
+                with request.urlopen(genesis_url) as response, open(genesis_file_path, "w") as file:
+                    file.write(response.read().decode("utf-8").strip())
+                
+                logging.info(f"Successfully downloaded and overwrote genesis.json for {self.interviewer.chain}")
+            elif self.interviewer.chain and not is_valid_url(genesis_url):
+                logging.error(f"Invalid URL for genesis file: {genesis_url}")
+                return False
+            else:
+                logging.debug("Skipping genesis.json download (chain not set or user chose not to check)")
 
             ### This next section changes values in configuration files only if the user has provided input ###
 
@@ -2014,6 +2113,7 @@ class Interviewer:
                 self.is_cosmovisor_needed = True
             elif answer.lower().startswith("n"):
                 self.is_cosmovisor_needed = False
+                self.is_cosmovisor_bump_needed = False
             else:
                 logging.error("Invalid input provided during installation. Please choose either 'yes' or 'no'.\n")
                 self.ask_for_cosmovisor()
@@ -2282,6 +2382,37 @@ class Interviewer:
         except Exception as e:
             logging.exception(f"Failed to set whether init snapshot. Reason: {e}")
 
+    # Ask user if they want to check their genesis.json during upgrade
+    def ask_for_genesis_check(self):
+        try:
+            logging.info("During upgrades, you can optionally verify that you have the correct genesis.json file for your network.\n")
+            answer = self.ask(
+                "Do you want to check and update your genesis.json file? (yes/no)", default="yes")
+            if answer.lower().startswith("y"):
+                # Ask which network they're running on (similar to fresh install)
+                network_answer = int(self.ask(
+                    "Which network are you running on?\n"
+                    f"1. Mainnet ({MAINNET_CHAIN_ID})\n"
+                    f"2. Testnet ({TESTNET_CHAIN_ID})", default=1))
+                if network_answer == 1:
+                    self.chain = "mainnet"
+                elif network_answer == 2:
+                    self.chain = "testnet"
+                else:
+                    logging.error("Invalid network selected. Please choose either 1 or 2.\n")
+                    self.ask_for_genesis_check()
+                
+                logging.debug(f"Network set to {self.chain} for genesis.json check")
+            elif answer.lower().startswith("n"):
+                # Keep chain empty to skip genesis.json download
+                self.chain = ""
+                logging.debug("Skipping genesis.json check")
+            else:
+                logging.error("Please choose either 'yes' or 'no'\n")
+                self.ask_for_genesis_check()
+        except Exception as e:
+            logging.exception(f"Failed to set genesis.json check preference. Reason: {e}")
+
 
 if __name__ == '__main__':
     # Order of questions to ask the user if installing:
@@ -2353,6 +2484,8 @@ if __name__ == '__main__':
 
             if interviewer.is_systemd_config_installed(DEFAULT_JOURNAL_CONFIG_FILE) is True:
                 interviewer.ask_for_rewrite_journal()
+
+            interviewer.ask_for_genesis_check()
 
         except Exception as e:
             logging.exception(f"Unable to complete user interview process for upgrade. Reason for exiting: {e}")
