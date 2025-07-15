@@ -2400,7 +2400,7 @@ class Interviewer:
                 else:
                     logging.error("Invalid network selected. Please choose either 1 or 2.\n")
                     self.ask_for_genesis_check()
-                
+
                 logging.debug(f"Network set to {self.chain} for genesis.json check")
             elif answer.lower().startswith("n"):
                 # Keep chain empty to skip genesis.json download
