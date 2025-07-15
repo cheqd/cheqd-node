@@ -987,25 +987,24 @@ class Installer():
 
             # Check if the cheqd user's default shell is fish
             try:
-                import pwd
                 cheqd_user_info = pwd.getpwnam(DEFAULT_CHEQD_USER)
                 cheqd_user_shell = cheqd_user_info.pw_shell
                 fish_detected = 'fish' in cheqd_user_shell
-                
+
                 if fish_detected:
                     # Set environment variable for fish shell
                     fish_config_dir = os.path.join(self.cheqd_home_dir, ".config", "fish")
                     fish_config_file = os.path.join(fish_config_dir, "config.fish")
-                    
+
                     # Create fish config directory if it doesn't exist
                     os.makedirs(fish_config_dir, exist_ok=True)
-                    
+
                     # Read existing config or create new one
                     lines = []
                     if os.path.exists(fish_config_file):
                         with open(fish_config_file, "r") as f:
                             lines = f.readlines()
-                    
+
                     # Check if interactive block exists
                     interactive_block_start = -1
                     interactive_block_end = -1
@@ -1015,21 +1014,21 @@ class Installer():
                         elif line.strip() == "end" and interactive_block_start != -1:
                             interactive_block_end = i
                             break
-                    
+
                     # Prepare the fish environment variable line
                     fish_line = f"    set -gx {env_var_name} {env_var_value}\n"
-                    
+
                     # Update or add the environment variable
                     updated = False
                     new_lines = []
-                    
+
                     for i, line in enumerate(lines):
                         if line.strip().startswith(f"set -gx {env_var_name} "):
                             new_lines.append(fish_line)
                             updated = True
                         else:
                             new_lines.append(line)
-                    
+
                     # If not updated, add to interactive block or create one
                     if not updated:
                         if interactive_block_start != -1 and interactive_block_end != -1:
@@ -1043,13 +1042,13 @@ class Installer():
                                 fish_line,
                                 "end\n"
                             ])
-                    
+
                     # Write the updated config
                     with open(fish_config_file, "w") as f:
                         f.writelines(new_lines)
-                    
+
                     logging.debug(f"Set {env_var_name} for fish shell in {fish_config_file}")
-                    
+
             except (KeyError, ImportError) as e:
                 logging.warning(f"Could not determine cheqd user shell or set fish config: {e}")
 
@@ -1117,10 +1116,10 @@ class Installer():
             # For upgrades, chain is only set if user chose to check genesis.json
             if self.interviewer.chain and is_valid_url(genesis_url):
                 logging.info(f"Downloading genesis file for {self.interviewer.chain} from GitHub repository")
-                
+
                 with request.urlopen(genesis_url) as response, open(genesis_file_path, "w") as file:
                     file.write(response.read().decode("utf-8").strip())
-                
+
                 logging.info(f"Successfully downloaded and overwrote genesis.json for {self.interviewer.chain}")
             elif self.interviewer.chain and not is_valid_url(genesis_url):
                 logging.error(f"Invalid URL for genesis file: {genesis_url}")
