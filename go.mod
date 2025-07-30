@@ -237,7 +237,7 @@ require (
 
 replace (
 	// replace cosmossdk.io/store with patched version
-	cosmossdk.io/store => github.com/cheqd/cosmos-sdk/store v1.1.1-uneven-heights-iavl
+	cosmossdk.io/store => github.com/cheqd/cosmos-sdk/store v1.1.2-0.20250730095718-3ec10400a3b2
 	// Keyring replacement from Cosmos SDK v0.50.13
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 
@@ -245,7 +245,7 @@ replace (
 	github.com/cheqd/cheqd-node/api/v2 => ./api
 
 	// replace cosmos-sdk v0.50.13
-	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.50.14-height-mismatch-iavl
+	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.50.14-height-mismatch-iavl.0.20250730095718-3ec10400a3b2
 
 	// replace iavl v1.2.2
 	// https://github.com/cheqd/iavl/tree/cheqd-v1.2.2-uneven-heights

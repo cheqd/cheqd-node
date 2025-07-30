@@ -20,7 +20,7 @@ require (
 )
 
 replace (
-	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.50.14-height-mismatch-iavl
+	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.50.14-height-mismatch-iavl.0.20250730095718-3ec10400a3b2
 
-	github.com/cosmos/iavl => github.com/cheqd/iavl v1.2.2-uneven-heights
+	// github.com/cosmos/iavl => github.com/cheqd/iavl v1.2.2-uneven-heights
 )
