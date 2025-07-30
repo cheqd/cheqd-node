@@ -249,7 +249,7 @@ replace (
 
 	// replace iavl v1.2.2
 	// https://github.com/cheqd/iavl/tree/cheqd-v1.2.2-uneven-heights
-	github.com/cosmos/iavl => github.com/cheqd/iavl v1.2.2-uneven-heights
+	// github.com/cosmos/iavl => github.com/cheqd/iavl v1.2.2-uneven-heights
 
 	// dgrijalva/jwt-go is deprecated and doesn't receive security updates.
 	// TODO: remove it: https://github.com/cosmos/cosmos-sdk/issues/13134
