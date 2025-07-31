@@ -1367,6 +1367,13 @@ func (app *App) RegisterUpgradeHandlers() {
 			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
 		},
 	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		upgradeV4.PatchUpgradeName,
+		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+		},
+	)
 }
 
 // configure store loader that checks if version == upgradeHeight and applies store upgrades
@@ -1391,6 +1398,17 @@ func (app *App) setupUpgradeStoreLoaders() {
 		storeUpgrades := storetypes.StoreUpgrades{
 			Added: []string{
 				circuittypes.ModuleName,
+			},
+		}
+		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	}
+
+	if upgradeInfo.Name == upgradeV4.PatchUpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		storeUpgrades := storetypes.StoreUpgrades{
+			Added: []string{
+				ibcfeetypes.StoreKey,
+				icacontrollertypes.StoreKey,
 			},
 		}
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
