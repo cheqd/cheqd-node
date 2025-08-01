@@ -14,7 +14,7 @@ require (
 	github.com/cheqd/cheqd-node/api/v2 v2.3.5-0.20250514151055-c7d12358336f
 	github.com/cometbft/cometbft v0.38.12
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
-	github.com/cosmos/cosmos-sdk v0.50.13
+	github.com/cosmos/cosmos-sdk v0.50.14
 	github.com/cosmos/gogoproto v1.7.0
 	github.com/cosmos/ibc-go/v8 v8.7.0
 	github.com/gabriel-vasile/mimetype v1.4.8
@@ -245,14 +245,14 @@ require (
 replace (
 	// replace cosmossdk.io/store with patched version
 	cosmossdk.io/store => github.com/cheqd/cosmos-sdk/store v1.1.1-uneven-heights-iavl
-	// Keyring replacement from Cosmos SDK v0.50.13
+	// Keyring replacement from Cosmos SDK v0.50.14
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 
 	// cheqd-node/api module replacement
 	github.com/cheqd/cheqd-node/api/v2 => ./api
 
-	// replace cosmos-sdk v0.50.13
-	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.50.13-auth-uneven-heights-fix
+	// replace cosmos-sdk v0.50.14
+	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.50.14-height-mismatch-iavl
 
 	// replace iavl v1.2.2
 	// https://github.com/cheqd/iavl/tree/cheqd-v1.2.2-uneven-heights
