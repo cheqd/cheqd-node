@@ -3,8 +3,8 @@ package resourcev2
 
 import (
 	_ "cosmossdk.io/api/amino"
-	v1beta1 "cosmossdk.io/api/cosmos/base/v1beta1"
 	fmt "fmt"
+	v2 "github.com/cheqd/cheqd-node/api/v2/cheqd/did/v2"
 	_ "github.com/cosmos/cosmos-proto"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
 	_ "github.com/cosmos/gogoproto/gogoproto"
@@ -15,6 +15,159 @@ import (
 	reflect "reflect"
 	sync "sync"
 )
+
+var _ protoreflect.List = (*_FeeParams_1_list)(nil)
+
+type _FeeParams_1_list struct {
+	list *[]*v2.FeeRange
+}
+
+func (x *_FeeParams_1_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_FeeParams_1_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
+}
+
+func (x *_FeeParams_1_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*v2.FeeRange)
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_FeeParams_1_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*v2.FeeRange)
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_FeeParams_1_list) AppendMutable() protoreflect.Value {
+	v := new(v2.FeeRange)
+	*x.list = append(*x.list, v)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_FeeParams_1_list) Truncate(n int) {
+	for i := n; i < len(*x.list); i++ {
+		(*x.list)[i] = nil
+	}
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_FeeParams_1_list) NewElement() protoreflect.Value {
+	v := new(v2.FeeRange)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_FeeParams_1_list) IsValid() bool {
+	return x.list != nil
+}
+
+var _ protoreflect.List = (*_FeeParams_2_list)(nil)
+
+type _FeeParams_2_list struct {
+	list *[]*v2.FeeRange
+}
+
+func (x *_FeeParams_2_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_FeeParams_2_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
+}
+
+func (x *_FeeParams_2_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*v2.FeeRange)
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_FeeParams_2_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*v2.FeeRange)
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_FeeParams_2_list) AppendMutable() protoreflect.Value {
+	v := new(v2.FeeRange)
+	*x.list = append(*x.list, v)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_FeeParams_2_list) Truncate(n int) {
+	for i := n; i < len(*x.list); i++ {
+		(*x.list)[i] = nil
+	}
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_FeeParams_2_list) NewElement() protoreflect.Value {
+	v := new(v2.FeeRange)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_FeeParams_2_list) IsValid() bool {
+	return x.list != nil
+}
+
+var _ protoreflect.List = (*_FeeParams_3_list)(nil)
+
+type _FeeParams_3_list struct {
+	list *[]*v2.FeeRange
+}
+
+func (x *_FeeParams_3_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_FeeParams_3_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
+}
+
+func (x *_FeeParams_3_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*v2.FeeRange)
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_FeeParams_3_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*v2.FeeRange)
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_FeeParams_3_list) AppendMutable() protoreflect.Value {
+	v := new(v2.FeeRange)
+	*x.list = append(*x.list, v)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_FeeParams_3_list) Truncate(n int) {
+	for i := n; i < len(*x.list); i++ {
+		(*x.list)[i] = nil
+	}
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_FeeParams_3_list) NewElement() protoreflect.Value {
+	v := new(v2.FeeRange)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_FeeParams_3_list) IsValid() bool {
+	return x.list != nil
+}
 
 var (
 	md_FeeParams             protoreflect.MessageDescriptor
@@ -98,20 +251,20 @@ func (x *fastReflection_FeeParams) Interface() protoreflect.ProtoMessage {
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
 func (x *fastReflection_FeeParams) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.Image != nil {
-		value := protoreflect.ValueOfMessage(x.Image.ProtoReflect())
+	if len(x.Image) != 0 {
+		value := protoreflect.ValueOfList(&_FeeParams_1_list{list: &x.Image})
 		if !f(fd_FeeParams_image, value) {
 			return
 		}
 	}
-	if x.Json != nil {
-		value := protoreflect.ValueOfMessage(x.Json.ProtoReflect())
+	if len(x.Json) != 0 {
+		value := protoreflect.ValueOfList(&_FeeParams_2_list{list: &x.Json})
 		if !f(fd_FeeParams_json, value) {
 			return
 		}
 	}
-	if x.Default != nil {
-		value := protoreflect.ValueOfMessage(x.Default.ProtoReflect())
+	if len(x.Default) != 0 {
+		value := protoreflect.ValueOfList(&_FeeParams_3_list{list: &x.Default})
 		if !f(fd_FeeParams_default, value) {
 			return
 		}
@@ -138,11 +291,11 @@ func (x *fastReflection_FeeParams) Range(f func(protoreflect.FieldDescriptor, pr
 func (x *fastReflection_FeeParams) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	case "cheqd.resource.v2.FeeParams.image":
-		return x.Image != nil
+		return len(x.Image) != 0
 	case "cheqd.resource.v2.FeeParams.json":
-		return x.Json != nil
+		return len(x.Json) != 0
 	case "cheqd.resource.v2.FeeParams.default":
-		return x.Default != nil
+		return len(x.Default) != 0
 	case "cheqd.resource.v2.FeeParams.burn_factor":
 		return x.BurnFactor != ""
 	default:
@@ -186,14 +339,23 @@ func (x *fastReflection_FeeParams) Clear(fd protoreflect.FieldDescriptor) {
 func (x *fastReflection_FeeParams) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
 	case "cheqd.resource.v2.FeeParams.image":
-		value := x.Image
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
+		if len(x.Image) == 0 {
+			return protoreflect.ValueOfList(&_FeeParams_1_list{})
+		}
+		listValue := &_FeeParams_1_list{list: &x.Image}
+		return protoreflect.ValueOfList(listValue)
 	case "cheqd.resource.v2.FeeParams.json":
-		value := x.Json
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
+		if len(x.Json) == 0 {
+			return protoreflect.ValueOfList(&_FeeParams_2_list{})
+		}
+		listValue := &_FeeParams_2_list{list: &x.Json}
+		return protoreflect.ValueOfList(listValue)
 	case "cheqd.resource.v2.FeeParams.default":
-		value := x.Default
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
+		if len(x.Default) == 0 {
+			return protoreflect.ValueOfList(&_FeeParams_3_list{})
+		}
+		listValue := &_FeeParams_3_list{list: &x.Default}
+		return protoreflect.ValueOfList(listValue)
 	case "cheqd.resource.v2.FeeParams.burn_factor":
 		value := x.BurnFactor
 		return protoreflect.ValueOfString(value)
@@ -218,11 +380,17 @@ func (x *fastReflection_FeeParams) Get(descriptor protoreflect.FieldDescriptor) 
 func (x *fastReflection_FeeParams) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	case "cheqd.resource.v2.FeeParams.image":
-		x.Image = value.Message().Interface().(*v1beta1.Coin)
+		lv := value.List()
+		clv := lv.(*_FeeParams_1_list)
+		x.Image = *clv.list
 	case "cheqd.resource.v2.FeeParams.json":
-		x.Json = value.Message().Interface().(*v1beta1.Coin)
+		lv := value.List()
+		clv := lv.(*_FeeParams_2_list)
+		x.Json = *clv.list
 	case "cheqd.resource.v2.FeeParams.default":
-		x.Default = value.Message().Interface().(*v1beta1.Coin)
+		lv := value.List()
+		clv := lv.(*_FeeParams_3_list)
+		x.Default = *clv.list
 	case "cheqd.resource.v2.FeeParams.burn_factor":
 		x.BurnFactor = value.Interface().(string)
 	default:
@@ -247,19 +415,22 @@ func (x *fastReflection_FeeParams) Mutable(fd protoreflect.FieldDescriptor) prot
 	switch fd.FullName() {
 	case "cheqd.resource.v2.FeeParams.image":
 		if x.Image == nil {
-			x.Image = new(v1beta1.Coin)
+			x.Image = []*v2.FeeRange{}
 		}
-		return protoreflect.ValueOfMessage(x.Image.ProtoReflect())
+		value := &_FeeParams_1_list{list: &x.Image}
+		return protoreflect.ValueOfList(value)
 	case "cheqd.resource.v2.FeeParams.json":
 		if x.Json == nil {
-			x.Json = new(v1beta1.Coin)
+			x.Json = []*v2.FeeRange{}
 		}
-		return protoreflect.ValueOfMessage(x.Json.ProtoReflect())
+		value := &_FeeParams_2_list{list: &x.Json}
+		return protoreflect.ValueOfList(value)
 	case "cheqd.resource.v2.FeeParams.default":
 		if x.Default == nil {
-			x.Default = new(v1beta1.Coin)
+			x.Default = []*v2.FeeRange{}
 		}
-		return protoreflect.ValueOfMessage(x.Default.ProtoReflect())
+		value := &_FeeParams_3_list{list: &x.Default}
+		return protoreflect.ValueOfList(value)
 	case "cheqd.resource.v2.FeeParams.burn_factor":
 		panic(fmt.Errorf("field burn_factor of message cheqd.resource.v2.FeeParams is not mutable"))
 	default:
@@ -276,14 +447,14 @@ func (x *fastReflection_FeeParams) Mutable(fd protoreflect.FieldDescriptor) prot
 func (x *fastReflection_FeeParams) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	case "cheqd.resource.v2.FeeParams.image":
-		m := new(v1beta1.Coin)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
+		list := []*v2.FeeRange{}
+		return protoreflect.ValueOfList(&_FeeParams_1_list{list: &list})
 	case "cheqd.resource.v2.FeeParams.json":
-		m := new(v1beta1.Coin)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
+		list := []*v2.FeeRange{}
+		return protoreflect.ValueOfList(&_FeeParams_2_list{list: &list})
 	case "cheqd.resource.v2.FeeParams.default":
-		m := new(v1beta1.Coin)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
+		list := []*v2.FeeRange{}
+		return protoreflect.ValueOfList(&_FeeParams_3_list{list: &list})
 	case "cheqd.resource.v2.FeeParams.burn_factor":
 		return protoreflect.ValueOfString("")
 	default:
@@ -355,17 +526,23 @@ func (x *fastReflection_FeeParams) ProtoMethods() *protoiface.Methods {
 		var n int
 		var l int
 		_ = l
-		if x.Image != nil {
-			l = options.Size(x.Image)
-			n += 1 + l + runtime.Sov(uint64(l))
+		if len(x.Image) > 0 {
+			for _, e := range x.Image {
+				l = options.Size(e)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
 		}
-		if x.Json != nil {
-			l = options.Size(x.Json)
-			n += 1 + l + runtime.Sov(uint64(l))
+		if len(x.Json) > 0 {
+			for _, e := range x.Json {
+				l = options.Size(e)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
 		}
-		if x.Default != nil {
-			l = options.Size(x.Default)
-			n += 1 + l + runtime.Sov(uint64(l))
+		if len(x.Default) > 0 {
+			for _, e := range x.Default {
+				l = options.Size(e)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
 		}
 		l = len(x.BurnFactor)
 		if l > 0 {
@@ -407,47 +584,53 @@ func (x *fastReflection_FeeParams) ProtoMethods() *protoiface.Methods {
 			i--
 			dAtA[i] = 0x22
 		}
-		if x.Default != nil {
-			encoded, err := options.Marshal(x.Default)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
+		if len(x.Default) > 0 {
+			for iNdEx := len(x.Default) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.Default[iNdEx])
+				if err != nil {
+					return protoiface.MarshalOutput{
+						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+						Buf:               input.Buf,
+					}, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+				i--
+				dAtA[i] = 0x1a
 			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0x1a
 		}
-		if x.Json != nil {
-			encoded, err := options.Marshal(x.Json)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
+		if len(x.Json) > 0 {
+			for iNdEx := len(x.Json) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.Json[iNdEx])
+				if err != nil {
+					return protoiface.MarshalOutput{
+						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+						Buf:               input.Buf,
+					}, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+				i--
+				dAtA[i] = 0x12
 			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0x12
 		}
-		if x.Image != nil {
-			encoded, err := options.Marshal(x.Image)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
+		if len(x.Image) > 0 {
+			for iNdEx := len(x.Image) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.Image[iNdEx])
+				if err != nil {
+					return protoiface.MarshalOutput{
+						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+						Buf:               input.Buf,
+					}, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+				i--
+				dAtA[i] = 0xa
 			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0xa
 		}
 		if input.Buf != nil {
 			input.Buf = append(input.Buf, dAtA...)
@@ -527,10 +710,8 @@ func (x *fastReflection_FeeParams) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				if x.Image == nil {
-					x.Image = &v1beta1.Coin{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Image); err != nil {
+				x.Image = append(x.Image, &v2.FeeRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Image[len(x.Image)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -563,10 +744,8 @@ func (x *fastReflection_FeeParams) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				if x.Json == nil {
-					x.Json = &v1beta1.Coin{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Json); err != nil {
+				x.Json = append(x.Json, &v2.FeeRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Json[len(x.Json)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -599,10 +778,8 @@ func (x *fastReflection_FeeParams) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				if x.Default == nil {
-					x.Default = &v1beta1.Coin{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Default); err != nil {
+				x.Default = append(x.Default, &v2.FeeRange{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Default[len(x.Default)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -696,15 +873,15 @@ type FeeParams struct {
 	// Fixed fee for creating a resource with media type 'image/*'
 	//
 	// Default: 10 CHEQ or 10000000000ncheq
-	Image *v1beta1.Coin `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
+	Image []*v2.FeeRange `protobuf:"bytes,1,rep,name=image,proto3" json:"image,omitempty"`
 	// Fixed fee for creating a resource with media type 'application/json'
 	//
 	// Default: 2.5 CHEQ or 2500000000ncheq
-	Json *v1beta1.Coin `protobuf:"bytes,2,opt,name=json,proto3" json:"json,omitempty"`
+	Json []*v2.FeeRange `protobuf:"bytes,2,rep,name=json,proto3" json:"json,omitempty"`
 	// Fixed fee for creating a resource with all other media types
 	//
 	// Default: 5 CHEQ or 5000000000ncheq
-	Default *v1beta1.Coin `protobuf:"bytes,3,opt,name=default,proto3" json:"default,omitempty"`
+	Default []*v2.FeeRange `protobuf:"bytes,3,rep,name=default,proto3" json:"default,omitempty"`
 	// Percentage of the fixed fee that will be burned
 	//
 	// Default: 0.5 (50%)
@@ -731,21 +908,21 @@ func (*FeeParams) Descriptor() ([]byte, []int) {
 	return file_cheqd_resource_v2_fee_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *FeeParams) GetImage() *v1beta1.Coin {
+func (x *FeeParams) GetImage() []*v2.FeeRange {
 	if x != nil {
 		return x.Image
 	}
 	return nil
 }
 
-func (x *FeeParams) GetJson() *v1beta1.Coin {
+func (x *FeeParams) GetJson() []*v2.FeeRange {
 	if x != nil {
 		return x.Json
 	}
 	return nil
 }
 
-func (x *FeeParams) GetDefault() *v1beta1.Coin {
+func (x *FeeParams) GetDefault() []*v2.FeeRange {
 	if x != nil {
 		return x.Default
 	}
@@ -765,43 +942,42 @@ var file_cheqd_resource_v2_fee_proto_rawDesc = []byte{
 	0x0a, 0x1b, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
 	0x2f, 0x76, 0x32, 0x2f, 0x66, 0x65, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x11, 0x63,
 	0x68, 0x65, 0x71, 0x64, 0x2e, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x2e, 0x76, 0x32,
-	0x1a, 0x1e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2f, 0x62, 0x61, 0x73, 0x65, 0x2f, 0x76, 0x31,
-	0x62, 0x65, 0x74, 0x61, 0x31, 0x2f, 0x63, 0x6f, 0x69, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x1a, 0x19, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63,
-	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x14, 0x67, 0x6f, 0x67,
-	0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x1a, 0x11, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x22, 0x8b, 0x02, 0x0a, 0x09, 0x46, 0x65, 0x65, 0x50, 0x61, 0x72, 0x61,
-	0x6d, 0x73, 0x12, 0x35, 0x0a, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61, 0x73, 0x65, 0x2e,
-	0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e, 0x42, 0x04, 0xc8, 0xde,
-	0x1f, 0x00, 0x52, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x12, 0x33, 0x0a, 0x04, 0x6a, 0x73, 0x6f,
-	0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73,
-	0x2e, 0x62, 0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f,
-	0x69, 0x6e, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x04, 0x6a, 0x73, 0x6f, 0x6e, 0x12, 0x39,
-	0x0a, 0x07, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32,
-	0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61, 0x73, 0x65, 0x2e, 0x76, 0x31,
-	0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00,
-	0x52, 0x07, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x12, 0x57, 0x0a, 0x0b, 0x62, 0x75, 0x72,
-	0x6e, 0x5f, 0x66, 0x61, 0x63, 0x74, 0x6f, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x42, 0x36,
-	0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x1b, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64,
-	0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x6d, 0x61, 0x74, 0x68, 0x2e, 0x4c, 0x65, 0x67, 0x61, 0x63, 0x79,
-	0x44, 0x65, 0x63, 0xd2, 0xb4, 0x2d, 0x0a, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x44, 0x65,
-	0x63, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x0a, 0x62, 0x75, 0x72, 0x6e, 0x46, 0x61, 0x63, 0x74,
-	0x6f, 0x72, 0x42, 0xcc, 0x01, 0xa8, 0xe2, 0x1e, 0x01, 0x0a, 0x15, 0x63, 0x6f, 0x6d, 0x2e, 0x63,
-	0x68, 0x65, 0x71, 0x64, 0x2e, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x2e, 0x76, 0x32,
-	0x42, 0x08, 0x46, 0x65, 0x65, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x3f, 0x67, 0x69,
-	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x63,
-	0x68, 0x65, 0x71, 0x64, 0x2d, 0x6e, 0x6f, 0x64, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x32,
-	0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x2f,
-	0x76, 0x32, 0x3b, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x76, 0x32, 0xa2, 0x02, 0x03,
-	0x43, 0x52, 0x58, 0xaa, 0x02, 0x11, 0x43, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x52, 0x65, 0x73, 0x6f,
-	0x75, 0x72, 0x63, 0x65, 0x2e, 0x56, 0x32, 0xca, 0x02, 0x11, 0x43, 0x68, 0x65, 0x71, 0x64, 0x5c,
-	0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x5c, 0x56, 0x32, 0xe2, 0x02, 0x1d, 0x43, 0x68,
-	0x65, 0x71, 0x64, 0x5c, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x5c, 0x56, 0x32, 0x5c,
-	0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x13, 0x43, 0x68,
-	0x65, 0x71, 0x64, 0x3a, 0x3a, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x3a, 0x3a, 0x56,
-	0x32, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x1a, 0x11, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x1a, 0x16, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x64, 0x69, 0x64, 0x2f, 0x76,
+	0x32, 0x2f, 0x66, 0x65, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x19, 0x63, 0x6f, 0x73,
+	0x6d, 0x6f, 0x73, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x82, 0x02, 0x0a,
+	0x09, 0x46, 0x65, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x32, 0x0a, 0x05, 0x69, 0x6d,
+	0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x16, 0x2e, 0x63, 0x68, 0x65, 0x71,
+	0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x46, 0x65, 0x65, 0x52, 0x61, 0x6e, 0x67,
+	0x65, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x12, 0x30,
+	0x0a, 0x04, 0x6a, 0x73, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x16, 0x2e, 0x63,
+	0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x46, 0x65, 0x65, 0x52,
+	0x61, 0x6e, 0x67, 0x65, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x04, 0x6a, 0x73, 0x6f, 0x6e,
+	0x12, 0x36, 0x0a, 0x07, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x18, 0x03, 0x20, 0x03, 0x28,
+	0x0b, 0x32, 0x16, 0x2e, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x64, 0x69, 0x64, 0x2e, 0x76, 0x32,
+	0x2e, 0x46, 0x65, 0x65, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52,
+	0x07, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x12, 0x57, 0x0a, 0x0b, 0x62, 0x75, 0x72, 0x6e,
+	0x5f, 0x66, 0x61, 0x63, 0x74, 0x6f, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x42, 0x36, 0xc8,
+	0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x1b, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b,
+	0x2e, 0x69, 0x6f, 0x2f, 0x6d, 0x61, 0x74, 0x68, 0x2e, 0x4c, 0x65, 0x67, 0x61, 0x63, 0x79, 0x44,
+	0x65, 0x63, 0xd2, 0xb4, 0x2d, 0x0a, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x44, 0x65, 0x63,
+	0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x0a, 0x62, 0x75, 0x72, 0x6e, 0x46, 0x61, 0x63, 0x74, 0x6f,
+	0x72, 0x42, 0xcc, 0x01, 0xa8, 0xe2, 0x1e, 0x01, 0x0a, 0x15, 0x63, 0x6f, 0x6d, 0x2e, 0x63, 0x68,
+	0x65, 0x71, 0x64, 0x2e, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x2e, 0x76, 0x32, 0x42,
+	0x08, 0x46, 0x65, 0x65, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x3f, 0x67, 0x69, 0x74,
+	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x63, 0x68,
+	0x65, 0x71, 0x64, 0x2d, 0x6e, 0x6f, 0x64, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x32, 0x2f,
+	0x63, 0x68, 0x65, 0x71, 0x64, 0x2f, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x2f, 0x76,
+	0x32, 0x3b, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x76, 0x32, 0xa2, 0x02, 0x03, 0x43,
+	0x52, 0x58, 0xaa, 0x02, 0x11, 0x43, 0x68, 0x65, 0x71, 0x64, 0x2e, 0x52, 0x65, 0x73, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x2e, 0x56, 0x32, 0xca, 0x02, 0x11, 0x43, 0x68, 0x65, 0x71, 0x64, 0x5c, 0x52,
+	0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x5c, 0x56, 0x32, 0xe2, 0x02, 0x1d, 0x43, 0x68, 0x65,
+	0x71, 0x64, 0x5c, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x5c, 0x56, 0x32, 0x5c, 0x47,
+	0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x13, 0x43, 0x68, 0x65,
+	0x71, 0x64, 0x3a, 0x3a, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x3a, 0x3a, 0x56, 0x32,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -818,13 +994,13 @@ func file_cheqd_resource_v2_fee_proto_rawDescGZIP() []byte {
 
 var file_cheqd_resource_v2_fee_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_cheqd_resource_v2_fee_proto_goTypes = []interface{}{
-	(*FeeParams)(nil),    // 0: cheqd.resource.v2.FeeParams
-	(*v1beta1.Coin)(nil), // 1: cosmos.base.v1beta1.Coin
+	(*FeeParams)(nil),   // 0: cheqd.resource.v2.FeeParams
+	(*v2.FeeRange)(nil), // 1: cheqd.did.v2.FeeRange
 }
 var file_cheqd_resource_v2_fee_proto_depIdxs = []int32{
-	1, // 0: cheqd.resource.v2.FeeParams.image:type_name -> cosmos.base.v1beta1.Coin
-	1, // 1: cheqd.resource.v2.FeeParams.json:type_name -> cosmos.base.v1beta1.Coin
-	1, // 2: cheqd.resource.v2.FeeParams.default:type_name -> cosmos.base.v1beta1.Coin
+	1, // 0: cheqd.resource.v2.FeeParams.image:type_name -> cheqd.did.v2.FeeRange
+	1, // 1: cheqd.resource.v2.FeeParams.json:type_name -> cheqd.did.v2.FeeRange
+	1, // 2: cheqd.resource.v2.FeeParams.default:type_name -> cheqd.did.v2.FeeRange
 	3, // [3:3] is the sub-list for method output_type
 	3, // [3:3] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name

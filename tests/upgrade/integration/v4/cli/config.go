@@ -25,6 +25,7 @@ const (
 	ExpectedBlockSeconds int64 = 1
 	ExtraBlocks          int64 = 10
 	UpgradeName                = upgradeV4.UpgradeName
+	MinorUpgradeName           = upgradeV4.MinorUpgradeName
 	DepositAmount              = "1000000000ncheq"
 	NetworkConfigDir           = "network-config"
 	KeyringDir                 = "keyring-test"
