@@ -287,7 +287,7 @@ jobs:
           name: report-post-upgrade.xml
           path: report-post-upgrade.xml
 
-      - name: Run integration tests on upgraded network with the DefalutUSDParams
+      - name: Run integration tests on upgraded network with the DefaultUSDParams
         working-directory: ./tests/integration
         run: |
           ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --skip-file cli_defi_test.go --skip-file cli_defi_negative_test.go --junit-report ../../report-upgraded-integration.xml
