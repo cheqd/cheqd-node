@@ -1407,7 +1407,7 @@ func (app *App) setupUpgradeStoreLoaders() {
 	if upgradeInfo.Name == upgradeV4.PatchUpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := storetypes.StoreUpgrades{
 			Added: []string{
-				ibcfeetypes.StoreKey,
+				// ibcfeetypes.StoreKey,
 				// icacontrollertypes.StoreKey,
 			},
 		}
