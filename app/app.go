@@ -1371,6 +1371,7 @@ func (app *App) RegisterUpgradeHandlers() {
 
 	app.UpgradeKeeper.SetUpgradeHandler(
 		upgradeV4.PatchUpgradeName,
+
 		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 			sdkCtx := sdk.UnwrapSDKContext(ctx)
 			storeKeys := []*storetypes.KVStoreKey{
@@ -1381,14 +1382,14 @@ func (app *App) RegisterUpgradeHandlers() {
 			}
 
 			for _, key := range storeKeys {
-				store := sdkCtx.MultiStore().GetKVStore(key)
+				store := app.CommitMultiStore().GetCommitKVStore(key)
 
 				iavlStore, ok := store.(*iavl.Store)
 				if !ok {
 					return nil, fmt.Errorf("store for key %s is not an iavl.Store", key.Name())
 				}
 
-				version := iavlStore.Commit().Version
+				version := iavlStore.LastCommitID().Version
 				targetVersion := sdkCtx.BlockHeight() - 1
 
 				sdkCtx.Logger().Info(fmt.Sprintf("Committing store %s from version %d to target version %d", key.Name(), version, targetVersion))
