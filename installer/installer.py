@@ -42,7 +42,7 @@ DEFAULT_DEBUG_BRANCH = os.getenv("DEFAULT_DEBUG_BRANCH") if os.getenv("DEFAULT_D
 ###############################################################
 ###     		Cosmovisor configuration      				###
 ###############################################################
-DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.7.1"
+DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.3.0"
 COSMOVISOR_BINARY_URL = "https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2F{}/cosmovisor-{}-linux-{}.tar.gz"
 DEFAULT_USE_COSMOVISOR = "yes"
 DEFAULT_BUMP_COSMOVISOR = "yes"
@@ -2123,7 +2123,7 @@ class Interviewer:
     def ask_for_cosmovisor_bump(self):
         try:
             answer = self.ask(
-                f"Do you want to bump your Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION}? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
+                f"Do you want to install Cosmovisor version {DEFAULT_LATEST_COSMOVISOR_VERSION}? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
             if answer.lower().startswith("y"):
                 self.is_cosmovisor_bump_needed = True
             elif answer.lower().startswith("n"):
