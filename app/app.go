@@ -1392,15 +1392,15 @@ func (app *App) RegisterUpgradeHandlers() {
 				targetVersion := sdkCtx.BlockHeight() - 1
 				version := iavlStore.LastCommitID().Version
 
-				// set iavl store version to latest last second block
-				iavlStore.SetVersion(targetVersion - 1)
+				// set iavl store version to last block
+				iavlStore.SetVersion(targetVersion)
 
 				// delete older versions of store
 				iavlStore.DeleteVersionsTo(version)
+				lastCommit := iavlStore.LastCommitID()
 
-				commitId := iavlStore.Commit()
-				version = commitId.Version
-				sdkCtx.Logger().Info(fmt.Sprintf("Committed store %s to version %d (hash: %X)", key.Name(), version, commitId.Hash))
+				sdkCtx.Logger().Info(fmt.Sprintf("Committed store %s to version %d (hash: %X)",
+					key.Name(), lastCommit.Version, lastCommit.Hash))
 			}
 
 			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
@@ -1437,12 +1437,7 @@ func (app *App) setupUpgradeStoreLoaders() {
 	}
 
 	if upgradeInfo.Name == upgradeV4.PatchUpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
-		storeUpgrades := storetypes.StoreUpgrades{
-			// Added: []string{
-			// 	// ibcfeetypes.StoreKey,
-			// 	// icacontrollertypes.StoreKey,
-			// },
-		}
+		storeUpgrades := storetypes.StoreUpgrades{}
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 	}
