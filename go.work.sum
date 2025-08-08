@@ -174,12 +174,10 @@ github.com/ccojocar/zxcvbn-go v1.0.2/go.mod h1:g1qkXtUSvHP8lhHp5GrSmTz6uWALGRMQd
 github.com/census-instrumentation/opencensus-proto v0.4.1/go.mod h1:4T9NM4+4Vw91VeyqjLS6ao50K5bOcLKN6Q42XnYaRYw=
 github.com/charithe/durationcheck v0.0.10/go.mod h1:bCWXb7gYRysD1CU3C+u4ceO49LoGOY1C1L6uouGNreQ=
 github.com/chavacava/garif v0.1.0/go.mod h1:XMyYCkEL58DF0oyW4qDjjnPWONs2HBqYKI+UIPD+Gww=
-github.com/cheqd/cosmos-sdk v0.50.14-height-mismatch-iavl.0.20250804101122-ba9e25da63d9 h1:Oou7F8HwAOad+GfnGq+bLbDlZtps+31xFyayDJED1I0=
-github.com/cheqd/cosmos-sdk v0.50.14-height-mismatch-iavl.0.20250804101122-ba9e25da63d9/go.mod h1:5yaf5FaygmrAi2Hw4PaKjHx1ilcaXTloyaE9xyvxads=
-github.com/cheqd/cosmos-sdk/store v1.1.2-0.20250804101122-ba9e25da63d9 h1:28dM8jh1jTqm1HapKbhf8QtY9F9FJkh+zQXP0ZcNO9M=
-github.com/cheqd/cosmos-sdk/store v1.1.2-0.20250804101122-ba9e25da63d9/go.mod h1:TGcM3Z+Zug0YmUEXhMpqVcz8GbWGbdev+RYKtrcWUNg=
-github.com/cheqd/iavl v1.2.2-uneven-heights.0.20250804100229-e641730275d7 h1:3rk6jerMSxU2iNTeYAnmJvYRPfQ0NLd8QQyhBsKRcUQ=
-github.com/cheqd/iavl v1.2.2-uneven-heights.0.20250804100229-e641730275d7/go.mod h1:GiM43q0pB+uG53mLxLDzimxM9l/5N9UuSY3/D0huuVw=
+github.com/cheqd/cosmos-sdk v0.50.14-height-mismatch-iavl.0.20250808071119-3b33570d853b h1:zvZCZPP1ebs9PSCDnt49nakH8E7k2b+7MSNsZGtxvpc=
+github.com/cheqd/cosmos-sdk v0.50.14-height-mismatch-iavl.0.20250808071119-3b33570d853b/go.mod h1:rPMofw6zpjUfnXUCzu0YD5+//9PDeBHMS/p9kZchUhQ=
+github.com/cheqd/cosmos-sdk/store v1.1.2-0.20250808071119-3b33570d853b h1:e1SWIyLsnFygPuTdJWoZ+zkszrB/Irh5sWqYCvdx3BM=
+github.com/cheqd/cosmos-sdk/store v1.1.2-0.20250808071119-3b33570d853b/go.mod h1:qSAHKgxM/BZkqYn+9HPAu+3PEkGsYENgYAS8OCAQ/0s=
 github.com/chigopher/pathlib v0.19.1/go.mod h1:tzC1dZLW8o33UQpWkNkhvPwL5n4yyFRFm/jL1YGWFvY=
 github.com/ckaznocha/intrange v0.1.2/go.mod h1:RWffCw/vKBwHeOEwWdCikAtY0q4gGt8VhJZEEA5n+RE=
 github.com/clbanning/mxj v1.8.4/go.mod h1:BVjHeAH+rl9rs6f+QIpeRl0tfu10SXn1pUSa5PVGJng=

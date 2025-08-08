@@ -1389,16 +1389,18 @@ func (app *App) RegisterUpgradeHandlers() {
 					return nil, fmt.Errorf("store for key %s is not an iavl.Store", key.Name())
 				}
 
-				version := iavlStore.LastCommitID().Version
 				targetVersion := sdkCtx.BlockHeight() - 1
+				version := iavlStore.LastCommitID().Version
 
-				sdkCtx.Logger().Info(fmt.Sprintf("Committing store %s from version %d to target version %d", key.Name(), version, targetVersion))
+				// set iavl store version to latest last second block
+				iavlStore.SetVersion(targetVersion - 1)
 
-				for version < targetVersion {
-					commitId := iavlStore.Commit()
-					version = commitId.Version
-					sdkCtx.Logger().Info(fmt.Sprintf("Committed store %s to version %d (hash: %X)", key.Name(), version, commitId.Hash))
-				}
+				// delete older versions of store
+				iavlStore.DeleteVersionsTo(version)
+
+				commitId := iavlStore.Commit()
+				version = commitId.Version
+				sdkCtx.Logger().Info(fmt.Sprintf("Committed store %s to version %d (hash: %X)", key.Name(), version, commitId.Hash))
 			}
 
 			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
