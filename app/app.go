@@ -1396,7 +1396,7 @@ func (app *App) RegisterUpgradeHandlers() {
 				iavlStore.SetVersion(targetVersion)
 
 				// delete older versions of store
-				iavlStore.DeleteVersionsTo(version)
+				_ = iavlStore.DeleteVersionsTo(version)
 				lastCommit := iavlStore.LastCommitID()
 
 				sdkCtx.Logger().Info(fmt.Sprintf("Committed store %s to version %d (hash: %X)",
