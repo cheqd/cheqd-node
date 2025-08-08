@@ -20,6 +20,7 @@ import (
 	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/log"
 	sdkmath "cosmossdk.io/math"
+	"cosmossdk.io/store/iavl"
 	storetypes "cosmossdk.io/store/types"
 	"cosmossdk.io/x/circuit"
 	circuitkeeper "cosmossdk.io/x/circuit/keeper"
@@ -1367,6 +1368,44 @@ func (app *App) RegisterUpgradeHandlers() {
 			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
 		},
 	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		upgradeV4.PatchUpgradeName,
+
+		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			sdkCtx := sdk.UnwrapSDKContext(ctx)
+			storeKeys := []*storetypes.KVStoreKey{
+				app.GetKey(ibcfeetypes.StoreKey),        // ibc-fee module store key
+				app.GetKey(icqtypes.StoreKey),           // icq module store key
+				app.GetKey(icacontrollertypes.StoreKey), // ica-controller module store key
+				app.GetKey(group.StoreKey),              // group module store key
+			}
+
+			for _, key := range storeKeys {
+				store := app.CommitMultiStore().GetCommitKVStore(key)
+
+				iavlStore, ok := store.(*iavl.Store)
+				if !ok {
+					return nil, fmt.Errorf("store for key %s is not an iavl.Store", key.Name())
+				}
+
+				targetVersion := sdkCtx.BlockHeight() - 1
+				version := iavlStore.LastCommitID().Version
+
+				// set iavl store version to last block
+				iavlStore.SetVersion(targetVersion)
+
+				// delete older versions of store
+				_ = iavlStore.DeleteVersionsTo(version)
+				lastCommit := iavlStore.LastCommitID()
+
+				sdkCtx.Logger().Info(fmt.Sprintf("Committed store %s to version %d (hash: %X)",
+					key.Name(), lastCommit.Version, lastCommit.Hash))
+			}
+
+			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+		},
+	)
 }
 
 // configure store loader that checks if version == upgradeHeight and applies store upgrades
@@ -1393,6 +1432,12 @@ func (app *App) setupUpgradeStoreLoaders() {
 				circuittypes.ModuleName,
 			},
 		}
+		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	}
+
+	if upgradeInfo.Name == upgradeV4.PatchUpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		storeUpgrades := storetypes.StoreUpgrades{}
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 	}
