@@ -20,7 +20,7 @@ jobs:
       DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: "Modify runner's home directory permissions"
         run: "sudo chmod 755 /home/runner"
@@ -52,7 +52,7 @@ jobs:
       PYTHONDEVMODE: 1
       DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: "Modify runner's home directory permissions"
         run: "sudo chmod 755 /home/runner"
@@ -82,7 +82,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions/setup-go@v5
         with:
@@ -108,7 +108,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Download binary artifact
         uses: actions/download-artifact@v4
@@ -174,7 +174,7 @@ jobs:
     name: "Fee Abstraction Tests"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Execute fee-abstraction logic by paying in `uosmo`
         working-directory: ./tests/fee-abs
@@ -184,7 +184,7 @@ jobs:
     name: "Upgrade Tests"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Download old node binary (mainnet-latest)
         run: |
@@ -318,7 +318,7 @@ jobs:
     if: always()
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Download unit test
         uses: actions/download-artifact@v4
