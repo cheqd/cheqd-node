@@ -1060,7 +1060,17 @@ func (app *App) InitChainer(ctx sdk.Context, req *abci.RequestInitChain) (*abci.
 	if err := app.UpgradeKeeper.SetModuleVersionMap(ctx, app.ModuleManager.GetVersionMap()); err != nil {
 		panic(err)
 	}
-	return app.ModuleManager.InitGenesis(ctx, app.appCodec, genesisState)
+	valUpdates, err := app.ModuleManager.InitGenesis(ctx, app.appCodec, genesisState)
+	if err != nil {
+		return valUpdates, err
+	}
+
+	// set consensus params app version to current protocol version
+	if err := UpdateConsParamsVersion(ctx, &app.ConsensusParamsKeeper); err != nil {
+		return nil, err
+	}
+
+	return valUpdates, nil
 }
 
 // LoadHeight loads a particular height
@@ -1403,6 +1413,11 @@ func (app *App) RegisterUpgradeHandlers() {
 					key.Name(), lastCommit.Version, lastCommit.Hash))
 			}
 
+			// update consensus params app version to fix statesync issue
+			if err := UpdateConsParamsVersion(sdkCtx, &app.ConsensusParamsKeeper); err != nil {
+				return nil, err
+			}
+
 			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
 		},
 	)
@@ -1512,5 +1527,21 @@ func ReplaceHostZoneConfig(ctx sdk.Context, feeAbsKeeper *feeabskeeper.Keeper) e
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func UpdateConsParamsVersion(ctx sdk.Context, ck *consensusparamkeeper.Keeper) error {
+	ctx.Logger().Info(fmt.Sprintf("Updating consensus params app version to %d", ProtocolVersion))
+	consensusParams, err := ck.ParamsStore.Get(ctx)
+	if err != nil {
+		return err
+	}
+
+	// Hack to fix state-sync issue
+	consensusParams.Version = &tmproto.VersionParams{App: ProtocolVersion}
+	if err := ck.ParamsStore.Set(ctx, consensusParams); err != nil {
+		return err
+	}
+
 	return nil
 }
