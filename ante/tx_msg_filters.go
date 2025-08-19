@@ -1,6 +1,7 @@
 package ante
 
 import (
+	"slices"
 	"strings"
 
 	sdkmath "cosmossdk.io/math"
@@ -155,11 +156,5 @@ func IsTaxableTx(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKe
 
 func IsTaxableTxLite(tx sdk.Tx) bool {
 	msgs := tx.GetMsgs()
-	for _, msg := range msgs {
-		if GetTaxableMsg(msg) {
-			return true
-		}
-	}
-
-	return false
+	return slices.ContainsFunc(msgs, GetTaxableMsg)
 }
