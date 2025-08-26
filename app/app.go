@@ -1418,6 +1418,20 @@ func (app *App) RegisterUpgradeHandlers() {
 				return nil, err
 			}
 
+			// fetch and update fee-abstraction params
+			sdkCtx.Logger().Info("Updating fee-abstraction parameters")
+			feeAbsParams := app.FeeabsKeeper.GetParams(sdkCtx)
+			feeAbsParams.ChainName = sdkCtx.ChainID()
+			feeAbsParams.IbcQueryIcqChannel = "channel-39"
+			feeAbsParams.IbcTransferChannel = "channel-0"
+			feeAbsParams.NativeIbcedInOsmosis = "ibc/7A08C6F11EF0F59EB841B9F788A87EC9F2361C7D9703157EC13D940DC53031FA"
+			app.FeeabsKeeper.SetParams(sdkCtx, feeAbsParams)
+
+			// remove the old host zone config and add the new one
+			if err := ReplaceHostZoneConfig(sdkCtx, &app.FeeabsKeeper); err != nil {
+				return nil, err
+			}
+
 			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
 		},
 	)
@@ -1513,8 +1527,10 @@ func ReplaceHostZoneConfig(ctx sdk.Context, feeAbsKeeper *feeabskeeper.Keeper) e
 	if ctx.ChainID() != "cheqd-mainnet-1" {
 		return nil
 	}
+
 	// remove the old host zone config and add the new one
-	err := feeAbsKeeper.DeleteHostZoneConfig(ctx, "ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4")
+	ctx.Logger().Info("Updating host zone config")
+	err := feeAbsKeeper.DeleteHostZoneConfig(ctx, "ibc/F5FABF52B54E65064B57BF6DBD8E5FAD22CEE9F4B8A57ADBB20CCD0173AA72A4")
 	// ignore error if not found
 	if err != nil && !errors.Is(err, feeabstypes.ErrHostZoneConfigNotFound) {
 		return err
@@ -1523,6 +1539,7 @@ func ReplaceHostZoneConfig(ctx sdk.Context, feeAbsKeeper *feeabskeeper.Keeper) e
 		IbcDenom:                "ibc/F5FABF52B54E65064B57BF6DBD8E5FAD22CEE9F4B8A57ADBB20CCD0173AA72A4",
 		OsmosisPoolTokenDenomIn: "ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4",
 		PoolId:                  1273,
+		Status:                  feeabstypes.HostChainFeeAbsStatus_UPDATED,
 	})
 	if err != nil {
 		return err
