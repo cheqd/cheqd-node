@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: ./go.mod
           cache: false # temporarily off, as golangci-lint doesn't align 100% with cached setup-go@v4, see: https://github.com/golangci/golangci-lint-action/issues/807
