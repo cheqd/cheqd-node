@@ -494,8 +494,8 @@ class Installer():
                 logging.error("Failed to configure cheqd-noded settings")
                 return False
 
-            # Configure state sync or snapshot based on user choice
-            if getattr(self.interviewer, 'use_statesync', False):
+            # Configure state sync only for fresh installs
+            if self.interviewer.is_from_scratch and getattr(self.interviewer, 'use_statesync', False):
                 logging.info("Configuring state sync (default)")
                 if not self.configure_statesync():
                     logging.error("Failed to configure state sync")
