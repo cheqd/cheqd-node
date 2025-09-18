@@ -1222,9 +1222,13 @@ class Installer():
                 try:
                     req = request.Request(f"{endpoint}/status")
                     with request.urlopen(req, timeout=10) as resp:
-                        if resp.getcode() == 200:
+                        code = resp.getcode()
+                        body_preview = resp.read(512).decode("utf-8", errors="ignore")
+                        logging.debug(f"RPC probe {endpoint}/status -> {code}, body: {body_preview[:200]}")
+                        if code == 200:
                             return endpoint
-                except Exception:
+                except Exception as err:
+                    logging.warning(f"RPC probe failed for {endpoint}: {repr(err)}")
                     continue
         except Exception as e:
             logging.exception(f"Could not select a working RPC endpoint. Reason: {e}")
