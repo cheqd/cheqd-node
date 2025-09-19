@@ -1253,6 +1253,14 @@ class Installer():
             logging.exception(f"Failed to fetch block hash at height {height} from {rpc_endpoint}. Reason: {e}")
             raise
 
+    def _is_endpoint_healthy(self, endpoint: str) -> bool:
+        try:
+            req = request.Request(f"{endpoint}/status")
+            with request.urlopen(req, timeout=10) as resp:
+                return resp.getcode() == 200
+        except Exception:
+            return False
+
     def configure_statesync(self) -> bool:
         # Configure statesync settings in config.toml using selected network RPCs
         try:
@@ -1260,15 +1268,21 @@ class Installer():
 
             # Determine RPC servers for the chosen network
             if self.interviewer.chain == "testnet":
-                rpc_servers = f"{TESTNET_RPC_ENDPOINT_EU},{TESTNET_RPC_ENDPOINT_AP}"
+                candidates = [TESTNET_RPC_ENDPOINT_EU, TESTNET_RPC_ENDPOINT_AP]
             else:
-                rpc_servers = f"{MAINNET_RPC_ENDPOINT_EU},{MAINNET_RPC_ENDPOINT_AP}"
+                candidates = [MAINNET_RPC_ENDPOINT_EU, MAINNET_RPC_ENDPOINT_AP]
 
-            # Pick a working endpoint to query status and block hash
-            working_rpc = self._select_working_rpc_endpoint(self.interviewer.chain)
-            if not working_rpc:
+            healthy = [ep for ep in candidates if self._is_endpoint_healthy(ep)]
+            if len(healthy) == 0:
                 logging.error("No working RPC endpoint found for statesync configuration")
                 return False
+
+            if len(healthy) == 1:
+                rpc_servers = f"{healthy[0]},{healthy[0]}"
+                working_rpc = healthy[0]
+            else:
+                rpc_servers = f"{healthy[0]},{healthy[1]}"
+                working_rpc = healthy[0]
 
             latest_height = self._get_latest_block_height(working_rpc)
             trust_height = max(latest_height - 2000, 1)
