@@ -20,6 +20,7 @@ import (
 	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/log"
 	sdkmath "cosmossdk.io/math"
+	"cosmossdk.io/store/iavl"
 	storetypes "cosmossdk.io/store/types"
 	"cosmossdk.io/x/circuit"
 	circuitkeeper "cosmossdk.io/x/circuit/keeper"
@@ -1095,7 +1096,17 @@ func (app *App) InitChainer(ctx sdk.Context, req *abci.RequestInitChain) (*abci.
 	if err := app.UpgradeKeeper.SetModuleVersionMap(ctx, app.ModuleManager.GetVersionMap()); err != nil {
 		panic(err)
 	}
-	return app.ModuleManager.InitGenesis(ctx, app.appCodec, genesisState)
+	valUpdates, err := app.ModuleManager.InitGenesis(ctx, app.appCodec, genesisState)
+	if err != nil {
+		return valUpdates, err
+	}
+
+	// set consensus params app version to current protocol version
+	if err := UpdateConsParamsVersion(ctx, &app.ConsensusParamsKeeper); err != nil {
+		return nil, err
+	}
+
+	return valUpdates, nil
 }
 
 // LoadHeight loads a particular height
@@ -1404,6 +1415,64 @@ func (app *App) RegisterUpgradeHandlers() {
 			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
 		},
 	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		upgradeV4.PatchUpgradeName,
+
+		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			sdkCtx := sdk.UnwrapSDKContext(ctx)
+			storeKeys := []*storetypes.KVStoreKey{
+				app.GetKey(ibcfeetypes.StoreKey),        // ibc-fee module store key
+				app.GetKey(icqtypes.StoreKey),           // icq module store key
+				app.GetKey(icacontrollertypes.StoreKey), // ica-controller module store key
+				app.GetKey(group.StoreKey),              // group module store key
+			}
+
+			for _, key := range storeKeys {
+				store := app.CommitMultiStore().GetCommitKVStore(key)
+
+				iavlStore, ok := store.(*iavl.Store)
+				if !ok {
+					return nil, fmt.Errorf("store for key %s is not an iavl.Store", key.Name())
+				}
+
+				targetVersion := sdkCtx.BlockHeight() - 1
+				version := iavlStore.LastCommitID().Version
+
+				// set iavl store version to last block
+				iavlStore.SetVersion(targetVersion)
+
+				// delete older versions of store
+				_ = iavlStore.DeleteVersionsTo(version)
+				lastCommit := iavlStore.LastCommitID()
+
+				sdkCtx.Logger().Info(fmt.Sprintf("Committed store %s to version %d (hash: %X)",
+					key.Name(), lastCommit.Version, lastCommit.Hash))
+			}
+
+			// update consensus params app version to fix statesync issue
+			if err := UpdateConsParamsVersion(sdkCtx, &app.ConsensusParamsKeeper); err != nil {
+				return nil, err
+			}
+
+			// fetch and update fee-abstraction params
+			sdkCtx.Logger().Info("Updating fee-abstraction parameters")
+			feeAbsParams := app.FeeabsKeeper.GetParams(sdkCtx)
+			feeAbsParams.ChainName = sdkCtx.ChainID()
+			feeAbsParams.IbcQueryIcqChannel = "channel-39"
+			feeAbsParams.IbcTransferChannel = "channel-0"
+			feeAbsParams.NativeIbcedInOsmosis = "ibc/7A08C6F11EF0F59EB841B9F788A87EC9F2361C7D9703157EC13D940DC53031FA"
+			app.FeeabsKeeper.SetParams(sdkCtx, feeAbsParams)
+
+			// remove the old host zone config and add the new one
+			if err := ReplaceHostZoneConfig(sdkCtx, &app.FeeabsKeeper); err != nil {
+				return nil, err
+			}
+
+			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+		},
+	)
+
 	app.UpgradeKeeper.SetUpgradeHandler(
 		upgradeV4.MinorUpgradeName,
 		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
@@ -1458,6 +1527,12 @@ func (app *App) setupUpgradeStoreLoaders() {
 			},
 		}
 
+		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	}
+
+	if upgradeInfo.Name == upgradeV4.PatchUpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		storeUpgrades := storetypes.StoreUpgrades{}
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 	}
@@ -1529,8 +1604,10 @@ func ReplaceHostZoneConfig(ctx sdk.Context, feeAbsKeeper *feeabskeeper.Keeper) e
 	if ctx.ChainID() != "cheqd-mainnet-1" {
 		return nil
 	}
+
 	// remove the old host zone config and add the new one
-	err := feeAbsKeeper.DeleteHostZoneConfig(ctx, "ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4")
+	ctx.Logger().Info("Updating host zone config")
+	err := feeAbsKeeper.DeleteHostZoneConfig(ctx, "ibc/F5FABF52B54E65064B57BF6DBD8E5FAD22CEE9F4B8A57ADBB20CCD0173AA72A4")
 	// ignore error if not found
 	if err != nil && !errors.Is(err, feeabstypes.ErrHostZoneConfigNotFound) {
 		return err
@@ -1539,9 +1616,26 @@ func ReplaceHostZoneConfig(ctx sdk.Context, feeAbsKeeper *feeabskeeper.Keeper) e
 		IbcDenom:                "ibc/F5FABF52B54E65064B57BF6DBD8E5FAD22CEE9F4B8A57ADBB20CCD0173AA72A4",
 		OsmosisPoolTokenDenomIn: "ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4",
 		PoolId:                  1273,
+		Status:                  feeabstypes.HostChainFeeAbsStatus_UPDATED,
 	})
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func UpdateConsParamsVersion(ctx sdk.Context, ck *consensusparamkeeper.Keeper) error {
+	ctx.Logger().Info(fmt.Sprintf("Updating consensus params app version to %d", ProtocolVersion))
+	consensusParams, err := ck.ParamsStore.Get(ctx)
+	if err != nil {
+		return err
+	}
+
+	// Hack to fix state-sync issue
+	consensusParams.Version = &tmproto.VersionParams{App: ProtocolVersion}
+	if err := ck.ParamsStore.Set(ctx, consensusParams); err != nil {
+		return err
+	}
+
 	return nil
 }
