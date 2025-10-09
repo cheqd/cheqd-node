@@ -46,8 +46,10 @@ func (k Keeper) evaluateAndSlashIfNeeded(
 		return // Validator is safe
 	}
 
+	oracleParams := k.GetParams(ctx)
+
 	validator, err := k.StakingKeeper.Validator(ctx, operator)
-	if err != nil || !validator.IsBonded() || validator.IsJailed() {
+	if err != nil || !validator.IsBonded() || validator.IsJailed() || !oracleParams.SlashingEnabled {
 		return // Cannot slash or jail this validator
 	}
 

@@ -75,6 +75,8 @@ message Params {
 
   // usdc ibc denom
   string usdc_ibc_denom = 16;
+
+  bool slashing_enabled = 17;
 }
 
 // Denom - the object to hold configurations of each denom

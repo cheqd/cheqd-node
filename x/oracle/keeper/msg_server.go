@@ -250,6 +250,9 @@ func (ms msgServer) LegacyGovUpdateParams(
 		case string(types.KeyUsdcIbcDenom):
 			ms.SetUsdcIbcDenom(ctx, msg.Changes.UsdcIbcDenom)
 
+		case string(types.KeySlashingEnabled):
+			ms.SetSlashingEnabled(ctx, msg.Changes.SlashingEnabled)
+
 		default:
 			return nil, fmt.Errorf("%s is not an existing oracle param key", key)
 		}
