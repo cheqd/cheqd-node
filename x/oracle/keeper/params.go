@@ -117,9 +117,15 @@ func (k Keeper) SetMinValidPerWindow(ctx sdk.Context, minValidPerWindow math.Leg
 	k.paramSpace.Set(ctx, types.KeyMinValidPerWindow, minValidPerWindow)
 }
 
-// MinValidPerWindow updates the oracle slashing threshold.
+// SetSlashingEnabled updates the oracle slashingEnabled.
 func (k Keeper) SetSlashingEnabled(ctx sdk.Context, value bool) {
 	k.paramSpace.Set(ctx, types.KeySlashingEnabled, value)
+}
+
+// SlashingEnabled returns the oracle slashingEnabled.
+func (k Keeper) SlashingEnabled(ctx sdk.Context) (res bool) {
+	k.paramSpace.Get(ctx, types.KeySlashingEnabled, &res)
+	return
 }
 
 // GetParams returns the total set of oracle parameters.

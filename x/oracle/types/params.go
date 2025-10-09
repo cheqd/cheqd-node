@@ -37,7 +37,7 @@ var (
 	KeyCurrencyPairProviders       = []byte("CurrencyPairProviders")
 	KeyCurrencyDeviationThresholds = []byte("CurrencyDeviationThresholds")
 	KeyUsdcIbcDenom                = []byte("UsdcIbcDenom")
-	KeySlashingEnabled             = []byte("SlashingEnable")
+	KeySlashingEnabled             = []byte("SlashingEnabled")
 )
 
 // Default parameter values
