@@ -128,6 +128,9 @@ func (k Keeper) ValidateParamChanges(ctx sdk.Context, keys []string, changes typ
 
 		case string(types.KeyUsdcIbcDenom):
 			params.UsdcIbcDenom = changes.UsdcIbcDenom
+
+		case string(types.KeySlashingEnabled):
+			params.SlashingEnabled = changes.SlashingEnabled
 		}
 	}
 
@@ -186,6 +189,9 @@ func (k Keeper) ExecuteParamUpdatePlan(ctx sdk.Context, plan types.ParamUpdatePl
 
 		case string(types.KeyUsdcIbcDenom):
 			k.SetUsdcIbcDenom(ctx, plan.Changes.UsdcIbcDenom)
+
+		case string(types.KeySlashingEnabled):
+			k.SetSlashingEnabled(ctx, plan.Changes.SlashingEnabled)
 		}
 	}
 

@@ -10,6 +10,9 @@ import (
 func (s *IntegrationTestSuite) TestSlashAndResetMissCounters() {
 	initialTokens := sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction)
 	validator, err := s.app.StakingKeeper.Validator(s.ctx, valAddr)
+	p := s.app.OracleKeeper.GetParams(s.ctx)
+	p.SlashingEnabled = true
+	s.app.OracleKeeper.SetParams(s.ctx, p)
 	s.Require().NoError(err)
 	s.Require().Equal(initialTokens, validator.GetBondedTokens())
 

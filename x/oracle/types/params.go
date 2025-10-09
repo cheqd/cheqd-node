@@ -37,6 +37,7 @@ var (
 	KeyCurrencyPairProviders       = []byte("CurrencyPairProviders")
 	KeyCurrencyDeviationThresholds = []byte("CurrencyDeviationThresholds")
 	KeyUsdcIbcDenom                = []byte("UsdcIbcDenom")
+	KeySlashingEnabled             = []byte("SlashingEnable")
 )
 
 // Default parameter values
@@ -204,6 +205,7 @@ func DefaultParams() Params {
 		CurrencyPairProviders:       DefaultCurrencyPairProviders,
 		CurrencyDeviationThresholds: DefaultCurrencyDeviationThresholds,
 		UsdcIbcDenom:                "ibc/F5FABF52B54E65064B57BF6DBD8E5FAD22CEE9F4B8A57ADBB20CCD0173AA72A4",
+		SlashingEnabled:             false,
 	}
 }
 
@@ -295,6 +297,11 @@ func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
 			KeyUsdcIbcDenom,
 			&p.UsdcIbcDenom,
 			validateString,
+		),
+		paramstypes.NewParamSetPair(
+			KeySlashingEnabled,
+			&p.SlashingEnabled,
+			validateBool,
 		),
 	}
 }
@@ -612,5 +619,13 @@ func validateString(i interface{}) error {
 		return fmt.Errorf("invalid parameter type string: %T", i)
 	}
 
+	return nil
+}
+
+func validateBool(i interface{}) error {
+	_, ok := i.(bool)
+	if !ok {
+		return fmt.Errorf("invalid parameter type bool: %T", i)
+	}
 	return nil
 }
