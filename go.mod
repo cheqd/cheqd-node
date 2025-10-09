@@ -244,7 +244,7 @@ require (
 
 replace (
 	// replace cosmossdk.io/store with patched version
-	cosmossdk.io/store => github.com/cheqd/cosmos-sdk/store v1.1.1-uneven-heights-iavl
+	cosmossdk.io/store => github.com/cheqd/cosmos-sdk/store v1.1.2-0.20250808071119-3b33570d853b
 	// Keyring replacement from Cosmos SDK v0.50.14
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 
@@ -252,11 +252,11 @@ replace (
 	github.com/cheqd/cheqd-node/api/v2 => ./api
 
 	// replace cosmos-sdk v0.50.14
-	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.50.14-height-mismatch-iavl
+	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.50.14-height-mismatch-iavl.0.20250808071119-3b33570d853b
 
 	// replace iavl v1.2.2
 	// https://github.com/cheqd/iavl/tree/cheqd-v1.2.2-uneven-heights
-	github.com/cosmos/iavl => github.com/cheqd/iavl v1.2.2-uneven-heights
+	github.com/cosmos/iavl => github.com/cheqd/iavl v1.2.2-uneven-heights.0.20250808065519-2c3d5a9959cc
 
 	// dgrijalva/jwt-go is deprecated and doesn't receive security updates.
 	// TODO: remove it: https://github.com/cosmos/cosmos-sdk/issues/13134

@@ -246,7 +246,6 @@ github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XL
 github.com/cespare/xxhash/v2 v2.2.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/charithe/durationcheck v0.0.10/go.mod h1:bCWXb7gYRysD1CU3C+u4ceO49LoGOY1C1L6uouGNreQ=
 github.com/chavacava/garif v0.1.0/go.mod h1:XMyYCkEL58DF0oyW4qDjjnPWONs2HBqYKI+UIPD+Gww=
-github.com/cheqd/cheqd-node v1.4.6-pseudo-version-3.1.5.0.20250514151055-c7d12358336f/go.mod h1:3LSoshHgVvHNhj6cZGWIRa7YP5Hd0MtvkFUNgEis3uA=
 github.com/cheqd/fee-abstraction/v8 v8.0.3-uneven-heights-patched h1:YhyT0Ug28u5uyPQFq5KJIXGRqNUQmpTEj6qbSxhDCz8=
 github.com/cheqd/fee-abstraction/v8 v8.0.3-uneven-heights-patched/go.mod h1:1BOa3dcKNQd9ODKCQh4uOoHx4gFj+YpFBLHY6G2vwGE=
 github.com/cheqd/price-feeder v0.50.13-cheqd-holistic h1:wQSKw+KupZiyl5FElKC9NAAqtDPgu636OEQD+e+vZsY=

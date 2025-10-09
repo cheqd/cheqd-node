@@ -37,12 +37,16 @@ PRINT_PREFIX = "********* "
 # Set branch dynamically in CI workflow for testing if Python dev mode is enabled and DEFAULT_DEBUG_BRANCH is set
 # Otherwise, use the main branch
 DEFAULT_DEBUG_BRANCH = os.getenv("DEFAULT_DEBUG_BRANCH") if os.getenv("DEFAULT_DEBUG_BRANCH") is not None else "main"
-
+# RPC endpoints
+MAINNET_RPC_ENDPOINT_EU = "https://eu-rpc.cheqd.net:443"
+MAINNET_RPC_ENDPOINT_AP = "https://ap-rpc.cheqd.net:443"
+TESTNET_RPC_ENDPOINT_EU = "https://eu-rpc.cheqd.network:443"
+TESTNET_RPC_ENDPOINT_AP = "https://ap-rpc.cheqd.network:443"
 
 ###############################################################
 ###     		Cosmovisor configuration      				###
 ###############################################################
-DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.7.1"
+DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.3.0"
 COSMOVISOR_BINARY_URL = "https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2F{}/cosmovisor-{}-linux-{}.tar.gz"
 DEFAULT_USE_COSMOVISOR = "yes"
 DEFAULT_BUMP_COSMOVISOR = "yes"
@@ -489,6 +493,15 @@ class Installer():
             else:
                 logging.error("Failed to configure cheqd-noded settings")
                 return False
+
+            # Configure state sync only for fresh installs
+            if self.interviewer.is_from_scratch and getattr(self.interviewer, 'use_statesync', False):
+                logging.info("Configuring state sync (default)")
+                if not self.configure_statesync():
+                    logging.error("Failed to configure state sync")
+                    return False
+                # Ensure snapshot is not attempted
+                self.interviewer.init_from_snapshot = False
 
             # Configure systemd service for cheqd-noded
             # Sets up either a standalone service or a Cosmovisor service
@@ -1197,6 +1210,137 @@ class Installer():
             logging.exception(f"Failed to configure cheqd-noded settings. Reason: {e}")
             return False
 
+    def _select_working_rpc_endpoint(self, chain: str) -> str:
+        try:
+            endpoints = []
+            if chain == "testnet":
+                endpoints = [TESTNET_RPC_ENDPOINT_EU, TESTNET_RPC_ENDPOINT_AP]
+            else:
+                endpoints = [MAINNET_RPC_ENDPOINT_EU, MAINNET_RPC_ENDPOINT_AP]
+
+            for endpoint in endpoints:
+                try:
+                    req = request.Request(f"{endpoint}/status")
+                    with request.urlopen(req, timeout=10) as resp:
+                        if resp.getcode() == 200:
+                            return endpoint
+                except Exception:
+                    continue
+        except Exception as e:
+            logging.exception(f"Could not select a working RPC endpoint. Reason: {e}")
+        return ""
+
+    def _get_latest_block_height(self, rpc_endpoint: str) -> int:
+        try:
+            req = request.Request(f"{rpc_endpoint}/status")
+            with request.urlopen(req, timeout=10) as resp:
+                status = json.loads(resp.read().decode("utf-8").strip())
+                # Tendermint /status -> result.sync_info.latest_block_height
+                latest_height = int(status["result"]["sync_info"]["latest_block_height"])
+                return latest_height
+        except Exception as e:
+            logging.exception(f"Failed to fetch latest block height from {rpc_endpoint}. Reason: {e}")
+            raise
+
+    def _get_block_hash_at_height(self, rpc_endpoint: str, height: int) -> str:
+        try:
+            req = request.Request(f"{rpc_endpoint}/block?height={height}")
+            with request.urlopen(req, timeout=10) as resp:
+                block = json.loads(resp.read().decode("utf-8").strip())
+                # Tendermint /block -> result.block_id.hash
+                return block["result"]["block_id"]["hash"]
+        except Exception as e:
+            logging.exception(f"Failed to fetch block hash at height {height} from {rpc_endpoint}. Reason: {e}")
+            raise
+
+    def _is_endpoint_healthy(self, endpoint: str) -> bool:
+        try:
+            req = request.Request(f"{endpoint}/status")
+            with request.urlopen(req, timeout=10) as resp:
+                return resp.getcode() == 200
+        except Exception:
+            return False
+
+    def configure_statesync(self) -> bool:
+        # Configure statesync settings in config.toml using selected network RPCs
+        try:
+            config_toml_path = os.path.join(self.cheqd_config_dir, "config.toml")
+
+            # Determine RPC servers for the chosen network
+            if self.interviewer.chain == "testnet":
+                candidates = [TESTNET_RPC_ENDPOINT_EU, TESTNET_RPC_ENDPOINT_AP]
+            else:
+                candidates = [MAINNET_RPC_ENDPOINT_EU, MAINNET_RPC_ENDPOINT_AP]
+
+            healthy = [ep for ep in candidates if self._is_endpoint_healthy(ep)]
+            if len(healthy) == 0:
+                logging.error("No working RPC endpoint found for statesync configuration")
+                return False
+
+            if len(healthy) == 1:
+                rpc_servers = f"{healthy[0]},{healthy[0]}"
+                working_rpc = healthy[0]
+            else:
+                rpc_servers = f"{healthy[0]},{healthy[1]}"
+                working_rpc = healthy[0]
+
+            latest_height = self._get_latest_block_height(working_rpc)
+            trust_height = max(latest_height - 2000, 1)
+            trust_hash = self._get_block_hash_at_height(working_rpc, trust_height)
+
+            # Safely edit only the [statesync] section for 'enable'
+            with open(config_toml_path, "r") as f:
+                lines = f.readlines()
+
+            start = -1
+            end = len(lines)
+            for i, line in enumerate(lines):
+                if line.strip() == "[statesync]":
+                    start = i
+                    break
+
+            if start == -1:
+                logging.error("[statesync] section not found in config.toml")
+                return False
+
+            # Find end of [statesync] block (next top-level table)
+            for j in range(start + 1, len(lines)):
+                stripped = lines[j].lstrip()
+                if stripped.startswith('['):
+                    end = j
+                    break
+
+            block = lines[start:end]
+
+            def upsert(key: str, value: str, quote: bool = False):
+                nonlocal block
+                key_prefix = f"{key} ="
+                new_line = f"{key} = \"{value}\"\n" if quote else f"{key} = {value}\n"
+                for idx, l in enumerate(block):
+                    if l.strip().startswith(key_prefix):
+                        block[idx] = new_line
+                        return
+                # insert after header
+                block.insert(1, new_line)
+
+            upsert("enable", "true", quote=False)
+
+            # Write back
+            new_lines = lines[:start] + block + lines[end:]
+            with open(config_toml_path, "w") as f:
+                f.writelines(new_lines)
+
+            # Use existing search_and_replace helper for other statesync fields (unique keys)
+            search_and_replace('rpc_servers = ""', f'rpc_servers = "{rpc_servers}"', config_toml_path)
+            search_and_replace('trust_height = 0', f'trust_height = {trust_height}', config_toml_path)
+            search_and_replace('trust_hash = ""', f'trust_hash = "{trust_hash}"', config_toml_path)
+
+            logging.info("Configured state sync settings in config.toml")
+            return True
+        except Exception as e:
+            logging.exception(f"Failed to configure state sync. Reason: {e}")
+            return False
+
     def setup_node_systemd(self) -> bool:
         # Setup cheqd-noded related systemd services
         # If user selected Cosmovisor install, then cheqd-cosmovisor.service will be setup
@@ -1702,6 +1846,7 @@ class Interviewer:
         self._is_cosmovisor_installed = False
         self._systemd_service_file = ""
         self._init_from_snapshot = False
+        self._use_statesync = True
         self._release = None
         self._chain = ""
         self._is_configuration_needed = False
@@ -1779,6 +1924,10 @@ class Interviewer:
     @property
     def init_from_snapshot(self) -> bool:
         return self._init_from_snapshot
+
+    @property
+    def use_statesync(self) -> bool:
+        return self._use_statesync
 
     @property
     def chain(self) -> str:
@@ -1880,6 +2029,10 @@ class Interviewer:
     @chain.setter
     def chain(self, chain):
         self._chain = chain
+
+    @use_statesync.setter
+    def use_statesync(self, value: bool):
+        self._use_statesync = value
 
     @is_configuration_needed.setter
     def is_configuration_needed(self, is_configuration_needed):
@@ -2119,11 +2272,28 @@ class Interviewer:
         except Exception as e:
             logging.exception(f"Failed to set whether installation should be done with Cosmovisor. Reason: {e}")
 
+    # Ask whether to initialize via state sync (default yes). If declined, snapshot remains available.
+    def ask_for_statesync(self):
+        try:
+            logging.info("State sync rapidly bootstraps a node without downloading state DB snapshot and uses less storage. You can still choose snapshot (slower, much larger storage, but contains more historic data and blocks) if you decline state sync.\n")
+            answer = self.ask(
+                "Initialize chain via State Sync? (yes/no)", default="yes")
+            if answer.lower().startswith("y"):
+                self.use_statesync = True
+                self.init_from_snapshot = False
+            elif answer.lower().startswith("n"):
+                self.use_statesync = False
+            else:
+                logging.error("Invalid input provided. Please choose either 'yes' or 'no'.\n")
+                self.ask_for_statesync()
+        except Exception as e:
+            logging.exception(f"Failed to set state sync preference. Reason: {e}")
+
     # Ask user whether to bump Cosmovisor to latest version
     def ask_for_cosmovisor_bump(self):
         try:
             answer = self.ask(
-                f"Do you want to bump your Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION}? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
+                f"Do you want to install Cosmovisor version {DEFAULT_LATEST_COSMOVISOR_VERSION}? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
             if answer.lower().startswith("y"):
                 self.is_cosmovisor_bump_needed = True
             elif answer.lower().startswith("n"):
@@ -2451,7 +2621,11 @@ if __name__ == '__main__':
                 interviewer.ask_for_log_level()
                 interviewer.ask_for_log_format()
 
-            interviewer.ask_for_init_from_snapshot()
+            # Prefer state sync by default; if declined, offer snapshot option
+            interviewer.ask_for_statesync()
+            if interviewer.use_statesync is False:
+                logging.info("You chose not to use state sync. Snapshot restore is slower and requires substantially more disk space.")
+                interviewer.ask_for_init_from_snapshot()
 
         except Exception as e:
             logging.exception(f"Unable to complete user interview process for installation. Reason for exiting: {e}")
