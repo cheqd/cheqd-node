@@ -8,15 +8,6 @@ read_timeout = "20s"
 verbose_cors = true
 write_timeout = "20s"
 
-[account]
-address = "${ACCOUNT_ADDRESS}"
-chain_id = "cheqd"
-validator = "${VALIDATOR_ADDRESS}"
-
-[keyring]
-backend = "test"
-dir = "${NODE_HOME}"
-
 [rpc]
 grpc_endpoint = "localhost:9090"
 rpc_timeout = "100ms"
@@ -30,3 +21,16 @@ enabled = true
 global-labels = [["chain_id", "cheqd"]]
 service-name = "price-feeder"
 prometheus-retention-time = 100
+
+[[provider_endpoints]]
+name = "mexc"
+rest = "https://api.mexc.com/"
+websocket = "wbs.mexc.com"
+
+[[provider_endpoints]]
+name = "coinbase"
+rest = "https://api.exchange.coinbase.com"
+websocket = "ws-feed.exchange.coinbase.com"
+
+## The application currently uses two providers: MEXC and Coinbase.
+## You can update the rest and websocket endpoints for these providers as needed.

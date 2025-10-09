@@ -210,16 +210,9 @@ do
     NODE_VAL_PUBKEY=$(cheqd-noded tendermint show-validator --home "${NODE_HOME}")
     cheqd-noded genesis gentx "operator-$i" 1000000000000000ncheq --chain-id "${CHAIN_ID}" --node-id "${NODE_ID}" \
     --pubkey "${NODE_VAL_PUBKEY}" --keyring-backend "test"  --home "${NODE_HOME}"
-    
-    
-    ACCOUNT_ADDRESS=$(cheqd-noded keys show  "operator-$i"  --keyring-backend test  --home "${NODE_HOME}" -a)
-    export ACCOUNT_ADDRESS
-    VALIDATOR_ADDRESS=$(cheqd-noded keys show  "operator-$i"  --keyring-backend test  --home "${NODE_HOME}" --bech val -a)
-    export VALIDATOR_ADDRESS
     export NODE_HOME
     
-    
-    envsubst < "$(dirname "$0")/price-feeder.toml.template" > "${NODE_HOME}/price-feeder.toml"
+    cp "$(dirname "$0")/../../pricefeeder/price-feeder.toml" "${NODE_HOME}/price-feeder.toml"
     cp "${NODE_HOME}/config/genesis.json" "${TMP_NODE_HOME}/config/genesis.json"
     cp -R "${NODE_HOME}/config/gentx/." "${TMP_NODE_HOME}/config/gentx"
 done

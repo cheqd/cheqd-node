@@ -106,8 +106,7 @@ func NewRootCmd() *cobra.Command {
 
 			// Allows us to overwrite the SDK's default server config.
 			// TODO: Use this instead of extending init command.
-			customAppTemplate := serverconfig.DefaultConfigTemplate
-			customAppConfig := serverconfig.DefaultConfig()
+			customAppTemplate, customAppConfig := initAppConfig()
 			customAppCMTConfig := cmtcfg.DefaultConfig()
 
 			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig, customAppCMTConfig)
@@ -129,6 +128,26 @@ func NewRootCmd() *cobra.Command {
 	}
 
 	return rootCmd
+}
+
+func initAppConfig() (string, interface{}) {
+	type CustomAppConfig struct {
+		serverconfig.Config
+		PriceFeeder pricefeeder.AppConfig `mapstructure:"pricefeeder"`
+	}
+
+	srvCfg := serverconfig.DefaultConfig()
+	customAppConfig := CustomAppConfig{
+		Config: *srvCfg,
+		PriceFeeder: pricefeeder.AppConfig{
+			ConfigPath: "",
+			LogLevel:   "info",
+			Enable:     false,
+		},
+	}
+
+	customAppTemplate := serverconfig.DefaultConfigTemplate + pricefeeder.DefaultConfigTemplate
+	return customAppTemplate, customAppConfig
 }
 
 func initRootCmd(
@@ -161,7 +180,7 @@ func initRootCmd(
 	)
 
 	rootCmd.PersistentFlags().String(pricefeeder.FlagConfigPath, "", "Path to price feeder config file")
-	rootCmd.PersistentFlags().String(pricefeeder.FlagLogLevel, "", "Log level of price feeder process")
+	rootCmd.PersistentFlags().String(pricefeeder.FlagLogLevel, "info", "Log level of price feeder process")
 	rootCmd.PersistentFlags().Bool(pricefeeder.FlagEnablePriceFeeder, false, "Enable the price feeder")
 }
 

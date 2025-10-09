@@ -211,15 +211,9 @@ do
 
   cp "${NODE_HOME}/config/genesis.json" "${TMP_NODE_HOME}/config/genesis.json"
   cp -R "${NODE_HOME}/config/gentx/." "${TMP_NODE_HOME}/config/gentx"
-      
-    ACCOUNT_ADDRESS=$(cheqd-noded keys show  "operator-$i"  --keyring-backend test  --home "${NODE_HOME}" -a)
-    export ACCOUNT_ADDRESS
-    VALIDATOR_ADDRESS=$(cheqd-noded keys show  "operator-$i"  --keyring-backend test  --home "${NODE_HOME}" --bech val -a)
-    export VALIDATOR_ADDRESS
-    export NODE_HOME
-    
-    
-    envsubst < "$(dirname "$0")/price-feeder.toml.template" > "${NODE_HOME}/price-feeder.toml"
+  export NODE_HOME
+
+  cp "$(dirname "$0")/../../pricefeeder/price-feeder.toml" "${NODE_HOME}/price-feeder.toml"
 done
 
 

@@ -45,13 +45,7 @@ sed -i $SED_EXT 's|log_level = "error"|log_level = "info"|g' "$HOME/.cheqdnode/c
 GENESIS="$HOME/.cheqdnode/config/genesis.json"
 sed -i $SED_EXT 's/"stake"/"ncheq"/' "$GENESIS"
 
-ACCOUNT_ADDRESS=$(cheqd-noded keys show cheqd-user --keyring-backend test --home "${HOME}/.cheqdnode" -a)
-VALIDATOR_ADDRESS=$(cheqd-noded keys show cheqd-user --keyring-backend test --home "${HOME}/.cheqdnode" --bech val -a)
-
-export ACCOUNT_ADDRESS
-export VALIDATOR_ADDRESS
-
-envsubst < "$(dirname "$0")/price-feeder.toml.template" > "${HOME}/.cheqdnode/price-feeder.toml"
+cp "$(dirname "$0")/price-feeder.toml.template" "${HOME}/.cheqdnode/price-feeder.toml"
 
 cheqd-noded genesis add-genesis-account cheqd-user 1000000000000000000000000000000ncheq --keyring-backend test
 cheqd-noded genesis gentx cheqd-user 1000000000000000000000ncheq --chain-id $CHAIN_ID --pubkey "$NODE_0_VAL_PUBKEY" --keyring-backend test
