@@ -46,8 +46,8 @@ RUN addgroup --system ${GROUP} --gid ${GID} \
     && adduser ${USER} --uid ${UID} -G ${GROUP} --system --home ${HOME_DIR} --shell /bin/bash
 
 # Copy mock price feeder binary from builder
-COPY --from=builder /go/src/github.com/cheqd/cheqd-node/tests/integration/mock-price-feed/mock-price-feed /home/cheqd/mock-price-feed/mock-price-feed
-RUN chmod +x /home/cheqd/mock-price-feed/mock-price-feed
+COPY --from=builder /go/src/github.com/cheqd/cheqd-node/tests/integration/mock-price-feed/mock-price-feed /usr/local/bin/mock-price-feed
+RUN chmod +x /usr/local/bin/mock-price-feed
 
 # Set entrypoint script
 COPY --chown=${USER}:${GROUP} docker/entrypoint.sh /bin/node-start
