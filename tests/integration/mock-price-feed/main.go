@@ -91,26 +91,35 @@ func (m *MockPriceFeed) sendTicker(conn *websocket.Conn, symbol string, data Pri
 			BidQuantity: data.Volume,
 		},
 	}
-	bz, _ := proto.Marshal(ticker)
-	conn.WriteMessage(websocket.BinaryMessage, bz)
+	bz, err := proto.Marshal(ticker)
+	if err != nil {
+		log.Printf("marshal ticker error: %v", err)
+		return
+	}
+	if err := conn.WriteMessage(websocket.BinaryMessage, bz); err != nil {
+		log.Printf("sendTicker write error: %v", err)
+	}
 }
 
 // --- Helper to send Protobuf candle ---
 func (m *MockPriceFeed) sendCandle(conn *websocket.Conn, symbol string, data PriceData) {
 	now := time.Now().Unix()
-	closePrice := data.Price
-	volume := data.Volume
-
 	candle := &types.SpotKline{
 		Symbol: &symbol,
 		PublicSpotKline: &types.PublicSpotKlineV3Api{
-			ClosingPrice: closePrice,
-			Volume:       volume,
+			ClosingPrice: data.Price,
+			Volume:       data.Volume,
 			WindowEnd:    now,
 		},
 	}
-	bz, _ := proto.Marshal(candle)
-	conn.WriteMessage(websocket.BinaryMessage, bz)
+	bz, err := proto.Marshal(candle)
+	if err != nil {
+		log.Printf("marshal candle error: %v", err)
+		return
+	}
+	if err := conn.WriteMessage(websocket.BinaryMessage, bz); err != nil {
+		log.Printf("sendCandle write error: %v", err)
+	}
 }
 
 // --- Broadcast updated prices to all clients ---
@@ -122,11 +131,23 @@ func (m *MockPriceFeed) broadcastPrices(ctx context.Context) {
 			for client := range m.clients {
 				switch msg := update.(type) {
 				case *types.BookTicker:
-					bz, _ := proto.Marshal(msg)
-					client.WriteMessage(websocket.BinaryMessage, bz)
+					bz, err := proto.Marshal(msg)
+					if err != nil {
+						log.Printf("marshal ticker broadcast error: %v", err)
+						continue
+					}
+					if err := client.WriteMessage(websocket.BinaryMessage, bz); err != nil {
+						log.Printf("broadcast ticker write error: %v", err)
+					}
 				case *types.SpotKline:
-					bz, _ := proto.Marshal(msg)
-					client.WriteMessage(websocket.BinaryMessage, bz)
+					bz, err := proto.Marshal(msg)
+					if err != nil {
+						log.Printf("marshal candle broadcast error: %v", err)
+						continue
+					}
+					if err := client.WriteMessage(websocket.BinaryMessage, bz); err != nil {
+						log.Printf("broadcast candle write error: %v", err)
+					}
 				}
 			}
 			m.mutex.RUnlock()
@@ -182,7 +203,9 @@ func (m *MockPriceFeed) updatePrices(ctx context.Context) {
 // --- Helper ---
 func parseFloat(s string) float64 {
 	var f float64
-	fmt.Sscanf(s, "%f", &f)
+	if _, err := fmt.Sscanf(s, "%f", &f); err != nil {
+		log.Printf("parseFloat error for %s: %v", s, err)
+	}
 	return f
 }
 
@@ -211,7 +234,9 @@ func (m *MockPriceFeed) setPriceHandler(w http.ResponseWriter, r *http.Request) 
 	m.mutex.Unlock()
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	if err := json.NewEncoder(w).Encode(map[string]string{"status": "ok"}); err != nil {
+		log.Printf("encode response error: %v", err)
+	}
 }
 
 func (m *MockPriceFeed) getPricesHandler(w http.ResponseWriter, r *http.Request) {
@@ -221,7 +246,9 @@ func (m *MockPriceFeed) getPricesHandler(w http.ResponseWriter, r *http.Request)
 	for s, d := range m.prices {
 		simplePrices[s] = d.Price
 	}
-	json.NewEncoder(w).Encode(simplePrices)
+	if err := json.NewEncoder(w).Encode(simplePrices); err != nil {
+		log.Printf("encode prices error: %v", err)
+	}
 }
 
 func main() {
@@ -238,7 +265,9 @@ func main() {
 	http.HandleFunc("/set-price", feed.setPriceHandler)
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintf(w, "OK")
+		if _, err := fmt.Fprintf(w, "OK"); err != nil {
+			log.Printf("health handler write error: %v", err)
+		}
 	})
 
 	http.HandleFunc("/api/v3/ticker/price", func(w http.ResponseWriter, r *http.Request) {
@@ -248,7 +277,9 @@ func main() {
 		for symbol := range feed.prices {
 			resp = append(resp, map[string]string{"symbol": symbol})
 		}
-		json.NewEncoder(w).Encode(resp)
+		if err := json.NewEncoder(w).Encode(resp); err != nil {
+			log.Printf("encode ticker price error: %v", err)
+		}
 	})
 
 	log.Printf("Mock MEXC Protobuf Price Feed server starting on %s", port)
@@ -256,5 +287,8 @@ func main() {
 	log.Printf("HTTP GET prices: http://localhost%s/prices", port)
 	log.Printf("HTTP POST set price: http://localhost%s/set-price", port)
 
-	log.Fatal(http.ListenAndServe(port, nil))
+	if err := http.ListenAndServe(port, nil); err != nil {
+		log.Printf("server error: %v", err)
+		return
+	}
 }
