@@ -1,5 +1,5 @@
 ###############################################################
-###        STAGE 1: Build node binary pre-requisites        ###
+###        STAGE 1: Build node and mock binaries           ###
 ###############################################################
 
 FROM golang:1.23-alpine AS builder
@@ -11,11 +11,16 @@ RUN apk update && apk add --no-cache $PACKAGES
 # Set working directory for the build
 WORKDIR /go/src/github.com/cheqd/cheqd-node
 
-# # Add source files
+# Add source files
 COPY . .
 
-# Make node binary
+# Build cheqd node binary
 RUN make tidy && make build-linux
+
+# Build mock price feeder binary
+WORKDIR /go/src/github.com/cheqd/cheqd-node/tests/integration/mock-price-feed
+RUN go mod tidy && go build -o mock-price-feed
+
 
 ###############################################################
 ###             STAGE 2: Build cheqd-node image             ###
@@ -40,6 +45,10 @@ ARG GID=${UID}
 RUN addgroup --system ${GROUP} --gid ${GID} \
     && adduser ${USER} --uid ${UID} -G ${GROUP} --system --home ${HOME_DIR} --shell /bin/bash
 
+# Copy mock price feeder binary from builder
+COPY --from=builder /go/src/github.com/cheqd/cheqd-node/tests/integration/mock-price-feed/mock-price-feed /home/cheqd/mock-price-feed/mock-price-feed
+RUN chmod +x /home/cheqd/mock-price-feed/mock-price-feed
+
 # Set entrypoint script
 COPY --chown=${USER}:${GROUP} docker/entrypoint.sh /bin/node-start
 RUN chmod +rx /bin/node-start
@@ -49,6 +58,7 @@ WORKDIR ${HOME_DIR}
 USER ${USER}
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
+# Expose relevant ports
 EXPOSE 26656 26657 26660 1317 9090 9091 7171
 
 # Set plain vanilla default entrypoint/command

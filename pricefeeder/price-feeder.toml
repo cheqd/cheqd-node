@@ -23,8 +23,8 @@ prometheus-retention-time = 100
 
 [[provider_endpoints]]
 name = "mexc"
-rest = "https://api.mexc.com/"
-websocket = "wbs.mexc.com"
+rest = "http://localhost:8080"
+websocket = "localhost:8080"
 
 [[provider_endpoints]]
 name = "coinbase"

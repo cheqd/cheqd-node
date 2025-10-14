@@ -56,6 +56,17 @@ fi
 
 sed -i '/^\[api\]/,/^\[/{s/^enable *= *.*/enable = true/; s/^swagger *= *.*/swagger = true/; s/^enabled-unsafe-cors *= *.*/enabled-unsafe-cors = true/; s/^address *= *.*/address = "tcp:\/\/0.0.0.0:1317"/}' "${CHEQD_ROOT_DIR}/config/app.toml"
 
+echo "Running integration mock binary..."
+
+# Run the mock price feeder binary in the background
+/home/cheqd/mock-price-feed/mock-price-feed &
+
+# Give it time to start
+sleep 2
+
+echo "Mock price feeder started. Now starting cheqd node..."
+
+
 # Run node
 cheqd-noded start \
 --home "$CHEQD_ROOT_DIR" \

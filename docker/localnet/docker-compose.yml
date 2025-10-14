@@ -16,6 +16,8 @@ services:
         published: 26660 # Prometheus metrics port
       - target: 7171 # Price-feeder port
         published: 7171
+      - target: 8080
+        published: 8080 # Mock price feed server port
     entrypoint: ["node-start"]
     healthcheck:
       test: curl -s http://localhost:26657/status | grep -c true
@@ -53,6 +55,8 @@ services:
         published: 26760 # Prometheus metrics port
       - target: 7171
         published: 7172 # Price-feeder port
+      - target: 8080
+        published: 8180 # Mock price feed server port
     entrypoint: ["node-start"]
     healthcheck:
       test: curl -s http://localhost:26757/status | grep -c true
@@ -90,6 +94,8 @@ services:
         published: 26860 # Prometheus metrics port
       - target: 7171
         published: 7173 # Price-feeder port
+      - target: 8080
+        published: 8280 # Mock price feed server port
     entrypoint: ["node-start"]
     healthcheck:
       test: curl -s http://localhost:26857/status | grep -c true
@@ -127,6 +133,8 @@ services:
         published: 26960 # Prometheus metrics port
       - target: 7171
         published: 7174 # Price-feeder port
+      - target: 8080
+        published: 8380 # Mock price feed server port
     entrypoint: ["node-start"]
     healthcheck:
       test: curl -s http://localhost:26957/status | grep -c true
