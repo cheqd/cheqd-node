@@ -148,6 +148,9 @@ import (
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
 
+	globalfee "github.com/noble-assets/globalfee"
+	globalfeekeeper "github.com/noble-assets/globalfee/keeper"
+	globalfeetypes "github.com/noble-assets/globalfee/types"
 	feemarketmodule "github.com/skip-mev/feemarket/x/feemarket"
 	feemarketkeeper "github.com/skip-mev/feemarket/x/feemarket/keeper"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
@@ -229,6 +232,7 @@ type App struct {
 	TransferKeeper        ibctransferkeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	FeeMarketKeeper       *feemarketkeeper.Keeper
+	GlobalFeeKeeper       *globalfeekeeper.Keeper
 	AuthzKeeper           authzkeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
@@ -364,6 +368,7 @@ func New(
 		feeabstypes.StoreKey,
 		feemarkettypes.StoreKey,
 		circuittypes.StoreKey,
+		globalfeetypes.ModuleName,
 	)
 
 	tkeys := storetypes.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -560,6 +565,13 @@ func New(
 		app.IBCKeeper.ChannelKeeper, // may be replaced with IBC middleware
 		app.IBCKeeper.ChannelKeeper,
 		app.IBCKeeper.PortKeeper, app.AccountKeeper, app.BankKeeper,
+	)
+
+	app.GlobalFeeKeeper = globalfeekeeper.NewKeeper(
+		authority,
+		app.interfaceRegistry,
+		runtime.NewKVStoreService(keys[globalfeetypes.ModuleName]),
+		appCodec,
 	)
 
 	// ICA Controller keeper
@@ -784,6 +796,7 @@ func New(
 		ibctm.NewAppModule(),
 
 		// cheqd modules
+		globalfee.NewAppModule(app.interfaceRegistry, app.GetSubspace(globalfeetypes.ModuleName), app.GlobalFeeKeeper),
 		feemarketmodule.NewAppModule(appCodec, *app.FeeMarketKeeper),
 		did.NewAppModule(appCodec, app.DidKeeper, app.GetSubspace(didtypes.ModuleName)),
 		resource.NewAppModule(appCodec, app.ResourceKeeper, app.DidKeeper, app.GetSubspace(resourcetypes.ModuleName)),
@@ -846,6 +859,7 @@ func New(
 		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		globalfeetypes.ModuleName,
 		feemarkettypes.ModuleName,
 	)
 
@@ -876,6 +890,7 @@ func New(
 		icqtypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		globalfeetypes.ModuleName,
 		feemarkettypes.ModuleName,
 	)
 
@@ -912,6 +927,7 @@ func New(
 		circuittypes.ModuleName,
 		didtypes.ModuleName,
 		resourcetypes.ModuleName,
+		globalfeetypes.ModuleName,
 		feemarkettypes.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
@@ -1004,6 +1020,8 @@ func (app *App) setAnteHandler(txConfig client.TxConfig) {
 		FeeAbskeeper:    app.FeeabsKeeper,
 		FeeMarketKeeper: app.FeeMarketKeeper,
 		CircuitKeeper:   &app.CircuitKeeper,
+		TxFeeChecker:    cheqdante.TxFeeChecker(app.GlobalFeeKeeper),
+		GlobalFeeKeeper: app.GlobalFeeKeeper,
 	})
 	if err != nil {
 		panic(err)
@@ -1260,6 +1278,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(didtypes.ModuleName).WithKeyTable(didtypes.ParamKeyTable())
 	paramsKeeper.Subspace(resourcetypes.ModuleName).WithKeyTable(resourcetypes.ParamKeyTable())
 	paramsKeeper.Subspace(feeabstypes.ModuleName).WithKeyTable(feeabstypes.ParamKeyTable())
+	paramsKeeper.Subspace(globalfeetypes.ModuleName).WithKeyTable(globalfeetypes.ParamKeyTable())
 	paramsKeeper.Subspace(icqtypes.ModuleName)
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
 

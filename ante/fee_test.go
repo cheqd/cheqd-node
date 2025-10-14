@@ -15,6 +15,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/bank/testutil"
+	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
+	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	feeabsante "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/ante"
@@ -77,6 +79,66 @@ var _ = Describe("Fee tests on CheckTx", func() {
 
 		// zero gas is accepted in simulation mode
 		_, err = antehandler(s.ctx, tx, true)
+		Expect(err).To(BeNil())
+	})
+
+	It("Whitelisted Tx - Ensure zero fees", func() {
+		fallbackDecorator := ante.NewDeductFeeDecorator(
+			s.app.AccountKeeper,
+			s.app.BankKeeper,
+			s.app.FeeGrantKeeper,
+			cheqdante.TxFeeChecker(s.app.GlobalFeeKeeper),
+		)
+		feeMarketDecorator := feemarketante.NewFeeMarketCheckDecorator(
+			s.app.AccountKeeper,
+			s.app.BankKeeper,
+			s.app.FeeGrantKeeper,
+			s.app.FeeMarketKeeper,
+			fallbackDecorator,
+		)
+		feeDecorators := []sdk.AnteDecorator{
+			cheqdante.NewFeeMarketBypassDecorator(s.app.GlobalFeeKeeper, feeMarketDecorator, fallbackDecorator),
+		}
+		mfd := cheqdante.NewOverAllDecorator(feeDecorators...)
+		antehandler := sdk.ChainAnteDecorators(mfd)
+
+		priv1, _, addr1 := testdata.KeyTestPubAddr()
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(1)))
+		err := testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, coins)
+		Expect(err).To(BeNil())
+
+		packet := channeltypes.NewPacket(
+			[]byte("data"),
+			1,
+			"transfer",
+			"channel-0",
+			"transfer",
+			"channel-1",
+			clienttypes.NewHeight(0, 1),
+			0,
+		)
+		msg := channeltypes.NewMsgAcknowledgement(
+			packet,
+			[]byte("ack"),
+			[]byte("proof"),
+			clienttypes.NewHeight(0, 1),
+			addr1.String(),
+		)
+		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
+		s.txBuilder.SetFeeAmount(sdk.NewCoins())
+		s.txBuilder.SetGasLimit(100000)
+		s.txBuilder.SetFeePayer(addr1)
+
+		privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
+		tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+		Expect(err).To(BeNil())
+
+		err = s.app.GlobalFeeKeeper.BypassMessages.Set(s.ctx, sdk.MsgTypeURL(msg))
+		Expect(err).To(BeNil())
+
+		s.ctx = s.ctx.WithIsCheckTx(true)
+
+		_, err = antehandler(s.ctx, tx, false)
 		Expect(err).To(BeNil())
 	})
 

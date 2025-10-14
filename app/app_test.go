@@ -14,6 +14,7 @@ import (
 	icq "github.com/cosmos/ibc-apps/modules/async-icq/v8"
 	"github.com/cosmos/ibc-go/modules/capability"
 	"github.com/golang/mock/gomock"
+	globalfee "github.com/noble-assets/globalfee"
 	"github.com/osmosis-labs/fee-abstraction/v8/x/feeabs"
 	"github.com/skip-mev/feemarket/x/feemarket"
 	"github.com/stretchr/testify/require"
@@ -221,6 +222,7 @@ func TestRunMigrations(t *testing.T) {
 					"resource":           resource.AppModule{}.ConsensusVersion(),
 					"feeabs":             feeabs.AppModule{}.ConsensusVersion(),
 					"feemarket":          feemarket.AppModule{}.ConsensusVersion(),
+					"globalfee":          globalfee.AppModule{}.ConsensusVersion(),
 					"capability":         capability.AppModule{}.ConsensusVersion(),
 					"ibc":                ibc.AppModule{}.ConsensusVersion(),
 					"interchainaccounts": ica.AppModule{}.ConsensusVersion(),
@@ -277,6 +279,7 @@ func TestInitGenesisOnMigration(t *testing.T) {
 			"genutil":      genutil.AppModule{}.ConsensusVersion(),
 			"cheqd":        did.AppModule{}.ConsensusVersion(),
 			"resource":     resource.AppModule{}.ConsensusVersion(),
+			"globalfee":    globalfee.AppModule{}.ConsensusVersion(),
 			"capability":   capability.AppModule{}.ConsensusVersion(),
 		},
 	)

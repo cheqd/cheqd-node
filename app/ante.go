@@ -14,6 +14,7 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	ibcante "github.com/cosmos/ibc-go/v8/modules/core/ante"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
+	globalfeekeeper "github.com/noble-assets/globalfee/keeper"
 	feeabsante "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/ante"
 	feeabskeeper "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/keeper"
 	feemarketante "github.com/skip-mev/feemarket/x/feemarket/ante"
@@ -36,6 +37,7 @@ type HandlerOptions struct {
 	FeeAbskeeper           feeabskeeper.Keeper
 	FeeMarketKeeper        *feemarketkeeper.Keeper
 	CircuitKeeper          circuitante.CircuitBreaker
+	GlobalFeeKeeper        *globalfeekeeper.Keeper
 }
 
 // NewAnteHandler returns an AnteHandler that checks and increments sequence
@@ -84,18 +86,22 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 }
 
 func feeDecorators(options HandlerOptions) []sdk.AnteDecorator {
+	fallbackDecorator := ante.NewDeductFeeDecorator(
+		options.AccountKeeper,
+		options.BankKeeper,
+		options.FeegrantKeeper,
+		options.TxFeeChecker,
+	)
+
+	feeMarketDecorator := feemarketante.NewFeeMarketCheckDecorator( // fee market check replaces fee deduct decorator
+		options.AccountKeeper,
+		options.BankKeeper,
+		options.FeegrantKeeper,
+		options.FeeMarketKeeper,
+		fallbackDecorator,
+	)
+
 	return []sdk.AnteDecorator{
-		feemarketante.NewFeeMarketCheckDecorator( // fee market check replaces fee deduct decorator
-			options.AccountKeeper,
-			options.BankKeeper,
-			options.FeegrantKeeper,
-			options.FeeMarketKeeper,
-			ante.NewDeductFeeDecorator(
-				options.AccountKeeper,
-				options.BankKeeper,
-				options.FeegrantKeeper,
-				options.TxFeeChecker,
-			),
-		),
+		cheqdante.NewFeeMarketBypassDecorator(options.GlobalFeeKeeper, feeMarketDecorator, fallbackDecorator),
 	}
 }
