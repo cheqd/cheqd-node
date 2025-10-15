@@ -13,6 +13,7 @@ import (
 
 // TxFeeChecker returns a custom ante.TxFeeChecker that ensures the fees for a
 // given transaction respect the gas prices set in the GlobalFee module.
+//nolint:nestif
 func TxFeeChecker(keeper *keeper.Keeper) ante.TxFeeChecker {
 	return func(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64, error) {
 		feeTx, ok := tx.(sdk.FeeTx)
