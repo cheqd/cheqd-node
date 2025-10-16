@@ -1477,7 +1477,9 @@ func (app *App) RegisterUpgradeHandlers() {
 				return nil, err
 			}
 			govParams.ExpeditedMinDeposit = sdk.NewCoins(sdk.NewCoin(resourcetypes.BaseMinimalDenom, sdkmath.NewInt(8000000000000))) // 8000 CHEQ, identical to regular min deposit
-			app.GovKeeper.Params.Set(sdkCtx, govParams)
+			if err := app.GovKeeper.Params.Set(sdkCtx, govParams); err != nil {
+				return nil, err
+			}
 
 			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
 		},
