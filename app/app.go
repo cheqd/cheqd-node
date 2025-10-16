@@ -1464,9 +1464,20 @@ func (app *App) RegisterUpgradeHandlers() {
 			sdkCtx := sdk.UnwrapSDKContext(ctx)
 			sdkCtx.Logger().Info("Bypassing fee for MsgAcknowledgement")
 
+			// allow MsgAcknowledgement to bypass fees, i.e. be executed with zero fees
+			// as otherwise, relayers would need to pay fees on destination chain for every packet
 			if err := app.GlobalFeeKeeper.BypassMessages.Set(ctx, sdk.MsgTypeURL(&channeltypes.MsgAcknowledgement{})); err != nil {
 				return nil, err
 			}
+
+			// update expedited gov proposal params
+			sdkCtx.Logger().Info("Updating expedited gov proposal params")
+			govParams, err := app.GovKeeper.Params.Get(sdkCtx)
+			if err != nil {
+				return nil, err
+			}
+			govParams.ExpeditedMinDeposit = sdk.NewCoins(sdk.NewCoin(resourcetypes.BaseMinimalDenom, sdkmath.NewInt(8000000000000))) // 8000 CHEQ, identical to regular min deposit
+			app.GovKeeper.Params.Set(sdkCtx, govParams)
 
 			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
 		},
