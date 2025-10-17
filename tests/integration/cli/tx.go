@@ -33,15 +33,15 @@ var CliGasParams = []string{
 type jsonTx struct {
 	Body       txBody     `json:"body"`
 	AuthInfo   txAuthInfo `json:"auth_info"`
-	Signatures []string   `json:"signatures"`
+	Signatures []string   `json:"signatures,omitempty"`
 }
 
 type txBody struct {
 	Messages                    []json.RawMessage `json:"messages"`
-	Memo                        string            `json:"memo"`
-	TimeoutHeight               string            `json:"timeout_height"`
-	ExtensionOptions            []json.RawMessage `json:"extension_options"`
-	NonCriticalExtensionOptions []json.RawMessage `json:"non_critical_extension_options"`
+	Memo                        string            `json:"memo,omitempty"`
+	TimeoutHeight               string            `json:"timeout_height,omitempty"`
+	ExtensionOptions            []json.RawMessage `json:"extension_options,omitempty"`
+	NonCriticalExtensionOptions []json.RawMessage `json:"non_critical_extension_options,omitempty"`
 }
 
 type txAuthInfo struct {
@@ -66,8 +66,8 @@ type txSingleModeInfo struct {
 type txFee struct {
 	Amount   sdk.Coins `json:"amount"`
 	GasLimit string    `json:"gas_limit"`
-	Payer    string    `json:"payer"`
-	Granter  string    `json:"granter"`
+	Payer    string    `json:"payer,omitempty"`
+	Granter  string    `json:"granter,omitempty"`
 }
 
 func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxResponse, error) {
@@ -112,11 +112,8 @@ func SignTx(from string, msg json.RawMessage, fee sdk.Coins, gasLimit uint64) (s
 
 	unsigned := jsonTx{
 		Body: txBody{
-			Messages:                    []json.RawMessage{msg},
-			Memo:                        "",
-			TimeoutHeight:               "0",
-			ExtensionOptions:            []json.RawMessage{},
-			NonCriticalExtensionOptions: []json.RawMessage{},
+			Messages:      []json.RawMessage{msg},
+			TimeoutHeight: "0",
 		},
 		AuthInfo: txAuthInfo{
 			SignerInfos: []txSignerInfo{
@@ -135,8 +132,8 @@ func SignTx(from string, msg json.RawMessage, fee sdk.Coins, gasLimit uint64) (s
 				Granter:  "",
 			},
 		},
-		Signatures: []string{},
 	}
+	unsigned.Signatures = make([]string, len(unsigned.AuthInfo.SignerInfos))
 
 	unsignedJSON, err := json.Marshal(&unsigned)
 	if err != nil {
