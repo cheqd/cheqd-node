@@ -213,6 +213,10 @@ do
     export NODE_HOME
     
     cp "$(dirname "$0")/../../pricefeeder/price-feeder.toml" "${NODE_HOME}/price-feeder.toml"
+    # update mexc provider urls to use mock provider for testing
+    sed -i 's|rest = "https://api.mexc.com/"|rest = "http://localhost:8080"|' "${NODE_HOME}/price-feeder.toml"
+    sed -i 's|websocket = "wbs-api.mexc.com"|websocket = "localhost:8080"|' "${NODE_HOME}/price-feeder.toml"
+
     cp "${NODE_HOME}/config/genesis.json" "${TMP_NODE_HOME}/config/genesis.json"
     cp -R "${NODE_HOME}/config/gentx/." "${TMP_NODE_HOME}/config/gentx"
 done

@@ -59,7 +59,7 @@ sed -i '/^\[api\]/,/^\[/{s/^enable *= *.*/enable = true/; s/^swagger *= *.*/swag
 echo "Running integration mock binary..."
 
 # Run the mock price feeder binary in the background
-/home/cheqd/mock-price-feed/mock-price-feed &
+/usr/local/bin/mock-price-feed &
 
 # Give it time to start
 sleep 2

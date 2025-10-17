@@ -214,6 +214,8 @@ do
   export NODE_HOME
 
   cp "$(dirname "$0")/../../pricefeeder/price-feeder.toml" "${NODE_HOME}/price-feeder.toml"
+  sed -i 's|rest = "https://api.mexc.com/"|rest = "http://localhost:8080"|' "${NODE_HOME}/price-feeder.toml"
+  sed -i 's|websocket = "wbs-api.mexc.com"|websocket = "localhost:8080"|' "${NODE_HOME}/price-feeder.toml"
 done
 
 
