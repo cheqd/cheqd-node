@@ -116,15 +116,7 @@ func SignTx(tmpDir, from string, msg json.RawMessage, fee sdk.Coins, gasLimit ui
 			TimeoutHeight: "0",
 		},
 		AuthInfo: txAuthInfo{
-			SignerInfos: []txSignerInfo{
-				{
-					PublicKey: nil,
-					ModeInfo: txModeInfo{
-						Single: &txSingleModeInfo{Mode: "SIGN_MODE_DIRECT"},
-					},
-					Sequence: "0",
-				},
-			},
+			SignerInfos: []txSignerInfo{},
 			Fee: txFee{
 				Amount:   fee,
 				GasLimit: strconv.FormatUint(gasLimit, 10),
@@ -133,7 +125,7 @@ func SignTx(tmpDir, from string, msg json.RawMessage, fee sdk.Coins, gasLimit ui
 			},
 		},
 	}
-	unsigned.Signatures = make([]string, len(unsigned.AuthInfo.SignerInfos))
+	unsigned.Signatures = []string{}
 
 	unsignedJSON, err := json.Marshal(&unsigned)
 	if err != nil {
