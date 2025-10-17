@@ -10,6 +10,7 @@ require (
 	cosmossdk.io/math v1.5.3
 	cosmossdk.io/tools/confix v0.1.2
 	filippo.io/edwards25519 v1.1.0
+	github.com/btcsuite/btcd/btcec/v2 v2.3.5
 	github.com/cheqd/cheqd-node/api/v2 v2.3.5-0.20250514151055-c7d12358336f
 	github.com/cometbft/cometbft v0.38.19
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
