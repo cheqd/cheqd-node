@@ -7,10 +7,13 @@ import (
 	"crypto/rsa"
 	"errors"
 	"fmt"
+	"math/big"
 	"reflect"
 
 	"filippo.io/edwards25519"
 
+	"github.com/btcsuite/btcd/btcec/v2"
+	btcececdsa "github.com/btcsuite/btcd/btcec/v2/ecdsa"
 	"github.com/lestrrat-go/jwx/jwk"
 )
 
@@ -78,6 +81,13 @@ func VerifyECDSASignature(pubKey ecdsa.PublicKey, message []byte, signature []by
 	hasher.Write(message)
 	digest := hasher.Sum(nil)
 
+	// Detect curve type
+	if pubKey.Curve.Params().Name == "secp256k1" {
+		// Use btcec for secp256k1
+		secpKey := btcec.NewPublicKey(bigIntToFieldVal(pubKey.X), bigIntToFieldVal(pubKey.Y))
+		return VerifySecp256k1Signature(secpKey, digest, signature)
+	}
+
 	ok := ecdsa.VerifyASN1(&pubKey, digest, signature)
 	if !ok {
 		return errors.New("invalid ecdsa signature")
@@ -85,6 +95,34 @@ func VerifyECDSASignature(pubKey ecdsa.PublicKey, message []byte, signature []by
 	return nil
 }
 
+func VerifySecp256k1Signature(pubKey *btcec.PublicKey, digest []byte, signature []byte) error {
+	sig, err := btcececdsa.ParseDERSignature(signature)
+	if err != nil {
+		return err
+	}
+
+	if !sig.Verify(digest, pubKey) {
+		return errors.New("invalid secp256k1 signature")
+	}
+
+	return nil
+}
+
 func GetEd25519VerificationKey2020(keyBytes []byte) []byte {
 	return keyBytes[2:]
+}
+
+// bigIntToFieldVal converts a *big.Int to a *btcec.FieldVal.
+func bigIntToFieldVal(x *big.Int) *btcec.FieldVal {
+	var fv btcec.FieldVal
+
+	// The byte slice must be 32 bytes (256 bits) long for secp256k1,
+	// padded with leading zeros if necessary.
+	// We use a fixed 32-byte array to ensure correct padding.
+	paddedBytes := make([]byte, 32)
+	xBytes := x.Bytes()
+	copy(paddedBytes[32-len(xBytes):], xBytes)
+
+	fv.SetByteSlice(paddedBytes)
+	return &fv
 }
