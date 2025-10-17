@@ -1062,6 +1062,7 @@ func (app *App) setPostHandler() {
 		FeeMarketKeeper: app.FeeMarketKeeper,
 		OracleKeeper:    app.OracleKeeper,
 		FeeabsKeeper:    app.FeeabsKeeper,
+		PriceFeeder:     app.OracleKeeper.PriceFeeder.Oracle,
 	})
 	if err != nil {
 		panic(err)

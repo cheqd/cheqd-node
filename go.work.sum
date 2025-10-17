@@ -248,8 +248,8 @@ github.com/charithe/durationcheck v0.0.10/go.mod h1:bCWXb7gYRysD1CU3C+u4ceO49LoG
 github.com/chavacava/garif v0.1.0/go.mod h1:XMyYCkEL58DF0oyW4qDjjnPWONs2HBqYKI+UIPD+Gww=
 github.com/cheqd/price-feeder v0.50.13-cheqd-holistic.0.20251010103011-97cd594df7bc h1:4wpts7f4ExlCmPWbJfmIBTZB2ZPKbq7pV6zszGAm0A0=
 github.com/cheqd/price-feeder v0.50.13-cheqd-holistic.0.20251010103011-97cd594df7bc/go.mod h1:Z5J2aR1G3MXw30lGP5dqP2+fFRyqa+x3+CvTCrsJpK4=
-github.com/cheqd/price-feeder v0.50.13-cheqd-holistic.0.20251014051243-4eff33f24bf6 h1:zd+RPgLhObS3Po+NCsS+8F2riDLeiwX3weTIOyTgNaI=
-github.com/cheqd/price-feeder v0.50.13-cheqd-holistic.0.20251014051243-4eff33f24bf6/go.mod h1:Z5J2aR1G3MXw30lGP5dqP2+fFRyqa+x3+CvTCrsJpK4=
+github.com/cheqd/price-feeder v0.50.13-cheqd-holistic.0.20251017051402-1755c7429f9d h1:/bthuJBYYhw1cSl0a/zoM9YEKAkfcgwlrFAg50A8WfY=
+github.com/cheqd/price-feeder v0.50.13-cheqd-holistic.0.20251017051402-1755c7429f9d/go.mod h1:Z5J2aR1G3MXw30lGP5dqP2+fFRyqa+x3+CvTCrsJpK4=
 github.com/chigopher/pathlib v0.19.1/go.mod h1:tzC1dZLW8o33UQpWkNkhvPwL5n4yyFRFm/jL1YGWFvY=
 github.com/ckaznocha/intrange v0.1.2/go.mod h1:RWffCw/vKBwHeOEwWdCikAtY0q4gGt8VhJZEEA5n+RE=
 github.com/clbanning/mxj v1.8.4/go.mod h1:BVjHeAH+rl9rs6f+QIpeRl0tfu10SXn1pUSa5PVGJng=

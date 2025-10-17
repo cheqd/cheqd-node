@@ -171,11 +171,11 @@ func checkFeeParamsFromSubspace(ctx sdk.Context, didKeeper DidKeeper, resourceKe
 	return true
 }
 
-func IsTaxableTx(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKeeper, tx sdk.Tx, oracleKeeper OracleKeeper, feeabsKeeper feeabskeeper.Keeper) (bool, sdk.Coins, sdk.Coins, error) {
+func IsTaxableTx(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKeeper, tx sdk.Tx, oracleKeeper OracleKeeper, feeabsKeeper feeabskeeper.Keeper, pricefeeder PriceFeeder) (bool, sdk.Coins, sdk.Coins, error) {
 	ncheqPrice, exist := oracleKeeper.GetWMA(ctx, oracletypes.CheqdSymbol, string(oraclekeeper.WmaStrategyBalanced))
 	if !exist {
-		// fallback to fixed fee range in ncheq if defined
-		ncheqPrice = sdkmath.LegacyZeroDec() // zero value, GetFeeForMsg will handle fallback
+		// fallback to fixed ICQ fixed price
+		ncheqPrice = pricefeeder.GetICQPrice()
 	}
 	_ = checkFeeParamsFromSubspace(ctx, didKeeper, resourceKeeper)
 

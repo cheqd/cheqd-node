@@ -46,3 +46,7 @@ type OracleKeeper interface {
 	GetExchangeRate(ctx sdk.Context, denom string) (math.LegacyDec, error)
 	GetWMA(ctx sdk.Context, denom string, strategy string) (math.LegacyDec, bool)
 }
+
+type PriceFeeder interface {
+	GetICQPrice() math.LegacyDec
+}
