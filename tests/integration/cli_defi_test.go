@@ -150,3 +150,16 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions)", func() {
 		Expect(res.Code).To(BeEquivalentTo(0))
 	})
 })
+
+var _ = Describe("Upgrade - Bypass global fee for IBC MsgAcknowledgement", func() {
+	It("should successfully submit an IBC MsgAcknowledgement with zero fees", func() {
+		// send the IBC MsgAcknowledgement, balance assertions are intentionally omitted or out of scope
+		res, err := cli.IBCAcknowledgementTx(testdata.BASE_ACCOUNT_1, testdata.IBCAcknowledgementMsg, testdata.IBCAcknowledgementGasLimit)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// assert the response code is 0
+		Expect(res.Code).To(BeEquivalentTo(0))
+	})
+})

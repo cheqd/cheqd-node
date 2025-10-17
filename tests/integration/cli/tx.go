@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
@@ -27,6 +28,46 @@ var CliGasParams = []string{
 	"--gas", Gas,
 	"--gas-adjustment", GasAdjustment,
 	"--gas-prices", GasPrices,
+}
+
+type jsonTx struct {
+	Body       txBody     `json:"body"`
+	AuthInfo   txAuthInfo `json:"auth_info"`
+	Signatures []string   `json:"signatures"`
+}
+
+type txBody struct {
+	Messages                    []json.RawMessage `json:"messages"`
+	Memo                        string            `json:"memo"`
+	TimeoutHeight               string            `json:"timeout_height"`
+	ExtensionOptions            []json.RawMessage `json:"extension_options"`
+	NonCriticalExtensionOptions []json.RawMessage `json:"non_critical_extension_options"`
+}
+
+type txAuthInfo struct {
+	SignerInfos []txSignerInfo `json:"signer_infos"`
+	Fee         txFee          `json:"fee"`
+}
+
+type txSignerInfo struct {
+	PublicKey *json.RawMessage `json:"public_key"`
+	ModeInfo  txModeInfo       `json:"mode_info"`
+	Sequence  string           `json:"sequence"`
+}
+
+type txModeInfo struct {
+	Single *txSingleModeInfo `json:"single,omitempty"`
+}
+
+type txSingleModeInfo struct {
+	Mode string `json:"mode"`
+}
+
+type txFee struct {
+	Amount   sdk.Coins `json:"amount"`
+	GasLimit string    `json:"gas_limit"`
+	Payer    string    `json:"payer"`
+	Granter  string    `json:"granter"`
 }
 
 func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxResponse, error) {
@@ -58,6 +99,85 @@ func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxRe
 
 	err = helpers.Codec.UnmarshalJSON([]byte(output), &resp)
 	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	return resp, nil
+}
+
+func SignTx(from string, msg json.RawMessage, fee sdk.Coins, gasLimit uint64) (string, error) {
+	if fee == nil {
+		fee = sdk.NewCoins()
+	}
+
+	unsigned := jsonTx{
+		Body: txBody{
+			Messages:                    []json.RawMessage{msg},
+			Memo:                        "",
+			TimeoutHeight:               "0",
+			ExtensionOptions:            []json.RawMessage{},
+			NonCriticalExtensionOptions: []json.RawMessage{},
+		},
+		AuthInfo: txAuthInfo{
+			SignerInfos: []txSignerInfo{
+				{
+					PublicKey: nil,
+					ModeInfo: txModeInfo{
+						Single: &txSingleModeInfo{Mode: "SIGN_MODE_DIRECT"},
+					},
+					Sequence: "0",
+				},
+			},
+			Fee: txFee{
+				Amount:   fee,
+				GasLimit: strconv.FormatUint(gasLimit, 10),
+				Payer:    "",
+				Granter:  "",
+			},
+		},
+		Signatures: []string{},
+	}
+
+	unsignedJSON, err := json.Marshal(&unsigned)
+	if err != nil {
+		return "", err
+	}
+
+	unsignedFile := helpers.MustWriteTmpFile("", unsignedJSON)
+
+	args := []string{
+		"tx", "sign", unsignedFile,
+		"--from", from,
+		"--chain-id", network.ChainID,
+		"--keyring-backend", KeyringBackend,
+		"--output", OutputFormat,
+	}
+
+	output, err := Exec(args...)
+	if err != nil {
+		return "", err
+	}
+
+	return helpers.TrimImportedStdout(output), nil
+}
+
+func BroadcastTx(signedTxJSON string) (sdk.TxResponse, error) {
+	signedFile := helpers.MustWriteTmpFile("", []byte(signedTxJSON))
+
+	args := []string{
+		"tx", "broadcast", signedFile,
+		"--output", OutputFormat,
+	}
+
+	output, err := Exec(args...)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	output = helpers.TrimImportedStdout(output)
+
+	var resp sdk.TxResponse
+	if err := helpers.Codec.UnmarshalJSON([]byte(output), &resp); err != nil {
 		return sdk.TxResponse{}, err
 	}
 
@@ -182,4 +302,13 @@ func VoteProposalTx(from, option, id string, feeParams []string) (sdk.TxResponse
 
 func SendTokensTx(from, to, amount string, feeParams []string) (sdk.TxResponse, error) {
 	return Tx("bank", "send", from, feeParams, from, to, amount)
+}
+
+func IBCAcknowledgementTx(from string, ack json.RawMessage, gasLimit uint64) (sdk.TxResponse, error) {
+	signed, err := SignTx(from, ack, sdk.NewCoins(), gasLimit)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	return BroadcastTx(signed)
 }
