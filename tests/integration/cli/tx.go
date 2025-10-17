@@ -142,6 +142,8 @@ func SignTx(from string, msg json.RawMessage, fee sdk.Coins, gasLimit uint64) (s
 
 	unsignedFile := helpers.MustWriteTmpFile("", unsignedJSON)
 
+	println("Unsigned tx written to:", unsignedFile)
+
 	args := []string{
 		"tx", "sign", unsignedFile,
 		"--from", from,
