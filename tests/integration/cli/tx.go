@@ -105,7 +105,7 @@ func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxRe
 	return resp, nil
 }
 
-func SignTx(from string, msg json.RawMessage, fee sdk.Coins, gasLimit uint64) (string, error) {
+func SignTx(tmpDir, from string, msg json.RawMessage, fee sdk.Coins, gasLimit uint64) (string, error) {
 	if fee == nil {
 		fee = sdk.NewCoins()
 	}
@@ -140,7 +140,7 @@ func SignTx(from string, msg json.RawMessage, fee sdk.Coins, gasLimit uint64) (s
 		return "", err
 	}
 
-	unsignedFile := helpers.MustWriteTmpFile("", unsignedJSON)
+	unsignedFile := helpers.MustWriteTmpFile(tmpDir, unsignedJSON)
 
 	println("Unsigned tx written to:", unsignedFile)
 
@@ -160,8 +160,8 @@ func SignTx(from string, msg json.RawMessage, fee sdk.Coins, gasLimit uint64) (s
 	return helpers.TrimImportedStdout(output), nil
 }
 
-func BroadcastTx(signedTxJSON string) (sdk.TxResponse, error) {
-	signedFile := helpers.MustWriteTmpFile("", []byte(signedTxJSON))
+func BroadcastTx(tmpDir, signedTxJSON string) (sdk.TxResponse, error) {
+	signedFile := helpers.MustWriteTmpFile(tmpDir, []byte(signedTxJSON))
 
 	args := []string{
 		"tx", "broadcast", signedFile,
@@ -303,11 +303,11 @@ func SendTokensTx(from, to, amount string, feeParams []string) (sdk.TxResponse, 
 	return Tx("bank", "send", from, feeParams, from, to, amount)
 }
 
-func IBCAcknowledgementTx(from string, ack json.RawMessage, gasLimit uint64) (sdk.TxResponse, error) {
-	signed, err := SignTx(from, ack, sdk.NewCoins(), gasLimit)
+func IBCAcknowledgementTx(tmpDir string, from string, ack json.RawMessage, gasLimit uint64) (sdk.TxResponse, error) {
+	signed, err := SignTx(tmpDir, from, ack, sdk.NewCoins(), gasLimit)
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
 
-	return BroadcastTx(signed)
+	return BroadcastTx(tmpDir, signed)
 }

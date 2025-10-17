@@ -152,9 +152,10 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions)", func() {
 })
 
 var _ = Describe("Upgrade - Bypass global fee for IBC MsgAcknowledgement", func() {
+	tmpDir := GinkgoT().TempDir()
 	It("should successfully submit an IBC MsgAcknowledgement with zero fees", func() {
 		// send the IBC MsgAcknowledgement, balance assertions are intentionally omitted or out of scope
-		res, err := cli.IBCAcknowledgementTx(testdata.BASE_ACCOUNT_1, testdata.IBCAcknowledgementMsg, testdata.IBCAcknowledgementGasLimit)
+		res, err := cli.IBCAcknowledgementTx(tmpDir, testdata.BASE_ACCOUNT_1, testdata.IBCAcknowledgementMsg, testdata.IBCAcknowledgementGasLimit)
 
 		// assert no error
 		Expect(err).To(BeNil())
