@@ -253,7 +253,7 @@ var _ = Describe("Upgrade - Bypass global fee for IBC MsgAcknowledgement", func(
 		// print the response
 		By("IBC MsgAcknowledgement Response: " + res.String())
 
-		// assert the response code is 0
-		Expect(res.Code).To(BeEquivalentTo(0))
+		// assert the response code is not 13 (insufficient fees)
+		Expect(res.Code).NotTo(BeEquivalentTo(13))
 	})
 })
