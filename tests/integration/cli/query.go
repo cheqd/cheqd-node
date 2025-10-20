@@ -14,6 +14,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	globalfeetypes "github.com/noble-assets/globalfee/types"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
@@ -268,4 +269,19 @@ func QueryKeys(name string) (string, error) {
 	}
 
 	return result.Address, nil
+}
+
+func QueryBypassMessages() ([]string, error) {
+	res, err := Query("globalfee", "bypass-messages")
+	if err != nil {
+		return nil, err
+	}
+
+	var resp globalfeetypes.QueryBypassMessagesResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.BypassMessages, nil
 }
