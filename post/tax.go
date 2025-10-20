@@ -12,6 +12,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	globalfeekeeper "github.com/noble-assets/globalfee/keeper"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
@@ -23,10 +24,11 @@ type TaxDecorator struct {
 	didKeeper       cheqdante.DidKeeper
 	resourceKeeper  cheqdante.ResourceKeeper
 	feemarketKeeper FeeMarketKeeper
+	globalFeeKeeper *globalfeekeeper.Keeper
 }
 
 // NewTaxDecorator returns a new taxDecorator
-func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper, fmk FeeMarketKeeper) TaxDecorator {
+func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper, fmk FeeMarketKeeper, gfk *globalfeekeeper.Keeper) TaxDecorator {
 	return TaxDecorator{
 		accountKeeper:   ak,
 		bankKeeper:      bk,
@@ -34,6 +36,7 @@ func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeepe
 		didKeeper:       dk,
 		resourceKeeper:  rk,
 		feemarketKeeper: fmk,
+		globalFeeKeeper: gfk,
 	}
 }
 
@@ -59,6 +62,11 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 	if err != nil {
 		return ctx, err
 	}
+	// if bypassable, perform no-op
+	if cheqdante.ShouldBypassFeeMarket(ctx, td.globalFeeKeeper, tx) {
+		return next(ctx, tx, simulate, success)
+	}
+
 	if taxable {
 		err := td.handleTaxableTransaction(ctx, feeTx, simulate, rewards, burn, tx)
 		if err != nil {

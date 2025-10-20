@@ -102,14 +102,14 @@ func NewFeeMarketBypassDecorator(
 }
 
 func (d feeMarketBypassDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
-	if shouldBypassFeeMarket(ctx, d.globalFeeKeeper, tx) {
+	if ShouldBypassFeeMarket(ctx, d.globalFeeKeeper, tx) {
 		return d.fallback.AnteHandle(ctx, tx, simulate, next)
 	}
 
 	return d.feeMarket.AnteHandle(ctx, tx, simulate, next)
 }
 
-func shouldBypassFeeMarket(ctx sdk.Context, k *keeper.Keeper, tx sdk.Tx) bool {
+func ShouldBypassFeeMarket(ctx sdk.Context, k *keeper.Keeper, tx sdk.Tx) bool {
 	if tx == nil {
 		return false
 	}
@@ -120,7 +120,7 @@ func shouldBypassFeeMarket(ctx sdk.Context, k *keeper.Keeper, tx sdk.Tx) bool {
 	}
 
 	for _, msg := range msgs {
-		if isDefaultFeeMarketBypassMsg(msg) {
+		if IsDefaultFeeMarketBypassMsg(msg) {
 			continue
 		}
 
@@ -137,7 +137,7 @@ func shouldBypassFeeMarket(ctx sdk.Context, k *keeper.Keeper, tx sdk.Tx) bool {
 	return true
 }
 
-func isDefaultFeeMarketBypassMsg(msg sdk.Msg) bool {
+func IsDefaultFeeMarketBypassMsg(msg sdk.Msg) bool {
 	switch msg.(type) {
 	case *channeltypes.MsgAcknowledgement:
 		return true
