@@ -10,6 +10,7 @@ import (
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	param "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
+	globalfeetypes "github.com/noble-assets/globalfee/types"
 )
 
 var (
@@ -20,12 +21,14 @@ var (
 func init() {
 	encodingConfig := params.MakeEncodingConfig()
 	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
+	globalfeetypes.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	resourcetypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	didtypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	govtypesv1.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	govtypesv1beta1.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	param.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	globalfeetypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	Codec = encodingConfig.Codec
 	Registry = encodingConfig.InterfaceRegistry
 }
