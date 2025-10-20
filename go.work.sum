@@ -151,6 +151,8 @@ github.com/bufbuild/connect-go v1.5.2/go.mod h1:GmMJYR6orFqD0Y6ZgX8pwQ8j9baizDrI
 github.com/casbin/casbin/v2 v2.37.0/go.mod h1:vByNa/Fchek0KZUgG5wEsl7iFsiviAYKRtgrQfcJqHg=
 github.com/census-instrumentation/opencensus-proto v0.4.1/go.mod h1:4T9NM4+4Vw91VeyqjLS6ao50K5bOcLKN6Q42XnYaRYw=
 github.com/cespare/xxhash v1.1.0 h1:a6HrQnmkObjyL+Gs60czilIUGqrzKutQD6XZog3p+ko=
+github.com/cheqd/fee-abstraction/v8 v8.0.3-uneven-heights-formula h1:nfTNtsD7qV8rJIlIx09dxyYE8lhAeQTz1umCT1bZWZ4=
+github.com/cheqd/fee-abstraction/v8 v8.0.3-uneven-heights-formula/go.mod h1:1BOa3dcKNQd9ODKCQh4uOoHx4gFj+YpFBLHY6G2vwGE=
 github.com/chigopher/pathlib v0.19.1/go.mod h1:tzC1dZLW8o33UQpWkNkhvPwL5n4yyFRFm/jL1YGWFvY=
 github.com/ckaznocha/intrange v0.1.2/go.mod h1:RWffCw/vKBwHeOEwWdCikAtY0q4gGt8VhJZEEA5n+RE=
 github.com/clbanning/mxj v1.8.4/go.mod h1:BVjHeAH+rl9rs6f+QIpeRl0tfu10SXn1pUSa5PVGJng=
