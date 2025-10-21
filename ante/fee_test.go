@@ -360,7 +360,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.GlobalFeeKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeabsKeeper, s.app.FeeMarketKeeper, s.app.GlobalFeeKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -426,7 +426,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.GlobalFeeKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeabsKeeper, s.app.FeeMarketKeeper, s.app.GlobalFeeKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -491,7 +491,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.GlobalFeeKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeabsKeeper, s.app.FeeMarketKeeper, s.app.GlobalFeeKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -585,7 +585,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		err = s.app.FeeMarketKeeper.SetState(s.ctx, feemarketState)
 		Expect(err).To(BeNil())
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.GlobalFeeKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeabsKeeper, s.app.FeeMarketKeeper, s.app.GlobalFeeKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -646,7 +646,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.GlobalFeeKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeabsKeeper, s.app.FeeMarketKeeper, s.app.GlobalFeeKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -1349,6 +1349,7 @@ var _ = Describe("Test PostHandle", func() {
 			s.app.FeeGrantKeeper,
 			s.app.DidKeeper,
 			s.app.ResourceKeeper,
+			s.app.FeeabsKeeper,
 			s.app.FeeMarketKeeper,
 			s.app.GlobalFeeKeeper,
 		)
@@ -1507,7 +1508,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		err = testutil.FundModuleAccount(s.ctx, s.app.BankKeeper, types.ModuleName, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.GlobalFeeKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeabsKeeper, s.app.FeeMarketKeeper, s.app.GlobalFeeKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -1577,7 +1578,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		err = testutil.FundModuleAccount(s.ctx, s.app.BankKeeper, types.ModuleName, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.GlobalFeeKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeabsKeeper, s.app.FeeMarketKeeper, s.app.GlobalFeeKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -1640,7 +1641,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.GlobalFeeKeeper)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeabsKeeper, s.app.FeeMarketKeeper, s.app.GlobalFeeKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx

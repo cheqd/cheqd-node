@@ -1039,6 +1039,7 @@ func (app *App) setPostHandler() {
 		FeegrantKeeper:  app.FeeGrantKeeper,
 		DidKeeper:       app.DidKeeper,
 		ResourceKeeper:  app.ResourceKeeper,
+		FeeAbsKeeper:    app.FeeabsKeeper,
 		FeeMarketKeeper: app.FeeMarketKeeper,
 	})
 	if err != nil {
