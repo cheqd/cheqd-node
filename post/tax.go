@@ -376,6 +376,7 @@ func (td *TaxDecorator) handleTaxableTransaction(
 		nativeFees = nativeFees.Add(fee)
 	}
 
+	//nolint:nestif
 	if onlyNativeDenom {
 		if err := td.validateTax(tax, simulate); err != nil {
 			return err
