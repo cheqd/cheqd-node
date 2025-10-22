@@ -16,8 +16,8 @@ import (
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
-	globalfeetypes "github.com/noble-assets/globalfee/types"
 	solomachine "github.com/cosmos/ibc-go/v8/modules/light-clients/06-solomachine"
+	globalfeetypes "github.com/noble-assets/globalfee/types"
 )
 
 // The following structs are overridden from the tendermint codebase.
