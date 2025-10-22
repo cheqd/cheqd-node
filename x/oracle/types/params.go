@@ -38,6 +38,7 @@ var (
 	KeyCurrencyDeviationThresholds = []byte("CurrencyDeviationThresholds")
 	KeyUsdcIbcDenom                = []byte("UsdcIbcDenom")
 	KeySlashingEnabled             = []byte("SlashingEnabled")
+	KeyAveragingWindow             = []byte("KeyAveragingWindow")
 )
 
 // Default parameter values
@@ -49,6 +50,7 @@ const (
 	DefaultMaximumPriceStamps       = 60                  // retain for 3 hours
 	DefaultMedianStampPeriod        = BlocksPerHour * 3   // window for 3 hours
 	DefaultMaximumMedianStamps      = 24                  // retain for 3 days
+	DefaultAveragingWindow          = 3
 )
 
 // Default parameter values
@@ -206,6 +208,7 @@ func DefaultParams() Params {
 		CurrencyDeviationThresholds: DefaultCurrencyDeviationThresholds,
 		UsdcIbcDenom:                "ibc/F5FABF52B54E65064B57BF6DBD8E5FAD22CEE9F4B8A57ADBB20CCD0173AA72A4",
 		SlashingEnabled:             false,
+		AveragingWindow:             DefaultAveragingWindow,
 	}
 }
 
@@ -302,6 +305,11 @@ func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
 			KeySlashingEnabled,
 			&p.SlashingEnabled,
 			validateBool,
+		),
+		paramstypes.NewParamSetPair(
+			KeyAveragingWindow,
+			&p.AveragingWindow,
+			validateAveragingWindow,
 		),
 	}
 }
@@ -627,5 +635,18 @@ func validateBool(i interface{}) error {
 	if !ok {
 		return fmt.Errorf("invalid parameter type bool: %T", i)
 	}
+	return nil
+}
+
+func validateAveragingWindow(i interface{}) error {
+	v, ok := i.(uint64)
+	if !ok {
+		return ErrInvalidParamValue.Wrapf("invalid parameter type: %T", i)
+	}
+
+	if v == 0 {
+		return ErrInvalidParamValue.Wrap("oracle parameter AveragingWindow must be > 0")
+	}
+
 	return nil
 }

@@ -12,7 +12,6 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/mocks"
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	"github.com/cheqd/cheqd-node/x/did/types"
-	oracleKeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
 	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
 	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 
@@ -491,7 +490,7 @@ var _ = Describe("cheqd cli - oracle module", func() {
 		Expect(oracleParams).ToNot(BeNil())
 
 		historicStampPeriod := oracleParams.Params.HistoricStampPeriod
-		averagingWindow := oracleKeeper.AveragingWindow
+		averagingWindow := oracleParams.Params.AveragingWindow
 
 		// Wait until the block height matches the ComputeAllAverages trigger
 		targetHeight := int64(historicStampPeriod) * int64(averagingWindow)
@@ -525,7 +524,7 @@ var _ = Describe("cheqd cli - oracle module", func() {
 		Expect(oracleParams).ToNot(BeNil())
 
 		historicStampPeriod := oracleParams.Params.HistoricStampPeriod
-		averagingWindow := oracleKeeper.AveragingWindow
+		averagingWindow := oracleParams.Params.AveragingWindow
 
 		// Wait until the block height matches the ComputeAllAverages trigger
 		targetHeight := int64(historicStampPeriod) * int64(averagingWindow)
@@ -559,7 +558,7 @@ var _ = Describe("cheqd cli - oracle module", func() {
 		Expect(oracleParams).ToNot(BeNil())
 
 		historicStampPeriod := oracleParams.Params.HistoricStampPeriod
-		averagingWindow := oracleKeeper.AveragingWindow
+		averagingWindow := oracleParams.Params.AveragingWindow
 
 		// Wait until the block height matches the ComputeAllAverages trigger
 		targetHeight := int64(historicStampPeriod) * int64(averagingWindow)

@@ -77,6 +77,8 @@ message Params {
   string usdc_ibc_denom = 16;
 
   bool slashing_enabled = 17;
+
+  uint64 averaging_window = 18;
 }
 
 // Denom - the object to hold configurations of each denom

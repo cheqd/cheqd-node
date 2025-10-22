@@ -57,7 +57,7 @@ func EndBlocker(ctx context.Context, k keeper.Keeper, feeabsk types.FeeAbskeeper
 			return err
 		}
 	}
-	if k.IsPeriodLastBlock(sdkCtx, params.HistoricStampPeriod*keeper.AveragingWindow) {
+	if k.IsPeriodLastBlock(sdkCtx, params.HistoricStampPeriod*params.AveragingWindow) {
 		if err := ComputeAllAverages(sdkCtx, params, k); err != nil {
 			return err
 		}

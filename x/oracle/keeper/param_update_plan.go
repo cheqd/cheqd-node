@@ -131,6 +131,10 @@ func (k Keeper) ValidateParamChanges(ctx sdk.Context, keys []string, changes typ
 
 		case string(types.KeySlashingEnabled):
 			params.SlashingEnabled = changes.SlashingEnabled
+
+		case string(types.KeyAveragingWindow):
+			params.AveragingWindow = changes.AveragingWindow
+
 		}
 	}
 
@@ -192,6 +196,9 @@ func (k Keeper) ExecuteParamUpdatePlan(ctx sdk.Context, plan types.ParamUpdatePl
 
 		case string(types.KeySlashingEnabled):
 			k.SetSlashingEnabled(ctx, plan.Changes.SlashingEnabled)
+
+		case string(types.KeyAveragingWindow):
+			k.SetAveragingWindow(ctx, plan.Changes.AveragingWindow)
 		}
 	}
 

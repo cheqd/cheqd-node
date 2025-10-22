@@ -243,3 +243,14 @@ func (k Keeper) GetExponent(ctx sdk.Context, denom string) (uint32, error) {
 	}
 	return 0, fmt.Errorf("unable to find exponent for %s", denom)
 }
+
+// SetAveragingWindow updates the oracle AveragingWindow.
+func (k Keeper) SetAveragingWindow(ctx sdk.Context, value uint64) {
+	k.paramSpace.Set(ctx, types.KeyAveragingWindow, value)
+}
+
+// AveragingWindow returns the oracle AveragingWindow.
+func (k Keeper) AveragingWindow(ctx sdk.Context) (res bool) {
+	k.paramSpace.Get(ctx, types.KeyAveragingWindow, &res)
+	return
+}

@@ -347,6 +347,8 @@ func (q Querier) EMA(ctx context.Context, req *types.QueryEMARequest) (*types.Qu
 func (q Querier) WMA(goCtx context.Context, req *types.QueryWMARequest) (*types.QueryWMAResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	params := q.GetParams(ctx)
+	averagingWindow := params.AveragingWindow
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "request cannot be nil")
 	}
@@ -364,9 +366,9 @@ func (q Querier) WMA(goCtx context.Context, req *types.QueryWMARequest) (*types.
 		if len(prices) == 0 {
 			return nil, status.Errorf(codes.NotFound, "no historic prices found for denom: %s", req.Denom)
 		}
-		if len(req.CustomWeights) != AveragingWindow {
+		if uint64(len(req.CustomWeights)) != averagingWindow {
 			return nil, status.Errorf(codes.InvalidArgument,
-				"custom_weights must have exactly %d elements (one per period)", AveragingWindow)
+				"custom_weights must have exactly %d elements (one per period)", averagingWindow)
 		}
 
 		result := CalculateWMA(prices, req.Strategy, req.CustomWeights)

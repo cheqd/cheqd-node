@@ -309,3 +309,14 @@ func TestAddDefaultRB(t *testing.T) {
 			"symbol_denom: USDC\nreward_band: \"0.020000000000000000\"\n\n"+
 			"symbol_denom: foo\nreward_band: \"0.020000000000000000\"")
 }
+
+func TestValidateAveragingWindow(t *testing.T) {
+	err := validateSlashWindow("invalidUint64")
+	require.ErrorContains(t, err, "invalid parameter type: string")
+
+	err = validateSlashWindow(uint64(0))
+	require.ErrorContains(t, err, "oracle parameter SlashWindow must be > 0")
+
+	err = validateSlashWindow(uint64(10))
+	require.Nil(t, err)
+}

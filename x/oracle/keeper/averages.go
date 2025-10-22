@@ -25,8 +25,6 @@ func KeyWMAWithStrategy(denom, strategy string) []byte {
 	return []byte(fmt.Sprintf("wma:%s:%s", denom, strategy))
 }
 
-const AveragingWindow = 3 // N-period for SMA/WMA/EMA // TODO: make it a param
-
 func (k Keeper) ComputeAverages(ctx sdk.Context, denom string) error {
 	store := ctx.KVStore(k.storeKey)
 	currentBlock := util.SafeInt64ToUint64(ctx.BlockHeight())
@@ -73,8 +71,10 @@ func CalculateHistoricPrices(ctx sdk.Context, store cosmosstore.KVStore, denom s
 		return []math.LegacyDec{}, nil
 
 	}
+	params := k.GetParams(ctx)
+	averagingWindow := params.AveragingWindow
 	lastBlock := sdk.BigEndianToUint64(lastBlockBz)
-	for i := uint64(0); i < AveragingWindow; i++ {
+	for i := uint64(0); i < averagingWindow; i++ {
 		bz := store.Get(types.KeyHistoricPrice(denom, lastBlock-i*types.DefaultParams().HistoricStampPeriod))
 		if bz == nil {
 			continue

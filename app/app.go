@@ -1492,7 +1492,18 @@ func (app *App) RegisterUpgradeHandlers() {
 			newParams.Abci = &tmproto.ABCIParams{
 				VoteExtensionsEnableHeight: plan.Height + 10,
 			}
+			// Only on non-mainnet chains, and only if TWAP rate not already set
+			if sdkCtx.ChainID() != "cheqd-mainnet-1" {
+				denom := oracletypes.DefaultParams().UsdcIbcDenom
 
+				// Check if TWAP rate is already set
+				rate, err := app.FeeabsKeeper.GetTwapRate(sdkCtx, denom)
+				if err != nil || rate.IsZero() {
+					defaultRate := sdkmath.LegacyMustNewDecFromStr("1.0")
+					app.FeeabsKeeper.SetTwapRate(sdkCtx, denom, defaultRate)
+					sdkCtx.Logger().Info("Initialized default TWAP rate", "denom", denom, "rate", defaultRate.String())
+				}
+			}
 			err = app.ConsensusParamsKeeper.ParamsStore.Set(sdkCtx, newParams)
 			if err != nil {
 				return migrations, err

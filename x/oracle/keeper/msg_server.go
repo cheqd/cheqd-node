@@ -253,6 +253,9 @@ func (ms msgServer) LegacyGovUpdateParams(
 		case string(types.KeySlashingEnabled):
 			ms.SetSlashingEnabled(ctx, msg.Changes.SlashingEnabled)
 
+		case string(types.KeyAveragingWindow):
+			ms.SetAveragingWindow(ctx, msg.Changes.AveragingWindow)
+
 		default:
 			return nil, fmt.Errorf("%s is not an existing oracle param key", key)
 		}

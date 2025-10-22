@@ -7,7 +7,6 @@ import (
 	"time"
 
 	cli "github.com/cheqd/cheqd-node/tests/integration/cli"
-	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
 	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -25,7 +24,7 @@ var _ = Describe("Integration - Convert USDC to CHEQ using MA", func() {
 		Expect(err).To(BeNil())
 
 		historicStampPeriod := oracleParams.Params.HistoricStampPeriod
-		averagingWindow := oraclekeeper.AveragingWindow
+		averagingWindow := oracleParams.Params.AveragingWindow
 
 		targetHeight := int64(historicStampPeriod) * int64(averagingWindow)
 		fmt.Printf("Waiting until block height ≥ %d to trigger ComputeAllAverages...\n", targetHeight)
