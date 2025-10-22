@@ -20,7 +20,7 @@ jobs:
       DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: "Modify runner's home directory permissions"
         run: "sudo chmod 755 /home/runner"
@@ -52,7 +52,7 @@ jobs:
       PYTHONDEVMODE: 1
       DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: "Modify runner's home directory permissions"
         run: "sudo chmod 755 /home/runner"
@@ -82,9 +82,9 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: ./go.mod
           cache: true
@@ -108,10 +108,10 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Download binary artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         id: download
         with:
           name: cheqd-noded
@@ -121,7 +121,7 @@ jobs:
         run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
 
       - name: Download node Docker image
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: cheqd-node-build.tar
 
@@ -144,7 +144,7 @@ jobs:
         run: |
           bash import-keys.sh
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: ./go.mod
           cache: true
@@ -174,7 +174,7 @@ jobs:
     name: "Fee Abstraction Tests"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Execute fee-abstraction logic by paying in `uosmo`
         working-directory: ./tests/fee-abs
@@ -184,7 +184,7 @@ jobs:
     name: "Upgrade Tests"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Download old node binary (mainnet-latest)
         run: |
@@ -202,7 +202,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: ./go.mod
           cache: true
@@ -212,7 +212,7 @@ jobs:
         run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
       - name: Download new version of the Docker image (build-latest)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: cheqd-node-build.tar
 
@@ -246,7 +246,7 @@ jobs:
           docker ps -a
       
       - name: Download binary artifact (build-latest)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         id: download
         with:
           name: cheqd-noded
@@ -318,39 +318,39 @@ jobs:
     if: always()
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Download unit test
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: report-unit.xml
 
       - name: Download integration test report
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: report-integration.xml
 
       - name: Download pre-upgrade test Report
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: report-pre-upgrade.xml
 
       - name: Download post-upgrade test Report
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: report-post-upgrade.xml
 
       - name: Download upgraded integration test Report
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: report-upgraded-integration.xml
 
       - name: Download pricing proposal test Report
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: report-pricing-proposal.xml
       - name: Download pricing change test Report
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: report-pricing-change.xml
       - name: Combine test results
