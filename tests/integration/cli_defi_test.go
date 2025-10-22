@@ -152,8 +152,8 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions)", func() {
 	})
 })
 
-var _ = Describe("Upgrade - Bypass global fee for IBC MsgAcknowledgement", func() {
-	It("should successfully submit an IBC MsgAcknowledgement with zero fees", func() {
+var _ = Describe("Upgrade - Bypass global fee for IBC messages", func() {
+	It("should successfully submit an IBC MsgAcknowledgement, MsgUpdateClient, MsgRecvPacket, MsgTimeout with zero fees", func() {
 		// submit a proposal to update the bypass messages
 		res, err := cli.SubmitProposalTx(cli.Operator0, "testdata/update-bypass-messages-proposal.json", cli.CliGasParams)
 
@@ -241,6 +241,15 @@ var _ = Describe("Upgrade - Bypass global fee for IBC MsgAcknowledgement", func(
 		// assert the bypass messages include the IBC MsgAcknowledgement type URL
 		Expect(bypassMessages).To(ContainElement("/ibc.core.channel.v1.MsgAcknowledgement"))
 
+		// assert the bypass messages include the IBC MsgUpdateClient type URL
+		Expect(bypassMessages).To(ContainElement("/ibc.core.client.v1.MsgUpdateClient"))
+
+		// assert the bypass messages include the IBC MsgRecvPacket type URL
+		Expect(bypassMessages).To(ContainElement("/ibc.core.channel.v1.MsgRecvPacket"))
+
+		// assert the bypass messages include the IBC MsgTimeout type URL
+		Expect(bypassMessages).To(ContainElement("/ibc.core.channel.v1.MsgTimeout"))
+
 		// create a temporary directory for the transaction files
 		tmpDir := GinkgoT().TempDir()
 
@@ -252,6 +261,39 @@ var _ = Describe("Upgrade - Bypass global fee for IBC MsgAcknowledgement", func(
 
 		// print the response
 		By("IBC MsgAcknowledgement Response: " + res.String())
+
+		// assert the response code is not 13 (insufficient fees)
+		Expect(res.Code).NotTo(BeEquivalentTo(13))
+
+		res, err = cli.IBCUpdateClientTx(tmpDir, testdata.BASE_ACCOUNT_1, testdata.IBCUpdateClientMsg, testdata.IBCUpdateClientGasLimit)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// print the response
+		By("IBC MsgUpdateClient Response: " + res.String())
+
+		// assert the response code is not 13 (insufficient fees)
+		Expect(res.Code).NotTo(BeEquivalentTo(13))
+
+		res, err = cli.IBCRecvPacketTx(tmpDir, testdata.BASE_ACCOUNT_1, testdata.IBCRecvPacketMsg, testdata.IBCRecvPacketGasLimit)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// print the response
+		By("IBC MsgRecvPacket Response: " + res.String())
+
+		// assert the response code is not 13 (insufficient fees)
+		Expect(res.Code).NotTo(BeEquivalentTo(13))
+
+		res, err = cli.IBCTimeoutTx(tmpDir, testdata.BASE_ACCOUNT_1, testdata.IBCTimeoutMsg, testdata.IBCTimeoutGasLimit)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// print the response
+		By("IBC MsgTimeout Response: " + res.String())
 
 		// assert the response code is not 13 (insufficient fees)
 		Expect(res.Code).NotTo(BeEquivalentTo(13))

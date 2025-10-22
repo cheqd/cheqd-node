@@ -303,3 +303,30 @@ func IBCAcknowledgementTx(tmpDir string, from string, ack json.RawMessage, gasLi
 
 	return BroadcastTx(tmpDir, signed)
 }
+
+func IBCUpdateClientTx(tmpDir string, from string, msg json.RawMessage, gasLimit uint64) (sdk.TxResponse, error) {
+	signed, err := SignTx(tmpDir, from, msg, sdk.NewCoins(), gasLimit)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	return BroadcastTx(tmpDir, signed)
+}
+
+func IBCRecvPacketTx(tmpDir string, from string, msg json.RawMessage, gasLimit uint64) (sdk.TxResponse, error) {
+	signed, err := SignTx(tmpDir, from, msg, sdk.NewCoins(), gasLimit)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	return BroadcastTx(tmpDir, signed)
+}
+
+func IBCTimeoutTx(tmpDir string, from string, msg json.RawMessage, gasLimit uint64) (sdk.TxResponse, error) {
+	signed, err := SignTx(tmpDir, from, msg, sdk.NewCoins(), gasLimit)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	return BroadcastTx(tmpDir, signed)
+}

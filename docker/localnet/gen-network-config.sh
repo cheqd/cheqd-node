@@ -144,6 +144,15 @@ function configure_genesis() {
 
   # add bypass for MsgAcknowledgement in global fee module
   jq '.app_state.globalfee.bypass_messages += ["/ibc.core.channel.v1.MsgAcknowledgement"]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
+
+  # add bypass for MsgUpdateClient in global fee module
+  jq '.app_state.globalfee.bypass_messages += ["/ibc.core.client.v1.MsgUpdateClient"]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
+
+  # add bypass for MsgRecvPacket in global fee module
+  jq '.app_state.globalfee.bypass_messages += ["/ibc.core.channel.v1.MsgRecvPacket"]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
+
+  # add bypass for MsgTimeout in global fee module
+  jq '.app_state.globalfee.bypass_messages += ["/ibc.core.channel.v1.MsgTimeout"]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
 }
 
 

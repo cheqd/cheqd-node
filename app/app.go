@@ -1471,6 +1471,24 @@ func (app *App) RegisterUpgradeHandlers() {
 				return nil, err
 			}
 
+			// allow MsgUpdateClient to bypass fees
+			sdkCtx.Logger().Info("Bypassing fee for MsgUpdateClient")
+			if err := app.GlobalFeeKeeper.BypassMessages.Set(ctx, sdk.MsgTypeURL(&ibcclienttypes.MsgUpdateClient{})); err != nil {
+				return nil, err
+			}
+
+			// allow MsgRecvPacket to bypass fees
+			sdkCtx.Logger().Info("Bypassing fee for MsgRecvPacket")
+			if err := app.GlobalFeeKeeper.BypassMessages.Set(ctx, sdk.MsgTypeURL(&channeltypes.MsgRecvPacket{})); err != nil {
+				return nil, err
+			}
+
+			// allow MsgTimeout to bypass fees
+			sdkCtx.Logger().Info("Bypassing fee for MsgTimeout")
+			if err := app.GlobalFeeKeeper.BypassMessages.Set(ctx, sdk.MsgTypeURL(&channeltypes.MsgTimeout{})); err != nil {
+				return nil, err
+			}
+
 			// update expedited gov proposal params
 			sdkCtx.Logger().Info("Updating expedited gov proposal params")
 			govParams, err := app.GovKeeper.Params.Get(sdkCtx)

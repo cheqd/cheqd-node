@@ -7,6 +7,7 @@ import (
 	cheqdante "github.com/cheqd/cheqd-node/ante"
 	cheqdpost "github.com/cheqd/cheqd-node/post"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -17,6 +18,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank/testutil"
 	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
+	solomachine "github.com/cosmos/ibc-go/v8/modules/light-clients/06-solomachine"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	feeabsante "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/ante"
@@ -107,6 +109,7 @@ var _ = Describe("Fee tests on CheckTx", func() {
 		err := testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, coins)
 		Expect(err).To(BeNil())
 
+		// whitelisted msg: MsgAcknowledgement
 		packet := channeltypes.NewPacket(
 			[]byte("data"),
 			1,
@@ -139,7 +142,111 @@ var _ = Describe("Fee tests on CheckTx", func() {
 		s.ctx = s.ctx.WithIsCheckTx(true)
 
 		_, err = antehandler(s.ctx, tx, false)
+
+		Expect(err).To(BeNil(), "Whitelisted Tx: MsgAcknowledgment: errored on zero fee in CheckTx")
+
+		s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
+
+		pubKeyAny, err := codectypes.NewAnyWithValue(priv1.PubKey())
 		Expect(err).To(BeNil())
+
+		header := &solomachine.Header{
+			Timestamp:      1,
+			Signature:      []byte{1},
+			NewPublicKey:   pubKeyAny,
+			NewDiversifier: "diversifier",
+		}
+
+		updateMsg, err := clienttypes.NewMsgUpdateClient("06-solomachine-0", header, addr1.String())
+		Expect(err).To(BeNil())
+		Expect(updateMsg.ValidateBasic()).To(BeNil())
+
+		err = s.app.GlobalFeeKeeper.BypassMessages.Set(s.ctx, sdk.MsgTypeURL(updateMsg))
+		Expect(err).To(BeNil())
+
+		Expect(s.txBuilder.SetMsgs(updateMsg)).To(BeNil())
+		s.txBuilder.SetFeeAmount(sdk.NewCoins())
+		s.txBuilder.SetGasLimit(100000)
+		s.txBuilder.SetFeePayer(addr1)
+
+		privs = []cryptotypes.PrivKey{priv1}
+		accNums = []uint64{0}
+		accSeqs = []uint64{0}
+
+		tx, err = s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+		Expect(err).To(BeNil())
+
+		err = s.app.GlobalFeeKeeper.BypassMessages.Set(s.ctx, sdk.MsgTypeURL(updateMsg))
+		Expect(err).To(BeNil())
+
+		s.ctx = s.ctx.WithIsCheckTx(true)
+
+		_, err = antehandler(s.ctx, tx, false)
+
+		Expect(err).To(BeNil(), "Whitelisted Tx: MsgUpdateClient: errored on zero fee in CheckTx")
+
+		s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
+
+		recvMsg := channeltypes.NewMsgRecvPacket(
+			packet,
+			[]byte("proof"),
+			clienttypes.NewHeight(0, 1),
+			addr1.String(),
+		)
+		Expect(recvMsg.ValidateBasic()).To(BeNil())
+
+		Expect(s.txBuilder.SetMsgs(recvMsg)).To(BeNil())
+		s.txBuilder.SetFeeAmount(sdk.NewCoins())
+		s.txBuilder.SetGasLimit(100000)
+		s.txBuilder.SetFeePayer(addr1)
+
+		privs = []cryptotypes.PrivKey{priv1}
+		accNums = []uint64{0}
+		accSeqs = []uint64{0}
+
+		tx, err = s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+		Expect(err).To(BeNil())
+
+		err = s.app.GlobalFeeKeeper.BypassMessages.Set(s.ctx, sdk.MsgTypeURL(recvMsg))
+		Expect(err).To(BeNil())
+
+		s.ctx = s.ctx.WithIsCheckTx(true)
+
+		_, err = antehandler(s.ctx, tx, false)
+
+		Expect(err).To(BeNil(), "Whitelisted Tx: MsgRecvPacket: errored on zero fee in CheckTx")
+
+		s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
+
+		timeoutMsg := channeltypes.NewMsgTimeout(
+			packet,
+			packet.Sequence,
+			[]byte("proof"),
+			clienttypes.NewHeight(0, 1),
+			addr1.String(),
+		)
+		Expect(timeoutMsg.ValidateBasic()).To(BeNil())
+
+		Expect(s.txBuilder.SetMsgs(timeoutMsg)).To(BeNil())
+		s.txBuilder.SetFeeAmount(sdk.NewCoins())
+		s.txBuilder.SetGasLimit(100000)
+		s.txBuilder.SetFeePayer(addr1)
+
+		privs = []cryptotypes.PrivKey{priv1}
+		accNums = []uint64{0}
+		accSeqs = []uint64{0}
+
+		tx, err = s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+		Expect(err).To(BeNil())
+
+		err = s.app.GlobalFeeKeeper.BypassMessages.Set(s.ctx, sdk.MsgTypeURL(timeoutMsg))
+		Expect(err).To(BeNil())
+
+		s.ctx = s.ctx.WithIsCheckTx(true)
+
+		_, err = antehandler(s.ctx, tx, false)
+
+		Expect(err).To(BeNil(), "Whitelisted Tx: MsgTimeout: errored on zero fee in CheckTx")
 	})
 
 	It("Ensure Mempool Fees", func() {

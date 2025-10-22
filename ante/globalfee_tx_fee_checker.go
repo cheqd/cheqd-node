@@ -7,6 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	errorstypes "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	"github.com/noble-assets/globalfee/keeper"
 )
@@ -139,7 +140,13 @@ func ShouldBypassFeeMarket(ctx sdk.Context, k *keeper.Keeper, tx sdk.Tx) bool {
 
 func IsDefaultFeeMarketBypassMsg(msg sdk.Msg) bool {
 	switch msg.(type) {
+	case *clienttypes.MsgUpdateClient:
+		return true
 	case *channeltypes.MsgAcknowledgement:
+		return true
+	case *channeltypes.MsgRecvPacket:
+		return true
+	case *channeltypes.MsgTimeout:
 		return true
 	default:
 		return false
