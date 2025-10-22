@@ -10,6 +10,7 @@ import (
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	param "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
+	solomachine "github.com/cosmos/ibc-go/v8/modules/light-clients/06-solomachine"
 	globalfeetypes "github.com/noble-assets/globalfee/types"
 )
 
@@ -28,6 +29,7 @@ func init() {
 	govtypesv1.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	govtypesv1beta1.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	param.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	solomachine.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	globalfeetypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	Codec = encodingConfig.Codec
 	Registry = encodingConfig.InterfaceRegistry
