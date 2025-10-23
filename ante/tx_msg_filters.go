@@ -175,7 +175,7 @@ func IsTaxableTx(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKe
 	ncheqPrice, exist := oracleKeeper.GetWMA(ctx, oracletypes.CheqdSymbol, string(oraclekeeper.WmaStrategyBalanced))
 	if !exist {
 		// fallback to fixed ICQ fixed price
-		ncheqPrice = pricefeeder.GetICQPrice()
+		ncheqPrice = pricefeeder.GetOracle().GetICQPrice()
 	}
 	_ = checkFeeParamsFromSubspace(ctx, didKeeper, resourceKeeper)
 

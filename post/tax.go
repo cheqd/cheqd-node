@@ -7,6 +7,7 @@ import (
 	errors "cosmossdk.io/errors"
 	"cosmossdk.io/math"
 	cheqdante "github.com/cheqd/cheqd-node/ante"
+	"github.com/cheqd/cheqd-node/pricefeeder"
 	"github.com/cheqd/cheqd-node/util"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
@@ -30,11 +31,11 @@ type TaxDecorator struct {
 	feemarketKeeper   FeeMarketKeeper
 	oracleKeeper      cheqdante.OracleKeeper
 	feeabsKeeper      feeabskeeper.Keeper
-	oraclePricefeeder cheqdante.PriceFeeder
+	oraclePricefeeder *pricefeeder.PriceFeeder
 }
 
 // NewTaxDecorator returns a new taxDecorator
-func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper, fmk FeeMarketKeeper, ok cheqdante.OracleKeeper, fak feeabskeeper.Keeper, pf cheqdante.PriceFeeder) TaxDecorator {
+func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper, fmk FeeMarketKeeper, ok cheqdante.OracleKeeper, fak feeabskeeper.Keeper, pf *pricefeeder.PriceFeeder) TaxDecorator {
 	return TaxDecorator{
 		accountKeeper:     ak,
 		bankKeeper:        bk,

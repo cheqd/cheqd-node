@@ -57,7 +57,7 @@ func (pf *PriceFeeder) Start(currentBlockHeight int64, oracleParams types.Params
 	if err != nil {
 		return err
 	}
-	pf.Oracle = oracle.New(
+	o := oracle.New(
 		logger,
 		client.OracleClient{},
 		providers,
@@ -66,6 +66,7 @@ func (pf *PriceFeeder) Start(currentBlockHeight int64, oracleParams types.Params
 		cfg.ProviderEndpointsMap(),
 		true,
 	)
+	pf.SetOracle(o)
 
 	telemetryCfg := telemetry.Config{}
 	err = mapstructure.Decode(cfg.Telemetry, &telemetryCfg)
@@ -100,6 +101,14 @@ func trapSignal(cancel context.CancelFunc, logger zerolog.Logger) {
 		logger.Info().Str("signal", sig.String()).Msg("caught signal; shutting down...")
 		cancel()
 	}()
+}
+
+func (pf *PriceFeeder) SetOracle(o *oracle.Oracle) {
+	pf.Oracle = o
+}
+
+func (pf *PriceFeeder) GetOracle() *oracle.Oracle {
+	return pf.Oracle
 }
 
 // startPriceFeeder starts the price feeder server which listens to websocket connections

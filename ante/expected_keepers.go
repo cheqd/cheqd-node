@@ -9,6 +9,7 @@ import (
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/ojo-network/price-feeder/oracle"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
@@ -48,5 +49,5 @@ type OracleKeeper interface {
 }
 
 type PriceFeeder interface {
-	GetICQPrice() math.LegacyDec
+	GetOracle() *oracle.Oracle
 }

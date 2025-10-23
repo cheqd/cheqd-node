@@ -2,6 +2,7 @@ package posthandler
 
 import (
 	cheqdante "github.com/cheqd/cheqd-node/ante"
+	"github.com/cheqd/cheqd-node/pricefeeder"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	feeabskeeper "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/keeper"
@@ -17,7 +18,7 @@ type HandlerOptions struct {
 	FeeMarketKeeper FeeMarketKeeper
 	OracleKeeper    cheqdante.OracleKeeper
 	FeeabsKeeper    feeabskeeper.Keeper
-	PriceFeeder     cheqdante.PriceFeeder
+	PriceFeeder     *pricefeeder.PriceFeeder
 }
 
 // NewPostHandler returns a default post handler
