@@ -308,8 +308,8 @@ github.com/cheqd/feemarket v1.0.5-uneven-heights h1:nnicfX1/2gVd3rAzYx6N316/9uwD
 github.com/cheqd/feemarket v1.0.5-uneven-heights/go.mod h1:9az4B2TVuCOVDh+rlNyc36Wkl0rQ8bCBZmiUm3yqyxc=
 github.com/cheqd/iavl v1.2.2-uneven-heights.0.20250808065519-2c3d5a9959cc h1:ZcM7+wZRXO9WVTGT37OXy+Toz3bWQk/PZzN8eqtsilo=
 github.com/cheqd/iavl v1.2.2-uneven-heights.0.20250808065519-2c3d5a9959cc/go.mod h1:GiM43q0pB+uG53mLxLDzimxM9l/5N9UuSY3/D0huuVw=
-github.com/cheqd/price-feeder v0.50.13-cheqd-holistic.0.20251017051402-1755c7429f9d h1:/bthuJBYYhw1cSl0a/zoM9YEKAkfcgwlrFAg50A8WfY=
-github.com/cheqd/price-feeder v0.50.13-cheqd-holistic.0.20251017051402-1755c7429f9d/go.mod h1:Z5J2aR1G3MXw30lGP5dqP2+fFRyqa+x3+CvTCrsJpK4=
+github.com/cheqd/price-feeder v0.50.13-cheqd-holistic.0.20251023050811-1ebf9b01b9a1 h1:/3b/Qzz/CgFJ3wyeg4ftX8l2lQoJQPzlT1OWux4v3PI=
+github.com/cheqd/price-feeder v0.50.13-cheqd-holistic.0.20251023050811-1ebf9b01b9a1/go.mod h1:oXu4V5h3zKG9ZBoQgJhQT8XuTxXO41ZTi92WLR3dSFY=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
 github.com/chzyer/logex v1.2.1 h1:XHDu3E6q+gdHgsdTPH6ImJMIp436vR6MPtH8gP05QzM=
 github.com/chzyer/logex v1.2.1/go.mod h1:JLbx6lG2kDbNRFnfkgvh4eRJRPX1QCoOIWomwysCBrQ=
