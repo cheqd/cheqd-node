@@ -1492,6 +1492,11 @@ func (app *App) RegisterUpgradeHandlers() {
 				return nil, err
 			}
 
+			versionMap, err := app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+			if err != nil {
+				return nil, err
+			}
+
 			// update expedited gov proposal params
 			sdkCtx.Logger().Info("Updating expedited gov proposal params")
 			govParams, err := app.GovKeeper.Params.Get(sdkCtx)
@@ -1503,7 +1508,7 @@ func (app *App) RegisterUpgradeHandlers() {
 				return nil, err
 			}
 
-			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+			return versionMap, nil
 		},
 	)
 }
