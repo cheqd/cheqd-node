@@ -140,6 +140,7 @@ import (
 	porttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
+	solomachine "github.com/cosmos/ibc-go/v8/modules/light-clients/06-solomachine"
 	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 	ibctmmigrations "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint/migrations"
 	"github.com/gorilla/mux"
@@ -304,6 +305,7 @@ func New(
 
 	std.RegisterLegacyAminoCodec(legacyAmino)
 	std.RegisterInterfaces(interfaceRegistry)
+	solomachine.RegisterInterfaces(interfaceRegistry)
 
 	// Below we could construct and set an application specific mempool and
 	// ABCI 1.0 PrepareProposal and ProcessProposal handlers. These defaults are
@@ -795,6 +797,7 @@ func New(
 		ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
 		icq.NewAppModule(app.ICQKeeper, app.GetSubspace(icqtypes.ModuleName)),
 		ibctm.NewAppModule(),
+		solomachine.NewAppModule(),
 
 		// cheqd modules
 		globalfee.NewAppModule(app.interfaceRegistry, app.GetSubspace(globalfeetypes.ModuleName), app.GlobalFeeKeeper),
