@@ -17,7 +17,6 @@ import (
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
-	solomachine "github.com/cosmos/ibc-go/v8/modules/light-clients/06-solomachine"
 )
 
 // The following structs are overridden from the tendermint codebase.
@@ -222,8 +221,6 @@ func MakeCodecWithExtendedRegistry() codec.Codec {
 		&didv2.MsgBurn{},
 		&didv2.MsgMint{},
 	)
-
-	solomachine.RegisterInterfaces(interfaceRegistry)
 
 	return codec.NewProtoCodec(interfaceRegistry)
 }

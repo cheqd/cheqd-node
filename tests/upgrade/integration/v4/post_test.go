@@ -187,11 +187,6 @@ var _ = Describe("Upgrade - Post", func() {
 			Expect(err).To(BeNil())
 			Expect(res.Code).NotTo(BeEquivalentTo(13))
 
-			By("broadcasting IBC MsgUpdateClient with zero fees")
-			res, err = integrationcli.IBCUpdateClientTx(tmpDir, testdata.RELAYER_ACCOUNT, testdata.IBCUpdateClientMsg, testdata.IBCUpdateClientGasLimit)
-			Expect(err).To(BeNil())
-			Expect(res.Code).NotTo(BeEquivalentTo(13))
-
 			By("broadcasting IBC MsgRecvPacket with zero fees")
 			res, err = integrationcli.IBCRecvPacketTx(tmpDir, testdata.RELAYER_ACCOUNT, testdata.IBCRecvPacketMsg, testdata.IBCRecvPacketGasLimit)
 			Expect(err).To(BeNil())

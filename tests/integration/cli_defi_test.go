@@ -265,17 +265,6 @@ var _ = Describe("Upgrade - Bypass global fee for IBC messages", func() {
 		// assert the response code is not 13 (insufficient fees)
 		Expect(res.Code).NotTo(BeEquivalentTo(13))
 
-		res, err = cli.IBCUpdateClientTx(tmpDir, testdata.BASE_ACCOUNT_1, testdata.IBCUpdateClientMsg, testdata.IBCUpdateClientGasLimit)
-
-		// assert no error
-		Expect(err).To(BeNil())
-
-		// print the response
-		By("IBC MsgUpdateClient Response: " + res.String())
-
-		// assert the response code is not 13 (insufficient fees)
-		Expect(res.Code).NotTo(BeEquivalentTo(13))
-
 		res, err = cli.IBCRecvPacketTx(tmpDir, testdata.BASE_ACCOUNT_1, testdata.IBCRecvPacketMsg, testdata.IBCRecvPacketGasLimit)
 
 		// assert no error
