@@ -5,6 +5,7 @@ package integration
 import (
 	"fmt"
 	"path/filepath"
+	"time"
 
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	integrationcli "github.com/cheqd/cheqd-node/tests/integration/cli"
@@ -76,6 +77,9 @@ var _ = Describe("Upgrade - Post", func() {
 			By("restart container which was stopped while export command")
 			_, err := cli.LocalnetStartContainer(cli.Validator2)
 			Expect(err).To(BeNil())
+
+			// wait for sometime to get node start
+			time.Sleep(2 * time.Second)
 
 			By("fetching the current chain height")
 			currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)

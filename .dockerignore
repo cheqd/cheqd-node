@@ -4,7 +4,6 @@
 # Skip build/test folders
 installer/**
 networks/**
-tests/**
 
 # Skip Git-related folders
 .github/**
