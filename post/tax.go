@@ -12,6 +12,8 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	globalfeekeeper "github.com/noble-assets/globalfee/keeper"
+	feeabstypes "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/types"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
@@ -22,18 +24,22 @@ type TaxDecorator struct {
 	feegrantKeeper  ante.FeegrantKeeper
 	didKeeper       cheqdante.DidKeeper
 	resourceKeeper  cheqdante.ResourceKeeper
+	feeabsKeeper    FeeAbsKeeper
 	feemarketKeeper FeeMarketKeeper
+	globalFeeKeeper *globalfeekeeper.Keeper
 }
 
 // NewTaxDecorator returns a new taxDecorator
-func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper, fmk FeeMarketKeeper) TaxDecorator {
+func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper, fak FeeAbsKeeper, fmk FeeMarketKeeper, gfk *globalfeekeeper.Keeper) TaxDecorator {
 	return TaxDecorator{
 		accountKeeper:   ak,
 		bankKeeper:      bk,
 		feegrantKeeper:  fk,
 		didKeeper:       dk,
 		resourceKeeper:  rk,
+		feeabsKeeper:    fak,
 		feemarketKeeper: fmk,
+		globalFeeKeeper: gfk,
 	}
 }
 
@@ -59,6 +65,11 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 	if err != nil {
 		return ctx, err
 	}
+	// if bypassable, perform no-op
+	if cheqdante.ShouldBypassFeeMarket(ctx, td.globalFeeKeeper, tx) {
+		return next(ctx, tx, simulate, success)
+	}
+
 	if taxable {
 		err := td.handleTaxableTransaction(ctx, feeTx, simulate, rewards, burn, tx)
 		if err != nil {
@@ -351,34 +362,86 @@ func (td *TaxDecorator) handleTaxableTransaction(
 	}
 
 	nativeDenom := params.FeeDenom
+	tax := rewards.Add(burn...)
 
-	// Check if fees contain only the native denom, if it is IBC denom fee abs logic applies.
-	// The fees will be deducted from the fee payer and the tokens already sent to did module account.
 	onlyNativeDenom := true
+	var ibcFees sdk.Coins
+	var nativeFees sdk.Coins
 	for _, fee := range feeTx.GetFee() {
 		if fee.Denom != nativeDenom {
-			// If any other token besides the native denom is present, set the flag to false
 			onlyNativeDenom = false
-			break
+			ibcFees = ibcFees.Add(fee)
+			continue
 		}
+		nativeFees = nativeFees.Add(fee)
 	}
 
-	// if the fees are only in native denom then fee-abs logic won't be applied and deduct the fees from fee payer.
+	//nolint:nestif
 	if onlyNativeDenom {
-		// Validate the tax
-		if err := td.validateTax(feeTx.GetFee(), simulate); err != nil {
+		if err := td.validateTax(tax, simulate); err != nil {
 			return err
 		}
 
-		// Get fee payer and check if fee grant exists
-		tax := rewards.Add(burn...)
 		feePayer, err := td.getFeePayer(ctx, feeTx, tax, tx.GetMsgs())
 		if err != nil {
 			return err
 		}
-		// Deduct tax from fee payer
+
 		if err := td.deductTaxFromFeePayer(ctx, feePayer, tax); err != nil {
 			return err
+		}
+	} else {
+		if td.feeabsKeeper == nil {
+			return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "fee abstraction keeper is not configured")
+		}
+
+		feePayer, err := td.getFeePayer(ctx, feeTx, feeTx.GetFee(), tx.GetMsgs())
+		if err != nil {
+			return err
+		}
+
+		convertedNative := math.ZeroInt()
+		for _, feeCoin := range ibcFees {
+			hostConfig, found := td.feeabsKeeper.GetHostZoneConfig(ctx, feeCoin.Denom)
+			if !found {
+				return errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "unsupported ibc fee denom: %s", feeCoin.Denom)
+			}
+
+			nativeCoins, err := td.feeabsKeeper.CalculateNativeFromIBCCoins(ctx, sdk.NewCoins(feeCoin), hostConfig)
+			if err != nil {
+				return err
+			}
+			convertedNative = convertedNative.Add(nativeCoins.AmountOf(nativeDenom))
+		}
+
+		taxAmount := tax.AmountOf(nativeDenom)
+		totalAvailable := convertedNative.Add(nativeFees.AmountOf(nativeDenom))
+		if totalAvailable.LT(taxAmount) {
+			return errorsmod.Wrapf(sdkerrors.ErrInsufficientFee, "insufficient native amount to cover tax; required %s%s, available %s%s", taxAmount.String(), nativeDenom, totalAvailable.String(), nativeDenom)
+		}
+
+		if !ibcFees.IsZero() {
+			if err := td.bankKeeper.SendCoinsFromAccountToModule(ctx, feePayer.GetAddress(), feeabstypes.ModuleName, ibcFees); err != nil {
+				return errorsmod.Wrapf(sdkerrors.ErrInsufficientFunds, "failed to transfer ibc fees from %s: %s", feePayer.GetAddress(), err)
+			}
+		}
+
+		convertedContribution := convertedNative
+		if convertedContribution.GT(taxAmount) {
+			convertedContribution = taxAmount
+		}
+		if convertedContribution.IsPositive() {
+			if err := td.bankKeeper.SendCoinsFromModuleToModule(ctx, feeabstypes.ModuleName, didtypes.ModuleName, sdk.NewCoins(sdk.NewCoin(nativeDenom, convertedContribution))); err != nil {
+				return err
+			}
+		}
+
+		remainingTax := taxAmount.Sub(convertedContribution)
+		if remainingTax.IsPositive() {
+			remaining := sdk.NewCoins(sdk.NewCoin(nativeDenom, remainingTax))
+			if err := td.deductTaxFromFeePayer(ctx, feePayer, remaining); err != nil {
+				return err
+			}
 		}
 	}
 

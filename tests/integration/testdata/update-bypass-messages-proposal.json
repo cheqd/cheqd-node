@@ -1,0 +1,17 @@
+{
+    "messages": [
+        {
+            "@type": "/noble.globalfee.v1.MsgUpdateBypassMessages",
+            "signer": "cheqd10d07y265gmmuvt4z0w9aw880jnsr700j5ql9az",
+            "bypass_messages": [
+                "/ibc.core.channel.v1.MsgAcknowledgement",
+                "/ibc.core.client.v1.MsgUpdateClient",
+                "/ibc.core.channel.v1.MsgRecvPacket",
+                "/ibc.core.channel.v1.MsgTimeout"
+            ]
+        }
+    ],
+    "deposit": "10000000000ncheq",
+    "title": "Bypass messages proposal",
+    "summary": "Proposal to update the bypass messages using gov authority address"
+}

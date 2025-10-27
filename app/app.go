@@ -136,6 +136,7 @@ import (
 	ibcclient "github.com/cosmos/ibc-go/v8/modules/core/02-client"
 	ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	ibcconnectiontypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
+	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	porttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
@@ -148,6 +149,9 @@ import (
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
 
+	globalfee "github.com/noble-assets/globalfee"
+	globalfeekeeper "github.com/noble-assets/globalfee/keeper"
+	globalfeetypes "github.com/noble-assets/globalfee/types"
 	feemarketmodule "github.com/skip-mev/feemarket/x/feemarket"
 	feemarketkeeper "github.com/skip-mev/feemarket/x/feemarket/keeper"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
@@ -229,6 +233,7 @@ type App struct {
 	TransferKeeper        ibctransferkeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	FeeMarketKeeper       *feemarketkeeper.Keeper
+	GlobalFeeKeeper       *globalfeekeeper.Keeper
 	AuthzKeeper           authzkeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
@@ -364,6 +369,7 @@ func New(
 		feeabstypes.StoreKey,
 		feemarkettypes.StoreKey,
 		circuittypes.StoreKey,
+		globalfeetypes.ModuleName,
 	)
 
 	tkeys := storetypes.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -560,6 +566,13 @@ func New(
 		app.IBCKeeper.ChannelKeeper, // may be replaced with IBC middleware
 		app.IBCKeeper.ChannelKeeper,
 		app.IBCKeeper.PortKeeper, app.AccountKeeper, app.BankKeeper,
+	)
+
+	app.GlobalFeeKeeper = globalfeekeeper.NewKeeper(
+		authority,
+		app.interfaceRegistry,
+		runtime.NewKVStoreService(keys[globalfeetypes.ModuleName]),
+		appCodec,
 	)
 
 	// ICA Controller keeper
@@ -784,6 +797,7 @@ func New(
 		ibctm.NewAppModule(),
 
 		// cheqd modules
+		globalfee.NewAppModule(app.interfaceRegistry, app.GetSubspace(globalfeetypes.ModuleName), app.GlobalFeeKeeper),
 		feemarketmodule.NewAppModule(appCodec, *app.FeeMarketKeeper),
 		did.NewAppModule(appCodec, app.DidKeeper, app.GetSubspace(didtypes.ModuleName)),
 		resource.NewAppModule(appCodec, app.ResourceKeeper, app.DidKeeper, app.GetSubspace(resourcetypes.ModuleName)),
@@ -846,6 +860,7 @@ func New(
 		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		globalfeetypes.ModuleName,
 		feemarkettypes.ModuleName,
 	)
 
@@ -876,6 +891,7 @@ func New(
 		icqtypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		globalfeetypes.ModuleName,
 		feemarkettypes.ModuleName,
 	)
 
@@ -912,6 +928,7 @@ func New(
 		circuittypes.ModuleName,
 		didtypes.ModuleName,
 		resourcetypes.ModuleName,
+		globalfeetypes.ModuleName,
 		feemarkettypes.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
@@ -1004,6 +1021,8 @@ func (app *App) setAnteHandler(txConfig client.TxConfig) {
 		FeeAbskeeper:    app.FeeabsKeeper,
 		FeeMarketKeeper: app.FeeMarketKeeper,
 		CircuitKeeper:   &app.CircuitKeeper,
+		TxFeeChecker:    cheqdante.TxFeeChecker(app.GlobalFeeKeeper),
+		GlobalFeeKeeper: app.GlobalFeeKeeper,
 	})
 	if err != nil {
 		panic(err)
@@ -1020,6 +1039,7 @@ func (app *App) setPostHandler() {
 		FeegrantKeeper:  app.FeeGrantKeeper,
 		DidKeeper:       app.DidKeeper,
 		ResourceKeeper:  app.ResourceKeeper,
+		FeeAbsKeeper:    app.FeeabsKeeper,
 		FeeMarketKeeper: app.FeeMarketKeeper,
 	})
 	if err != nil {
@@ -1260,6 +1280,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(didtypes.ModuleName).WithKeyTable(didtypes.ParamKeyTable())
 	paramsKeeper.Subspace(resourcetypes.ModuleName).WithKeyTable(resourcetypes.ParamKeyTable())
 	paramsKeeper.Subspace(feeabstypes.ModuleName).WithKeyTable(feeabstypes.ParamKeyTable())
+	//nolint:staticcheck
+	paramsKeeper.Subspace(globalfeetypes.ModuleName).WithKeyTable(globalfeetypes.ParamKeyTable())
 	paramsKeeper.Subspace(icqtypes.ModuleName)
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
 
@@ -1435,6 +1457,57 @@ func (app *App) RegisterUpgradeHandlers() {
 			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
 		},
 	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		upgradeV4.MinorUpgradeName,
+		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			// define type url of the message to bypass
+			sdkCtx := sdk.UnwrapSDKContext(ctx)
+			sdkCtx.Logger().Info("Bypassing fee for MsgAcknowledgement")
+
+			// allow MsgAcknowledgement to bypass fees, i.e. be executed with zero fees
+			// as otherwise, relayers would need to pay fees on destination chain for every packet
+			if err := app.GlobalFeeKeeper.BypassMessages.Set(ctx, sdk.MsgTypeURL(&channeltypes.MsgAcknowledgement{})); err != nil {
+				return nil, err
+			}
+
+			// allow MsgUpdateClient to bypass fees
+			sdkCtx.Logger().Info("Bypassing fee for MsgUpdateClient")
+			if err := app.GlobalFeeKeeper.BypassMessages.Set(ctx, sdk.MsgTypeURL(&ibcclienttypes.MsgUpdateClient{})); err != nil {
+				return nil, err
+			}
+
+			// allow MsgRecvPacket to bypass fees
+			sdkCtx.Logger().Info("Bypassing fee for MsgRecvPacket")
+			if err := app.GlobalFeeKeeper.BypassMessages.Set(ctx, sdk.MsgTypeURL(&channeltypes.MsgRecvPacket{})); err != nil {
+				return nil, err
+			}
+
+			// allow MsgTimeout to bypass fees
+			sdkCtx.Logger().Info("Bypassing fee for MsgTimeout")
+			if err := app.GlobalFeeKeeper.BypassMessages.Set(ctx, sdk.MsgTypeURL(&channeltypes.MsgTimeout{})); err != nil {
+				return nil, err
+			}
+
+			versionMap, err := app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+			if err != nil {
+				return nil, err
+			}
+
+			// update expedited gov proposal params
+			sdkCtx.Logger().Info("Updating expedited gov proposal params")
+			govParams, err := app.GovKeeper.Params.Get(sdkCtx)
+			if err != nil {
+				return nil, err
+			}
+			govParams.ExpeditedMinDeposit = sdk.NewCoins(sdk.NewCoin(resourcetypes.BaseMinimalDenom, sdkmath.NewInt(8000000000000))) // 8000 CHEQ, identical to regular min deposit
+			if err := app.GovKeeper.Params.Set(sdkCtx, govParams); err != nil {
+				return nil, err
+			}
+
+			return versionMap, nil
+		},
+	)
 }
 
 // configure store loader that checks if version == upgradeHeight and applies store upgrades
@@ -1467,6 +1540,16 @@ func (app *App) setupUpgradeStoreLoaders() {
 
 	if upgradeInfo.Name == upgradeV4.PatchUpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := storetypes.StoreUpgrades{}
+		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	}
+
+	if upgradeInfo.Name == upgradeV4.MinorUpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		storeUpgrades := storetypes.StoreUpgrades{
+			Added: []string{
+				globalfeetypes.ModuleName,
+			},
+		}
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 	}

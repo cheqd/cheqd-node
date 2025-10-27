@@ -16,6 +16,7 @@ import (
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
+	globalfeetypes "github.com/noble-assets/globalfee/types"
 )
 
 // The following structs are overridden from the tendermint codebase.
@@ -180,6 +181,7 @@ func MakeCodecWithExtendedRegistry() codec.Codec {
 		&govtypesv1.MsgExecLegacyContent{},
 		&didv2.MsgBurn{},
 		&didv2.MsgMint{},
+		&globalfeetypes.MsgUpdateBypassMessages{},
 	)
 
 	return codec.NewProtoCodec(interfaceRegistry)

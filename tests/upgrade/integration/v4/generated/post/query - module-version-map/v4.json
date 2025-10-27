@@ -66,6 +66,10 @@
         "version": 1
       },
       {
+        "name": "globalfee",
+        "version": 2
+      },
+      {
         "name": "gov",
         "version": 5
       },

@@ -8,6 +8,7 @@ import (
 
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	integrationcli "github.com/cheqd/cheqd-node/tests/integration/cli"
+	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	cli "github.com/cheqd/cheqd-node/tests/upgrade/integration/v4/cli"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -161,6 +162,55 @@ var _ = Describe("Upgrade - Post", func() {
 			expectedBalance := balanceBefore.Sub(sdk.NewCoin(didtypes.BaseMinimalDenom, sdkmath.NewInt(1000)))
 			diff := balanceAfter.Amount.Sub(expectedBalance.Amount)
 			Expect(diff).To(Equal(sdkmath.NewInt(1000)))
+		})
+
+		It("should ensure whitelisted IBC messages bypass global fees", func() {
+			By("querying the globalfee bypass messages")
+			bypassMessages, err := integrationcli.QueryBypassMessages()
+			Expect(err).To(BeNil())
+
+			expectedBypassMessages := []string{
+				"/ibc.core.channel.v1.MsgAcknowledgement",
+				"/ibc.core.client.v1.MsgUpdateClient",
+				"/ibc.core.channel.v1.MsgRecvPacket",
+				"/ibc.core.channel.v1.MsgTimeout",
+			}
+
+			for _, typeURL := range expectedBypassMessages {
+				Expect(bypassMessages).To(ContainElement(typeURL))
+			}
+
+			tmpDir := GinkgoT().TempDir()
+
+			By("broadcasting IBC MsgAcknowledgement with zero fees")
+			res, err := integrationcli.IBCAcknowledgementTx(tmpDir, testdata.RELAYER_ACCOUNT, testdata.IBCAcknowledgementMsg, testdata.IBCAcknowledgementGasLimit)
+			Expect(err).To(BeNil())
+			Expect(res.Code).NotTo(BeEquivalentTo(13))
+
+			By("broadcasting IBC MsgRecvPacket with zero fees")
+			res, err = integrationcli.IBCRecvPacketTx(tmpDir, testdata.RELAYER_ACCOUNT, testdata.IBCRecvPacketMsg, testdata.IBCRecvPacketGasLimit)
+			Expect(err).To(BeNil())
+			Expect(res.Code).NotTo(BeEquivalentTo(13))
+
+			By("broadcasting IBC MsgTimeout with zero fees")
+			res, err = integrationcli.IBCTimeoutTx(tmpDir, testdata.RELAYER_ACCOUNT, testdata.IBCTimeoutMsg, testdata.IBCTimeoutGasLimit)
+			Expect(err).To(BeNil())
+			Expect(res.Code).NotTo(BeEquivalentTo(13))
+		})
+
+		It("should ensure governance expedited deposit params are restored", func() {
+			By("querying the governance module params")
+			govParams, err := cli.QueryGovParams(cli.Validator0)
+			Expect(err).To(BeNil())
+			Expect(govParams.Params).NotTo(BeNil())
+
+			By("verifying the expedited minimum deposit matches the expected coin")
+			expeditedDeposit := govParams.Params.ExpeditedMinDeposit
+			Expect(expeditedDeposit).To(HaveLen(1))
+
+			expeditedCoin := expeditedDeposit[0]
+			Expect(expeditedCoin.Denom).To(Equal(didtypes.BaseMinimalDenom))
+			Expect(expeditedCoin.Amount.String()).To(Equal("8000000000000"))
 		})
 	})
 })
