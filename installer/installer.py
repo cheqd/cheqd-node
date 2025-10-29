@@ -1210,7 +1210,6 @@ class Installer():
             logging.exception(f"Failed to configure cheqd-noded settings. Reason: {e}")
             return False
 
-    
 
     def _get_latest_block_height(self, rpc_endpoint: str) -> int:
         try:
@@ -1235,7 +1234,6 @@ class Installer():
             logging.exception(f"Failed to fetch block hash at height {height} from {rpc_endpoint}. Reason: {e}")
             raise
 
-    
 
     def configure_statesync(self) -> bool:
         # Configure statesync settings in config.toml using selected network RPCs
@@ -1261,7 +1259,10 @@ class Installer():
                 trust_hash = self._get_block_hash_at_height(working_rpc, trust_height)
             except Exception:
                 logging.warning(
-                    "Could not fetch trusted state from %s. Please calculate trust_height and trust_hash manually and update config.toml.",
+                    "Could not fetch trusted state from %s. "
+                    "Please calculate trust_height and trust_hash manually and update config.toml. "
+                    "See more details at "
+                    "https://docs.cheqd.io/node/validator-guides/validator-guide/reenable-pruning#state-sync",
                     working_rpc,
                 )
 
