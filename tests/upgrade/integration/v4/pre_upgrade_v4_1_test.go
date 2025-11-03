@@ -11,8 +11,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Upgrade_v4_2 - Pre", func() {
-	ProposalID := "3"
+var _ = Describe("Upgrade_v4_1 - Pre", func() {
+	ProposalID := "2"
 
 	Context("Before a software upgrade execution is initiated", func() {
 		It("should wait for node catching up", func() {
@@ -45,7 +45,7 @@ var _ = Describe("Upgrade_v4_2 - Pre", func() {
 
 		It("should submit a software upgrade proposal", func() {
 			By("sending a SubmitUpgradeProposal transaction from `validator0` container")
-			res, err := cli.SubmitUpgradeProposal(cli.FeatureUpgradeName, VotingEndHeight, cli.Validator0)
+			res, err := cli.SubmitUpgradeProposal(cli.MinorUpgradeName, VotingEndHeight, cli.Validator0)
 			Expect(err).To(BeNil())
 			Expect(res.Code).To(BeEquivalentTo(0))
 		})

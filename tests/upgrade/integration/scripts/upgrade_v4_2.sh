@@ -7,7 +7,7 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 pushd "$DIR/../../../../docker/localnet"
 
 # Stop network
-docker compose --env-file upgrade-v4-latest.env down
+docker compose --env-file upgrade-v4-1-latest.env down
 
 # Start network
 docker compose --env-file build-latest.env up --detach --no-build
