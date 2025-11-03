@@ -377,7 +377,7 @@ func New(
 		feemarkettypes.StoreKey,
 		circuittypes.StoreKey,
 		oracletypes.StoreKey,
-		globalfeetypes.StoreKey,
+		globalfeetypes.ModuleName,
 	)
 
 	tkeys := storetypes.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -1078,11 +1078,11 @@ func (app *App) setPostHandler() {
 		FeegrantKeeper:  app.FeeGrantKeeper,
 		DidKeeper:       app.DidKeeper,
 		ResourceKeeper:  app.ResourceKeeper,
-		FeeAbsKeeper:    app.FeeabsKeeper,
 		FeeMarketKeeper: app.FeeMarketKeeper,
 		OracleKeeper:    app.OracleKeeper,
 		FeeabsKeeper:    app.FeeabsKeeper,
 		PriceFeeder:     app.OracleKeeper.PriceFeeder,
+		GlobalFeeKeeper: app.GlobalFeeKeeper,
 	})
 	if err != nil {
 		panic(err)
