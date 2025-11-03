@@ -29,7 +29,7 @@ func (suite *UpgradeTestSuite) TestV4MinorUpgradeHandler() {
 	suite.Setup()
 
 	const upgradeHeight = 10
-	const upgradeName = v4.MinorUpgradeName
+	const upgradeName = v4.FeatureUpgradeName
 	denom := oracletypes.DefaultParams().UsdcIbcDenom
 
 	// -----------------------------
