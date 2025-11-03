@@ -291,6 +291,9 @@ func QueryOracleParams() (oracletypes.QueryParamsResponse, error) {
 // QueryAggregateVote queries the aggregate vote for a validator
 func QueryAggregateVote(validatorAddr string) (*oracletypes.QueryAggregateVoteResponse, error) {
 	res, err := Query("oracle", "aggregate-votes", validatorAddr)
+	if err != nil {
+		return nil, err
+	}
 	var resp oracletypes.QueryAggregateVoteResponse
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
