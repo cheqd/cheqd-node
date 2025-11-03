@@ -49,7 +49,7 @@ func SubmitUpgradeProposalLegacy(upgradeHeight int64, container string) (sdk.TxR
 	args := append([]string{
 		CliBinaryName,
 		"tx", "gov", "submit-legacy-proposal", "software-upgrade",
-		UpgradeName,
+		FeatureUpgradeName,
 		"--title", "Upgrade Title",
 		"--description", "Upgrade Description",
 		"--upgrade-height", strconv.FormatInt(upgradeHeight, 10),

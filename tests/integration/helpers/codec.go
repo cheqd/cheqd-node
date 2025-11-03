@@ -32,6 +32,7 @@ func init() {
 	param.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	oracletypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	upgradetypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	globalfeetypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	Codec = encodingConfig.Codec
 	Registry = encodingConfig.InterfaceRegistry
 }
