@@ -10,6 +10,7 @@ import (
 	"github.com/cheqd/cheqd-node/tests/integration/testdata"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -148,5 +149,142 @@ var _ = Describe("Upgrade - Feemarket fees (non-taxable transactions)", func() {
 
 		// assert the response code is 0
 		Expect(res.Code).To(BeEquivalentTo(0))
+	})
+})
+
+var _ = Describe("Upgrade - Bypass global fee for IBC messages", func() {
+	It("should successfully submit an IBC MsgAcknowledgement, MsgUpdateClient, MsgRecvPacket, MsgTimeout with zero fees", func() {
+		// submit a proposal to update the bypass messages
+		res, err := cli.SubmitProposalTx(cli.Operator0, "testdata/update-bypass-messages-proposal.json", cli.CliGasParams)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// query the transaction to get the proposal ID
+		res, err = cli.QueryTxn(res.TxHash)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// get the proposal ID from the events
+		proposalID, err := cli.GetProposalID(res.Events)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// assert the response code is 0
+		Expect(res.Code).To(BeEquivalentTo(0))
+
+		// get current block height
+		currentHeight, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// wait for the proposal to be included in a block
+		err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, 2)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// vote "yes" for the proposal from validator1
+		res, err = cli.VoteProposalTx(cli.Operator1, proposalID, "yes", cli.CliGasParams)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// vote "yes" for the proposal from validator2
+		res, err = cli.VoteProposalTx(cli.Operator2, proposalID, "yes", cli.CliGasParams)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// vote "yes" for the proposal from validator0
+		res, err = cli.VoteProposalTx(cli.Operator0, proposalID, "yes", cli.CliGasParams)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// vote "yes" for the proposal from validator3
+		res, err = cli.VoteProposalTx(cli.Operator3, proposalID, "yes", cli.CliGasParams)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// get current block height
+		currentHeight, err = cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// wait for the proposal to pass
+		err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+20, 25)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// verify the proposal has passed
+		resp, err := cli.QueryProposal(cli.Validator0, proposalID)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// assert the proposal status is "passed"
+		Expect(resp.Status).To(BeEquivalentTo(govtypesv1.StatusPassed))
+
+		// verify the bypass messages include the IBC MsgAcknowledgement
+		bypassMessages, err := cli.QueryBypassMessages()
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// assert the bypass messages include the IBC MsgAcknowledgement type URL
+		Expect(bypassMessages).To(ContainElement("/ibc.core.channel.v1.MsgAcknowledgement"))
+
+		// assert the bypass messages include the IBC MsgUpdateClient type URL
+		Expect(bypassMessages).To(ContainElement("/ibc.core.client.v1.MsgUpdateClient"))
+
+		// assert the bypass messages include the IBC MsgRecvPacket type URL
+		Expect(bypassMessages).To(ContainElement("/ibc.core.channel.v1.MsgRecvPacket"))
+
+		// assert the bypass messages include the IBC MsgTimeout type URL
+		Expect(bypassMessages).To(ContainElement("/ibc.core.channel.v1.MsgTimeout"))
+
+		// create a temporary directory for the transaction files
+		tmpDir := GinkgoT().TempDir()
+
+		// send the IBC MsgAcknowledgement, balance assertions are intentionally omitted or out of scope
+		res, err = cli.IBCAcknowledgementTx(tmpDir, testdata.BASE_ACCOUNT_1, testdata.IBCAcknowledgementMsg, testdata.IBCAcknowledgementGasLimit)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// print the response
+		By("IBC MsgAcknowledgement Response: " + res.String())
+
+		// assert the response code is not 13 (insufficient fees)
+		Expect(res.Code).NotTo(BeEquivalentTo(13))
+
+		res, err = cli.IBCRecvPacketTx(tmpDir, testdata.BASE_ACCOUNT_1, testdata.IBCRecvPacketMsg, testdata.IBCRecvPacketGasLimit)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// print the response
+		By("IBC MsgRecvPacket Response: " + res.String())
+
+		// assert the response code is not 13 (insufficient fees)
+		Expect(res.Code).NotTo(BeEquivalentTo(13))
+
+		res, err = cli.IBCTimeoutTx(tmpDir, testdata.BASE_ACCOUNT_1, testdata.IBCTimeoutMsg, testdata.IBCTimeoutGasLimit)
+
+		// assert no error
+		Expect(err).To(BeNil())
+
+		// print the response
+		By("IBC MsgTimeout Response: " + res.String())
+
+		// assert the response code is not 13 (insufficient fees)
+		Expect(res.Code).NotTo(BeEquivalentTo(13))
 	})
 })

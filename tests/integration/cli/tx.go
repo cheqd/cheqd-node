@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"cosmossdk.io/math"
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
@@ -34,6 +35,46 @@ var CliGasParams = []string{
 	"--gas-prices", GasPrices,
 }
 
+type jsonTx struct {
+	Body       txBody     `json:"body"`
+	AuthInfo   txAuthInfo `json:"auth_info"`
+	Signatures []string   `json:"signatures,omitempty"`
+}
+
+type txBody struct {
+	Messages                    []json.RawMessage `json:"messages"`
+	Memo                        string            `json:"memo,omitempty"`
+	TimeoutHeight               string            `json:"timeout_height,omitempty"`
+	ExtensionOptions            []json.RawMessage `json:"extension_options,omitempty"`
+	NonCriticalExtensionOptions []json.RawMessage `json:"non_critical_extension_options,omitempty"`
+}
+
+type txAuthInfo struct {
+	SignerInfos []txSignerInfo `json:"signer_infos"`
+	Fee         txFee          `json:"fee"`
+}
+
+type txSignerInfo struct {
+	PublicKey *json.RawMessage `json:"public_key"`
+	ModeInfo  txModeInfo       `json:"mode_info"`
+	Sequence  string           `json:"sequence"`
+}
+
+type txModeInfo struct {
+	Single *txSingleModeInfo `json:"single,omitempty"`
+}
+
+type txSingleModeInfo struct {
+	Mode string `json:"mode"`
+}
+
+type txFee struct {
+	Amount   sdk.Coins `json:"amount"`
+	GasLimit string    `json:"gas_limit"`
+	Payer    string    `json:"payer,omitempty"`
+	Granter  string    `json:"granter,omitempty"`
+}
+
 func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxResponse, error) {
 	args := []string{"tx", module, tx}
 
@@ -63,6 +104,76 @@ func Tx(module, tx, from string, feeParams []string, txArgs ...string) (sdk.TxRe
 
 	err = helpers.Codec.UnmarshalJSON([]byte(output), &resp)
 	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	return resp, nil
+}
+
+func SignTx(tmpDir, from string, msg json.RawMessage, fee sdk.Coins, gasLimit uint64) (string, error) {
+	if fee == nil {
+		fee = sdk.NewCoins()
+	}
+
+	unsigned := jsonTx{
+		Body: txBody{
+			Messages:      []json.RawMessage{msg},
+			TimeoutHeight: "0",
+		},
+		AuthInfo: txAuthInfo{
+			SignerInfos: []txSignerInfo{},
+			Fee: txFee{
+				Amount:   fee,
+				GasLimit: strconv.FormatUint(gasLimit, 10),
+				Payer:    "",
+				Granter:  "",
+			},
+		},
+	}
+	unsigned.Signatures = []string{}
+
+	unsignedJSON, err := json.Marshal(&unsigned)
+	if err != nil {
+		return "", err
+	}
+
+	unsignedFile := helpers.MustWriteTmpFile(tmpDir, unsignedJSON)
+
+	println("Unsigned tx written to:", unsignedFile)
+
+	args := []string{
+		"tx", "sign", unsignedFile,
+		"--from", from,
+		"--chain-id", network.ChainID,
+		"--keyring-backend", KeyringBackend,
+		"--output", OutputFormat,
+	}
+
+	output, err := Exec(args...)
+	if err != nil {
+		return "", err
+	}
+
+	return helpers.TrimImportedStdout(output), nil
+}
+
+func BroadcastTx(tmpDir, signedTxJSON string) (sdk.TxResponse, error) {
+	signedFile := helpers.MustWriteTmpFile(tmpDir, []byte(signedTxJSON))
+
+	args := []string{
+		"tx", "broadcast", signedFile,
+		"--output", OutputFormat,
+	}
+
+	output, err := Exec(args...)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	output = helpers.TrimImportedStdout(output)
+
+	var resp sdk.TxResponse
+	if err := helpers.Codec.UnmarshalJSON([]byte(output), &resp); err != nil {
 		return sdk.TxResponse{}, err
 	}
 
@@ -271,4 +382,40 @@ func ConvertUsdToCheq(usdAmt math.Int, cheqPrice math.LegacyDec) (math.Int, erro
 	usdDec := math.LegacyNewDecFromInt(usdAmt).Quo(math.LegacyNewDecFromInt(util.UsdExponent)) // convert from 1e18 scale
 	ncheqDec := usdDec.Quo(cheqPrice).MulInt64(util.CheqScale.Int64())                         // convert to 1e9 scale
 	return ncheqDec.TruncateInt(), nil
+}
+
+func IBCAcknowledgementTx(tmpDir string, from string, ack json.RawMessage, gasLimit uint64) (sdk.TxResponse, error) {
+	signed, err := SignTx(tmpDir, from, ack, sdk.NewCoins(), gasLimit)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	return BroadcastTx(tmpDir, signed)
+}
+
+func IBCUpdateClientTx(tmpDir string, from string, msg json.RawMessage, gasLimit uint64) (sdk.TxResponse, error) {
+	signed, err := SignTx(tmpDir, from, msg, sdk.NewCoins(), gasLimit)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	return BroadcastTx(tmpDir, signed)
+}
+
+func IBCRecvPacketTx(tmpDir string, from string, msg json.RawMessage, gasLimit uint64) (sdk.TxResponse, error) {
+	signed, err := SignTx(tmpDir, from, msg, sdk.NewCoins(), gasLimit)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	return BroadcastTx(tmpDir, signed)
+}
+
+func IBCTimeoutTx(tmpDir string, from string, msg json.RawMessage, gasLimit uint64) (sdk.TxResponse, error) {
+	signed, err := SignTx(tmpDir, from, msg, sdk.NewCoins(), gasLimit)
+	if err != nil {
+		return sdk.TxResponse{}, err
+	}
+
+	return BroadcastTx(tmpDir, signed)
 }

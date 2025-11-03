@@ -8,6 +8,7 @@ import (
 	cheqdpost "github.com/cheqd/cheqd-node/post"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -16,6 +17,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/bank/testutil"
+	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
+	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
+	solomachine "github.com/cosmos/ibc-go/v8/modules/light-clients/06-solomachine"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	feeabsante "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/ante"
@@ -79,6 +83,171 @@ var _ = Describe("Fee tests on CheckTx", func() {
 		// zero gas is accepted in simulation mode
 		_, err = antehandler(s.ctx, tx, true)
 		Expect(err).To(BeNil())
+	})
+
+	It("Whitelisted Tx - Ensure zero fees", func() {
+		fallbackDecorator := ante.NewDeductFeeDecorator(
+			s.app.AccountKeeper,
+			s.app.BankKeeper,
+			s.app.FeeGrantKeeper,
+			cheqdante.TxFeeChecker(s.app.GlobalFeeKeeper),
+		)
+		feeMarketDecorator := feemarketante.NewFeeMarketCheckDecorator(
+			s.app.AccountKeeper,
+			s.app.BankKeeper,
+			s.app.FeeGrantKeeper,
+			s.app.FeeMarketKeeper,
+			fallbackDecorator,
+		)
+		feeDecorators := []sdk.AnteDecorator{
+			cheqdante.NewFeeMarketBypassDecorator(s.app.GlobalFeeKeeper, feeMarketDecorator, fallbackDecorator),
+		}
+		mfd := cheqdante.NewOverAllDecorator(feeDecorators...)
+		antehandler := sdk.ChainAnteDecorators(mfd)
+
+		priv1, _, addr1 := testdata.KeyTestPubAddr()
+		coins := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(1)))
+		err := testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, coins)
+		Expect(err).To(BeNil())
+
+		// whitelisted msg: MsgAcknowledgement
+		packet := channeltypes.NewPacket(
+			[]byte("data"),
+			1,
+			"transfer",
+			"channel-0",
+			"transfer",
+			"channel-1",
+			clienttypes.NewHeight(0, 1),
+			0,
+		)
+		msg := channeltypes.NewMsgAcknowledgement(
+			packet,
+			[]byte("ack"),
+			[]byte("proof"),
+			clienttypes.NewHeight(0, 1),
+			addr1.String(),
+		)
+		Expect(s.txBuilder.SetMsgs(msg)).To(BeNil())
+		s.txBuilder.SetFeeAmount(sdk.NewCoins())
+		s.txBuilder.SetGasLimit(100000)
+		s.txBuilder.SetFeePayer(addr1)
+
+		privs, accNums, accSeqs := []cryptotypes.PrivKey{priv1}, []uint64{0}, []uint64{0}
+		tx, err := s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+		Expect(err).To(BeNil())
+
+		err = s.app.GlobalFeeKeeper.BypassMessages.Set(s.ctx, sdk.MsgTypeURL(msg))
+		Expect(err).To(BeNil())
+
+		s.ctx = s.ctx.WithIsCheckTx(true)
+
+		_, err = antehandler(s.ctx, tx, false)
+
+		Expect(err).To(BeNil(), "Whitelisted Tx: MsgAcknowledgment: errored on zero fee in CheckTx")
+
+		s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
+
+		pubKeyAny, err := codectypes.NewAnyWithValue(priv1.PubKey())
+		Expect(err).To(BeNil())
+
+		header := &solomachine.Header{
+			Timestamp:      1,
+			Signature:      []byte{1},
+			NewPublicKey:   pubKeyAny,
+			NewDiversifier: "diversifier",
+		}
+
+		updateMsg, err := clienttypes.NewMsgUpdateClient("06-solomachine-0", header, addr1.String())
+		Expect(err).To(BeNil())
+		Expect(updateMsg.ValidateBasic()).To(BeNil())
+
+		err = s.app.GlobalFeeKeeper.BypassMessages.Set(s.ctx, sdk.MsgTypeURL(updateMsg))
+		Expect(err).To(BeNil())
+
+		Expect(s.txBuilder.SetMsgs(updateMsg)).To(BeNil())
+		s.txBuilder.SetFeeAmount(sdk.NewCoins())
+		s.txBuilder.SetGasLimit(100000)
+		s.txBuilder.SetFeePayer(addr1)
+
+		privs = []cryptotypes.PrivKey{priv1}
+		accNums = []uint64{0}
+		accSeqs = []uint64{0}
+
+		tx, err = s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+		Expect(err).To(BeNil())
+
+		err = s.app.GlobalFeeKeeper.BypassMessages.Set(s.ctx, sdk.MsgTypeURL(updateMsg))
+		Expect(err).To(BeNil())
+
+		s.ctx = s.ctx.WithIsCheckTx(true)
+
+		_, err = antehandler(s.ctx, tx, false)
+
+		Expect(err).To(BeNil(), "Whitelisted Tx: MsgUpdateClient: errored on zero fee in CheckTx")
+
+		s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
+
+		recvMsg := channeltypes.NewMsgRecvPacket(
+			packet,
+			[]byte("proof"),
+			clienttypes.NewHeight(0, 1),
+			addr1.String(),
+		)
+		Expect(recvMsg.ValidateBasic()).To(BeNil())
+
+		Expect(s.txBuilder.SetMsgs(recvMsg)).To(BeNil())
+		s.txBuilder.SetFeeAmount(sdk.NewCoins())
+		s.txBuilder.SetGasLimit(100000)
+		s.txBuilder.SetFeePayer(addr1)
+
+		privs = []cryptotypes.PrivKey{priv1}
+		accNums = []uint64{0}
+		accSeqs = []uint64{0}
+
+		tx, err = s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+		Expect(err).To(BeNil())
+
+		err = s.app.GlobalFeeKeeper.BypassMessages.Set(s.ctx, sdk.MsgTypeURL(recvMsg))
+		Expect(err).To(BeNil())
+
+		s.ctx = s.ctx.WithIsCheckTx(true)
+
+		_, err = antehandler(s.ctx, tx, false)
+
+		Expect(err).To(BeNil(), "Whitelisted Tx: MsgRecvPacket: errored on zero fee in CheckTx")
+
+		s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
+
+		timeoutMsg := channeltypes.NewMsgTimeout(
+			packet,
+			packet.Sequence,
+			[]byte("proof"),
+			clienttypes.NewHeight(0, 1),
+			addr1.String(),
+		)
+		Expect(timeoutMsg.ValidateBasic()).To(BeNil())
+
+		Expect(s.txBuilder.SetMsgs(timeoutMsg)).To(BeNil())
+		s.txBuilder.SetFeeAmount(sdk.NewCoins())
+		s.txBuilder.SetGasLimit(100000)
+		s.txBuilder.SetFeePayer(addr1)
+
+		privs = []cryptotypes.PrivKey{priv1}
+		accNums = []uint64{0}
+		accSeqs = []uint64{0}
+
+		tx, err = s.CreateTestTx(privs, accNums, accSeqs, s.ctx.ChainID())
+		Expect(err).To(BeNil())
+
+		err = s.app.GlobalFeeKeeper.BypassMessages.Set(s.ctx, sdk.MsgTypeURL(timeoutMsg))
+		Expect(err).To(BeNil())
+
+		s.ctx = s.ctx.WithIsCheckTx(true)
+
+		_, err = antehandler(s.ctx, tx, false)
+
+		Expect(err).To(BeNil(), "Whitelisted Tx: MsgTimeout: errored on zero fee in CheckTx")
 	})
 
 	It("Ensure Mempool Fees", func() {
@@ -300,7 +469,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper, s.app.FeeabsKeeper, s.app.OracleKeeper.PriceFeeder)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper, s.app.FeeabsKeeper, s.app.OracleKeeper.PriceFeeder, s.app.GlobalFeeKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -384,7 +553,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper, s.app.FeeabsKeeper, s.app.OracleKeeper.PriceFeeder)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper, s.app.FeeabsKeeper, s.app.OracleKeeper.PriceFeeder, s.app.GlobalFeeKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -464,7 +633,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper, s.app.FeeabsKeeper, s.app.OracleKeeper.PriceFeeder)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper, s.app.FeeabsKeeper, s.app.OracleKeeper.PriceFeeder, s.app.GlobalFeeKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -558,7 +727,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		err = s.app.FeeMarketKeeper.SetState(s.ctx, feemarketState)
 		Expect(err).To(BeNil())
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper, s.app.FeeabsKeeper, s.app.OracleKeeper.PriceFeeder)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper, s.app.FeeabsKeeper, s.app.OracleKeeper.PriceFeeder, s.app.GlobalFeeKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -619,7 +788,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		dfd := cheqdante.NewOverAllDecorator(decorators...)
 		antehandler := sdk.ChainAnteDecorators(dfd)
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper, s.app.FeeabsKeeper, s.app.OracleKeeper.PriceFeeder)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper, s.app.FeeabsKeeper, s.app.OracleKeeper.PriceFeeder, s.app.GlobalFeeKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -1326,6 +1495,7 @@ var _ = Describe("Test PostHandle", func() {
 			s.app.OracleKeeper,
 			s.app.FeeabsKeeper,
 			s.app.OracleKeeper.PriceFeeder,
+			s.app.GlobalFeeKeeper,
 		)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
@@ -1482,7 +1652,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		err = testutil.FundModuleAccount(s.ctx, s.app.BankKeeper, types.ModuleName, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper, s.app.FeeabsKeeper, s.app.OracleKeeper.PriceFeeder)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper, s.app.FeeabsKeeper, s.app.OracleKeeper.PriceFeeder, s.app.GlobalFeeKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -1583,7 +1753,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		err = testutil.FundModuleAccount(s.ctx, s.app.BankKeeper, types.ModuleName, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper, s.app.FeeabsKeeper, s.app.OracleKeeper.PriceFeeder)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper, s.app.FeeabsKeeper, s.app.OracleKeeper.PriceFeeder, s.app.GlobalFeeKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx
@@ -1648,7 +1818,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		err = testutil.FundAccount(s.ctx, s.app.BankKeeper, addr1, sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount)))
 		Expect(err).To(BeNil())
 
-		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper, s.app.FeeabsKeeper, s.app.OracleKeeper.PriceFeeder)
+		taxDecorator := cheqdpost.NewTaxDecorator(s.app.AccountKeeper, s.app.BankKeeper, s.app.FeeGrantKeeper, s.app.DidKeeper, s.app.ResourceKeeper, s.app.FeeMarketKeeper, s.app.OracleKeeper, s.app.FeeabsKeeper, s.app.OracleKeeper.PriceFeeder, s.app.GlobalFeeKeeper)
 		posthandler := sdk.ChainPostDecorators(taxDecorator)
 
 		// get supply before tx

@@ -16,6 +16,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	globalfeetypes "github.com/noble-assets/globalfee/types"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
@@ -290,10 +291,6 @@ func QueryOracleParams() (oracletypes.QueryParamsResponse, error) {
 // QueryAggregateVote queries the aggregate vote for a validator
 func QueryAggregateVote(validatorAddr string) (*oracletypes.QueryAggregateVoteResponse, error) {
 	res, err := Query("oracle", "aggregate-votes", validatorAddr)
-	if err != nil {
-		return nil, err
-	}
-
 	var resp oracletypes.QueryAggregateVoteResponse
 	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
 	if err != nil {
@@ -301,6 +298,22 @@ func QueryAggregateVote(validatorAddr string) (*oracletypes.QueryAggregateVoteRe
 	}
 
 	return &resp, nil
+}
+
+// QueryBypassMessages queries the global fee bypass messages
+func QueryBypassMessages() ([]string, error) {
+	res, err := Query("globalfee", "bypass-messages")
+	if err != nil {
+		return nil, err
+	}
+
+	var resp globalfeetypes.QueryBypassMessagesResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.BypassMessages, nil
 }
 
 // QueryAggregatePrevote queries the aggregate prevote for a validator

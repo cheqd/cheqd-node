@@ -1210,25 +1210,6 @@ class Installer():
             logging.exception(f"Failed to configure cheqd-noded settings. Reason: {e}")
             return False
 
-    def _select_working_rpc_endpoint(self, chain: str) -> str:
-        try:
-            endpoints = []
-            if chain == "testnet":
-                endpoints = [TESTNET_RPC_ENDPOINT_EU, TESTNET_RPC_ENDPOINT_AP]
-            else:
-                endpoints = [MAINNET_RPC_ENDPOINT_EU, MAINNET_RPC_ENDPOINT_AP]
-
-            for endpoint in endpoints:
-                try:
-                    req = request.Request(f"{endpoint}/status")
-                    with request.urlopen(req, timeout=10) as resp:
-                        if resp.getcode() == 200:
-                            return endpoint
-                except Exception:
-                    continue
-        except Exception as e:
-            logging.exception(f"Could not select a working RPC endpoint. Reason: {e}")
-        return ""
 
     def _get_latest_block_height(self, rpc_endpoint: str) -> int:
         try:
@@ -1253,13 +1234,6 @@ class Installer():
             logging.exception(f"Failed to fetch block hash at height {height} from {rpc_endpoint}. Reason: {e}")
             raise
 
-    def _is_endpoint_healthy(self, endpoint: str) -> bool:
-        try:
-            req = request.Request(f"{endpoint}/status")
-            with request.urlopen(req, timeout=10) as resp:
-                return resp.getcode() == 200
-        except Exception:
-            return False
 
     def configure_statesync(self) -> bool:
         # Configure statesync settings in config.toml using selected network RPCs
@@ -1272,21 +1246,25 @@ class Installer():
             else:
                 candidates = [MAINNET_RPC_ENDPOINT_EU, MAINNET_RPC_ENDPOINT_AP]
 
-            healthy = [ep for ep in candidates if self._is_endpoint_healthy(ep)]
-            if len(healthy) == 0:
-                logging.error("No working RPC endpoint found for statesync configuration")
-                return False
+            # Always set both endpoints and use the first for trusted state
+            rpc_servers = f"{candidates[0]},{candidates[1]}"
+            working_rpc = candidates[0]
 
-            if len(healthy) == 1:
-                rpc_servers = f"{healthy[0]},{healthy[0]}"
-                working_rpc = healthy[0]
-            else:
-                rpc_servers = f"{healthy[0]},{healthy[1]}"
-                working_rpc = healthy[0]
-
-            latest_height = self._get_latest_block_height(working_rpc)
-            trust_height = max(latest_height - 2000, 1)
-            trust_hash = self._get_block_hash_at_height(working_rpc, trust_height)
+            # Try to compute trusted state from the first endpoint; warn softly if unavailable
+            trust_height = None
+            trust_hash = None
+            try:
+                latest_height = self._get_latest_block_height(working_rpc)
+                trust_height = max(latest_height - 2000, 1)
+                trust_hash = self._get_block_hash_at_height(working_rpc, trust_height)
+            except Exception:
+                logging.warning(
+                    "Could not fetch trusted state from %s. "
+                    "Please calculate trust_height and trust_hash manually and update config.toml. "
+                    "See more details at "
+                    "https://docs.cheqd.io/node/validator-guides/validator-guide/reenable-pruning#state-sync",
+                    working_rpc,
+                )
 
             # Safely edit only the [statesync] section for 'enable'
             with open(config_toml_path, "r") as f:
@@ -1332,8 +1310,9 @@ class Installer():
 
             # Use existing search_and_replace helper for other statesync fields (unique keys)
             search_and_replace('rpc_servers = ""', f'rpc_servers = "{rpc_servers}"', config_toml_path)
-            search_and_replace('trust_height = 0', f'trust_height = {trust_height}', config_toml_path)
-            search_and_replace('trust_hash = ""', f'trust_hash = "{trust_hash}"', config_toml_path)
+            if trust_height is not None and trust_hash is not None:
+                search_and_replace('trust_height = 0', f'trust_height = {trust_height}', config_toml_path)
+                search_and_replace('trust_hash = ""', f'trust_hash = "{trust_hash}"', config_toml_path)
 
             logging.info("Configured state sync settings in config.toml")
             return True

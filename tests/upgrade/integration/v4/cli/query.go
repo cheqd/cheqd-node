@@ -218,3 +218,18 @@ func QueryOracleParams(container string) (oracletypes.QueryParamsResponse, error
 
 	return resp, nil
 }
+
+func QueryGovParams(container string) (govtypesv1.QueryParamsResponse, error) {
+	res, err := Query(container, CliBinaryName, "gov", "params")
+	if err != nil {
+		return govtypesv1.QueryParamsResponse{}, err
+	}
+
+	var resp govtypesv1.QueryParamsResponse
+	err = integrationhelpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return govtypesv1.QueryParamsResponse{}, err
+	}
+
+	return resp, nil
+}

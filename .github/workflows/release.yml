@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         fetch-depth: 0 # Required to fetch version
 
@@ -50,7 +50,7 @@ jobs:
       EXECUTE_RELEASE: ${{ steps.execute-release.outputs.EXECUTE_RELEASE }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0 # Required to fetch version
           persist-credentials: false
@@ -58,7 +58,7 @@ jobs:
       # Node.js setup is needed to run Semantic Release
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: 'npm'
 
       # Required for short-lived token provided to Semantic Release
@@ -105,12 +105,12 @@ jobs:
     if: needs.release-guard.outputs.EXECUTE_RELEASE == 'true'
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0 # Required to fetch version
           persist-credentials: false
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: ./go.mod
           cache: true
@@ -155,7 +155,7 @@ jobs:
             runs-on: ubuntu-24.04-arm
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
 
@@ -185,7 +185,7 @@ jobs:
       IMAGE_NAME: ${{ github.repository }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
 
