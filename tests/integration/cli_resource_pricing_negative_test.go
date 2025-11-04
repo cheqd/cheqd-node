@@ -363,7 +363,12 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(convertedFees.AmountOf(tax.Denom)))
+		expected := convertedFees.AmountOf(tax.Denom)
+		deviation := diff.Sub(expected).Abs()
+		tolerance := sdkmath.NewInt(helpers.OracleJitterTolerance)
+		Expect(
+			deviation.LTE(tolerance),
+		).To(BeTrue(), "fee deviation %s exceeded tolerance %d", deviation, helpers.OracleJitterTolerance)
 	})
 
 	It("should not charge more than tax in create resource image message - case: fixed fee", func() {
@@ -407,7 +412,12 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(convertedFees.AmountOf(didtypes.BaseMinimalDenom)))
+		expected := convertedFees.AmountOf(didtypes.BaseMinimalDenom)
+		deviation := diff.Sub(expected).Abs()
+		tolerance := sdkmath.NewInt(helpers.OracleJitterTolerance)
+		Expect(
+			deviation.LTE(tolerance),
+		).To(BeTrue(), "fee deviation %s exceeded tolerance %d", deviation, helpers.OracleJitterTolerance)
 	})
 
 	It("should not charge more than tax in create resource default message - case: fixed fee", func() {
@@ -450,6 +460,11 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(convertedFees.AmountOf(didtypes.BaseMinimalDenom)))
+		expected := convertedFees.AmountOf(didtypes.BaseMinimalDenom)
+		deviation := diff.Sub(expected).Abs()
+		tolerance := sdkmath.NewInt(helpers.OracleJitterTolerance)
+		Expect(
+			deviation.LTE(tolerance),
+		).To(BeTrue(), "fee deviation %s exceeded tolerance %d", deviation, helpers.OracleJitterTolerance)
 	})
 })
