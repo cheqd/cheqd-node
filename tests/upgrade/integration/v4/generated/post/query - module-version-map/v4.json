@@ -23,7 +23,7 @@
       },
       {
         "name": "cheqd",
-        "version": 5
+        "version": 6
       },
       {
         "name": "circuit",
@@ -94,12 +94,16 @@
         "version": 2
       },
       {
+        "name": "oracle",
+        "version": 1
+      },
+      {
         "name": "params",
         "version": 1
       },
       {
         "name": "resource",
-        "version": 4
+        "version": 5
       },
       {
         "name": "slashing",

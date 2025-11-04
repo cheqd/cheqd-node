@@ -37,8 +37,7 @@ func (k msgServer) UpdateParams(goCtx context.Context, req *types.MsgUpdateParam
 	if k.authority != req.Authority {
 		return nil, errors.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", k.authority, req.Authority)
 	}
-
-	if err := req.Params.ValidateBasic(); err != nil {
+	if err := req.Params.ValidateWithOracle(goCtx, k.Keeper.oracleKeeper); err != nil {
 		return nil, err
 	}
 

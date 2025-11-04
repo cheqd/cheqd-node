@@ -35,6 +35,11 @@ import (
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	portkeeper "github.com/cosmos/ibc-go/v8/modules/core/05-port/keeper"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+
+	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
+	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
+	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
+	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
 type TestSetup struct {
@@ -55,6 +60,8 @@ func Setup() TestSetup {
 	didtypes.RegisterInterfaces(ir)
 	banktypes.RegisterInterfaces(ir)
 	authtypes.RegisterInterfaces(ir)
+	distrtypes.RegisterInterfaces(ir)
+	oracletypes.RegisterInterfaces(ir)
 	cdc := codec.NewProtoCodec(ir)
 	aminoCdc := codec.NewLegacyAmino()
 
@@ -69,6 +76,8 @@ func Setup() TestSetup {
 		paramstypes.StoreKey,
 		types.StoreKey,
 		didtypes.StoreKey,
+		distrtypes.StoreKey,
+		oracletypes.StoreKey,
 	)
 
 	transientKeys := storetypes.NewTransientStoreKeys(
@@ -86,6 +95,8 @@ func Setup() TestSetup {
 		types.ModuleName:               {authtypes.Minter, authtypes.Burner},
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
+		distrtypes.ModuleName:          nil,
+		oracletypes.ModuleName:         {authtypes.Minter},
 	}
 
 	accountKeeper := authkeeper.NewAccountKeeper(
@@ -112,10 +123,32 @@ func Setup() TestSetup {
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 		authcodec.NewBech32Codec(app.AccountAddressPrefix),
 		authcodec.NewBech32Codec(app.ConsNodeAddressPrefix))
+	distrKeeper := distrkeeper.NewKeeper(
+		cdc,
+		runtime.NewKVStoreService(keys[distrtypes.StoreKey]),
+		accountKeeper,
+		bankKeeper,
+		stakingKeeper,
+		authtypes.FeeCollectorName,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
 
 	paramsKeeper := initParamsKeeper(cdc, aminoCdc, keys[paramstypes.StoreKey], transientKeys[paramstypes.StoreKey])
 
-	didKeeper := didkeeper.NewKeeper(cdc, runtime.NewKVStoreService(keys[didtypes.StoreKey]), getSubspace(didtypes.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	OracleKeeper := oraclekeeper.NewKeeper(
+		cdc,
+		keys[oracletypes.ModuleName],
+		getSubspace(oracletypes.ModuleName, paramsKeeper),
+		accountKeeper,
+		bankKeeper,
+		distrKeeper,
+		stakingKeeper,
+		distrtypes.ModuleName,
+		true, // cast.ToBool(appOpts.Get("telemetry.enabled")),
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
+	didKeeper := didkeeper.NewKeeper(cdc, runtime.NewKVStoreService(keys[didtypes.StoreKey]), getSubspace(didtypes.ModuleName, paramsKeeper), accountKeeper, bankKeeper, stakingKeeper, OracleKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String())
 	capabilityKeeper := capabilitykeeper.NewKeeper(cdc, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 
 	scopedIBCKeeper := capabilityKeeper.ScopeToModule(ibcexported.ModuleName)
@@ -125,7 +158,7 @@ func Setup() TestSetup {
 	resourceKeeper := keeper.NewKeeper(cdc, runtime.NewKVStoreService(keys[types.StoreKey]),
 		getSubspace(types.ModuleName, paramsKeeper),
 		&portKeeper,
-		scopedResourceKeeper, authority)
+		scopedResourceKeeper, authority, OracleKeeper)
 
 	ibcModule := resource.NewIBCModule(*resourceKeeper)
 
@@ -182,6 +215,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	// set params subspaces
 	paramsKeeper.Subspace(didtypes.ModuleName)
 	paramsKeeper.Subspace(types.ModuleName).WithKeyTable(types.ParamKeyTable())
+	paramsKeeper.Subspace(oracletypes.ModuleName).WithKeyTable(oracletypes.ParamKeyTable())
 
 	return paramsKeeper
 }

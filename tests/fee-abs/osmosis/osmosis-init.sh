@@ -41,6 +41,6 @@ sed -i $SED_EXT 's/output = "text"/output = "json"/g' "${CLIENT_TOML}"
 echo 'success claw flock lecture soul photo jump pause sadness enter uncle stage cherry teach inside now fun fuel oval angry unveil horn tobacco penalty' | osmosisd keys add osmosis-user --keyring-backend test --recover
 
 # Genesis
-osmosisd add-genesis-account "$(osmosisd keys show osmosis-user -a --keyring-backend=test)" 2000000000000uosmo
+osmosisd add-genesis-account "$(osmosisd keys show osmosis-user -a --keyring-backend=test)" 20000000000000000uosmo,1000000000000000000usdc
 osmosisd gentx osmosis-user 50000000000uosmo --keyring-backend=test --chain-id "$CHAIN_ID"
 osmosisd collect-gentxs

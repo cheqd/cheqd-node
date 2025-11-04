@@ -18,8 +18,8 @@ import (
 )
 
 var _ = Describe("Upgrade - Pre", func() {
-	var didFeeParams didtypes.FeeParams
-	var resourceFeeParams resourcetypes.FeeParams
+	var didFeeParams didtypes.LegacyFeeParams
+	var resourceFeeParams resourcetypes.LegacyFeeParams
 	ProposalID := "1"
 
 	BeforeEach(func() {
