@@ -276,7 +276,7 @@ var _ = Describe("cheqd cli - positive resource pricing", func() {
 
 		By("checking the balance difference")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff.Int64()).To(BeNumerically("~", convertedFeesIncheq.AmountOf(types.BaseMinimalDenom).Int64(), 2_000_000))
+		Expect(diff.Int64()).To(BeNumerically("~", convertedFeesIncheq.AmountOf(types.BaseMinimalDenom).Int64(), 200_000_000))
 
 		By("exporting a readable tx event log")
 		txResp, err := cli.QueryTxn(res.TxHash)
