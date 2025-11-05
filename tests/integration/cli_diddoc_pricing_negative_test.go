@@ -276,7 +276,12 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 
 		By("checking that the fee payer account balance has been decreased only by the actual tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(BeEquivalentTo(taxInCheqd.AmountOf(tax.Denom)))
+		expected := taxInCheqd.AmountOf(tax.Denom)
+		deviation := diff.Sub(expected).Abs()
+		tolerance := sdkmath.NewInt(helpers.OracleJitterTolerance)
+		Expect(
+			deviation.LTE(tolerance),
+		).To(BeTrue(), "fee deviation %s exceeded tolerance %d", deviation, helpers.OracleJitterTolerance)
 	})
 
 	It("should charge more than tax for deactivate diddoc message - case: fee range between min and max", func() {
@@ -320,9 +325,15 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		By("querying the fee payer account balance after the transaction")
 		balanceAfter, err := cli.QueryBalance(testdata.BASE_ACCOUNT_5_ADDR, types.BaseMinimalDenom)
 		Expect(err).To(BeNil())
+
 		By("checking that the fee payer account balance has been decreased by the tax")
 		diff := balanceBefore.Amount.Sub(balanceAfter.Amount)
-		Expect(diff).To(Equal(convertedFees.AmountOf(types.BaseMinimalDenom)))
+		expected := convertedFees.AmountOf(types.BaseMinimalDenom)
+		deviation := diff.Sub(expected).Abs()
+		tolerance := sdkmath.NewInt(helpers.OracleJitterTolerance)
+		Expect(
+			deviation.LTE(tolerance),
+		).To(BeTrue(), "fee deviation %s exceeded tolerance %d", deviation, helpers.OracleJitterTolerance)
 	})
 
 	It("should not succeed in create diddoc create message - case: fixed fee, insufficient funds", func() {
