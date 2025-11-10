@@ -1,6 +1,6 @@
 {
     "binaries": {
-        "linux/amd64": "https://github.com/cheqd/cheqd-node/releases/download/v4.1.6-develop.1/cheqd-noded-4.1.6-develop.1-linux-amd64.tar.gz?checksum=sha256:27cf403b32fd10c397f66231a55ea1b755c5909a4f506e19322f54512824a9f7",
-        "linux/arm64": "https://github.com/cheqd/cheqd-node/releases/download/v4.1.6-develop.1/cheqd-noded-4.1.6-develop.1-linux-arm64.tar.gz?checksum=sha256:a47436b4aa5d23493470ba9f1d7567603f488bdf1ef7cf0cb125c9031eebbb75"
+        "linux/amd64": "https://github.com/cheqd/cheqd-node/releases/download/v4.1.6/cheqd-noded-4.1.6-linux-amd64.tar.gz?checksum=sha256:a1a967caba0cc9e06dc86378bdd7126e6fb91ee0080117f4c1b7acd1cd525842",
+        "linux/arm64": "https://github.com/cheqd/cheqd-node/releases/download/v4.1.6/cheqd-noded-4.1.6-linux-arm64.tar.gz?checksum=sha256:88232d36ecb9216ee128121784c966efe69841e4e98368f201e6b5d07f93dd11"
     }
 }
