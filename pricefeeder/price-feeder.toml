@@ -16,8 +16,13 @@ tmrpc_endpoint = "http://localhost:26657"
 enable-hostname = true
 enable-hostname-label = true
 enable-service-label = true
+# This will not be enabled if default telemetry is already enabled in the cheqd app config
+# and the pricefeeder is not running as a separate process (i.e., it is running within the app binary).
+# Pricefeeder metrics will still be recorded regardless.
 enabled = true
 global-labels = [["chain_id", "cheqd"]]
+# This service-name will not be used if default telemetry is already enabled in the cheqd app config
+# and the pricefeeder is not running as a separate process (i.e., it is running within the app binary).
 service-name = "price-feeder"
 prometheus-retention-time = 100
 
