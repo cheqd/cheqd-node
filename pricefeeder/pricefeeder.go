@@ -68,14 +68,24 @@ func (pf *PriceFeeder) Start(currentBlockHeight int64, oracleParams types.Params
 	)
 	pf.SetOracle(o)
 
-	telemetryCfg := telemetry.Config{}
-	err = mapstructure.Decode(cfg.Telemetry, &telemetryCfg)
-	if err != nil {
-		return err
-	}
-	metrics, err := telemetry.New(telemetryCfg)
-	if err != nil {
-		return err
+	var metrics *telemetry.Metrics
+
+	// check if app telemetry is already running
+	if !telemetry.IsTelemetryEnabled() {
+		telemetryCfg := telemetry.Config{}
+		err = mapstructure.Decode(cfg.Telemetry, &telemetryCfg)
+		if err != nil {
+			return err
+		}
+
+		metrics, err = telemetry.New(telemetryCfg)
+		if err != nil {
+			return err
+		}
+	} else {
+		// disable price feeder telemetry and use app telemetry instead
+		cfg.Telemetry.Enabled = false
+		metrics = nil
 	}
 
 	g.Go(func() error {
