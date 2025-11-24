@@ -39,7 +39,7 @@ var _ = Describe("Upgrade - Pre", func() {
 	Context("Before a software upgrade execution is initiated", func() {
 		It("should wait for chain to bootstrap", func() {
 			By("pinging the node status until the voting end height is reached")
-			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, cli.BootstrapHeight, cli.BootstrapPeriod+20)
+			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, cli.BootstrapHeight, cli.BootstrapPeriod+5)
 			Expect(err).To(BeNil())
 		})
 
@@ -67,7 +67,7 @@ var _ = Describe("Upgrade - Pre", func() {
 				By("waiting for an additional set of blocks to be produced")
 				height, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
 				Expect(err).To(BeNil())
-				err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, height+5, cli.VotingPeriod*6)
+				err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, height+5, cli.VotingPeriod*2)
 				Expect(err).To(BeNil())
 			}
 		})
@@ -107,7 +107,7 @@ var _ = Describe("Upgrade - Pre", func() {
 				By("waiting for an additional set of blocks to be produced")
 				height, err := cli.GetCurrentBlockHeight(cli.Validator0, cli.CliBinaryName)
 				Expect(err).To(BeNil())
-				err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, height+5, cli.VotingPeriod*6)
+				err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, height+5, cli.VotingPeriod*2)
 				Expect(err).To(BeNil())
 			}
 		})
@@ -137,7 +137,7 @@ var _ = Describe("Upgrade - Pre", func() {
 			Expect(err).To(BeNil())
 
 			By("waiting for 10 blocks to be produced on top, after the upgrade")
-			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+3, cli.VotingPeriod*3)
+			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+3, cli.VotingPeriod*1)
 			Expect(err).To(BeNil())
 		})
 
@@ -154,7 +154,7 @@ var _ = Describe("Upgrade - Pre", func() {
 			Expect(err).To(BeNil())
 
 			By("waiting for the proposal to be included in a block")
-			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+3, cli.VotingPeriod*3)
+			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+3, cli.VotingPeriod*1)
 			Expect(err).To(BeNil())
 		})
 
@@ -171,7 +171,7 @@ var _ = Describe("Upgrade - Pre", func() {
 			Expect(err).To(BeNil())
 
 			By("waiting for 10 blocks to be produced on top, after the upgrade")
-			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, cli.VotingPeriod*2)
+			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, cli.VotingPeriod*1)
 			Expect(err).To(BeNil())
 		})
 
@@ -188,7 +188,7 @@ var _ = Describe("Upgrade - Pre", func() {
 			Expect(err).To(BeNil())
 
 			By("waiting for 10 blocks to be produced on top, after the upgrade")
-			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, cli.VotingPeriod*2)
+			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, cli.VotingPeriod*1)
 			Expect(err).To(BeNil())
 		})
 
@@ -205,7 +205,7 @@ var _ = Describe("Upgrade - Pre", func() {
 			Expect(err).To(BeNil())
 
 			By("waiting for 10 blocks to be produced on top, after the upgrade")
-			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, cli.VotingPeriod*2)
+			err = cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, currentHeight+1, cli.VotingPeriod*1)
 			Expect(err).To(BeNil())
 		})
 
@@ -224,7 +224,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should wait for the upgrade height to be reached", func() {
 			By("pinging the node status until the upgrade height is reached")
-			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, UpgradeHeight, cli.VotingPeriod)
+			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, UpgradeHeight, cli.VotingPeriod*6)
 			Expect(err).To(BeNil())
 		})
 	})
