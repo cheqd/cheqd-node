@@ -224,7 +224,7 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should wait for the upgrade height to be reached", func() {
 			By("pinging the node status until the upgrade height is reached")
-			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, UpgradeHeight, cli.VotingPeriod*6)
+			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, UpgradeHeight, cli.VotingPeriod)
 			Expect(err).To(BeNil())
 		})
 	})
