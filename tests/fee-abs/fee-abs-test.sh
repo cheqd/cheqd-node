@@ -82,7 +82,7 @@ docker compose exec -d osmosis osmosisd start
 
 info "Waiting for chains"
 # TODO: Get rid of this
-sleep 20
+sleep 10
 
 info "Checking statuses"
 CHEQD_STATUS=$(docker compose exec cheqd cheqd-noded status 2>&1)
@@ -211,7 +211,7 @@ RES=$(docker compose exec cheqd cheqd-noded tx feeabs fund 200000000000000000nch
 assert_tx_successful "${RES}"
 
 info "wait for exchange rate to be updated"
-sleep 600
+sleep 150
 
 info "pay fees using osmo in cheqd (recursively)"
 # shellcheck disable=SC2034
