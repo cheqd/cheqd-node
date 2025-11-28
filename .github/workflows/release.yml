@@ -115,7 +115,7 @@ jobs:
 
             # Tag is not on main branch - tagging staging release
             echo "LATEST_TAG=staging-latest" >> "$GITHUB_OUTPUT"
-            echo "Detected staging release from non-main branch (tag: $TAG)"
+            echo "Detected staging release from develop branch (tag: $TAG)"
           fi
 
   release-binary:
