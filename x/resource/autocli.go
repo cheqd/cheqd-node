@@ -53,11 +53,16 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 			EnhanceCustomCommand: true, // Set to true if we have manual commands for the resource module
 		},
 		Tx: &autocliv1.ServiceCommandDescriptor{
-			Service: resourcev2.Msg_ServiceDesc.ServiceName,
+			Service:              resourcev2.Msg_ServiceDesc.ServiceName,
+			EnhanceCustomCommand: true,
 			RpcCommandOptions: []*autocliv1.RpcCommandOptions{
 				{
 					RpcMethod: "UpdateParams",
 					Skip:      true, // skipped because authority gated
+				},
+				{
+					RpcMethod: "CreateResource",
+					Skip:      true,
 				},
 			},
 		},

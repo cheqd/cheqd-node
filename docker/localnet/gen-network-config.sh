@@ -6,9 +6,9 @@ set -euo pipefail
 
 # sed in MacOS requires extra argument
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  SED_EXT='.orig'
-else 
-  SED_EXT=''
+    SED_EXT='.orig'
+else
+    SED_EXT=''
 fi
 
 # Params
@@ -19,140 +19,141 @@ SEEDS_COUNT=${3:-1} # Third parameter, default is 1
 OBSERVERS_COUNT=${4:-1} # Fourth parameter, default is 1
 
 function init_node() {
-  NODE_HOME=$1
-  NODE_MONIKER=$2
-
-  echo "[${NODE_MONIKER}] Initializing"
-
-  cheqd-noded init "${NODE_MONIKER}" --chain-id "${CHAIN_ID}" --home "${NODE_HOME}" 2> /dev/null
-  cheqd-noded tendermint show-node-id --home "${NODE_HOME}" > "${NODE_HOME}/node_id.txt"
-  cheqd-noded tendermint show-validator --home "${NODE_HOME}" > "${NODE_HOME}/node_val_pubkey.txt"
+    NODE_HOME=$1
+    NODE_MONIKER=$2
+    
+    echo "[${NODE_MONIKER}] Initializing"
+    
+    cheqd-noded init "${NODE_MONIKER}" --chain-id "${CHAIN_ID}" --home "${NODE_HOME}" 2> /dev/null
+    cheqd-noded tendermint show-node-id --home "${NODE_HOME}" > "${NODE_HOME}/node_id.txt"
+    cheqd-noded tendermint show-validator --home "${NODE_HOME}" > "${NODE_HOME}/node_val_pubkey.txt"
 }
 
 function configure_node() {
-  NODE_HOME=$1
-  NODE_MONIKER=$2
-
-  echo "[${NODE_MONIKER}] Configuring app.toml and config.toml"
-
-  APP_TOML="${NODE_HOME}/config/app.toml"
-  CONFIG_TOML="${NODE_HOME}/config/config.toml"
-
-  sed -i $SED_EXT 's/minimum-gas-prices = ""/minimum-gas-prices = "50ncheq"/g' "${APP_TOML}"
-  sed -i $SED_EXT 's/enable = false/enable = true/g' "${APP_TOML}"
-  sed -i $SED_EXT 's|laddr = "tcp://127.0.0.1:26657"|laddr = "tcp://0.0.0.0:26657"|g' "${CONFIG_TOML}"
-  sed -i $SED_EXT 's|addr_book_strict = true|addr_book_strict = false|g' "${CONFIG_TOML}"
-  sed -i $SED_EXT 's/timeout_propose = "3s"/timeout_propose = "500ms"/g' "${CONFIG_TOML}"
-  sed -i $SED_EXT 's/timeout_prevote = "1s"/timeout_prevote = "500ms"/g' "${CONFIG_TOML}"
-  sed -i $SED_EXT 's/timeout_precommit = "1s"/timeout_precommit = "500ms"/g' "${CONFIG_TOML}"
-  sed -i $SED_EXT 's/timeout_commit = "5s"/timeout_commit = "500ms"/g' "${CONFIG_TOML}"
-  sed -i $SED_EXT 's/log_level = "info"/log_level = "debug"/g' "${CONFIG_TOML}"
+    NODE_HOME=$1
+    NODE_MONIKER=$2
+    
+    echo "[${NODE_MONIKER}] Configuring app.toml and config.toml"
+    
+    APP_TOML="${NODE_HOME}/config/app.toml"
+    CONFIG_TOML="${NODE_HOME}/config/config.toml"
+    
+    sed -i $SED_EXT 's/minimum-gas-prices = ""/minimum-gas-prices = "50ncheq"/g' "${APP_TOML}"
+    sed -i $SED_EXT 's/enable = false/enable = true/g' "${APP_TOML}"
+    sed -i $SED_EXT 's|laddr = "tcp://127.0.0.1:26657"|laddr = "tcp://0.0.0.0:26657"|g' "${CONFIG_TOML}"
+    sed -i $SED_EXT 's|addr_book_strict = true|addr_book_strict = false|g' "${CONFIG_TOML}"
+    sed -i $SED_EXT 's/timeout_propose = "3s"/timeout_propose = "500ms"/g' "${CONFIG_TOML}"
+    sed -i $SED_EXT 's/timeout_prevote = "1s"/timeout_prevote = "500ms"/g' "${CONFIG_TOML}"
+    sed -i $SED_EXT 's/timeout_precommit = "1s"/timeout_precommit = "500ms"/g' "${CONFIG_TOML}"
+    sed -i $SED_EXT 's/timeout_commit = "5s"/timeout_commit = "500ms"/g' "${CONFIG_TOML}"
+    sed -i $SED_EXT 's/log_level = "info"/log_level = "debug"/g' "${CONFIG_TOML}"
 }
 
 function configure_genesis() {
-  NODE_HOME=$1
-  NODE_MONIKER=$2
+    NODE_HOME=$1
+    NODE_MONIKER=$2
 
-  echo "[${NODE_MONIKER}] Configuring genesis"
+    echo "[${NODE_MONIKER}] Configuring genesis"
 
-  GENESIS="${NODE_HOME}/config/genesis.json"
-  echo $GENESIS
-  GENESIS_TMP="${NODE_HOME}/config/genesis_tmp.json"
+    GENESIS="${NODE_HOME}/config/genesis.json"
+    echo $GENESIS
+    GENESIS_TMP="${NODE_HOME}/config/genesis_tmp.json"
 
-  # Default denom
-  sed -i $SED_EXT 's/"stake"/"ncheq"/' "${GENESIS}"
+    # Default denom
+    sed -i $SED_EXT 's/"stake"/"ncheq"/' "${GENESIS}"
 
-  # Short voting period
-  sed -i $SED_EXT 's/"voting_period": "172800s"/"voting_period": "12s"/' "${GENESIS}"
-  sed -i $SED_EXT 's/"expedited_voting_period": "86400s"/"expedited_voting_period": "10s"/' "${GENESIS}"
+    # Short voting period
+    sed -i $SED_EXT 's/"voting_period": "172800s"/"voting_period": "12s"/' "${GENESIS}"
+    sed -i $SED_EXT 's/"expedited_voting_period": "86400s"/"expedited_voting_period": "10s"/' "${GENESIS}"
+    sed -i $SED_EXT 's/"vote_extensions_enable_height"[[:space:]]*:[[:space:]]*"0"/"vote_extensions_enable_height": "2"/' "${GENESIS}"
 
-  # Test accounts
-  BASE_ACCOUNT_1="cheqd1rnr5jrt4exl0samwj0yegv99jeskl0hsxmcz96"
-  # Mnemonic: sketch mountain erode window enact net enrich smoke claim kangaroo another visual write meat latin bacon pulp similar forum guilt father state erase bright
-  jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_1}'", "coins": [{"denom": "ncheq", "amount": "100001000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP" && \
+    # Test accounts
+    BASE_ACCOUNT_1="cheqd1rnr5jrt4exl0samwj0yegv99jeskl0hsxmcz96"
+    # Mnemonic: sketch mountain erode window enact net enrich smoke claim kangaroo another visual write meat latin bacon pulp similar forum guilt father state erase bright
+    jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_1}'", "coins": [{"denom": "ncheq", "amount": "100001000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP" && \
     mv "${GENESIS_TMP}" "${GENESIS}"
-  jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_1}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
-    mv "${GENESIS_TMP}" "${GENESIS}"
-
-  BASE_ACCOUNT_2="cheqd1l9sq0se0jd3vklyrrtjchx4ua47awug5vsyeeh"
-  # Mnemonic: ugly dirt sorry girl prepare argue door man that manual glow scout bomb pigeon matter library transfer flower clown cat miss pluck drama dizzy
-  jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_2}'", "coins": [{"denom": "ncheq", "amount": "100001000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP"  && \
-    mv "${GENESIS_TMP}" "${GENESIS}"
-  jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_2}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
+    jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_1}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
     mv "${GENESIS_TMP}" "${GENESIS}"
 
-  BASE_ACCOUNT_3="cheqd14wymr6h8a0rvynwayytssy5rhn3evltcpxh0zh"
-  # Mnemonic: fix wheel picnic about army scan table fence device trust alter erupt wear donkey wood slender gold reunion grant quiz absurd tragic reform attitude
-  jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_3}'", "coins": [{"denom": "ncheq", "amount": "100"}] }]' "$GENESIS" > "$GENESIS_TMP"  && \
+    BASE_ACCOUNT_2="cheqd1l9sq0se0jd3vklyrrtjchx4ua47awug5vsyeeh"
+    # Mnemonic: ugly dirt sorry girl prepare argue door man that manual glow scout bomb pigeon matter library transfer flower clown cat miss pluck drama dizzy
+    jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_2}'", "coins": [{"denom": "ncheq", "amount": "100001000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP"  && \
     mv "${GENESIS_TMP}" "${GENESIS}"
-  jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_3}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
-    mv "${GENESIS_TMP}" "${GENESIS}"
-
-  BASE_ACCOUNT_4="cheqd1c8tq9wcfwtunkunng5pe442jlmwns9sgve42mf"
-  # Mnemonic: horn slim pigeon winner capable piano soul find ignore crawl arrow genuine magnet nasty basic lamp scissors treat stick arm dress elbow trash naive
-  jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_4}'", "coins": [{"denom": "ncheq", "amount": "100001000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP"  && \
-    mv "${GENESIS_TMP}" "${GENESIS}"
-  jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_4}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
+    jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_2}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
     mv "${GENESIS_TMP}" "${GENESIS}"
 
-  BASE_ACCOUNT_5="cheqd1xnx6fe4fg4etlaxm0ty25j3ae5thhadraskplv"
-  # Mnemonic: blue town hobby lens hawk deputy father tissue state choose another liquid license start push iron limb visa taste mother cause history tackle fiber
-  jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_5}'", "coins": [{"denom": "ncheq", "amount": "100001000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP"  && \
+    BASE_ACCOUNT_3="cheqd14wymr6h8a0rvynwayytssy5rhn3evltcpxh0zh"
+    # Mnemonic: fix wheel picnic about army scan table fence device trust alter erupt wear donkey wood slender gold reunion grant quiz absurd tragic reform attitude
+    jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_3}'", "coins": [{"denom": "ncheq", "amount": "100"}] }]' "$GENESIS" > "$GENESIS_TMP"  && \
     mv "${GENESIS_TMP}" "${GENESIS}"
-  jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_5}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
-    mv "${GENESIS_TMP}" "${GENESIS}"
-
-  BASE_ACCOUNT_6="cheqd1makysw7c788c7fzkfzn7al80wyfl4at6jtjyg4"
-  # Mnemonic: gallery hospital vicious demand orient piano melody vanish remind pistol elephant bracket olive kitten caution apart capital protect junior endorse run drama tiny patrol
-  jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_6}'", "coins": [{"denom": "ncheq", "amount": "100"}] }]' "$GENESIS" > "$GENESIS_TMP"  && \
-    mv "${GENESIS_TMP}" "${GENESIS}"
-  jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_6}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
+    jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_3}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
     mv "${GENESIS_TMP}" "${GENESIS}"
 
-  BASE_VESTING_ACCOUNT="cheqd1lkqddnapqvz2hujx2trpj7xj6c9hmuq7uhl0md"
-  # Mnemonic: coach index fence broken very cricket someone casino dial truth fitness stay habit such three jump exotic spawn planet fragile walk enact angry great
-  # shellcheck disable=SC2089
-  BASE_VESTING_COIN="{\"denom\":\"ncheq\",\"amount\":\"10001000000000000\"}"
-  jq '.app_state.bank.balances += [{"address": "'${BASE_VESTING_ACCOUNT}'", "coins": [{"denom": "ncheq", "amount": "5000000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP" && \
+    BASE_ACCOUNT_4="cheqd1c8tq9wcfwtunkunng5pe442jlmwns9sgve42mf"
+    # Mnemonic: horn slim pigeon winner capable piano soul find ignore crawl arrow genuine magnet nasty basic lamp scissors treat stick arm dress elbow trash naive
+    jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_4}'", "coins": [{"denom": "ncheq", "amount": "100001000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP"  && \
     mv "${GENESIS_TMP}" "${GENESIS}"
-  jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.BaseVestingAccount", "base_account": {"address": "'${BASE_VESTING_ACCOUNT}'","pub_key": null,"account_number": "0","sequence": "0"}, "original_vesting": ['"${BASE_VESTING_COIN}"'], "delegated_free": [], "delegated_vesting": [], "end_time": "1672531199"}]' "$GENESIS" > "$GENESIS_TMP" && \
+    jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_4}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
     mv "${GENESIS_TMP}" "${GENESIS}"
 
-  CONTINUOUS_VESTING_ACCOUNT="cheqd1353p46macvn444rupg2jstmx3tmz657yt9gl4l"
-  # Mnemonic: phone worry flame safe panther dirt picture pepper purchase tiny search theme issue genre orange merit stove spoil surface color garment mind chuckle image
-  jq '.app_state.bank.balances += [{"address": "'${CONTINUOUS_VESTING_ACCOUNT}'", "coins": [{"denom": "ncheq", "amount": "5000000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP" && \
+    BASE_ACCOUNT_5="cheqd1xnx6fe4fg4etlaxm0ty25j3ae5thhadraskplv"
+    # Mnemonic: blue town hobby lens hawk deputy father tissue state choose another liquid license start push iron limb visa taste mother cause history tackle fiber
+    jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_5}'", "coins": [{"denom": "ncheq", "amount": "100001000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP"  && \
     mv "${GENESIS_TMP}" "${GENESIS}"
-  jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.ContinuousVestingAccount", "base_vesting_account": { "base_account": {"address": "'${CONTINUOUS_VESTING_ACCOUNT}'","pub_key": null,"account_number": "0","sequence": "0"}, "original_vesting": ['"${BASE_VESTING_COIN}"'], "delegated_free": [], "delegated_vesting": [], "end_time": "1672531199"}, "start_time": "1630352459"}]' "$GENESIS" > "$GENESIS_TMP" && \
-    mv "${GENESIS_TMP}" "${GENESIS}"
-
-  DELAYED_VESTING_ACCOUNT="cheqd1njwu33lek5jt4kzlmljkp366ny4qpqusahpyrj"
-  # Mnemonic: pilot text keen deal economy donkey use artist divide foster walk pink breeze proud dish brown icon shaft infant level labor lift will tomorrow
-  jq '.app_state.bank.balances += [{"address": "'${DELAYED_VESTING_ACCOUNT}'", "coins": [{"denom": "ncheq", "amount": "5000000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP" && \
-    mv "${GENESIS_TMP}" "${GENESIS}"
-  jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.DelayedVestingAccount", "base_vesting_account": { "base_account": {"address": "'${DELAYED_VESTING_ACCOUNT}'","pub_key": null,"account_number": "0","sequence": "0"}, "original_vesting": ['"${BASE_VESTING_COIN}"'], "delegated_free": [], "delegated_vesting": [], "end_time": "1672531199"}}]' "$GENESIS" > "$GENESIS_TMP" && \
+    jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_5}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
     mv "${GENESIS_TMP}" "${GENESIS}"
 
-  PERIODIC_VESTING_ACCOUNT="cheqd1uyngr0l3xtyj07js9sdew9mk50tqeq8lghhcfr"
-  # Mnemonic: want merge flame plate trouble moral submit wing whale sick meat lonely yellow lens enable oyster slight health vast weird radar mesh grab olive
-  jq '.app_state.bank.balances += [{"address": "'${PERIODIC_VESTING_ACCOUNT}'", "coins": [{"denom": "ncheq", "amount": "5000000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP" && \
+    BASE_ACCOUNT_6="cheqd1makysw7c788c7fzkfzn7al80wyfl4at6jtjyg4"
+    # Mnemonic: gallery hospital vicious demand orient piano melody vanish remind pistol elephant bracket olive kitten caution apart capital protect junior endorse run drama tiny patrol
+    jq '.app_state.bank.balances += [{"address": "'${BASE_ACCOUNT_6}'", "coins": [{"denom": "ncheq", "amount": "100"}] }]' "$GENESIS" > "$GENESIS_TMP"  && \
     mv "${GENESIS_TMP}" "${GENESIS}"
-  jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.PeriodicVestingAccount", "base_vesting_account": { "base_account": {"address": "'${PERIODIC_VESTING_ACCOUNT}'","pub_key": null,"account_number": "0","sequence": "0"}, "original_vesting": ['"${BASE_VESTING_COIN}"'], "delegated_free": [], "delegated_vesting": [], "end_time": "1672531199"}, "start_time": "1672531179", "vesting_periods": [{"length": "20", "amount": ['"${BASE_VESTING_COIN}"']}]}]' "$GENESIS" > "$GENESIS_TMP" && \
+    jq '.app_state.auth.accounts += [{"@type": "/cosmos.auth.v1beta1.BaseAccount","address": "'${BASE_ACCOUNT_6}'", "pub_key": null,"account_number": "0","sequence": "0"}]' "$GENESIS" > "$GENESIS_TMP" && \
     mv "${GENESIS_TMP}" "${GENESIS}"
 
-  # supplied added tokens
-  jq '.app_state.bank.supply += [{"denom": "ncheq", "amount": "420004000000000200"}]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
+    BASE_VESTING_ACCOUNT="cheqd1lkqddnapqvz2hujx2trpj7xj6c9hmuq7uhl0md"
+    # Mnemonic: coach index fence broken very cricket someone casino dial truth fitness stay habit such three jump exotic spawn planet fragile walk enact angry great
+    # shellcheck disable=SC2089
+    BASE_VESTING_COIN="{\"denom\":\"ncheq\",\"amount\":\"10001000000000000\"}"
+    jq '.app_state.bank.balances += [{"address": "'${BASE_VESTING_ACCOUNT}'", "coins": [{"denom": "ncheq", "amount": "5000000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP" && \
+    mv "${GENESIS_TMP}" "${GENESIS}"
+    jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.BaseVestingAccount", "base_account": {"address": "'${BASE_VESTING_ACCOUNT}'","pub_key": null,"account_number": "0","sequence": "0"}, "original_vesting": ['"${BASE_VESTING_COIN}"'], "delegated_free": [], "delegated_vesting": [], "end_time": "1672531199"}]' "$GENESIS" > "$GENESIS_TMP" && \
+    mv "${GENESIS_TMP}" "${GENESIS}"
 
-  # add bypass for MsgAcknowledgement in global fee module
-  jq '.app_state.globalfee.bypass_messages += ["/ibc.core.channel.v1.MsgAcknowledgement"]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
+    CONTINUOUS_VESTING_ACCOUNT="cheqd1353p46macvn444rupg2jstmx3tmz657yt9gl4l"
+    # Mnemonic: phone worry flame safe panther dirt picture pepper purchase tiny search theme issue genre orange merit stove spoil surface color garment mind chuckle image
+    jq '.app_state.bank.balances += [{"address": "'${CONTINUOUS_VESTING_ACCOUNT}'", "coins": [{"denom": "ncheq", "amount": "5000000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP" && \
+    mv "${GENESIS_TMP}" "${GENESIS}"
+    jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.ContinuousVestingAccount", "base_vesting_account": { "base_account": {"address": "'${CONTINUOUS_VESTING_ACCOUNT}'","pub_key": null,"account_number": "0","sequence": "0"}, "original_vesting": ['"${BASE_VESTING_COIN}"'], "delegated_free": [], "delegated_vesting": [], "end_time": "1672531199"}, "start_time": "1630352459"}]' "$GENESIS" > "$GENESIS_TMP" && \
+    mv "${GENESIS_TMP}" "${GENESIS}"
 
-  # add bypass for MsgUpdateClient in global fee module
-  jq '.app_state.globalfee.bypass_messages += ["/ibc.core.client.v1.MsgUpdateClient"]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
+    DELAYED_VESTING_ACCOUNT="cheqd1njwu33lek5jt4kzlmljkp366ny4qpqusahpyrj"
+    # Mnemonic: pilot text keen deal economy donkey use artist divide foster walk pink breeze proud dish brown icon shaft infant level labor lift will tomorrow
+    jq '.app_state.bank.balances += [{"address": "'${DELAYED_VESTING_ACCOUNT}'", "coins": [{"denom": "ncheq", "amount": "5000000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP" && \
+    mv "${GENESIS_TMP}" "${GENESIS}"
+    jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.DelayedVestingAccount", "base_vesting_account": { "base_account": {"address": "'${DELAYED_VESTING_ACCOUNT}'","pub_key": null,"account_number": "0","sequence": "0"}, "original_vesting": ['"${BASE_VESTING_COIN}"'], "delegated_free": [], "delegated_vesting": [], "end_time": "1672531199"}}]' "$GENESIS" > "$GENESIS_TMP" && \
+    mv "${GENESIS_TMP}" "${GENESIS}"
 
-  # add bypass for MsgRecvPacket in global fee module
-  jq '.app_state.globalfee.bypass_messages += ["/ibc.core.channel.v1.MsgRecvPacket"]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
+    PERIODIC_VESTING_ACCOUNT="cheqd1uyngr0l3xtyj07js9sdew9mk50tqeq8lghhcfr"
+    # Mnemonic: want merge flame plate trouble moral submit wing whale sick meat lonely yellow lens enable oyster slight health vast weird radar mesh grab olive
+    jq '.app_state.bank.balances += [{"address": "'${PERIODIC_VESTING_ACCOUNT}'", "coins": [{"denom": "ncheq", "amount": "5000000000000000"}] }]' "$GENESIS" > "$GENESIS_TMP" && \
+    mv "${GENESIS_TMP}" "${GENESIS}"
+    jq '.app_state.auth.accounts += [{"@type": "/cosmos.vesting.v1beta1.PeriodicVestingAccount", "base_vesting_account": { "base_account": {"address": "'${PERIODIC_VESTING_ACCOUNT}'","pub_key": null,"account_number": "0","sequence": "0"}, "original_vesting": ['"${BASE_VESTING_COIN}"'], "delegated_free": [], "delegated_vesting": [], "end_time": "1672531199"}, "start_time": "1672531179", "vesting_periods": [{"length": "20", "amount": ['"${BASE_VESTING_COIN}"']}]}]' "$GENESIS" > "$GENESIS_TMP" && \
+    mv "${GENESIS_TMP}" "${GENESIS}"
 
-  # add bypass for MsgTimeout in global fee module
-  jq '.app_state.globalfee.bypass_messages += ["/ibc.core.channel.v1.MsgTimeout"]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
+    # supplied added tokens
+    jq '.app_state.bank.supply += [{"denom": "ncheq", "amount": "420004000000000200"}]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
+
+    # add bypass for MsgAcknowledgement in global fee module
+    jq '.app_state.globalfee.bypass_messages += ["/ibc.core.channel.v1.MsgAcknowledgement"]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
+
+    # add bypass for MsgUpdateClient in global fee module
+    jq '.app_state.globalfee.bypass_messages += ["/ibc.core.client.v1.MsgUpdateClient"]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
+
+    # add bypass for MsgRecvPacket in global fee module
+    jq '.app_state.globalfee.bypass_messages += ["/ibc.core.channel.v1.MsgRecvPacket"]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
+
+    # add bypass for MsgTimeout in global fee module
+    jq '.app_state.globalfee.bypass_messages += ["/ibc.core.channel.v1.MsgTimeout"]' "$GENESIS" > "$GENESIS_TMP" && mv "${GENESIS_TMP}" "${GENESIS}"
 }
 
 
@@ -164,29 +165,29 @@ mkdir $NETWORK_CONFIG_DIR
 # Generating node configurations
 for ((i=0 ; i<VALIDATORS_COUNT ; i++))
 do
-  NODE_MONIKER="validator-$i"
-  NODE_HOME="${NETWORK_CONFIG_DIR}/${NODE_MONIKER}"
+    NODE_MONIKER="validator-$i"
+    NODE_HOME="${NETWORK_CONFIG_DIR}/${NODE_MONIKER}"
 
-  init_node "${NODE_HOME}" "${NODE_MONIKER}"
-  configure_node "${NODE_HOME}" "${NODE_MONIKER}"
+    init_node "${NODE_HOME}" "${NODE_MONIKER}"
+    configure_node "${NODE_HOME}" "${NODE_MONIKER}"
 done
 
 for ((i=0 ; i<SEEDS_COUNT ; i++))
 do
-  NODE_MONIKER="seed-$i"
-  NODE_HOME="${NETWORK_CONFIG_DIR}/${NODE_MONIKER}"
+    NODE_MONIKER="seed-$i"
+    NODE_HOME="${NETWORK_CONFIG_DIR}/${NODE_MONIKER}"
 
-  init_node "${NODE_HOME}" "${NODE_MONIKER}"
-  configure_node "${NODE_HOME}" "${NODE_MONIKER}"
+    init_node "${NODE_HOME}" "${NODE_MONIKER}"
+    configure_node "${NODE_HOME}" "${NODE_MONIKER}"
 done
 
 for ((i=0 ; i<OBSERVERS_COUNT ; i++))
 do
-  NODE_MONIKER="observer-$i"
-  NODE_HOME="${NETWORK_CONFIG_DIR}/${NODE_MONIKER}"
+    NODE_MONIKER="observer-$i"
+    NODE_HOME="${NETWORK_CONFIG_DIR}/${NODE_MONIKER}"
 
-  init_node "${NODE_HOME}" "${NODE_MONIKER}"
-  configure_node "${NODE_HOME}" "${NODE_MONIKER}"
+    init_node "${NODE_HOME}" "${NODE_MONIKER}"
+    configure_node "${NODE_HOME}" "${NODE_MONIKER}"
 done
 
 
@@ -199,31 +200,37 @@ configure_genesis "${TMP_NODE_HOME}" "${TMP_NODE_MONIKER}"
 mkdir "${TMP_NODE_HOME}/config/gentx"
 
 mnemonics=(
-  "mix around destroy web fever address comfort vendor tank sudden abstract cabin acoustic attitude peasant hospital vendor harsh void current shield couple barrel suspect"
-  "useful case library girl narrow plate knee side supreme base horror fence tent glass leaf okay budget chalk patch forum coil crunch employ need"
-  "slight oblige answer vault project symbol dismiss match match honey forum wood resist exotic inner close foil notice onion acquire sausage boost acquire produce"
-  "prefer spring subject mimic shadow biology connect option east dirt security surge thrive kiwi nothing pulse holiday license hub pitch motion sunny pelican birth"
+    "mix around destroy web fever address comfort vendor tank sudden abstract cabin acoustic attitude peasant hospital vendor harsh void current shield couple barrel suspect"
+    "useful case library girl narrow plate knee side supreme base horror fence tent glass leaf okay budget chalk patch forum coil crunch employ need"
+    "slight oblige answer vault project symbol dismiss match match honey forum wood resist exotic inner close foil notice onion acquire sausage boost acquire produce"
+    "prefer spring subject mimic shadow biology connect option east dirt security surge thrive kiwi nothing pulse holiday license hub pitch motion sunny pelican birth"
 )
 
 # Adding genesis validators
 for ((i=0 ; i<VALIDATORS_COUNT ; i++))
 do
-  NODE_MONIKER="validator-$i"
-  NODE_HOME="${NETWORK_CONFIG_DIR}/${NODE_MONIKER}"
-
-  cp "${TMP_NODE_HOME}/config/genesis.json" "${NODE_HOME}/config/genesis.json"
-
-  echo "${mnemonics[$i]}" | cheqd-noded keys add "operator-$i" --keyring-backend "test" --home "${NODE_HOME}" --recover
-  cheqd-noded keys list --keyring-backend "test" --home "${NODE_HOME}"
-  cheqd-noded genesis add-genesis-account "operator-$i" 20000000000000000ncheq --keyring-backend "test" --home "${NODE_HOME}"
-
-  NODE_ID=$(cheqd-noded tendermint show-node-id --home "${NODE_HOME}")
-  NODE_VAL_PUBKEY=$(cheqd-noded tendermint show-validator --home "${NODE_HOME}")
-  cheqd-noded genesis gentx "operator-$i" 1000000000000000ncheq --chain-id "${CHAIN_ID}" --node-id "${NODE_ID}" \
+    NODE_MONIKER="validator-$i"
+    NODE_HOME="${NETWORK_CONFIG_DIR}/${NODE_MONIKER}"
+    
+    cp "${TMP_NODE_HOME}/config/genesis.json" "${NODE_HOME}/config/genesis.json"
+    
+    echo "${mnemonics[$i]}" | cheqd-noded keys add "operator-$i" --keyring-backend "test" --home "${NODE_HOME}" --recover
+    cheqd-noded keys list --keyring-backend "test" --home "${NODE_HOME}"
+    cheqd-noded genesis add-genesis-account "operator-$i" 20000000000000000ncheq --keyring-backend "test" --home "${NODE_HOME}"
+    
+    NODE_ID=$(cheqd-noded tendermint show-node-id --home "${NODE_HOME}")
+    NODE_VAL_PUBKEY=$(cheqd-noded tendermint show-validator --home "${NODE_HOME}")
+    cheqd-noded genesis gentx "operator-$i" 1000000000000000ncheq --chain-id "${CHAIN_ID}" --node-id "${NODE_ID}" \
     --pubkey "${NODE_VAL_PUBKEY}" --keyring-backend "test"  --home "${NODE_HOME}"
+    export NODE_HOME
+    
+    cp "$(dirname "$0")/../../pricefeeder/price-feeder.toml" "${NODE_HOME}/price-feeder.toml"
+    # update mexc provider urls to use mock provider for testing
+    sed -i 's|rest = "https://api.mexc.com/"|rest = "http://localhost:8080"|' "${NODE_HOME}/price-feeder.toml"
+    sed -i 's|websocket = "wbs-api.mexc.com"|websocket = "localhost:8080"|' "${NODE_HOME}/price-feeder.toml"
 
-  cp "${NODE_HOME}/config/genesis.json" "${TMP_NODE_HOME}/config/genesis.json"
-  cp -R "${NODE_HOME}/config/gentx/." "${TMP_NODE_HOME}/config/gentx"
+    cp "${NODE_HOME}/config/genesis.json" "${TMP_NODE_HOME}/config/genesis.json"
+    cp -R "${NODE_HOME}/config/gentx/." "${TMP_NODE_HOME}/config/gentx"
 done
 
 
@@ -237,26 +244,26 @@ cheqd-noded config set client output json --home "${TMP_NODE_HOME}"
 # Distribute final genesis
 for ((i=0 ; i<VALIDATORS_COUNT ; i++))
 do
-  NODE_MONIKER="validator-$i"
-  NODE_HOME="${NETWORK_CONFIG_DIR}/${NODE_MONIKER}"
-
-  cp "${TMP_NODE_HOME}/config/genesis.json" "${NODE_HOME}/config/genesis.json"
+    NODE_MONIKER="validator-$i"
+    NODE_HOME="${NETWORK_CONFIG_DIR}/${NODE_MONIKER}"
+    
+    cp "${TMP_NODE_HOME}/config/genesis.json" "${NODE_HOME}/config/genesis.json"
 done
 
 for ((i=0 ; i<SEEDS_COUNT ; i++))
 do
-  NODE_MONIKER="seed-$i"
-  NODE_HOME="${NETWORK_CONFIG_DIR}/${NODE_MONIKER}"
-
-  cp "${TMP_NODE_HOME}/config/genesis.json" "${NODE_HOME}/config/genesis.json"
+    NODE_MONIKER="seed-$i"
+    NODE_HOME="${NETWORK_CONFIG_DIR}/${NODE_MONIKER}"
+    
+    cp "${TMP_NODE_HOME}/config/genesis.json" "${NODE_HOME}/config/genesis.json"
 done
 
 for ((i=0 ; i<OBSERVERS_COUNT ; i++))
 do
-  NODE_MONIKER="observer-$i"
-  NODE_HOME="${NETWORK_CONFIG_DIR}/${NODE_MONIKER}"
-
-  cp "${TMP_NODE_HOME}/config/genesis.json" "${NODE_HOME}/config/genesis.json"
+    NODE_MONIKER="observer-$i"
+    NODE_HOME="${NETWORK_CONFIG_DIR}/${NODE_MONIKER}"
+    
+    cp "${TMP_NODE_HOME}/config/genesis.json" "${NODE_HOME}/config/genesis.json"
 done
 
 # Leave one copy of genesis in the root of network-config
@@ -267,16 +274,16 @@ SEEDS_STR=""
 
 for ((i=0 ; i<SEEDS_COUNT ; i++))
 do
-  NODE_MONIKER="seed-$i"
-  NODE_P2P_PORT="26656"
-  NODE_HOME="${NETWORK_CONFIG_DIR}/${NODE_MONIKER}"
-
-  if ((i != 0))
-  then
-  SEEDS_STR="${SEEDS_STR},"
-  fi
-
-  SEEDS_STR="${SEEDS_STR}$(cat "${NODE_HOME}/node_id.txt")@${NODE_MONIKER}:${NODE_P2P_PORT}"
+    NODE_MONIKER="seed-$i"
+    NODE_P2P_PORT="26656"
+    NODE_HOME="${NETWORK_CONFIG_DIR}/${NODE_MONIKER}"
+    
+    if ((i != 0))
+    then
+        SEEDS_STR="${SEEDS_STR},"
+    fi
+    
+    SEEDS_STR="${SEEDS_STR}$(cat "${NODE_HOME}/node_id.txt")@${NODE_MONIKER}:${NODE_P2P_PORT}"
 done
 
 echo "${SEEDS_STR}" > "${NETWORK_CONFIG_DIR}/seeds.txt"

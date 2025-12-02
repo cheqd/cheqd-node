@@ -4,42 +4,51 @@ import (
 	"bytes"
 	"fmt"
 
-	errorsmod "cosmossdk.io/errors"
+	errors "cosmossdk.io/errors"
 	"cosmossdk.io/math"
 	cheqdante "github.com/cheqd/cheqd-node/ante"
+	"github.com/cheqd/cheqd-node/pricefeeder"
+	"github.com/cheqd/cheqd-node/util"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
+	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	globalfeekeeper "github.com/noble-assets/globalfee/keeper"
+	feeabskeeper "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/keeper"
 	feeabstypes "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/types"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
 // TaxDecorator will handle tax for all taxable messages
 type TaxDecorator struct {
-	accountKeeper   ante.AccountKeeper
-	bankKeeper      BankKeeper
-	feegrantKeeper  ante.FeegrantKeeper
-	didKeeper       cheqdante.DidKeeper
-	resourceKeeper  cheqdante.ResourceKeeper
-	feeabsKeeper    FeeAbsKeeper
-	feemarketKeeper FeeMarketKeeper
-	globalFeeKeeper *globalfeekeeper.Keeper
+	accountKeeper     ante.AccountKeeper
+	bankKeeper        BankKeeper
+	feegrantKeeper    ante.FeegrantKeeper
+	didKeeper         cheqdante.DidKeeper
+	resourceKeeper    cheqdante.ResourceKeeper
+	feemarketKeeper   FeeMarketKeeper
+	oracleKeeper      cheqdante.OracleKeeper
+	feeabsKeeper      feeabskeeper.Keeper
+	oraclePricefeeder *pricefeeder.PriceFeeder
+	globalFeeKeeper   *globalfeekeeper.Keeper
 }
 
 // NewTaxDecorator returns a new taxDecorator
-func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper, fak FeeAbsKeeper, fmk FeeMarketKeeper, gfk *globalfeekeeper.Keeper) TaxDecorator {
+func NewTaxDecorator(ak ante.AccountKeeper, bk BankKeeper, fk ante.FeegrantKeeper, dk cheqdante.DidKeeper, rk cheqdante.ResourceKeeper, fmk FeeMarketKeeper, ok cheqdante.OracleKeeper, fak feeabskeeper.Keeper, pf *pricefeeder.PriceFeeder, gfk *globalfeekeeper.Keeper) TaxDecorator {
 	return TaxDecorator{
-		accountKeeper:   ak,
-		bankKeeper:      bk,
-		feegrantKeeper:  fk,
-		didKeeper:       dk,
-		resourceKeeper:  rk,
-		feeabsKeeper:    fak,
-		feemarketKeeper: fmk,
-		globalFeeKeeper: gfk,
+		accountKeeper:     ak,
+		bankKeeper:        bk,
+		feegrantKeeper:    fk,
+		didKeeper:         dk,
+		resourceKeeper:    rk,
+		feemarketKeeper:   fmk,
+		oracleKeeper:      ok,
+		feeabsKeeper:      fak,
+		oraclePricefeeder: pf,
+		globalFeeKeeper:   gfk,
 	}
 }
 
@@ -54,7 +63,7 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 	// must implement FeeTx
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
-		return ctx, errorsmod.Wrapf(sdkerrors.ErrTxDecode, "invalid transaction type: %T, must implement FeeTx", tx)
+		return ctx, errors.Wrapf(sdkerrors.ErrTxDecode, "invalid transaction type: %T, must implement FeeTx", tx)
 	}
 	// if simulate, perform no-op
 	if simulate {
@@ -79,7 +88,7 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 	}
 	params, err = td.feemarketKeeper.GetParams(ctx)
 	if err != nil {
-		return ctx, errorsmod.Wrapf(err, "unable to get fee market params")
+		return ctx, errors.Wrapf(err, "unable to get fee market params")
 	}
 	// return if disabled
 	if !params.Enabled {
@@ -88,7 +97,7 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 
 	enabledHeight, err := td.feemarketKeeper.GetEnabledHeight(ctx)
 	if err != nil {
-		return ctx, errorsmod.Wrapf(err, "unable to get fee market enabled height")
+		return ctx, errors.Wrapf(err, "unable to get fee market enabled height")
 	}
 
 	// if the current height is that which enabled the feemarket or lower, skip deduction
@@ -99,7 +108,7 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 	// update fee market state
 	state, err := td.feemarketKeeper.GetState(ctx)
 	if err != nil {
-		return ctx, errorsmod.Wrapf(err, "unable to get fee market state")
+		return ctx, errors.Wrapf(err, "unable to get fee market state")
 	}
 
 	onlyNativeDenom := true
@@ -110,7 +119,6 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 			break
 		}
 	}
-
 	var feeCoins sdk.Coins
 
 	// if IBC Denom fetch the balance of did module.
@@ -121,14 +129,13 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 		feeBal := td.bankKeeper.GetBalance(ctx, addr, nativeDenom)
 		feeCoins = sdk.NewCoins(feeBal)
 	}
-
 	gas := ctx.GasMeter().GasConsumed() // use context gas consumed
 
 	if len(feeCoins) == 0 && !simulate {
-		return ctx, errorsmod.Wrapf(feemarkettypes.ErrNoFeeCoins, "got length %d", len(feeCoins))
+		return ctx, errors.Wrapf(feemarkettypes.ErrNoFeeCoins, "got length %d", len(feeCoins))
 	}
 	if len(feeCoins) > 1 {
-		return ctx, errorsmod.Wrapf(feemarkettypes.ErrTooManyFeeCoins, "got length %d", len(feeCoins))
+		return ctx, errors.Wrapf(feemarkettypes.ErrTooManyFeeCoins, "got length %d", len(feeCoins))
 	}
 
 	var feeCoin sdk.Coin
@@ -148,7 +155,7 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 
 	minGasPrice, err := td.feemarketKeeper.GetMinGasPrice(ctx, feeCoin.GetDenom())
 	if err != nil {
-		return ctx, errorsmod.Wrapf(err, "unable to get min gas price for denom %s", feeCoins[0].GetDenom())
+		return ctx, errors.Wrapf(err, "unable to get min gas price for denom %s", feeCoins[0].GetDenom())
 	}
 
 	ctx.Logger().Info("fee deduct post handle",
@@ -172,12 +179,12 @@ func (td TaxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, suc
 	}
 	err = state.Update(gas, params)
 	if err != nil {
-		return ctx, errorsmod.Wrapf(err, "unable to update fee market state")
+		return ctx, errors.Wrapf(err, "unable to update fee market state")
 	}
 
 	err = td.feemarketKeeper.SetState(ctx, state)
 	if err != nil {
-		return ctx, errorsmod.Wrapf(err, "unable to set fee market state")
+		return ctx, errors.Wrapf(err, "unable to set fee market state")
 	}
 
 	return next(ctx, tx, simulate, success)
@@ -250,14 +257,14 @@ func SendTip(bankKeeper BankKeeper, ctx sdk.Context, proposer sdk.AccAddress, co
 func (td TaxDecorator) isTaxable(ctx sdk.Context, sdkTx sdk.Tx) (rewards sdk.Coins, burn sdk.Coins, taxable bool, err error) {
 	feeTx, ok := sdkTx.(sdk.FeeTx)
 	if !ok {
-		return sdk.Coins{}, sdk.Coins{}, false, errorsmod.Wrapf(sdkerrors.ErrTxDecode, "invalid transaction type: %T, must implement FeeTx", sdkTx)
+		return sdk.Coins{}, sdk.Coins{}, false, errors.Wrapf(sdkerrors.ErrTxDecode, "invalid transaction type: %T, must implement FeeTx", sdkTx)
 	}
 	// run lite validation
 	taxable = cheqdante.IsTaxableTxLite(feeTx)
 	if taxable {
 		// run full validation
-		_, rewards, burn = cheqdante.IsTaxableTx(ctx, td.didKeeper, td.resourceKeeper, feeTx)
-		return rewards, burn, taxable, nil
+		_, rewards, burn, err = cheqdante.IsTaxableTx(ctx, td.didKeeper, td.resourceKeeper, feeTx, td.oracleKeeper, td.feeabsKeeper, td.oraclePricefeeder)
+		return rewards, burn, taxable, err
 	}
 
 	return rewards, burn, taxable, err
@@ -276,7 +283,7 @@ func (td TaxDecorator) getFeePayer(ctx sdk.Context, feeTx sdk.FeeTx, tax sdk.Coi
 			// check if fee grant exists
 			err := td.feegrantKeeper.UseGrantedFees(ctx, feeGranter, feePayer, tax, msgs)
 			if err != nil {
-				return nil, errorsmod.Wrapf(err, "%s does not not allow to pay fees for %s", feeGranter, feePayer)
+				return nil, errors.Wrapf(err, "%s does not not allow to pay fees for %s", feeGranter, feePayer)
 			}
 		}
 		deductFrom = feeGranter
@@ -297,11 +304,11 @@ func (td TaxDecorator) validateTax(tax sdk.Coins, simulate bool) error {
 	}
 	// check if denom is accepted
 	if !tax.DenomsSubsetOf(sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(1)))) {
-		return errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "invalid denom: %s", tax)
+		return errors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid denom: %s", tax)
 	}
 	// check if tax is positive
 	if !tax.IsAllPositive() {
-		return errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "invalid tax: %s", tax)
+		return errors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid tax: %s", tax)
 	}
 	return nil
 }
@@ -315,7 +322,7 @@ func (td TaxDecorator) deductTaxFromFeePayer(ctx sdk.Context, acc sdk.AccountI, 
 	// deduct fees to did module account
 	err := td.bankKeeper.SendCoinsFromAccountToModule(ctx, acc.GetAddress(), didtypes.ModuleName, fees)
 	if err != nil {
-		return errorsmod.Wrapf(sdkerrors.ErrInsufficientFunds, "failed to deduct fees from %s: %s", acc.GetAddress(), err)
+		return errors.Wrapf(sdkerrors.ErrInsufficientFunds, "failed to deduct fees from %s: %s", acc.GetAddress(), err)
 	}
 	ctx.EventManager().EmitEvents(
 		sdk.Events{
@@ -331,12 +338,44 @@ func (td TaxDecorator) deductTaxFromFeePayer(ctx sdk.Context, acc sdk.AccountI, 
 
 // distributeRewards distributes rewards to the fee collector
 func (td TaxDecorator) distributeRewards(ctx sdk.Context, rewards sdk.Coins) error {
-	// move rewards to fee collector
-	err := td.bankKeeper.SendCoinsFromModuleToModule(ctx, didtypes.ModuleName, types.FeeCollectorName, rewards)
-	if err != nil {
-		return err
+	if rewards.IsZero() {
+		return nil
+	}
+
+	oracleShareRate := math.LegacyNewDecFromIntWithPrec(math.NewInt(5), 3) // 0.005 = 0.5%
+	oracleRewards, feeCollectorRewards := SplitRewardsByRatio(rewards, oracleShareRate)
+
+	if !oracleRewards.IsZero() {
+		if err := td.bankKeeper.SendCoinsFromModuleToModule(ctx, didtypes.ModuleName, oracletypes.ModuleName, oracleRewards); err != nil {
+			return err
+		}
+	}
+	if !feeCollectorRewards.IsZero() {
+		if err := td.bankKeeper.SendCoinsFromModuleToModule(ctx, didtypes.ModuleName, types.FeeCollectorName, feeCollectorRewards); err != nil {
+			return err
+		}
 	}
 	return nil
+}
+
+// SplitRewardsByRatio splits the input rewards by a share ratio.
+// It returns two sdk.Coins:  and remainingShare.
+func SplitRewardsByRatio(rewards sdk.Coins, ratio math.LegacyDec) (oracleRewards sdk.Coins, feeCollectorRewards sdk.Coins) {
+	oracleRewards = sdk.NewCoins()
+	feeCollectorRewards = sdk.NewCoins()
+
+	for _, coin := range rewards {
+		portion := ratio.MulInt(coin.Amount).TruncateInt()
+		rest := coin.Amount.Sub(portion)
+
+		if portion.IsPositive() {
+			oracleRewards = oracleRewards.Add(sdk.NewCoin(coin.Denom, portion))
+		}
+		if rest.IsPositive() {
+			feeCollectorRewards = feeCollectorRewards.Add(sdk.NewCoin(coin.Denom, rest))
+		}
+	}
+	return
 }
 
 // burnFees burns fees from the module account
@@ -356,104 +395,253 @@ func (td *TaxDecorator) handleTaxableTransaction(
 	rewards, burn sdk.Coins,
 	tx sdk.Tx,
 ) error {
+	var (
+		convertedRewards sdk.Coins
+		convertedBurn    sdk.Coins
+	)
+
 	params, err := td.feemarketKeeper.GetParams(ctx)
 	if err != nil {
 		return err
 	}
-
 	nativeDenom := params.FeeDenom
-	tax := rewards.Add(burn...)
+	onlyNativeDenom := td.isOnlyNativeDenom(feeTx.GetFee(), nativeDenom)
 
-	onlyNativeDenom := true
-	var ibcFees sdk.Coins
-	var nativeFees sdk.Coins
-	for _, fee := range feeTx.GetFee() {
-		if fee.Denom != nativeDenom {
-			onlyNativeDenom = false
-			ibcFees = ibcFees.Add(fee)
-			continue
-		}
-		nativeFees = nativeFees.Add(fee)
+	cheqPrice, found := td.oracleKeeper.GetWMA(ctx, oracletypes.CheqdSymbol, string(oraclekeeper.WmaStrategyBalanced))
+	if !found {
+		return err
 	}
-
-	//nolint:nestif
 	if onlyNativeDenom {
-		if err := td.validateTax(tax, simulate); err != nil {
-			return err
-		}
-
-		feePayer, err := td.getFeePayer(ctx, feeTx, tax, tx.GetMsgs())
+		err := td.processNativeDenomTax(ctx, feeTx, simulate, rewards, burn, tx, &convertedRewards, &convertedBurn, cheqPrice)
 		if err != nil {
-			return err
-		}
-
-		if err := td.deductTaxFromFeePayer(ctx, feePayer, tax); err != nil {
 			return err
 		}
 	} else {
-		if td.feeabsKeeper == nil {
-			return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "fee abstraction keeper is not configured")
-		}
-
-		feePayer, err := td.getFeePayer(ctx, feeTx, feeTx.GetFee(), tx.GetMsgs())
-		if err != nil {
+		if err := td.handleNonNativeTax(ctx, feeTx, simulate, rewards, burn, tx, cheqPrice, &convertedRewards, &convertedBurn); err != nil {
 			return err
 		}
-
-		convertedNative := math.ZeroInt()
-		for _, feeCoin := range ibcFees {
-			hostConfig, found := td.feeabsKeeper.GetHostZoneConfig(ctx, feeCoin.Denom)
-			if !found {
-				return errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, "unsupported ibc fee denom: %s", feeCoin.Denom)
-			}
-
-			nativeCoins, err := td.feeabsKeeper.CalculateNativeFromIBCCoins(ctx, sdk.NewCoins(feeCoin), hostConfig)
-			if err != nil {
-				return err
-			}
-			convertedNative = convertedNative.Add(nativeCoins.AmountOf(nativeDenom))
-		}
-
-		taxAmount := tax.AmountOf(nativeDenom)
-		totalAvailable := convertedNative.Add(nativeFees.AmountOf(nativeDenom))
-		if totalAvailable.LT(taxAmount) {
-			return errorsmod.Wrapf(sdkerrors.ErrInsufficientFee, "insufficient native amount to cover tax; required %s%s, available %s%s", taxAmount.String(), nativeDenom, totalAvailable.String(), nativeDenom)
-		}
-
-		if !ibcFees.IsZero() {
-			if err := td.bankKeeper.SendCoinsFromAccountToModule(ctx, feePayer.GetAddress(), feeabstypes.ModuleName, ibcFees); err != nil {
-				return errorsmod.Wrapf(sdkerrors.ErrInsufficientFunds, "failed to transfer ibc fees from %s: %s", feePayer.GetAddress(), err)
-			}
-		}
-
-		convertedContribution := convertedNative
-		if convertedContribution.GT(taxAmount) {
-			convertedContribution = taxAmount
-		}
-		if convertedContribution.IsPositive() {
-			if err := td.bankKeeper.SendCoinsFromModuleToModule(ctx, feeabstypes.ModuleName, didtypes.ModuleName, sdk.NewCoins(sdk.NewCoin(nativeDenom, convertedContribution))); err != nil {
-				return err
-			}
-		}
-
-		remainingTax := taxAmount.Sub(convertedContribution)
-		if remainingTax.IsPositive() {
-			remaining := sdk.NewCoins(sdk.NewCoin(nativeDenom, remainingTax))
-			if err := td.deductTaxFromFeePayer(ctx, feePayer, remaining); err != nil {
-				return err
-			}
-		}
 	}
 
-	// Distribute rewards to fee collector
-	if err := td.distributeRewards(ctx, rewards); err != nil {
+	if err := td.distributeRewards(ctx, convertedRewards); err != nil {
 		return err
 	}
-
-	// Burn the tax portion
-	if err := td.burnFees(ctx, burn); err != nil {
+	if err := td.burnFees(ctx, convertedBurn); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (td *TaxDecorator) handleNonNativeTax(
+	ctx sdk.Context,
+	feeTx sdk.FeeTx,
+	simulate bool,
+	rewards, burn sdk.Coins,
+	tx sdk.Tx,
+	cheqPrice math.LegacyDec,
+	convertedRewards, convertedBurn *sdk.Coins,
+) error {
+	var err error
+
+	*convertedRewards, err = ConvertToCheq(rewards, cheqPrice)
+	if err != nil {
+		return fmt.Errorf("failed to convert rewards to ncheq: %w", err)
+	}
+
+	*convertedBurn, err = ConvertToCheq(burn, cheqPrice)
+	if err != nil {
+		return fmt.Errorf("failed to convert burn to ncheq: %w", err)
+	}
+
+	userFee := feeTx.GetFee()
+	if userFee.IsZero() {
+		return fmt.Errorf("user fee is zero")
+	}
+	denom := userFee[0].Denom
+
+	hostChainConfig, found := td.feeabsKeeper.GetHostZoneConfig(ctx, denom)
+	if !found {
+		return fmt.Errorf("host chain config not found for denom: %s", denom)
+	}
+
+	totalTax := convertedRewards.Add(*convertedBurn...)
+
+	return td.processNonNativeDenomTax(ctx, tx, simulate, feeTx, hostChainConfig, totalTax)
+}
+
+func (td *TaxDecorator) isOnlyNativeDenom(fees sdk.Coins, nativeDenom string) bool {
+	for _, fee := range fees {
+		if fee.Denom != nativeDenom {
+			return false
+		}
+	}
+	return true
+}
+
+func (td *TaxDecorator) processNativeDenomTax(
+	ctx sdk.Context,
+	feeTx sdk.FeeTx,
+	simulate bool,
+	rewards, burn sdk.Coins,
+	tx sdk.Tx,
+	convertedRewards, convertedBurn *sdk.Coins,
+	cheqPrice math.LegacyDec,
+) error {
+	if err := td.validateTax(feeTx.GetFee(), simulate); err != nil {
+		return err
+	}
+	var err error
+	*convertedRewards, err = ConvertToCheq(rewards, cheqPrice)
+	if err != nil {
+		return err
+	}
+	*convertedBurn, err = ConvertToCheq(sdk.NewCoins(burn...), cheqPrice)
+	if err != nil {
+		return err
+	}
+	tax := convertedRewards.Add(*convertedBurn...)
+	feePayer, err := td.getFeePayer(ctx, feeTx, tax, tx.GetMsgs())
+	if err != nil {
+		return err
+	}
+	return td.deductTaxFromFeePayer(ctx, feePayer, tax)
+}
+
+func (td *TaxDecorator) processNonNativeDenomTax(ctx sdk.Context, tx sdk.Tx, simulate bool, feeTx sdk.FeeTx, hostChainConfig feeabstypes.HostChainFeeAbsConfig, nativeFeeTax sdk.Coins) error {
+	if hostChainConfig.Status == feeabstypes.HostChainFeeAbsStatus_FROZEN {
+		return errors.Wrap(feeabstypes.ErrHostZoneFrozen, "cannot deduct fee as host zone is frozen")
+	}
+
+	// if hostChainConfig.Status == feeabstypes.HostChainFeeAbsStatus_OUTDATED {
+	// 	return ctx, sdkerrors.Wrap(feeabstypes.ErrHostZoneOutdated, "cannot deduct fee as host zone is outdated")
+	// }
+	fee := feeTx.GetFee()
+	feePayer := feeTx.FeePayer()
+	feeGranter := feeTx.FeeGranter()
+
+	feeAbstractionPayer := feePayer
+	// if feegranter set deduct fee from feegranter account.
+	// this works with only when feegrant enabled.
+	if feeGranter != nil {
+		if td.feegrantKeeper == nil {
+			return errors.Wrap(sdkerrors.ErrInvalidRequest, "fee grants are not enabled")
+		} else if !bytes.Equal(feeGranter, feePayer) {
+			err := td.feegrantKeeper.UseGrantedFees(ctx, feeGranter, feePayer, fee, tx.GetMsgs())
+			if err != nil {
+				return errors.Wrapf(err, "%s not allowed to pay fees from %s", feeGranter, feePayer)
+			}
+		}
+
+		feeAbstractionPayer = feeGranter
+	}
+
+	deductFeesFrom := td.feeabsKeeper.GetFeeAbsModuleAddress()
+	deductFeesFromAcc := td.accountKeeper.GetAccount(ctx, deductFeesFrom)
+	if deductFeesFromAcc == nil {
+		return errors.Wrapf(sdkerrors.ErrUnknownAddress, "fee abstraction didn't set : %s does not exist", deductFeesFrom)
+	}
+
+	// calculate the native token can be swapped from ibc token
+	if len(fee) != 1 {
+		return errors.Wrapf(sdkerrors.ErrInvalidCoins, "invalid ibc token: %s", fee)
+	}
+
+	ibcFeetax, err := CalculateIBCCoinsFromNative(ctx, nativeFeeTax, hostChainConfig, td.feeabsKeeper)
+	if err != nil {
+		return err
+	}
+
+	// deduct the fees
+	if !feeTx.GetFee().IsZero() {
+		err := td.bankKeeper.SendCoinsFromAccountToModule(ctx, sdk.AccAddress(feeAbstractionPayer), feeabstypes.ModuleName, ibcFeetax)
+		if err != nil {
+			return err
+		}
+		err = DeductFees(td.bankKeeper, ctx, deductFeesFrom, nativeFeeTax)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func CalculateIBCCoinsFromNative(ctx sdk.Context, nativeCoins sdk.Coins, chainConfig feeabstypes.HostChainFeeAbsConfig, feeabskeeper feeabskeeper.Keeper) (sdk.Coins, error) {
+	// Support only 1 native denom at a time
+	if len(nativeCoins) != 1 {
+		return nil, errors.Wrapf(sdkerrors.ErrInvalidCoins, "expected single native coin, got: %s", nativeCoins)
+	}
+
+	nativeCoin := nativeCoins[0]
+
+	// Get TWAP rate: ibcDenom price in native denom
+	twapRate, err := feeabskeeper.GetTwapRate(ctx, chainConfig.IbcDenom)
+	if err != nil {
+		return nil, err
+	}
+
+	if twapRate.IsZero() {
+		return nil, errors.Wrapf(sdkerrors.ErrInvalidRequest, "zero twap rate for denom %s", chainConfig.IbcDenom)
+	}
+
+	// inverse: ibcAmount = nativeAmount / twapRate
+	ibcAmount := math.LegacyNewDecFromInt(nativeCoin.Amount).Quo(twapRate).TruncateInt()
+
+	// Create and return the IBC coin
+	ibcCoin := sdk.NewCoin(chainConfig.IbcDenom, ibcAmount)
+
+	ibcCoins := sdk.NewCoins(ibcCoin)
+	if ibcCoins.Len() != 1 {
+		return nil, feeabstypes.ErrInvalidIBCFees
+	}
+
+	ibcDenom := ibcCoins[0].Denom
+	if !feeabskeeper.HasHostZoneConfig(ctx, ibcDenom) {
+		return nil, feeabstypes.ErrHostZoneConfigNotFound
+	}
+	return sdk.NewCoins(ibcCoin), nil
+}
+
+// DeductFees deducts fees from the given account.
+func DeductFees(bankKeeper types.BankKeeper, ctx sdk.Context, accAddress sdk.AccAddress, fees sdk.Coins) error {
+	if err := fees.Validate(); err != nil {
+		return errors.Wrapf(sdkerrors.ErrInsufficientFee, "invalid fee amount: %s", fees)
+	}
+
+	if err := bankKeeper.SendCoinsFromAccountToModule(ctx, accAddress, didtypes.ModuleName, fees); err != nil {
+		return errors.Wrapf(sdkerrors.ErrInsufficientFunds, "failed to deduct fees: %s", err)
+	}
+
+	return nil
+}
+
+func ConvertToCheq(coins sdk.Coins, cheqPrice math.LegacyDec) (sdk.Coins, error) {
+	if coins.DenomsSubsetOf(sdk.NewCoins(sdk.NewCoin(oracletypes.CheqdDenom, math.ZeroInt()))) {
+		return coins, nil
+	}
+
+	converted := sdk.NewCoins()
+
+	for _, coin := range coins {
+		switch coin.Denom {
+		case oracletypes.UsdDenom:
+			if cheqPrice.IsZero() {
+				return nil, fmt.Errorf("cannot convert USD to ncheq: CHEQ price unavailable")
+			}
+
+			// Convert: USD (1e18) → CHEQ → ncheq (1e9)
+			usdAmount := coin.Amount.ToLegacyDec().Quo(math.LegacyNewDecFromInt(util.UsdExponent))
+			ncheqAmount := usdAmount.Quo(cheqPrice).MulInt64(util.CheqScale.Int64()).TruncateInt()
+
+			converted = converted.Add(sdk.NewCoin(oracletypes.CheqdDenom, ncheqAmount))
+
+		case oracletypes.CheqdDenom:
+			converted = converted.Add(coin)
+
+		default:
+			return nil, fmt.Errorf("unexpected denom: %s", coin.Denom)
+		}
+	}
+
+	return converted, nil
 }
