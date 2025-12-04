@@ -45,6 +45,15 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 	var payload didcli.DIDDocument
 	var signInputs []didcli.SignInput
 
+	makeLowerFee := func(required sdk.Coin) sdk.Coin {
+		lower := required.Amount.Sub(sdkmath.NewInt(1))
+		if lower.IsNegative() {
+			lower = sdkmath.ZeroInt()
+		}
+
+		return sdk.NewCoin(required.Denom, lower)
+	}
+
 	BeforeEach(func() {
 		tmpDir = GinkgoT().TempDir()
 
@@ -151,7 +160,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		feeInNCheq, err := cli.ResolveFeeFromParams(feeParams.CreateDid, useMin)
 		Expect(err).To(BeNil())
 
-		lowerTax := sdk.NewCoin(feeInNCheq.Denom, sdkmath.NewInt(feeInNCheq.Amount.Int64()-10000000000))
+		lowerTax := makeLowerFee(feeInNCheq)
 		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(1))
@@ -185,7 +194,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		useMin = true
 		feeInNCheq, err = cli.ResolveFeeFromParams(feeParams.UpdateDid, useMin)
 		Expect(err).To(BeNil())
-		lowerTax := sdk.NewCoin(feeInNCheq.Denom, sdkmath.NewInt(feeInNCheq.Amount.Int64()-10000000000))
+		lowerTax := makeLowerFee(feeInNCheq)
 		res, err = cli.UpdateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_5, helpers.GenerateFees(lowerTax.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(1))
@@ -209,7 +218,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 		useMin = true
 		feeInNCheq, err = cli.ResolveFeeFromParams(feeParams.DeactivateDid, useMin)
 		Expect(err).To(BeNil())
-		lowerTax := sdk.NewCoin(feeInNCheq.Denom, sdkmath.NewInt(feeInNCheq.Amount.Int64()-1000000000))
+		lowerTax := makeLowerFee(feeInNCheq)
 		res, err = cli.DeactivateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_5, helpers.GenerateFees(lowerTax.String()))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(1))
