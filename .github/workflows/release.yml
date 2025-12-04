@@ -212,7 +212,8 @@ jobs:
             latest=auto
           tags: |
             type=semver,pattern={{version}},value=${{ needs.release-guard.outputs.RELEASE_VERSION }}
-            type=raw,value=production-latest
+            type=raw,value=production-latest,enable=${{ startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-') }}
+            type=raw,value=staging-latest,enable=${{ startsWith(github.ref, 'refs/tags/v') && contains(github.ref, '-') }}
             type=sha,format=long
           labels: |
             org.opencontainers.image.vendor="Cheqd Foundation Limited"

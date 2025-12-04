@@ -81,7 +81,7 @@ docker compose exec -d osmosis osmosisd start
 
 info "Waiting for chains"
 # TODO: Get rid of this
-sleep 20
+sleep 10
 
 info "Checking statuses"
 CHEQD_STATUS=$(docker compose exec cheqd cheqd-noded status 2>&1)

@@ -16,7 +16,7 @@ type HumanReadableEvent struct {
 }
 
 func ReadableEvents(events []types.Event) []HumanReadableEvent {
-	readableEvents := make([]HumanReadableEvent, len(events))
+	readableEvents := make([]HumanReadableEvent, 0, len(events))
 	for _, event := range events {
 		readableAttributes := make([]HumanReadableEventAttribute, len(event.Attributes))
 		for i, attribute := range event.Attributes {
