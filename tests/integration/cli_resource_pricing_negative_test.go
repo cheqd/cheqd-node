@@ -187,7 +187,8 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		useMin := true
 		tax, err := cli.ResolveFeeFromParams(resourceFeeParams.Json, useMin)
 		Expect(err).To(BeNil())
-		lowerTax := sdk.NewCoin(tax.Denom, sdkmath.NewInt(tax.Amount.Int64()-1000000000))
+		lowerAmount := sdkmath.MaxInt(sdkmath.NewInt(1), sdkmath.NewInt(tax.Amount.Int64()-1000000000))
+		lowerTax := sdk.NewCoin(tax.Denom, lowerAmount)
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
@@ -212,7 +213,8 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		useMin := true
 		tax, err := cli.ResolveFeeFromParams(resourceFeeParams.Image, useMin)
 		Expect(err).To(BeNil())
-		lowerTax := sdk.NewCoin(tax.Denom, sdkmath.NewInt(tax.Amount.Int64()-1000000000))
+		lowerAmount := sdkmath.MaxInt(sdkmath.NewInt(1), sdkmath.NewInt(tax.Amount.Int64()-1000000000))
+		lowerTax := sdk.NewCoin(tax.Denom, lowerAmount)
 
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
@@ -238,7 +240,8 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 		useMin := true
 		tax, err := cli.ResolveFeeFromParams(resourceFeeParams.Default, useMin)
 		Expect(err).To(BeNil())
-		lowerTax := sdk.NewCoin(tax.Denom, sdkmath.NewInt(tax.Amount.Int64()-1000000000))
+		lowerAmount := sdkmath.MaxInt(sdkmath.NewInt(1), sdkmath.NewInt(tax.Amount.Int64()-1000000000))
+		lowerTax := sdk.NewCoin(tax.Denom, lowerAmount)
 		res, err := cli.CreateResource(tmpDir, resourcetypes.MsgCreateResourcePayload{
 			CollectionId: collectionID,
 			Id:           resourceID,
