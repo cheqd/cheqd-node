@@ -46,7 +46,7 @@ var _ = Describe("cheqd cli - negative diddoc pricing", func() {
 	var signInputs []didcli.SignInput
 
 	makeLowerFee := func(required sdk.Coin) sdk.Coin {
-		lower := required.Amount.Sub(sdkmath.NewInt(1))
+		lower := required.Amount.Sub(sdkmath.NewInt(1_000_000_000)) // subtract 1 CHEQ
 		if lower.IsNegative() {
 			lower = sdkmath.ZeroInt()
 		}
