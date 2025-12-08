@@ -1231,7 +1231,7 @@ class Installer():
                 stripped = line.strip()
 
                 # Check if we're entering the [mempool] section
-                if stripped == "[mempool]" or stripped == "#[mempool]":
+                if stripped in {"[mempool]", "#[mempool]"}:
                     in_mempool_section = True
                     # Comment out the section header if not already commented
                     if not stripped.startswith("#"):
