@@ -1215,7 +1215,6 @@ class Installer():
 
     def remove_mempool_section(self, app_toml_path: str) -> bool:
         # Remove or comment out the [mempool] section from app.toml
-        # This section is deprecated in newer Cosmos SDK versions
         try:
             if not os.path.exists(app_toml_path):
                 logging.debug(f"app.toml not found at {app_toml_path}. Skipping mempool section removal...")
