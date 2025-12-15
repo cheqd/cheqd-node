@@ -1200,6 +1200,11 @@ class Installer():
             else:
                 logging.debug("Log format not set by user. Skipping...")
 
+            # Remove [mempool] section from app.toml
+            if not self.remove_mempool_section(app_toml_path):
+                logging.error("Failed to remove [mempool] section from app.toml.")
+                return False
+
             # Set ownership of configuration directory to cheqd:cheqd
             logging.info(f"Setting ownership of {self.cheqd_config_dir} to {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}")
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_config_dir}")
@@ -1210,6 +1215,60 @@ class Installer():
             logging.exception(f"Failed to configure cheqd-noded settings. Reason: {e}")
             return False
 
+    def remove_mempool_section(self, app_toml_path: str) -> bool:
+        # Remove or comment out the [mempool] section from app.toml
+        try:
+            if not os.path.exists(app_toml_path):
+                logging.debug(f"app.toml not found at {app_toml_path}. Skipping mempool section removal...")
+                return True
+
+            with open(app_toml_path, "r") as file:
+                lines = file.readlines()
+
+            # Find and comment out the [mempool] section
+            in_mempool_section = False
+            modified_lines = []
+
+            for line in lines:
+                stripped = line.strip()
+
+                # Check if we're entering the [mempool] section
+                if stripped in {"[mempool]", "#[mempool]"}:
+                    in_mempool_section = True
+                    # Comment out the section header if not already commented
+                    if not stripped.startswith("#"):
+                        # Preserve original indentation
+                        leading_space = line[:len(line) - len(line.lstrip())]
+                        modified_lines.append(leading_space + "# " + line.lstrip())
+                    else:
+                        modified_lines.append(line)
+                    continue
+
+                # Check if we're exiting the [mempool] section (next section starts)
+                if in_mempool_section and stripped.startswith("[") and not stripped.startswith("#"):
+                    in_mempool_section = False
+
+                # Comment out lines within the [mempool] section
+                if in_mempool_section:
+                    # Only comment out non-empty, non-commented lines
+                    if stripped and not stripped.startswith("#"):
+                        # Preserve original indentation
+                        leading_space = line[:len(line) - len(line.lstrip())]
+                        modified_lines.append(leading_space + "# " + line.lstrip())
+                    else:
+                        modified_lines.append(line)
+                else:
+                    modified_lines.append(line)
+
+            # Write the modified content back to the file
+            with open(app_toml_path, "w") as file:
+                file.writelines(modified_lines)
+
+            logging.info(f"Successfully commented out [mempool] section in {app_toml_path}")
+            return True
+        except Exception as e:
+            logging.exception(f"Failed to comment out [mempool] section in app.toml. Reason: {e}")
+            return False
 
     def _get_latest_block_height(self, rpc_endpoint: str) -> int:
         try:
