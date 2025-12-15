@@ -1201,7 +1201,9 @@ class Installer():
                 logging.debug("Log format not set by user. Skipping...")
 
             # Remove [mempool] section from app.toml
-            self.remove_mempool_section(app_toml_path)
+            if not self.remove_mempool_section(app_toml_path):
+                logging.error("Failed to remove [mempool] section from app.toml.")
+                return False
 
             # Set ownership of configuration directory to cheqd:cheqd
             logging.info(f"Setting ownership of {self.cheqd_config_dir} to {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}")
@@ -1235,7 +1237,9 @@ class Installer():
                     in_mempool_section = True
                     # Comment out the section header if not already commented
                     if not stripped.startswith("#"):
-                        modified_lines.append("# " + line.lstrip())
+                        # Preserve original indentation
+                        leading_space = line[:len(line) - len(line.lstrip())]
+                        modified_lines.append(leading_space + "# " + line.lstrip())
                     else:
                         modified_lines.append(line)
                     continue
@@ -1248,7 +1252,9 @@ class Installer():
                 if in_mempool_section:
                     # Only comment out non-empty, non-commented lines
                     if stripped and not stripped.startswith("#"):
-                        modified_lines.append("# " + line.lstrip())
+                        # Preserve original indentation
+                        leading_space = line[:len(line) - len(line.lstrip())]
+                        modified_lines.append(leading_space + "# " + line.lstrip())
                     else:
                         modified_lines.append(line)
                 else:
@@ -1258,10 +1264,10 @@ class Installer():
             with open(app_toml_path, "w") as file:
                 file.writelines(modified_lines)
 
-            logging.info(f"Successfully removed [mempool] section from {app_toml_path}")
+            logging.info(f"Successfully commented out [mempool] section in {app_toml_path}")
             return True
         except Exception as e:
-            logging.exception(f"Failed to remove [mempool] section from app.toml. Reason: {e}")
+            logging.exception(f"Failed to comment out [mempool] section in app.toml. Reason: {e}")
             return False
 
     def _get_latest_block_height(self, rpc_endpoint: str) -> int:
