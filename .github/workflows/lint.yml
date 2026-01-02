@@ -12,7 +12,7 @@ jobs:
     name: "Shell pipefail check"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Run 'set -euox pipefail' check
         run: bash ./.github/scripts/ensure_set_euox_pipefail.sh
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Run Markdown link check
         uses: gaurav-nelson/github-action-markdown-link-check@v1
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-go@v6
         with:
@@ -45,16 +45,16 @@ jobs:
           cache: false # temporarily off, as golangci-lint doesn't align 100% with cached setup-go@v4, see: https://github.com/golangci/golangci-lint-action/issues/807
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: v1.60.3
+          version: v2.7.2
           args: --config .github/linters/.golangci.yaml
 
   proto-lint:
     name: "Protobuf"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       # Install the `buf` CLI
       - uses: bufbuild/buf-setup-action@v1.50.0
@@ -78,7 +78,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0 # Required to fetch version
 
