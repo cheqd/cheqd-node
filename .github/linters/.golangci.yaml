@@ -1,5 +1,3 @@
-version: "2"
-
 run:
   timeout: 10m
   go: "1.23"
@@ -8,12 +6,15 @@ linters:
   enable:
     - bodyclose
     - copyloopvar
-    # - depguard # Disabled - no import restrictions applied earlier
+    - depguard
     - dogsled
     - errcheck
     - goconst
     - gocritic
-    # - gosimple # Merged into staticcheck in v2
+    - gofumpt
+    - gofmt
+    - goimports
+    - gosimple
     - govet
     - ineffassign
     - misspell
@@ -21,16 +22,16 @@ linters:
     - nestif
     - nolintlint
     - staticcheck
-    # - stylecheck # Merged into staticcheck in v2
-    # - typecheck # Removed in v2
+    - stylecheck
+    - typecheck
     - unconvert
     - unused
-
-formatters:
-  enable:
-    - gofumpt
-    - goimports
-
+    
+issues:
+  exclude-rules:
+    - text: "ST1003:"
+      linters:
+        - stylecheck
 
 linters-settings:
   dogsled:
@@ -45,16 +46,14 @@ linters-settings:
     disabled-checks:
       - regexpMust
       - badCall # Remove this after CI workflow PR
-    
+
   misspell:
     ignore-words:
       - cheqd
       - cheq
       - ncheq
 
-  staticcheck:
-    # Select the Go version to target.
-    go: "1.23"
+  stylecheck:
     # STxxxx checks in https://staticcheck.io/docs/configuration/options/#checks
     # Default: ["*"]
     checks: ["all"]
@@ -65,7 +64,16 @@ linters-settings:
     # https://staticcheck.io/docs/configuration/options/#initialisms
     initialisms: ["ACL", "API", "ASCII", "CPU", "CSS", "DNS", "EOF", "GUID", "HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "QPS", "RAM", "RPC", "SLA", "SMTP", "SQL", "SSH", "TCP", "TLS", "TTL", "UDP", "UI", "GID", "UID", "UUID", "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS", "SIP", "RTP", "AMQP", "DB", "TS"]
 
+  depguard:
+    rules:
+      main:
+        files:
+          - $all
+        list-mode: lax
+        allow: "*"
+  
   goconst:
     min-occurrences: 5
     ignore-tests: true
     ignore-strings: "echo '"
+    
