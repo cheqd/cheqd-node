@@ -20,7 +20,7 @@ jobs:
       DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: "Modify runner's home directory permissions"
         run: "sudo chmod 755 /home/runner"
@@ -52,7 +52,7 @@ jobs:
       PYTHONDEVMODE: 1
       DEFAULT_DEBUG_BRANCH: ${{ github.ref_name }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: "Modify runner's home directory permissions"
         run: "sudo chmod 755 /home/runner"
@@ -82,7 +82,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-go@v6
         with:
@@ -98,7 +98,7 @@ jobs:
         run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --junit-report report-unit.xml
 
       - name: Upload unit tests result
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: report-unit.xml
           path: report-unit.xml
@@ -108,10 +108,10 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Download binary artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         id: download
         with:
           name: cheqd-noded
@@ -121,7 +121,7 @@ jobs:
         run: sudo chmod +x ${{ env.RUNNER_BIN_DIR }}/cheqd-noded
 
       - name: Download node Docker image
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: cheqd-node-build.tar
 
@@ -165,7 +165,7 @@ jobs:
         run: docker compose --env-file build-latest.env logs --tail --follow
 
       - name: Upload integration tests result
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: report-integration.xml
           path: report-integration.xml
@@ -174,7 +174,7 @@ jobs:
     name: "Fee Abstraction Tests"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Execute fee-abstraction logic by paying in `uosmo`
         working-directory: ./tests/fee-abs
@@ -184,7 +184,7 @@ jobs:
     name: "Upgrade Tests"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Download old node binary (mainnet-latest)
         run: |
@@ -212,7 +212,7 @@ jobs:
         run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
 
       - name: Download new version of the Docker image (build-latest)
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: cheqd-node-build.tar
 
@@ -230,7 +230,7 @@ jobs:
           ginkgo -r --race --tags upgrade_integration --focus-file pre_test.go --keep-going --trace --junit-report ../../../../report-pre-upgrade.xml
 
       - name: Upload pre-upgrade tests result
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: report-pre-upgrade.xml
           path: report-pre-upgrade.xml
@@ -251,7 +251,7 @@ jobs:
           ginkgo -r --race --tags upgrade_integration --focus-file pre_upgrade_v4_1_test.go --keep-going --trace --junit-report ../../../../report-pre-upgrade-v4_1.xml
 
       - name: Upload pre-upgrade-v4_1 tests result
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: report-pre-upgrade-v4_1.xml
           path: report-pre-upgrade-v4_1.xml
@@ -272,7 +272,7 @@ jobs:
           ginkgo -r --race --tags upgrade_integration --focus-file pre_upgrade_v4_2_test.go --keep-going --trace --junit-report ../../../../report-pre-upgrade-v4_2.xml
 
       - name: Upload pre-upgrade-v4_2 tests result
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: report-pre-upgrade-v4_2.xml
           path: report-pre-upgrade-v4_2.xml
@@ -288,7 +288,7 @@ jobs:
           docker ps -a
 
       - name: Download binary artifact (build-latest)
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         id: download
         with:
           name: cheqd-noded
@@ -303,7 +303,7 @@ jobs:
           ginkgo -r --race --tags upgrade_integration --focus-file post_test.go --keep-going --trace --junit-report ../../../../report-post-upgrade.xml
 
       - name: Upload post-upgrade tests result
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: report-post-upgrade.xml
           path: report-post-upgrade.xml
@@ -314,7 +314,7 @@ jobs:
           ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --skip-file cli_defi_test.go --skip-file cli_defi_negative_test.go --junit-report ../../report-upgraded-integration.xml
 
       - name: Upload post-upgrade integration tests result
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: report-upgraded-integration.xml
           path: report-upgraded-integration.xml
@@ -330,7 +330,7 @@ jobs:
           ginkgo -r --race --tags upgrade_integration --focus-file param_change_proposal_test.go --keep-going --trace --junit-report ../../../../report-pricing-proposal.xml
 
       - name: Upload pricing proposal tests result
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: report-pricing-proposal.xml
           path: report-pricing-proposal.xml
@@ -341,7 +341,7 @@ jobs:
           ginkgo -r --tags integration --race --randomize-suites --keep-going --trace --skip-file cli_diddoc_test.go --skip-file cli_diddoc_negative_test.go --skip-file cli_resource_test.go --skip-file cli_resource_negative_test.go --skip-file cli_defi_test.go --skip-file cli_defi_negative_test.go --junit-report ../../report-pricing-change.xml
 
       - name: Upload pricing change tests result
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: report-pricing-change.xml
           path: report-pricing-change.xml
@@ -360,39 +360,39 @@ jobs:
     if: always()
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Download unit test
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: report-unit.xml
 
       - name: Download integration test report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: report-integration.xml
 
       - name: Download pre-upgrade test Report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: report-pre-upgrade.xml
 
       - name: Download post-upgrade test Report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: report-post-upgrade.xml
 
       - name: Download upgraded integration test Report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: report-upgraded-integration.xml
 
       - name: Download pricing proposal test Report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: report-pricing-proposal.xml
       - name: Download pricing change test Report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: report-pricing-change.xml
       - name: Combine test results
