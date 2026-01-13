@@ -9,61 +9,60 @@ GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
 function info() {
-  printf "${GREEN}[info] %s${NC}\n" "${1}"
+    printf "${GREEN}[info] %s${NC}\n" "${1}"
 }
 
 function err() {
-  printf "${RED}[err] %s${NC}\n" "${1}"
+    printf "${RED}[err] %s${NC}\n" "${1}"
 }
 
 function assert_tx_successful() {
-  RES="$1"
-
-  if [[ $(echo "${RES}" | jq --raw-output '.code') == 0 ]]; then
-    info "tx successful"
-  else
-    err "non zero tx return code"
-    exit 1
-  fi
+    RES="$1"
+    
+    if [[ $(echo "${RES}" | jq --raw-output '.code') == 0 ]]; then
+        info "tx successful"
+    else
+        err "non zero tx return code"
+        exit 1
+    fi
 }
 
 function exit_if_tx_successful() {
-  RES="$1"
-
-  if [[ $(echo "${RES}" | jq --raw-output '.code') == 0 ]]; then
-    info "tx successful"
-    exit 0
-  else
-    err "tx failed, retrying"
-  fi
+    RES="$1"
+    
+    if [[ $(echo "${RES}" | jq --raw-output '.code') == 0 ]]; then
+        info "tx successful"
+        exit 0
+    else
+        err "tx failed, retrying"
+    fi
 }
 
 function assert_network_running() {
-  RES="$1"
-  LATEST_HEIGHT=$(echo "${RES}" | jq --raw-output '.SyncInfo.latest_block_height')
-  info "latest height: ${LATEST_HEIGHT}"
-
-  if [[ $LATEST_HEIGHT -gt 1 ]]; then
-    info "network is running"
-  else
-    err "network is not running"
-    exit 1
-  fi
+    RES="$1"
+    LATEST_HEIGHT=$(echo "${RES}" | jq --raw-output '.SyncInfo.latest_block_height')
+    info "latest height: ${LATEST_HEIGHT}"
+    
+    if [[ $LATEST_HEIGHT -gt 1 ]]; then
+        info "network is running"
+    else
+        err "network is not running"
+        exit 1
+    fi
 }
 
 function assert_network_running_comet_v38_or_above() {
-  RES="$1"
-  LATEST_HEIGHT=$(echo "${RES}" | jq --raw-output '.sync_info.latest_block_height')
-  info "latest height: ${LATEST_HEIGHT}"
-
-  if [[ $LATEST_HEIGHT -gt 1 ]]; then
-    info "network is running"
-  else
-    err "network is not running"
-    exit 1
-  fi
+    RES="$1"
+    LATEST_HEIGHT=$(echo "${RES}" | jq --raw-output '.sync_info.latest_block_height')
+    info "latest height: ${LATEST_HEIGHT}"
+    
+    if [[ $LATEST_HEIGHT -gt 1 ]]; then
+        info "network is running"
+    else
+        err "network is not running"
+        exit 1
+    fi
 }
-
 info "Cleanup"
 docker compose down --volumes --remove-orphans
 
@@ -71,7 +70,7 @@ info "Running cheqd network"
 docker compose up -d cheqd
 docker compose cp ./cheqd cheqd:/
 docker compose exec cheqd bash /cheqd/cheqd-init.sh
-docker compose exec -d cheqd cheqd-noded start
+docker compose exec -d cheqd /bin/sh -c 'cheqd-noded start --pricefeeder.enable=true --pricefeeder.config_path="/home/cheqd/.cheqdnode/price-feeder.toml" --pricefeeder.log_level="INFO" >> cheqd.log 2>&1'
 
 info "Running osmosis network"
 docker compose up -d osmosis
@@ -138,7 +137,7 @@ info "Open channel" # ---
 docker compose exec hermes hermes create channel --a-chain cheqd --b-chain osmosis --a-port transfer --b-port transfer --new-client-connection --yes
 docker compose exec hermes hermes create channel --a-chain osmosis --b-chain cheqd --a-port icqhost --b-port feeabs --new-client-connection --yes
 info "Start hermes" # ---
-docker compose exec -d hermes hermes start
+docker compose exec -d hermes /bin/sh -c 'hermes start >> hermes.log 2>&1'
 
 info "Deploy the smart contracts in osmosis"
 docker compose cp osmosis/deploy_osmosis_contract.sh osmosis:/osmosis/deploy_osmosis_contract.sh
@@ -153,7 +152,7 @@ OSMOSIS_RELAYER_ADDRESS=$(docker compose exec osmosis osmosisd keys show --addre
 info "Transfer cheqd -> osmosis" # ---
 PORT="transfer"
 CHANNEL="channel-0"
-docker compose exec cheqd cheqd-noded tx ibc-transfer transfer $PORT $CHANNEL "$OSMOSIS_USER_ADDRESS" 10000000000ncheq --from cheqd-user --chain-id cheqd --gas-prices 10000ncheq --keyring-backend test -y
+docker compose exec cheqd cheqd-noded tx ibc-transfer transfer $PORT $CHANNEL "$OSMOSIS_USER_ADDRESS" 10000000000000ncheq --from cheqd-user --chain-id cheqd --gas-prices 10000ncheq --keyring-backend test -y
 sleep 30 # Wait for relayer
 
 info "Get balances" # ---
@@ -171,17 +170,35 @@ sleep 30
 
 CHEQD_BALANCE_2=$(docker compose exec cheqd cheqd-noded query bank balances "$CHEQD_USER_ADDRESS" --output json)
 
-info "balances before"
+info "balances after osmo transfer"
 echo $CHEQD_BALANCE_2
 
-info "create pool"
+info "create cheqd-osmo pool"
 # create pool
 TX_HASH=$(docker compose exec osmosis osmosisd tx gamm create-pool --pool-file /osmosis/pool.json --from $OSMOSIS_USER_ADDRESS --keyring-backend test --fees 100000000uosmo --gas auto --gas-adjustment 2 -y --chain-id osmosis --output json | jq -r '.txhash')
 echo "tx hash: $TX_HASH"
 sleep 5
 
 POOL_ID=$(docker compose exec osmosis osmosisd q tx $TX_HASH --output json | jq -r '.events[] | select(.type == "pool_created") | .attributes[] | select(.key == "pool_id") | .value')
-echo "pool id: $POOL_ID"
+echo "CHEQD-OSMO pool id: $POOL_ID"
+
+info "Send 500000USDC to cheqd"
+docker compose exec osmosis osmosisd tx ibc-transfer transfer $PORT $CHANNEL "$CHEQD_USER_ADDRESS" 500000000000usdc --from osmosis-user --chain-id osmosis --fees 500uosmo --keyring-backend test -y
+sleep 30
+
+CHEQD_BALANCE_3=$(docker compose exec cheqd cheqd-noded query bank balances "$CHEQD_USER_ADDRESS" --output json)
+
+info "balances after usdc transfer"
+echo $CHEQD_BALANCE_3
+
+info "create cheqd-usdc pool"
+# create pool
+TX_HASH=$(docker compose exec osmosis osmosisd tx gamm create-pool --pool-file /osmosis/cheqd_usdc_pool.json --from $OSMOSIS_USER_ADDRESS --keyring-backend test --fees 100000000uosmo --gas auto --gas-adjustment 2 -y --chain-id osmosis --output json | jq -r '.txhash')
+echo "tx hash: $TX_HASH"
+sleep 5
+
+POOL_ID=$(docker compose exec osmosis osmosisd q tx $TX_HASH --output json | jq -r '.events[] | select(.type == "pool_created") | .attributes[] | select(.key == "pool_id") | .value')
+echo "CHEQD-USDC pool id: $POOL_ID"
 
 info "enable fee abs"
 RES=$(docker compose exec cheqd cheqd-noded tx gov submit-proposal /cheqd/proposal.json --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
@@ -193,11 +210,29 @@ RES=$(docker compose exec cheqd cheqd-noded tx gov vote 1 yes --from $CHEQD_USER
 assert_tx_successful "${RES}"
 sleep 5
 
-info "add host zone config"
+info "update usdc ibc denom param in oracle params"
+RES=$(docker compose exec cheqd cheqd-noded tx gov submit-proposal /cheqd/oracle_params_proposal.json --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
+assert_tx_successful "${RES}"
+sleep 5
+
+info "vote on oracle param change proposal"
+RES=$(docker compose exec cheqd cheqd-noded tx gov vote 2 yes --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
+assert_tx_successful "${RES}"
+sleep 5
+
+info "add cheqd-osmo host zone config"
 RES=$(docker compose exec cheqd cheqd-noded tx gov submit-proposal /cheqd/host_zone.json --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
 assert_tx_successful "${RES}"
 sleep 5
-RES=$(docker compose exec cheqd cheqd-noded tx gov vote 2 yes --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
+RES=$(docker compose exec cheqd cheqd-noded tx gov vote 3 yes --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
+assert_tx_successful "${RES}"
+sleep 5
+
+info "add cheqd-usdc host zone config"
+RES=$(docker compose exec cheqd cheqd-noded tx gov submit-proposal /cheqd/usdc_host_zone.json --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
+assert_tx_successful "${RES}"
+sleep 5
+RES=$(docker compose exec cheqd cheqd-noded tx gov vote 4 yes --from $CHEQD_USER_ADDRESS --keyring-backend test --chain-id cheqd --yes --gas-prices 10000ncheq --gas 350000)
 assert_tx_successful "${RES}"
 sleep 5
 
@@ -206,17 +241,27 @@ RES=$(docker compose exec cheqd cheqd-noded tx feeabs fund 1000000000ibc/ED07A33
 assert_tx_successful "${RES}"
 sleep 5
 
+info "fund fee-abs module account with IBC usdc"
+RES=$(docker compose exec cheqd cheqd-noded tx feeabs fund 1000000000ibc/A1A6E963EBFE83F5BA5785DD7804B388C1FD50F4F3BF30C14A66A1FC48500F3E --from $CHEQD_USER_ADDRESS --gas-prices 10000ncheq --gas 350000 --chain-id cheqd -y --keyring-backend test)
+assert_tx_successful "${RES}"
+sleep 5
+
 info "fund fee-abs module account with native asset, cheq"
 RES=$(docker compose exec cheqd cheqd-noded tx feeabs fund 200000000000000000ncheq --from $CHEQD_USER_ADDRESS --gas-prices 10000ncheq --gas 350000 --chain-id cheqd -y --keyring-backend test)
 assert_tx_successful "${RES}"
 
 info "wait for exchange rate to be updated"
-sleep 150
+sleep 120
 
 info "pay fees using osmo in cheqd (recursively)"
 # shellcheck disable=SC2034
-for i in {1..20}; do
-  RES=$(docker compose exec cheqd cheqd-noded tx bank send cheqd-user "$CHEQD_RELAYER_ADDRESS" 50000000ncheq --fees 200000000000ibc/ED07A3391A112B175915CD8FAF43A2DA8E4790EDE12566649D0C2F97716B8518 --chain-id cheqd -y --keyring-backend test)
+for i in {1..5}; do
+  RES=$(docker compose exec cheqd cheqd-noded tx bank send cheqd-user "$CHEQD_RELAYER_ADDRESS" 50000000ncheq --fees 2000000000ibc/ED07A3391A112B175915CD8FAF43A2DA8E4790EDE12566649D0C2F97716B8518 --chain-id cheqd -y --keyring-backend test)
   exit_if_tx_successful "${RES}"
   sleep 6
 done
+
+assert_tx_successful "${RES}"
+
+info "test CHEQ/USDC exchange rate received"
+{ docker compose exec cheqd cheqd-noded q feeabs osmo-arithmetic-twap ibc/A1A6E963EBFE83F5BA5785DD7804B388C1FD50F4F3BF30C14A66A1FC48500F3E && info "Received cheq/usdc exchange rate"; } || { err "Failed to get cheqd/usdc exchange rate"; exit 1; }

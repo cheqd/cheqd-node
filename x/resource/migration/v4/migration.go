@@ -41,7 +41,7 @@ func MigrateStore(ctx sdk.Context, storeService corestoretypes.KVStoreService, l
 }
 
 func migrateParams(ctx sdk.Context, store corestoretypes.KVStore, legacySubspace exported.Subspace, cdc codec.BinaryCodec) error {
-	var currParams types.FeeParams
+	var currParams types.LegacyFeeParams
 	legacySubspace.Get(ctx, types.ParamStoreKeyFeeParams, &currParams)
 
 	if err := currParams.ValidateBasic(); err != nil {

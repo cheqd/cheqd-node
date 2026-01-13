@@ -64,7 +64,6 @@ function configure_genesis() {
 
   # Short voting period
   sed -i $SED_EXT 's/"voting_period": "172800s"/"voting_period": "12s"/' "${GENESIS}"
-
   # Test accounts
   BASE_ACCOUNT_1="cheqd1rnr5jrt4exl0samwj0yegv99jeskl0hsxmcz96"
   # Mnemonic: sketch mountain erode window enact net enrich smoke claim kangaroo another visual write meat latin bacon pulp similar forum guilt father state erase bright
@@ -212,6 +211,11 @@ do
 
   cp "${NODE_HOME}/config/genesis.json" "${TMP_NODE_HOME}/config/genesis.json"
   cp -R "${NODE_HOME}/config/gentx/." "${TMP_NODE_HOME}/config/gentx"
+  export NODE_HOME
+
+  cp "$(dirname "$0")/../../pricefeeder/price-feeder.toml" "${NODE_HOME}/price-feeder.toml"
+  sed -i 's|rest = "https://api.mexc.com/"|rest = "http://localhost:8080"|' "${NODE_HOME}/price-feeder.toml"
+  sed -i 's|websocket = "wbs-api.mexc.com"|websocket = "localhost:8080"|' "${NODE_HOME}/price-feeder.toml"
 done
 
 

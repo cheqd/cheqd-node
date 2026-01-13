@@ -5,10 +5,15 @@ import (
 	"fmt"
 	"strconv"
 
+	"cosmossdk.io/math"
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
+	"github.com/cheqd/cheqd-node/util"
 	"github.com/cheqd/cheqd-node/x/did/client/cli"
 	"github.com/cheqd/cheqd-node/x/did/types"
+	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
+	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
+
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -293,6 +298,90 @@ func VoteProposalTx(from, option, id string, feeParams []string) (sdk.TxResponse
 
 func SendTokensTx(from, to, amount string, feeParams []string) (sdk.TxResponse, error) {
 	return Tx("bank", "send", from, feeParams, from, to, amount)
+}
+
+// DelegateFeederAddress delegates a feeder address for a validator
+func DelegateFeedConsent(validatorAddr, feederAddr, account string, fees []string) (sdk.TxResponse, error) {
+	return Tx("oracle", "delegate-feed-consent", account, fees, validatorAddr, feederAddr)
+}
+
+// // DelegateFeedConsent executes the delegate-feed-consent transaction command
+// func DelegateFeedConsent(operatorAddr, feederAddr, from string, feeParams []string) (sdk.TxResponse, error) {
+// 	return Tx(ModuleName, "delegate-feed-consent", from, feeParams, operatorAddr, feederAddr)
+// }
+
+// AggregateExchangeRatePrevote executes the exchange-rate-prevote transaction command
+func AggregateExchangeRatePrevote(hash string, validatorAddr, from string, feeParams []string) (sdk.TxResponse, error) {
+	return Tx("oracle", "exchange-rate-prevote", from, feeParams, hash, validatorAddr)
+}
+
+// AggregateExchangeRateVote executes the exchange-rate-vote transaction command
+func AggregateExchangeRateVote(salt string, exchangeRates string, validatorAddr, from string, feeParams []string) (sdk.TxResponse, error) {
+	return Tx("oracle", "exchange-rate-vote", from, feeParams, salt, exchangeRates, validatorAddr)
+}
+
+func ResolveFeeFromParams(feeRanges []types.FeeRange, useMin bool) (sdk.Coin, error) {
+	getFeeAmount := func(fee types.FeeRange) *math.Int {
+		if useMin {
+			if fee.MinAmount != nil {
+				return fee.MinAmount
+			}
+			return fee.MaxAmount
+		} else {
+			if fee.MaxAmount != nil {
+				return fee.MaxAmount
+			}
+			return fee.MinAmount
+		}
+	}
+
+	// 1. Try native (ncheq) fee
+	for _, fee := range feeRanges {
+		if fee.Denom != types.BaseMinimalDenom {
+			continue
+		}
+		amount := getFeeAmount(fee)
+		if amount == nil {
+			return sdk.Coin{}, fmt.Errorf("both MinAmount and MaxAmount are nil for %s", fee.Denom)
+		}
+		return sdk.NewCoin(types.BaseMinimalDenom, *amount), nil
+	}
+
+	// 2. Try USD fallback
+	for _, fee := range feeRanges {
+		if fee.Denom != oracletypes.UsdDenom {
+			continue
+		}
+
+		price, err := QueryWMA(types.BaseDenom, string(oraclekeeper.WmaStrategyBalanced), nil)
+		if err != nil {
+			return sdk.Coin{}, fmt.Errorf("failed to query WMA price: %w", err)
+		}
+
+		amount := getFeeAmount(fee)
+		if amount == nil {
+			return sdk.Coin{}, fmt.Errorf("both MinAmount and MaxAmount are nil for %s", fee.Denom)
+		}
+
+		converted, err := ConvertUsdToCheq(*amount, price.Price)
+		if err != nil {
+			return sdk.Coin{}, fmt.Errorf("failed to convert usd to ncheq: %w", err)
+		}
+		return sdk.NewCoin(types.BaseMinimalDenom, converted), nil
+	}
+
+	return sdk.Coin{}, fmt.Errorf("no valid fee param found with ncheq or usd denom")
+}
+
+func ConvertUsdToCheq(usdAmt math.Int, cheqPrice math.LegacyDec) (math.Int, error) {
+	if cheqPrice.IsZero() {
+		return math.ZeroInt(), fmt.Errorf("cheq price is zero")
+	}
+
+	// Convert: 1e18 usd → 1e0 → 1e9 ncheq
+	usdDec := math.LegacyNewDecFromInt(usdAmt).Quo(math.LegacyNewDecFromInt(util.UsdExponent)) // convert from 1e18 scale
+	ncheqDec := usdDec.Quo(cheqPrice).MulInt64(util.CheqScale.Int64())                         // convert to 1e9 scale
+	return ncheqDec.TruncateInt(), nil
 }
 
 func IBCAcknowledgementTx(tmpDir string, from string, ack json.RawMessage, gasLimit uint64) (sdk.TxResponse, error) {

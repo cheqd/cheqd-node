@@ -3,12 +3,14 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"cosmossdk.io/errors"
 	"github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
 
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -271,6 +273,37 @@ func QueryKeys(name string) (string, error) {
 	return result.Address, nil
 }
 
+func QueryOracleParams() (oracletypes.QueryParamsResponse, error) {
+	res, err := Query("oracle", "params")
+	if err != nil {
+		return oracletypes.QueryParamsResponse{}, err
+	}
+
+	var resp oracletypes.QueryParamsResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return oracletypes.QueryParamsResponse{}, err
+	}
+
+	return resp, nil
+}
+
+// QueryAggregateVote queries the aggregate vote for a validator
+func QueryAggregateVote(validatorAddr string) (*oracletypes.QueryAggregateVoteResponse, error) {
+	res, err := Query("oracle", "aggregate-votes", validatorAddr)
+	if err != nil {
+		return nil, err
+	}
+	var resp oracletypes.QueryAggregateVoteResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling aggregate vote response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+// QueryBypassMessages queries the global fee bypass messages
 func QueryBypassMessages() ([]string, error) {
 	res, err := Query("globalfee", "bypass-messages")
 	if err != nil {
@@ -284,4 +317,265 @@ func QueryBypassMessages() ([]string, error) {
 	}
 
 	return resp.BypassMessages, nil
+}
+
+// QueryAggregatePrevote queries the aggregate prevote for a validator
+func QueryAggregatePrevote(validatorAddr string) (*oracletypes.QueryAggregatePrevoteResponse, error) {
+	res, err := Query("oracle", "aggregate-prevotes", validatorAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp oracletypes.QueryAggregatePrevoteResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling aggregate prevote response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+// QueryExchangeRates queries all exchange rates
+func QueryExchangeRates() (*oracletypes.QueryExchangeRatesResponse, error) {
+	res, err := Query("oracle", "exchange-rates")
+	if err != nil {
+		return nil, err
+	}
+
+	var resp oracletypes.QueryExchangeRatesResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling exchange rates response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+// QueryExchangeRate queries the exchange rate for a specific denom
+func QueryExchangeRate(denom string) (*oracletypes.QueryExchangeRatesResponse, error) {
+	res, err := Query("oracle", "exchange-rate", denom)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp oracletypes.QueryExchangeRatesResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling exchange rate response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+// QueryFeederDelegation queries the feeder delegation for a validator
+func QueryFeederDelegation(validatorAddr string) (*oracletypes.QueryFeederDelegationResponse, error) {
+	res, err := Query("oracle", "feeder-delegation", validatorAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp oracletypes.QueryFeederDelegationResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling feeder delegation response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+// QueryMissCounter queries the miss counter for a validator
+func QueryMissCounter(validatorAddr string) (*oracletypes.QueryMissCounterResponse, error) {
+	res, err := Query("oracle", "miss-counter", validatorAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp oracletypes.QueryMissCounterResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling miss counter response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+// QuerySlashWindow queries the current slash window progress
+func QuerySlashWindow() (*oracletypes.QuerySlashWindowResponse, error) {
+	res, err := Query("oracle", "slash-window")
+	if err != nil {
+		return nil, err
+	}
+
+	var resp oracletypes.QuerySlashWindowResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling slash window response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+// FundAccount sends tokens to the specified account address to allow it to pay for transaction fees
+func FundAccount(recipientAddr, fromAddr string, amount string, feeParams []string) (sdk.TxResponse, error) {
+	// Execute a bank send transaction to fund the account
+	return Tx("bank", "send", fromAddr, feeParams, fromAddr, recipientAddr, amount)
+}
+
+// EnsureAccountFunded checks if an account has sufficient funds and funds it if needed
+func EnsureAccountFunded(accountAddr, funderAddr string, minAmount string, feeParams []string) error {
+	// First check the account balance
+	balance, err := QueryBankBalance(accountAddr, didtypes.BaseMinimalDenom)
+	if err != nil {
+		// If we can't query the balance, try funding anyway
+		fundingAmount := "5000000000ncheq" // 5000 CHEQ in ncheq
+		_, err = FundAccount(accountAddr, funderAddr, fundingAmount, feeParams)
+		return err
+	}
+
+	// Parse the minimum required amount
+	requiredAmount, err := parseAmount(minAmount)
+	if err != nil {
+		return err
+	}
+
+	// If balance is less than required, fund the account
+	if balance < requiredAmount {
+		fundingAmount := fmt.Sprintf("%dncheq", requiredAmount*2) // Fund with twice the minimum needed
+		_, err = FundAccount(accountAddr, funderAddr, fundingAmount, feeParams)
+		return err
+	}
+
+	// Account has sufficient funds
+	return nil
+}
+
+// QueryBankBalance queries the balance of an account for a specific denom
+func QueryBankBalance(accountAddr, denom string) (int64, error) {
+	// Construct the command to query the balance
+	output, err := Exec("query", "bank", "balances", accountAddr, "--denom", denom, "--output", "json")
+	if err != nil {
+		return 0, err
+	}
+
+	// Parse the output to extract the balance
+	// This is a simplified example - the actual parsing would depend on the JSON structure
+	if strings.Contains(output, "amount") {
+		var amount int64
+		_, err := fmt.Sscanf(output, `{"amount":"%d"`, &amount)
+		if err != nil {
+			return 0, err
+		}
+		return amount, nil
+	}
+
+	// If no balance found, return 0
+	return 0, nil
+}
+
+// parseAmount parses an amount string like "1000000ncheq" into a numeric value
+func parseAmount(amount string) (int64, error) {
+	var value int64
+	_, err := fmt.Sscanf(amount, "%d", &value)
+	if err != nil {
+		return 0, err
+	}
+	return value, nil
+}
+
+func QueryEMA(denom string) (*oracletypes.QueryWMAResponse, error) {
+	res, err := Query("oracle", "ema", denom)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp oracletypes.QueryWMAResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling exchange rate response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+func QuerySMA(denom string) (*oracletypes.QuerySMAResponse, error) {
+	res, err := Query("oracle", "sma", denom)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp oracletypes.QuerySMAResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling exchange rate response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+func QueryWMA(denom string, strategy string, customWeights []int64) (*oracletypes.QueryWMAResponse, error) {
+	// Base CLI args
+	args := []string{denom, "--strategy", strategy}
+
+	// Only add weights if strategy is CUSTOM
+	if strings.ToUpper(strategy) == "CUSTOM" {
+		if len(customWeights) == 0 {
+			return nil, fmt.Errorf("custom weights must be provided for CUSTOM strategy")
+		}
+
+		var weightsStr []string
+		for _, w := range customWeights {
+			weightsStr = append(weightsStr, fmt.Sprintf("%d", w))
+		}
+		args = append(args, "--weights", strings.Join(weightsStr, ","))
+	}
+
+	// Run CLI query
+	res, err := Query("oracle", "wma", args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to run WMA query: %w", err)
+	}
+	var resp oracletypes.QueryWMAResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling WMA response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+func QueryConvertUSDCtoCHEQ(amount string, maType string, wmaStrategy string, customWeights []int64) (*oracletypes.ConvertUSDCtoCHEQResponse, error) {
+	// Base CLI args
+	args := []string{amount, maType}
+
+	if strings.ToLower(maType) == "wma" {
+		if wmaStrategy == "" {
+			return nil, fmt.Errorf("wma_strategy must be provided when ma_type is 'wma'")
+		}
+		args = append(args, wmaStrategy)
+
+		if strings.ToUpper(wmaStrategy) == "CUSTOM" {
+			if len(customWeights) == 0 {
+				return nil, fmt.Errorf("custom weights must be provided for CUSTOM strategy")
+			}
+			var weightsStr []string
+			for _, w := range customWeights {
+				weightsStr = append(weightsStr, fmt.Sprintf("%d", w))
+			}
+			args = append(args, strings.Join(weightsStr, ","))
+		}
+	}
+
+	// Run CLI query
+	res, err := Query("oracle", "convert-usdc-to-cheq", args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to run convert-usdc-to-cheq query: %w", err)
+	}
+
+	var resp oracletypes.ConvertUSDCtoCHEQResponse
+	err = helpers.Codec.UnmarshalJSON([]byte(res), &resp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling ConvertUSDCtoCHEQ response: %w", err)
+	}
+
+	return &resp, nil
 }

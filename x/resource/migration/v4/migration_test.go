@@ -21,19 +21,19 @@ import (
 )
 
 type mockSubspace struct {
-	ps types.FeeParams
+	ps types.LegacyFeeParams
 }
 
-func newMockSubspace(ps types.FeeParams) mockSubspace {
+func newMockSubspace(ps types.LegacyFeeParams) mockSubspace {
 	return mockSubspace{ps: ps}
 }
 
 func (ms mockSubspace) GetParamSet(ctx sdk.Context, ps exported.ParamSet) {
-	*ps.(*types.FeeParams) = ms.ps
+	*ps.(*types.LegacyFeeParams) = ms.ps
 }
 
 func (ms mockSubspace) Get(ctx sdk.Context, key []byte, ps interface{}) {
-	*ps.(*types.FeeParams) = ms.ps
+	*ps.(*types.LegacyFeeParams) = ms.ps
 }
 
 func TestMigrate(t *testing.T) {
@@ -86,11 +86,11 @@ func TestMigrate(t *testing.T) {
 	require.NoError(t, store.Set([]byte(types.ResourceMetadataKey+testCollectionId+":"+testId), cdc.MustMarshal(&metadata)))
 	require.NoError(t, store.Set(v4.LegacyResourceDataKey(testCollectionId, testId), testData))
 
-	legacySubspace := newMockSubspace(*types.DefaultFeeParams())
+	legacySubspace := newMockSubspace(*types.DefaultLegacyFeeParams())
 	require.NoError(t, v4.MigrateStore(ctx, runtime.NewKVStoreService(storeKey), legacySubspace, cdc,
 		countCollection, metadataCollection, dataCollection, latestResourceVersionCollection))
 
-	var res types.FeeParams
+	var res types.LegacyFeeParams
 	bz, err := store.Get(types.ParamStoreKeyFeeParams)
 	require.NoError(t, err)
 	require.NoError(t, cdc.Unmarshal(bz, &res))
