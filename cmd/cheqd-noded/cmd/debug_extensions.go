@@ -97,7 +97,7 @@ func ed25519publicKeyBase64ToJwkCmd() *cobra.Command {
 	return cmd
 }
 
-// encoding returns cobra Command.
+// encodingCmd returns cobra Command.
 func encodingCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "encoding",
