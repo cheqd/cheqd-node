@@ -243,6 +243,9 @@ replace (
 	// cheqd-node/api module replacement
 	github.com/cheqd/cheqd-node/api/v2 => ./api
 
+	// address CometBFT vulnerability
+	github.com/cometbft/cometbft => /root/cometbft-sec-tachyon
+
 	// replace cosmos-sdk v0.50.14
 	github.com/cosmos/cosmos-sdk => github.com/cheqd/cosmos-sdk v0.50.14-height-mismatch-iavl.0.20250808071119-3b33570d853b
 
