@@ -92,7 +92,7 @@ jobs:
       - name: Install ginkgo
         working-directory: ./..
         run: |
-          go install github.com/onsi/ginkgo/v2/ginkgo@latest
+          go install github.com/onsi/ginkgo/v2/ginkgo@v2.27.2
 
       - name: Run Ginkgo unit tests
         run: ginkgo -r --race --randomize-all --randomize-suites --keep-going --trace --junit-report report-unit.xml
@@ -151,7 +151,7 @@ jobs:
 
       - name: Install ginkgo
         working-directory: ./..
-        run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
+        run: go install github.com/onsi/ginkgo/v2/ginkgo@v2.27.2
 
       - name: Run Ginkgo integration tests
         working-directory: ./tests/integration
@@ -209,7 +209,7 @@ jobs:
 
       - name: Install ginkgo
         working-directory: ./..
-        run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
+        run: go install github.com/onsi/ginkgo/v2/ginkgo@v2.27.2
 
       - name: Download new version of the Docker image (build-latest)
         uses: actions/download-artifact@v7
