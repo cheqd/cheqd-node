@@ -1,6 +1,7 @@
 package ante
 
 import (
+	"cosmossdk.io/math"
 	feeabskeeper "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/keeper"
 	feeabstypes "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/types"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
@@ -50,6 +51,11 @@ func (r *DenomResolverImpl) ConvertToDenom(ctx sdk.Context, coin sdk.DecCoin, de
 	if err != nil {
 		return sdk.DecCoin{}, err
 	}
+
+	if amount.IsZero() {
+		return sdk.NewDecCoinFromDec(denom, math.LegacyZeroDec()), nil
+	}
+
 	return sdk.NewDecCoinFromDec(denom, amount[0].Amount.ToLegacyDec()), nil
 }
 

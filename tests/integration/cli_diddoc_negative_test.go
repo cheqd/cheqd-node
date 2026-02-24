@@ -6,6 +6,7 @@ import (
 	"crypto/ed25519"
 	"fmt"
 
+	"cosmossdk.io/math"
 	"github.com/cheqd/cheqd-node/tests/integration/cli"
 	helpers "github.com/cheqd/cheqd-node/tests/integration/helpers"
 	"github.com/cheqd/cheqd-node/tests/integration/network"
@@ -62,7 +63,11 @@ var _ = Describe("cheqd cli - negative did", func() {
 			},
 		}
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees(feeParams.CreateDid.String()))
+		useMin := false
+		feeInNCheq, err := cli.ResolveFeeFromParams(feeParams.CreateDid, useMin)
+		Expect(err).To(BeNil())
+
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -98,37 +103,38 @@ var _ = Describe("cheqd cli - negative did", func() {
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.Purple, "cannot create diddoc with missing cli arguments"))
 		// Fail to create a new DID Doc with missing cli arguments
 		//   a. missing payload, sign inputs and account
-		_, err = cli.CreateDidDoc(tmpDir, didcli.DIDDocument{}, []didcli.SignInput{}, "", "", helpers.GenerateFees(feeParams.CreateDid.String()))
+
+		_, err = cli.CreateDidDoc(tmpDir, didcli.DIDDocument{}, []didcli.SignInput{}, "", "", helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).ToNot(BeNil())
 
 		//   b. missing payload, sign inputs
-		_, err = cli.CreateDidDoc(tmpDir, didcli.DIDDocument{}, []didcli.SignInput{}, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees(feeParams.CreateDid.String()))
+		_, err = cli.CreateDidDoc(tmpDir, didcli.DIDDocument{}, []didcli.SignInput{}, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees((feeInNCheq.Amount.String() + feeInNCheq.Denom)))
 		Expect(err).ToNot(BeNil())
 
 		//   c. missing payload, account
-		_, err = cli.CreateDidDoc(tmpDir, didcli.DIDDocument{}, signInputs2, "", "", helpers.GenerateFees(feeParams.CreateDid.String()))
+		_, err = cli.CreateDidDoc(tmpDir, didcli.DIDDocument{}, signInputs2, "", "", helpers.GenerateFees((feeInNCheq.Amount.String() + feeInNCheq.Denom)))
 		Expect(err).ToNot(BeNil())
 
 		//   d. missing sign inputs, account
-		_, err = cli.CreateDidDoc(tmpDir, payload2, []didcli.SignInput{}, "", "", helpers.GenerateFees(feeParams.CreateDid.String()))
+		_, err = cli.CreateDidDoc(tmpDir, payload2, []didcli.SignInput{}, "", "", helpers.GenerateFees((feeInNCheq.Amount.String() + feeInNCheq.Denom)))
 		Expect(err).ToNot(BeNil())
 
 		//   e. missing payload
-		_, err = cli.CreateDidDoc(tmpDir, didcli.DIDDocument{}, signInputs2, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees(feeParams.CreateDid.String()))
+		_, err = cli.CreateDidDoc(tmpDir, didcli.DIDDocument{}, signInputs2, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees((feeInNCheq.Amount.String() + feeInNCheq.Denom)))
 		Expect(err).ToNot(BeNil())
 
 		//   f. missing sign inputs
-		_, err = cli.CreateDidDoc(tmpDir, payload2, []didcli.SignInput{}, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees(feeParams.CreateDid.String()))
+		_, err = cli.CreateDidDoc(tmpDir, payload2, []didcli.SignInput{}, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees((feeInNCheq.Amount.String() + feeInNCheq.Denom)))
 		Expect(err).ToNot(BeNil())
 
 		//   g. missing account
-		_, err = cli.CreateDidDoc(tmpDir, payload2, signInputs2, "", "", helpers.GenerateFees(feeParams.CreateDid.String()))
+		_, err = cli.CreateDidDoc(tmpDir, payload2, signInputs2, "", "", helpers.GenerateFees((feeInNCheq.Amount.String() + feeInNCheq.Denom)))
 		Expect(err).ToNot(BeNil())
 
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.Purple, "cannot create diddoc with sign inputs mismatch"))
 		// Fail to create a new DID Doc with sign inputs mismatch
 		//   a. sign inputs mismatch
-		_, err = cli.CreateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees(feeParams.CreateDid.String()))
+		_, err = cli.CreateDidDoc(tmpDir, payload2, signInputs, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees((feeInNCheq.Amount.String() + feeInNCheq.Denom)))
 		Expect(err).ToNot(BeNil())
 
 		//   b. non-existing key id
@@ -137,7 +143,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 				VerificationMethodID: "non-existing-key-id",
 				PrivKey:              privateKey2,
 			},
-		}, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees(feeParams.CreateDid.String()))
+		}, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees((feeInNCheq.Amount.String() + feeInNCheq.Denom)))
 		Expect(err).ToNot(BeNil())
 
 		//   c. non-matching private key
@@ -146,19 +152,19 @@ var _ = Describe("cheqd cli - negative did", func() {
 				VerificationMethodID: keyId2,
 				PrivKey:              privKey,
 			},
-		}, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees(feeParams.CreateDid.String()))
+		}, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees((feeInNCheq.Amount.String() + feeInNCheq.Denom)))
 		Expect(err).ToNot(BeNil())
 
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.Purple, "cannot create diddoc with non-supported VM type"))
 		// Fail to create a new DID Doc with non-supported VM type
 		payload3 := payload2
 		payload3.VerificationMethod[0]["type"] = "NonSupportedVMType"
-		_, err = cli.CreateDidDoc(tmpDir, payload3, signInputs2, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees(feeParams.CreateDid.String()))
+		_, err = cli.CreateDidDoc(tmpDir, payload3, signInputs2, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees((feeInNCheq.Amount.String() + feeInNCheq.Denom)))
 		Expect(err).ToNot(BeNil())
 
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.Purple, "cannot create diddoc with already existing DID"))
 		// Fail to create a new DID Doc with already existing DID
-		_, err = cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid.String()))
+		_, err = cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees((feeInNCheq.Amount.String() + feeInNCheq.Denom)))
 		Expect(err).ToNot(BeNil())
 	})
 
@@ -195,7 +201,11 @@ var _ = Describe("cheqd cli - negative did", func() {
 			},
 		}
 
-		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.CreateDid.String()))
+		useMin := false
+		feeInNCheq, err := cli.ResolveFeeFromParams(feeParams.CreateDid, useMin)
+		Expect(err).To(BeNil())
+
+		res, err := cli.CreateDidDoc(tmpDir, payload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -213,8 +223,12 @@ var _ = Describe("cheqd cli - negative did", func() {
 			Authentication:  []string{keyId},
 			AssertionMethod: []string{keyId},
 		}
+		useMin = true
+		feeInNCheq, err = cli.ResolveFeeFromParams(feeParams.UpdateDid, useMin)
+		Expect(err).To(BeNil())
 
-		res, err = cli.UpdateDidDoc(tmpDir, updatedPayload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid.String()))
+		fees := feeInNCheq.Amount.Mul(math.NewInt(2))
+		res, err = cli.UpdateDidDoc(tmpDir, updatedPayload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(fees.String()+feeInNCheq.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
@@ -249,7 +263,10 @@ var _ = Describe("cheqd cli - negative did", func() {
 			},
 		}
 
-		res_, err := cli.CreateDidDoc(tmpDir, payload2, signInputs2, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees(feeParams.UpdateDid.String()))
+		useMin = false
+		feeInNCheq, err = cli.ResolveFeeFromParams(feeParams.CreateDid, useMin)
+		Expect(err).To(BeNil())
+		res_, err := cli.CreateDidDoc(tmpDir, payload2, signInputs2, "", testdata.BASE_ACCOUNT_2, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).To(BeNil())
 		Expect(res_.Code).To(BeEquivalentTo(0))
 
@@ -303,41 +320,44 @@ var _ = Describe("cheqd cli - negative did", func() {
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.Purple, "cannot update diddoc with missing cli arguments"))
 		// Fail to update the DID Doc with missing cli arguments
 		//   a. missing payload, sign inputs and account
-		_, err = cli.UpdateDidDoc(tmpDir, didcli.DIDDocument{}, []didcli.SignInput{}, "", "", helpers.GenerateFees(feeParams.UpdateDid.String()))
+		useMin = true
+		feeInNCheq, err = cli.ResolveFeeFromParams(feeParams.UpdateDid, useMin)
+		Expect(err).To(BeNil())
+		_, err = cli.UpdateDidDoc(tmpDir, didcli.DIDDocument{}, []didcli.SignInput{}, "", "", helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).ToNot(BeNil())
 
 		//   b. missing payload, sign inputs
-		_, err = cli.UpdateDidDoc(tmpDir, didcli.DIDDocument{}, []didcli.SignInput{}, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid.String()))
+		_, err = cli.UpdateDidDoc(tmpDir, didcli.DIDDocument{}, []didcli.SignInput{}, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).ToNot(BeNil())
 
 		//   c. missing payload, account
-		_, err = cli.UpdateDidDoc(tmpDir, didcli.DIDDocument{}, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid.String()))
+		_, err = cli.UpdateDidDoc(tmpDir, didcli.DIDDocument{}, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).ToNot(BeNil())
 
 		//   d. missing sign inputs, account
-		_, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, []didcli.SignInput{}, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid.String()))
+		_, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, []didcli.SignInput{}, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).ToNot(BeNil())
 
 		//   e. missing payload
-		_, err = cli.UpdateDidDoc(tmpDir, didcli.DIDDocument{}, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid.String()))
+		_, err = cli.UpdateDidDoc(tmpDir, didcli.DIDDocument{}, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).ToNot(BeNil())
 
 		//   f. missing sign inputs
-		_, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, []didcli.SignInput{}, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid.String()))
+		_, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, []didcli.SignInput{}, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).ToNot(BeNil())
 
 		//   g. missing account
-		_, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, signInputs, "", "", helpers.GenerateFees(feeParams.UpdateDid.String()))
+		_, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, signInputs, "", "", helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).ToNot(BeNil())
 
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.Purple, "cannot update diddoc with sign inputs mismatch"))
 		// Fail to update the DID Doc with sign inputs mismatch
 		//   a. sign inputs total mismatch
-		_, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, signInputsFuzzed, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid.String()))
+		_, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, signInputsFuzzed, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).ToNot(BeNil())
 
 		//   b. sign inputs invalid length
-		_, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid.String()))
+		_, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, signInputs, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).ToNot(BeNil())
 
 		//   c. non-existing key id
@@ -350,7 +370,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 				VerificationMethodID: "non-existing-key-id",
 				PrivKey:              privateKey2,
 			},
-		}, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid.String()))
+		}, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).ToNot(BeNil())
 
 		//  d. non-matching private key
@@ -363,7 +383,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 				VerificationMethodID: keyId,
 				PrivKey:              privateKey2,
 			},
-		}, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid.String()))
+		}, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).ToNot(BeNil())
 
 		//  e. invalid private key
@@ -376,7 +396,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 				VerificationMethodID: keyId2AsExtraController,
 				PrivKey:              privateKey2,
 			},
-		}, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid.String()))
+		}, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).ToNot(BeNil())
 
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.Purple, "cannot update diddoc with a non-supported VM type"))
@@ -391,7 +411,7 @@ var _ = Describe("cheqd cli - negative did", func() {
 				"VerificationMaterial":   "pretty-long-public-key-multibase",
 			},
 		}
-		_, err = cli.UpdateDidDoc(tmpDir, invalidVmTypePayload, signInputsAugmented, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid.String()))
+		_, err = cli.UpdateDidDoc(tmpDir, invalidVmTypePayload, signInputsAugmented, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).ToNot(BeNil())
 
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.Purple, "cannot update diddoc with a non-existing DID"))
@@ -399,17 +419,18 @@ var _ = Describe("cheqd cli - negative did", func() {
 		nonExistingDid := "did:cheqd:" + network.DidNamespace + ":" + uuid.NewString()
 		nonExistingDidPayload := deepCopierUpdateDid.DeepCopy(followingUpdatedPayload)
 		nonExistingDidPayload.ID = nonExistingDid
-		_, err = cli.UpdateDidDoc(tmpDir, nonExistingDidPayload, signInputsAugmented, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid.String()))
+		_, err = cli.UpdateDidDoc(tmpDir, nonExistingDidPayload, signInputsAugmented, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeInNCheq.Amount.String()+feeInNCheq.Denom))
 		Expect(err).ToNot(BeNil())
 
 		// Finally, update the DID Doc
-		res, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, signInputsAugmented, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid.String()))
+
+		res, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, signInputsAugmented, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(fees.String()+feeInNCheq.Denom))
 		Expect(err).To(BeNil())
 		Expect(res.Code).To(BeEquivalentTo(0))
 
 		AddReportEntry("Integration", fmt.Sprintf("%sNegative: %s", cli.Purple, "cannot update diddoc with an unchanged payload"))
 		// Fail to update the DID Doc with an unchanged payload
-		_, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, signInputsAugmented, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(feeParams.UpdateDid.String()))
+		_, err = cli.UpdateDidDoc(tmpDir, followingUpdatedPayload, signInputsAugmented, "", testdata.BASE_ACCOUNT_1, helpers.GenerateFees(fees.String()+feeInNCheq.Denom))
 		Expect(err).To(BeNil()) // TODO: Decide if this should be an error, if the DID Doc is unchanged
 	})
 

@@ -2,29 +2,38 @@ syntax = "proto3";
 package cheqd.did.v2;
 
 import "amino/amino.proto";
-import "cosmos/base/v1beta1/coin.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/cheqd/cheqd-node/x/did/types";
 option (gogoproto.equal_all) = true;
 
-// FeeParams defines the parameters for the cheqd DID module fixed fee
+message FeeRange {
+  // Denomination of the token (e.g., "ncheq")
+  string denom = 1;
+
+  // Minimum fee amount allowed (stored as string for large values)
+  string min_amount = 2 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = true
+  ];
+
+  // Maximum fee amount allowed (stored as string for large values)
+  string max_amount = 3 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = true
+  ];
+}
+
 message FeeParams {
-  // Fixed fee for creating a DID
-  //
-  // Default: 50 CHEQ or 50000000000ncheq
-  cosmos.base.v1beta1.Coin create_did = 1 [(gogoproto.nullable) = false];
+  // Range-based fee for creating a DID
+  repeated FeeRange create_did = 1 [(gogoproto.nullable) = false];
 
-  // Fixed fee for updating a DID
-  //
-  // Default: 25 CHEQ or 25000000000ncheq
-  cosmos.base.v1beta1.Coin update_did = 2 [(gogoproto.nullable) = false];
+  // Range-based fee for updating a DID
+  repeated FeeRange update_did = 2 [(gogoproto.nullable) = false];
 
-  // Fixed fee for deactivating a DID
-  //
-  // Default: 10 CHEQ or 10000000000ncheq
-  cosmos.base.v1beta1.Coin deactivate_did = 3 [(gogoproto.nullable) = false];
+  // Range-based fee for deactivating a DID
+  repeated FeeRange deactivate_did = 3 [(gogoproto.nullable) = false];
 
   // Percentage of the fixed fee that will be burned
   //

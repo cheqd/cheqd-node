@@ -19,6 +19,7 @@ type Keeper struct {
 	storeService store.KVStoreService
 	paramSpace   types.ParamSubspace
 	portKeeper   types.PortKeeper
+	oracleKeeper types.OracleKeeper
 	scopedKeeper exported.ScopedKeeper
 	Schema       collections.Schema
 
@@ -32,6 +33,9 @@ type Keeper struct {
 	// ResourceData stores resource data by collection ID and resource ID
 	ResourceData collections.Map[collections.Pair[string, string], []byte]
 
+	// ResourceID of the latest resource version
+	LatestResourceVersion collections.Map[collections.Triple[string, string, string], string]
+
 	// the address capable of executing a MsgUpdateParams message. Typically, this
 	// should be the x/resource module account.
 	authority string
@@ -39,7 +43,7 @@ type Keeper struct {
 	ParamsStore collections.Item[types.FeeParams]
 }
 
-func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSpace types.ParamSubspace, portKeeper types.PortKeeper, scopedKeeper exported.ScopedKeeper, authority string) *Keeper {
+func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSpace types.ParamSubspace, portKeeper types.PortKeeper, scopedKeeper exported.ScopedKeeper, authority string, ok types.OracleKeeper) *Keeper {
 	sb := collections.NewSchemaBuilder(storeService)
 	// Define the port collection
 
@@ -79,12 +83,21 @@ func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSp
 			collections.PairKeyCodec(collections.StringKey, collections.StringKey),
 			collections.BytesValue,
 		),
+
+		LatestResourceVersion: collections.NewMap(
+			sb,
+			collections.NewPrefix(types.ResourceLatestVersionKey),
+			"resource_latest_version",
+			collections.TripleKeyCodec(collections.StringKey, collections.StringKey, collections.StringKey),
+			collections.StringValue,
+		),
 		ParamsStore: collections.NewItem(
 			sb,
 			collections.NewPrefix(types.ParamStoreKeyFeeParams),
 			"params",
 			codec.CollValue[types.FeeParams](cdc),
 		),
+		oracleKeeper: ok,
 	}
 
 	// Build the schema

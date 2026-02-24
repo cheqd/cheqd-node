@@ -5,5 +5,5 @@ const (
 	Home = ".cheqdnode"
 
 	// Set ProtocolVersion to app's major version number
-	ProtocolVersion = 2
+	ProtocolVersion = 4
 )

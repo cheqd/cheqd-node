@@ -1,0 +1,339 @@
+syntax = "proto3";
+package cheqd.oracle.v2;
+
+import "cheqd/oracle/v2/oracle.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/cheqd/cheqd-node/x/oracle/types";
+option (gogoproto.goproto_getters_all) = false;
+
+// Query defines the gRPC querier service.
+service Query {
+  // ExchangeRates returns exchange rates of all denoms,
+  // or, if specified, returns a single denom
+  rpc ExchangeRates(QueryExchangeRates) returns (QueryExchangeRatesResponse) {
+    option (google.api.http).get = "/cheqd/oracle/v2/denoms/exchange_rates/{denom}";
+  }
+
+  // ActiveExchangeRates returns all active denoms
+  rpc ActiveExchangeRates(QueryActiveExchangeRates) returns (QueryActiveExchangeRatesResponse) {
+    option (google.api.http).get = "/cheqd/oracle/v2/denoms/active_exchange_rates";
+  }
+
+  // FeederDelegation returns feeder delegation of a validator
+  rpc FeederDelegation(QueryFeederDelegation) returns (QueryFeederDelegationResponse) {
+    option (google.api.http).get = "/cheqd/oracle/v2/validators/{validator_addr}/feeder";
+  }
+
+  // MissCounter returns oracle miss counter of a validator
+  rpc MissCounter(QueryMissCounter) returns (QueryMissCounterResponse) {
+    option (google.api.http).get = "/cheqd/oracle/v2/validators/{validator_addr}/miss";
+  }
+
+  // SlashWindow returns slash window information
+  rpc SlashWindow(QuerySlashWindow) returns (QuerySlashWindowResponse) {
+    option (google.api.http).get = "/cheqd/oracle/v2/slash_window";
+  }
+
+  // AggregatePrevote returns an aggregate prevote of a validator
+  rpc AggregatePrevote(QueryAggregatePrevote) returns (QueryAggregatePrevoteResponse) {
+    option (google.api.http).get = "/cheqd/oracle/v2/validators/{validator_addr}/aggregate_prevote";
+  }
+
+  // AggregatePrevotes returns aggregate prevotes of all validators
+  rpc AggregatePrevotes(QueryAggregatePrevotes) returns (QueryAggregatePrevotesResponse) {
+    option (google.api.http).get = "/cheqd/oracle/v2/validators/aggregate_prevotes";
+  }
+
+  // AggregateVote returns an aggregate vote of a validator
+  rpc AggregateVote(QueryAggregateVote) returns (QueryAggregateVoteResponse) {
+    option (google.api.http).get = "/cheqd/oracle/v2/valdiators/{validator_addr}/aggregate_vote";
+  }
+
+  // AggregateVotes returns aggregate votes of all validators
+  rpc AggregateVotes(QueryAggregateVotes) returns (QueryAggregateVotesResponse) {
+    option (google.api.http).get = "/cheqd/oracle/v2/validators/aggregate_votes";
+  }
+
+  // Params queries all parameters.
+  rpc Params(QueryParams) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/cheqd/oracle/v2/params";
+  }
+
+  // Medians returns medians of all denoms,
+  // or, if specified, returns a single median
+  rpc Medians(QueryMedians) returns (QueryMediansResponse) {
+    option (google.api.http).get = "/cheqd/historacle/v2/denoms/medians";
+  }
+
+  // MedianDeviations returns median deviations of all denoms,
+  // or, if specified, returns a single median deviation
+  rpc MedianDeviations(QueryMedianDeviations) returns (QueryMedianDeviationsResponse) {
+    option (google.api.http).get = "/cheqd/historacle/v2/denoms/median_deviations";
+  }
+
+  // ValidatorRewardSet returns the set of validators that is
+  // earning rewards for voting on exchange rates based on their
+  // misscounter in a given Slash Window
+  rpc ValidatorRewardSet(QueryValidatorRewardSet) returns (QueryValidatorRewardSetResponse) {
+    option (google.api.http).get = "/cheqd/oracle/v1/valdiators/validator_reward_set";
+  }
+
+  rpc EMA(QueryEMARequest) returns (QueryEMAResponse) {
+    option (google.api.http).get = "/cheqd/oracle/v2/ema/{denom}";
+  }
+
+  rpc WMA(QueryWMARequest) returns (QueryWMAResponse) {
+    option (google.api.http).get = "/cheqd/oracle/v2/wma/{denom}/{strategy}";
+  }
+
+  rpc SMA(QuerySMARequest) returns (QuerySMAResponse) {
+    option (google.api.http).get = "/cheqd/oracle/v2/sma/{denom}";
+  }
+
+   rpc ConvertUSDCtoCHEQ(ConvertUSDCtoCHEQRequest) returns (ConvertUSDCtoCHEQResponse){
+     option (google.api.http) = {
+      get: "/cheqd/oracle/v2/convert_usdc_to_cheq"
+    };
+  }
+}
+
+// QueryExchangeRates is the request type for the Query/ExchangeRate RPC
+// method.
+message QueryExchangeRates {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // denom defines the denomination to query for.
+  string denom = 1;
+}
+
+// QueryExchangeRatesResponse is response type for the
+// Query/ExchangeRates RPC method.
+message QueryExchangeRatesResponse {
+  // exchange_rates defines a list of the exchange rate for all whitelisted
+  // denoms.
+  repeated cosmos.base.v1beta1.DecCoin exchange_rates = 1 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// QueryActiveExchangeRates is the request type for the
+// Query/ActiveExchangeRates RPC method.
+message QueryActiveExchangeRates {}
+
+// QueryActiveExchangeRatesResponse is response type for the
+// Query/ActiveExchangeRates RPC method.
+message QueryActiveExchangeRatesResponse {
+  // activeRates defines a list of the denomination which oracle prices aggreed
+  // upon.
+  repeated string active_rates = 1;
+}
+
+// QueryFeederDelegation is the request type for the
+// Query/FeederDelegation RPC method.
+message QueryFeederDelegation {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // validator defines the validator address to query for.
+  string validator_addr = 1;
+}
+
+// QueryFeederDelegationResponse is response type for the
+// Query/FeederDelegation RPC method.
+message QueryFeederDelegationResponse {
+  // feeder_addr defines the feeder delegation of a validator
+  string feeder_addr = 1;
+}
+
+// QueryMissCounter is the request type for the Query/MissCounter RPC
+// method.
+message QueryMissCounter {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // validator defines the validator address to query for.
+  string validator_addr = 1;
+}
+
+// QueryMissCounterResponse is response type for the
+// Query/MissCounter RPC method.
+message QueryMissCounterResponse {
+  // miss_counter defines the oracle miss counter of a validator
+  uint64 miss_counter = 1;
+}
+
+// QuerySlashWindow is the request type for the
+// Query/SlashWindow RPC method.
+message QuerySlashWindow {}
+
+// QuerySlashWindowResponse is response type for the
+// Query/SlashWindow RPC method.
+message QuerySlashWindowResponse {
+  // window_progress defines the number of voting periods
+  // since the last slashing event would have taken place.
+  uint64 window_progress = 1;
+}
+
+// QueryAggregatePrevote is the request type for the
+// Query/AggregatePrevote RPC method.
+message QueryAggregatePrevote {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // validator defines the validator address to query for.
+  string validator_addr = 1;
+}
+
+// QueryAggregatePrevoteResponse is response type for the
+// Query/AggregatePrevote RPC method.
+message QueryAggregatePrevoteResponse {
+  // aggregate_prevote defines oracle aggregate prevote submitted by a validator
+  // in the current vote period
+  AggregateExchangeRatePrevote aggregate_prevote = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAggregatePrevotes is the request type for the
+// Query/AggregatePrevotes RPC method.
+message QueryAggregatePrevotes {}
+
+// QueryAggregatePrevotesResponse is response type for the
+// Query/AggregatePrevotes RPC method.
+message QueryAggregatePrevotesResponse {
+  // aggregate_prevotes defines all oracle aggregate prevotes submitted in the
+  // current vote period
+  repeated AggregateExchangeRatePrevote aggregate_prevotes = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAggregateVote is the request type for the Query/AggregateVote RPC
+// method.
+message QueryAggregateVote {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // validator defines the validator address to query for.
+  string validator_addr = 1;
+}
+
+// QueryAggregateVoteResponse is response type for the
+// Query/AggregateVote RPC method.
+message QueryAggregateVoteResponse {
+  // aggregate_vote defines oracle aggregate vote submitted by a validator in
+  // the current vote period
+  AggregateExchangeRateVote aggregate_vote = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAggregateVotes is the request type for the Query/AggregateVotes
+// RPC method.
+message QueryAggregateVotes {}
+
+// QueryAggregateVotesResponse is response type for the
+// Query/AggregateVotes RPC method.
+message QueryAggregateVotesResponse {
+  // aggregate_votes defines all oracle aggregate votes submitted in the current
+  // vote period
+  repeated AggregateExchangeRateVote aggregate_votes = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryParams is the request type for the Query/Params RPC method.
+message QueryParams {}
+
+// QueryParamsResponse is the response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params defines the parameters of the module.
+  Params params = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryMedians is the request type for the Query/Medians RPC Response.
+message QueryMedians {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  // denom defines the denomination to query for.
+  string denom = 1;
+  // numStamps defines the number of median stamps to query for. numStamps
+  // must be greater than 0.
+  uint32 num_stamps = 2;
+}
+
+// QueryMediansResponse is response type for the
+// Query/Medians RPC method.
+message QueryMediansResponse {
+  // medians defines a list of the medians for all stamped denoms.
+  repeated PriceStamp medians = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryMedianDeviations is the request type for the Query/MedianDeviations RPC
+// Response.
+message QueryMedianDeviations {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  // denom defines the denomination to query for.
+  string denom = 1;
+}
+
+// QueryMedianDeviationsResponse is response type for the
+// Query/MedianDeviations RPC method.
+message QueryMedianDeviationsResponse {
+  // medians defines a list of the median deviations for all stamped denoms.
+  repeated PriceStamp median_deviations = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryValidatorRewardSet is the request type for the Query/ValidatorRewardSet RPC method.
+message QueryValidatorRewardSet {}
+
+// QueryValidatorRewardSetResponse is the response type for the Query/ValidatorRewardSet RPC method.
+message QueryValidatorRewardSetResponse {
+  ValidatorRewardSet validators = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryEMARequest {
+  string denom = 1;
+}
+message QueryEMAResponse {
+  string price = 1 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message QueryWMARequest {
+  string denom = 1;
+  string strategy = 2; // "BALANCED", "RECENT", etc.
+  repeated int64 custom_weights = 3; // Only used if strategy == "CUSTOM"
+}
+
+message QueryWMAResponse {
+  string price = 1 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message QuerySMARequest {
+  string denom = 1;
+}
+message QuerySMAResponse {
+  string price = 1 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message ConvertUSDCtoCHEQRequest {
+  string amount = 1;            // e.g., "1000000usdc"
+  string ma_type = 2;           // "sma", "ema", or "wma"
+  string wma_strategy = 3;      // "daily", "hourly", "custom" (optional unless wma is chosen)
+  repeated int32 custom_weights = 4; // only used if strategy == custom
+}
+
+message ConvertUSDCtoCHEQResponse {
+  string amount = 1; // e.g., "25000000ncheq"
+}

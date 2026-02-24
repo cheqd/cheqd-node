@@ -3,6 +3,7 @@ package types
 import (
 	context "context"
 
+	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
@@ -36,4 +37,9 @@ type BankKeeper interface {
 
 type StakingKeeper interface {
 	BondDenom(ctx context.Context) (string, error)
+}
+
+// OracleKeeper interface for price fetching
+type OracleKeeper interface {
+	GetWMA(ctx sdk.Context, denom string, strategy string) (sdkmath.LegacyDec, bool)
 }

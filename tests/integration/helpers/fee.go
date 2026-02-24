@@ -19,13 +19,17 @@ func GenerateFeeGranter(granter string, feeParams []string) []string {
 	}, feeParams...)
 }
 
-func GetBurntPortion(tax sdk.Coin, burnFactor sdkmath.LegacyDec) sdk.Coin {
-	taxDec := sdk.NewDecCoinFromCoin(tax)
-	taxDec.Amount = taxDec.Amount.Mul(burnFactor)
-	burnt, _ := taxDec.TruncateDecimal()
-	return burnt
+func GetBurnFeePortion(burnFactor sdkmath.LegacyDec, fee sdk.Coins) sdk.Coins {
+	feeDecCoins := sdk.NewDecCoinsFromCoins(fee...)
+
+	burnFeePortion, _ := feeDecCoins.MulDec(burnFactor).TruncateDecimal()
+
+	return burnFeePortion
 }
 
-func GetRewardPortion(tax sdk.Coin, burnt sdk.Coin) sdk.Coin {
-	return tax.Sub(burnt)
+func GetRewardPortion(total sdk.Coins, burnPortion sdk.Coins) sdk.Coins {
+	if burnPortion.IsZero() {
+		return total
+	}
+	return total.Sub(burnPortion...)
 }

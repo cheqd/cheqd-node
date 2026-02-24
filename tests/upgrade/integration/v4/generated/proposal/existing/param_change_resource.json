@@ -1,28 +1,37 @@
 {
-    "messages": [
-        {
-            "@type": "/cheqd.resource.v2.MsgUpdateParams",
-            "authority": "cheqd10d07y265gmmuvt4z0w9aw880jnsr700j5ql9az",
-            "params": {
-                "image": {
-                    "denom": "ncheq",
-                    "amount": "20000000000"
-                },
-                "json": {
-                    "denom": "ncheq",
-                    "amount": "5000000000"
-                },
-                "default": {
-                    "denom": "ncheq",
-                    "amount": "10000000000"
-                },
-                "burn_factor": "0.990000000000000000"
-            }
-        }
-    ],
-    "metadata": "",
-    "deposit": "10000000000ncheq",
-    "title": "Resource Param Change",
-    "summary": "This is a simple example of a param change - double the values, 99% burn factor",
-    "expedited": false
+  "messages": [
+    {
+      "@type": "/cheqd.resource.v2.MsgUpdateParams",
+      "authority": "cheqd10d07y265gmmuvt4z0w9aw880jnsr700j5ql9az",
+      "params": {
+        "image": [
+          {
+            "denom": "ncheq",
+            "min_amount": "20000000000",
+            "max_amount": "20000000000"
+          }
+        ],
+        "json": [
+          {
+            "denom": "ncheq",
+            "min_amount": "5000000000",
+            "max_amount": "5000000000"
+          }
+        ],
+        "default": [
+          {
+            "denom": "ncheq",
+            "min_amount": "10000000000",
+            "max_amount": "10000000000"
+          }
+        ],
+        "burn_factor": "0.990000000000000000"
+      }
+    }
+  ],
+  "metadata": "",
+  "deposit": "10000000000ncheq",
+  "title": "Resource Param Change",
+  "summary": "This is a simple example of a param change - double the values, 99% burn factor",
+  "expedited": false
 }

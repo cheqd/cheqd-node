@@ -1,5 +1,5 @@
 1
-2
+1
 /home/runner/.local/cheqd
 yes
 yes
@@ -7,3 +7,5 @@ no
 yes
 yes
 yes
+yes
+2

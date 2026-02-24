@@ -4,10 +4,12 @@ import (
 	"context"
 
 	"cosmossdk.io/core/address"
+	"cosmossdk.io/math"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/ojo-network/price-feeder/oracle"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
 
@@ -38,4 +40,14 @@ type FeeMarketKeeper interface {
 	SetState(ctx context.Context, state feemarkettypes.State) error
 	SetParams(ctx context.Context, params feemarkettypes.Params) error
 	ResolveToDenom(ctx context.Context, coin sdk.DecCoin, denom string) (sdk.DecCoin, error)
+}
+
+type OracleKeeper interface {
+	GetEMA(ctx sdk.Context, denom string) (math.LegacyDec, bool)
+	GetExchangeRate(ctx sdk.Context, denom string) (math.LegacyDec, error)
+	GetWMA(ctx sdk.Context, denom string, strategy string) (math.LegacyDec, bool)
+}
+
+type PriceFeeder interface {
+	GetOracle() *oracle.Oracle
 }

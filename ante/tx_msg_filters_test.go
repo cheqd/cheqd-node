@@ -5,6 +5,7 @@ import (
 
 	"cosmossdk.io/math"
 	"github.com/cheqd/cheqd-node/ante"
+	"github.com/cheqd/cheqd-node/util"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	resourceutils "github.com/cheqd/cheqd-node/x/resource/utils"
@@ -18,12 +19,48 @@ var _ = Describe("TxMsgFilters", func() {
 
 	BeforeEach(func() {
 		ante.TaxableMsgFees = ante.TaxableMsgFee{
-			ante.MsgCreateDidDoc:          sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(didtypes.DefaultCreateDidTxFee))),
-			ante.MsgUpdateDidDoc:          sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(didtypes.DefaultUpdateDidTxFee))),
-			ante.MsgDeactivateDidDoc:      sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, math.NewInt(didtypes.DefaultDeactivateDidTxFee))),
-			ante.MsgCreateResourceDefault: sdk.NewCoins(sdk.NewCoin(resourcetypes.BaseMinimalDenom, math.NewInt(resourcetypes.DefaultCreateResourceDefaultFee))),
-			ante.MsgCreateResourceImage:   sdk.NewCoins(sdk.NewCoin(resourcetypes.BaseMinimalDenom, math.NewInt(resourcetypes.DefaultCreateResourceImageFee))),
-			ante.MsgCreateResourceJSON:    sdk.NewCoins(sdk.NewCoin(resourcetypes.BaseMinimalDenom, math.NewInt(resourcetypes.DefaultCreateResourceJSONFee))),
+			ante.MsgCreateDidDoc: []didtypes.FeeRange{
+				{
+					Denom:     didtypes.BaseMinimalDenom,
+					MinAmount: util.PtrInt(didtypes.DefaultCreateDidTxFee),
+					MaxAmount: util.PtrInt(100e9),
+				},
+			},
+			ante.MsgUpdateDidDoc: []didtypes.FeeRange{
+				{
+					Denom:     didtypes.BaseMinimalDenom,
+					MinAmount: util.PtrInt(didtypes.DefaultUpdateDidTxFee),
+					MaxAmount: util.PtrInt(100e9),
+				},
+			},
+			ante.MsgDeactivateDidDoc: []didtypes.FeeRange{
+				{
+					Denom:     didtypes.BaseMinimalDenom,
+					MinAmount: util.PtrInt(didtypes.DefaultDeactivateDidTxFee),
+					MaxAmount: util.PtrInt(100e9),
+				},
+			},
+			ante.MsgCreateResourceDefault: []didtypes.FeeRange{
+				{
+					Denom:     didtypes.BaseMinimalDenom,
+					MinAmount: util.PtrInt(resourcetypes.DefaultCreateResourceDefaultFee),
+					MaxAmount: util.PtrInt(100e9),
+				},
+			},
+			ante.MsgCreateResourceImage: []didtypes.FeeRange{
+				{
+					Denom:     didtypes.BaseMinimalDenom,
+					MinAmount: util.PtrInt(resourcetypes.DefaultCreateResourceImageFee),
+					MaxAmount: util.PtrInt(100e9),
+				},
+			},
+			ante.MsgCreateResourceJSON: []didtypes.FeeRange{
+				{
+					Denom:     didtypes.BaseMinimalDenom,
+					MinAmount: util.PtrInt(resourcetypes.DefaultCreateResourceJSONFee),
+					MaxAmount: util.PtrInt(100e9),
+				},
+			},
 		}
 
 		ante.BurnFactors = ante.BurnFactor{
@@ -38,7 +75,7 @@ var _ = Describe("TxMsgFilters", func() {
 			content, err := base64.StdEncoding.DecodeString("iVBORw0KGgoAAAANSUhEUgAAABEAAAAOCAMAAAD+MweGAAADAFBMVEUAAAAAAFUAAKoAAP8AJAAAJFUAJKoAJP8ASQAASVUASaoASf8AbQAAbVUAbaoAbf8AkgAAklUAkqoAkv8AtgAAtlUAtqoAtv8A2wAA21UA26oA2/8A/wAA/1UA/6oA//8kAAAkAFUkAKokAP8kJAAkJFUkJKokJP8kSQAkSVUkSaokSf8kbQAkbVUkbaokbf8kkgAkklUkkqokkv8ktgAktlUktqoktv8k2wAk21Uk26ok2/8k/wAk/1Uk/6ok//9JAABJAFVJAKpJAP9JJABJJFVJJKpJJP9JSQBJSVVJSapJSf9JbQBJbVVJbapJbf9JkgBJklVJkqpJkv9JtgBJtlVJtqpJtv9J2wBJ21VJ26pJ2/9J/wBJ/1VJ/6pJ//9tAABtAFVtAKptAP9tJABtJFVtJKptJP9tSQBtSVVtSaptSf9tbQBtbVVtbaptbf9tkgBtklVtkqptkv9ttgBttlVttqpttv9t2wBt21Vt26pt2/9t/wBt/1Vt/6pt//+SAACSAFWSAKqSAP+SJACSJFWSJKqSJP+SSQCSSVWSSaqSSf+SbQCSbVWSbaqSbf+SkgCSklWSkqqSkv+StgCStlWStqqStv+S2wCS21WS26qS2/+S/wCS/1WS/6qS//+2AAC2AFW2AKq2AP+2JAC2JFW2JKq2JP+2SQC2SVW2Saq2Sf+2bQC2bVW2baq2bf+2kgC2klW2kqq2kv+2tgC2tlW2tqq2tv+22wC221W226q22/+2/wC2/1W2/6q2///bAADbAFXbAKrbAP/bJADbJFXbJKrbJP/bSQDbSVXbSarbSf/bbQDbbVXbbarbbf/bkgDbklXbkqrbkv/btgDbtlXbtqrbtv/b2wDb21Xb26rb2//b/wDb/1Xb/6rb////AAD/AFX/AKr/AP//JAD/JFX/JKr/JP//SQD/SVX/Sar/Sf//bQD/bVX/bar/bf//kgD/klX/kqr/kv//tgD/tlX/tqr/tv//2wD/21X/26r/2////wD//1X//6r////qm24uAAAA1ElEQVR42h1PMW4CQQwc73mlFJGCQChFIp0Rh0RBGV5AFUXKC/KPfCFdqryEgoJ8IX0KEF64q0PPnow3jT2WxzNj+gAgAGfvvDdCQIHoSnGYcGDE2nH92DoRqTYJ2bTcsKgqhIi47VdgAWNmwFSFA1UAAT2sSFcnq8a3x/zkkJrhaHT3N+hD3aH7ZuabGHX7bsSMhxwTJLr3evf1e0nBVcwmqcTZuatKoJaB7dSHjTZdM0G1HBTWefly//q2EB7/BEvk5vmzeQaJ7/xKPImpzv8/s4grhAxHl0DsqGUAAAAASUVORK5CYII=")
 			Expect(err).To(BeNil())
 
-			// perform holistic action benchmark - 100k rounds
+			// perform holistic action benchmark - 1mn rounds
 			for range rounds {
 				// detect mime type
 				mimeType := resourceutils.DetectMediaType(content)
@@ -69,12 +106,21 @@ var _ = Describe("TxMsgFilters", func() {
 					Signatures: signatures,
 				}
 
+				ncheqPrice := math.LegacyMustNewDecFromStr("0.016")
 				// calculate portions
-				reward, burn, ok := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg)
+				amount := math.NewInt(int64(resourcetypes.DefaultCreateResourceImageFee))
+
+				userFee := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount))
+
+				fee, err := ante.GetFeeForMsg(userFee, ante.TaxableMsgFees[ante.MsgCreateResourceImage], ncheqPrice, nil)
+				Expect(err).To(BeNil())
+
+				reward, burn, ok, err := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice, userFee, nil)
+				Expect(err).To(BeNil())
 				Expect(ok).To(BeTrue())
-				Expect(reward).To(Equal(ante.GetRewardPortion(ante.TaxableMsgFees[ante.MsgCreateResourceImage], ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], ante.TaxableMsgFees[ante.MsgCreateResourceImage]))))
-				Expect(burn).To(Equal(ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], ante.TaxableMsgFees[ante.MsgCreateResourceImage])))
-				Expect(reward.Add(burn[0])[0].Amount).To(BeEquivalentTo(ante.TaxableMsgFees[ante.MsgCreateResourceImage][0].Amount))
+				Expect(reward).To(Equal(ante.GetRewardPortion(fee, ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee))))
+				Expect(burn).To(Equal(ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee)))
+				Expect(reward.Add(burn[0])[0].Amount).To(BeEquivalentTo(fee[0].Amount))
 			}
 		})
 
@@ -113,12 +159,21 @@ var _ = Describe("TxMsgFilters", func() {
 					Signatures: signatures,
 				}
 
+				amount := math.NewInt(int64(resourcetypes.DefaultCreateResourceJSONFee))
+
+				userFee := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount))
+				ncheqPrice := math.LegacyMustNewDecFromStr("0.016")
+				fee, err := ante.GetFeeForMsg(userFee, ante.TaxableMsgFees[ante.MsgCreateResourceJSON], ncheqPrice, nil)
+				Expect(err).To(BeNil())
 				// calculate portions
-				reward, burn, ok := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg)
+				reward, burn, ok, err := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice, userFee, nil)
+				Expect(err).To(BeNil())
+
 				Expect(ok).To(BeTrue())
-				Expect(reward).To(Equal(ante.GetRewardPortion(ante.TaxableMsgFees[ante.MsgCreateResourceJSON], ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], ante.TaxableMsgFees[ante.MsgCreateResourceJSON]))))
-				Expect(burn).To(Equal(ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], ante.TaxableMsgFees[ante.MsgCreateResourceJSON])))
-				Expect(reward.Add(burn[0])[0].Amount).To(BeEquivalentTo(ante.TaxableMsgFees[ante.MsgCreateResourceJSON][0].Amount))
+				Expect(reward).To(Equal(ante.GetRewardPortion(fee, ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee))))
+				Expect(burn).To(Equal(ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee)))
+
+				Expect(reward.Add(burn[0])[0].Amount).To(BeEquivalentTo(fee[0].Amount))
 			}
 		})
 
@@ -157,13 +212,22 @@ var _ = Describe("TxMsgFilters", func() {
 					},
 					Signatures: signatures,
 				}
+				amount := math.NewInt(int64(resourcetypes.DefaultCreateResourceDefaultFee))
+
+				userFee := sdk.NewCoins(sdk.NewCoin(didtypes.BaseMinimalDenom, amount))
+
+				ncheqPrice := math.LegacyMustNewDecFromStr("0.016")
+				fee, err := ante.GetFeeForMsg(userFee, ante.TaxableMsgFees[ante.MsgCreateResourceDefault], ncheqPrice, nil)
+				Expect(err).To(BeNil())
 
 				// calculate portions
-				reward, burn, ok := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg)
+				reward, burn, ok, err := ante.GetResourceTaxableMsgFee(sdk.Context{}, &resourceMsg, ncheqPrice, userFee, nil)
+				Expect(err).To(BeNil())
+
 				Expect(ok).To(BeTrue())
-				Expect(reward).To(Equal(ante.GetRewardPortion(ante.TaxableMsgFees[ante.MsgCreateResourceDefault], ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], ante.TaxableMsgFees[ante.MsgCreateResourceDefault]))))
-				Expect(burn).To(Equal(ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], ante.TaxableMsgFees[ante.MsgCreateResourceDefault])))
-				Expect(reward.Add(burn[0])[0].Amount).To(BeEquivalentTo(ante.TaxableMsgFees[ante.MsgCreateResourceDefault][0].Amount))
+				Expect(reward).To(Equal(ante.GetRewardPortion(fee, ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee))))
+				Expect(burn).To(Equal(ante.GetBurnFeePortion(ante.BurnFactors[ante.BurnFactorResource], fee)))
+				Expect(reward.Add(burn[0])[0].Amount).To(BeEquivalentTo(fee[0].Amount))
 			}
 		})
 	})
