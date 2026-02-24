@@ -79,6 +79,8 @@ archives:
     format: tar.gz
     wrap_in_directory: false
     name_template: "{{ .Binary }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    files:
+      - none*
 
 checksum:
   algorithm: sha256
