@@ -12,7 +12,7 @@ require (
 	filippo.io/edwards25519 v1.1.0
 	github.com/armon/go-metrics v0.4.1
 	github.com/cheqd/cheqd-node/api/v2 v2.3.5-0.20250514151055-c7d12358336f
-	github.com/cometbft/cometbft v0.38.19
+	github.com/cometbft/cometbft v0.38.21
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/cosmos-sdk v0.50.14
 	github.com/cosmos/gogoproto v1.7.0
@@ -46,6 +46,7 @@ require (
 require (
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
+	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/mod v0.27.0 // indirect
 )
 
@@ -64,7 +65,6 @@ require (
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/ojo-network/ojo v0.4.0-rc1.0.20240912201233-2af60de6026b // indirect
 	github.com/rs/xid v1.6.0 // indirect; indirect	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
-	go.uber.org/automaxprocs v1.6.0 // indirect
 )
 
 require (

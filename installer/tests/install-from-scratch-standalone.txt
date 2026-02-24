@@ -1,6 +1,6 @@
 1
 /home/runner/.local/cheqd
-2
+1
 yes
 test-install
 rpc.cheqd.network
