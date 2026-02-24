@@ -1,0 +1,273 @@
+syntax = "proto3";
+package cheqd.oracle.v2;
+
+import "cheqd/oracle/v2/oracle.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/cheqd/cheqd-node/x/oracle/types";
+option (gogoproto.goproto_getters_all) = false;
+
+// Msg defines the oracle Msg service.
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  // AggregateExchangeRatePrevote defines a method for submitting an aggregate
+  // exchange rate prevote.
+  rpc AggregateExchangeRatePrevote(MsgAggregateExchangeRatePrevote) returns (MsgAggregateExchangeRatePrevoteResponse);
+
+  // AggregateExchangeRateVote defines a method for submitting an aggregate
+  // exchange rate vote.
+  rpc AggregateExchangeRateVote(MsgAggregateExchangeRateVote) returns (MsgAggregateExchangeRateVoteResponse);
+
+  // DelegateFeedConsent defines a method for setting the feeder delegation.
+  rpc DelegateFeedConsent(MsgDelegateFeedConsent) returns (MsgDelegateFeedConsentResponse);
+
+  // LegacyGovUpdateParams defines the legacy message that updates the oracle parameters.
+  rpc LegacyGovUpdateParams(MsgLegacyGovUpdateParams) returns (MsgLegacyGovUpdateParamsResponse);
+
+  // GovUpdateParams updates the oracle parameters.
+  rpc GovUpdateParams(MsgGovUpdateParams) returns (MsgGovUpdateParamsResponse);
+
+  // GovAddDenoms updates the oracle parameters to include a new tokens.
+  rpc GovAddDenoms(MsgGovAddDenoms) returns (MsgGovAddDenomsResponse);
+
+  // GovRemoveCurrencyPairProviders updates the oracle parameters to remove a list of
+  // currency pair providers.
+  rpc GovRemoveCurrencyPairProviders(MsgGovRemoveCurrencyPairProviders) returns (MsgGovRemoveCurrencyPairProvidersResponse);
+
+  // GovRemoveCurrencyDeviationThresholds updates the oracle parameters to remove a list
+  // of currency deviation thresholds.
+  rpc GovRemoveCurrencyDeviationThresholds(MsgGovRemoveCurrencyDeviationThresholds) returns (MsgGovRemoveCurrencyDeviationThresholdsResponse);
+
+  // GovCancelUpdateParamPlan cancels a plan to update the oracle parameters.
+  rpc GovCancelUpdateParamPlan(MsgGovCancelUpdateParamPlan) returns (MsgGovCancelUpdateParamPlanResponse);
+}
+
+// MsgAggregateExchangeRatePrevote represents a message to submit an aggregate
+// exchange rate prevote.
+message MsgAggregateExchangeRatePrevote {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "feeder";
+
+  string hash = 1 [(gogoproto.moretags) = "yaml:\"hash\""];
+  // Feeder is the author and the signer of the message.
+  string feeder = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string validator = 3 [(cosmos_proto.scalar) = "cosmos.ValidatorAddressString"];
+}
+
+// MsgAggregateExchangeRatePrevoteResponse defines the
+// Msg/AggregateExchangeRatePrevote response type.
+message MsgAggregateExchangeRatePrevoteResponse {}
+
+// MsgAggregateExchangeRateVote represents a message to submit anaggregate
+// exchange rate vote.
+message MsgAggregateExchangeRateVote {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "feeder";
+
+  string salt = 1 [(gogoproto.moretags) = "yaml:\"salt\""];
+  string exchange_rates = 2 [(gogoproto.moretags) = "yaml:\"exchange_rates\""];
+  // Feeder is the author and the signer of the message.
+  string feeder = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string validator = 4 [(cosmos_proto.scalar) = "cosmos.ValidatorAddressString"];
+}
+
+// MsgAggregateExchangeRateVoteResponse defines the
+// Msg/AggregateExchangeRateVote response type.
+message MsgAggregateExchangeRateVoteResponse {}
+
+// MsgDelegateFeedConsent represents a message to delegate oracle voting rights
+// to another address.
+message MsgDelegateFeedConsent {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "operator";
+
+  // Operator is the author and the signer of the message.
+  string operator = 1 [(cosmos_proto.scalar) = "cosmos.ValidatorAddressString"];
+  string delegate = 2 [(cosmos_proto.scalar) = "cosmos.ValidatorAddressString"];
+}
+
+// MsgDelegateFeedConsentResponse defines the Msg/DelegateFeedConsent response
+// type.
+message MsgDelegateFeedConsentResponse {}
+
+// MsgLegacyGovUpdateParams defines the Msg/MsgLegacyGovUpdateParams request type.
+message MsgLegacyGovUpdateParams {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority is the address of the governance account.
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string title = 2;
+  string description = 3;
+  repeated string keys = 4;
+  Params changes = 5 [(gogoproto.nullable) = false];
+}
+
+// MsgLegacyGovUpdateParams defines the Msg/MsgLegacyGovUpdateParams response type.
+message MsgLegacyGovUpdateParamsResponse {}
+
+// MsgGovUpdateParams defines the Msg/GovUpdateParams request type.
+message MsgGovUpdateParams {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority is the address of the governance account.
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // title of the proposal
+  string title = 2;
+
+  // description of the proposal
+  string description = 3;
+
+  // plan is the param update plan
+  ParamUpdatePlan plan = 4 [(gogoproto.nullable) = false];
+}
+
+// MsgGovUpdateParamsResponse defines the Msg/GovUpdateParams response type.
+message MsgGovUpdateParamsResponse {}
+
+// MsgGovAddDenoms defines the Msg/GovAddDenoms request type.
+message MsgGovAddDenoms {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority is the address of the governance account.
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // title of the proposal
+  string title = 2;
+
+  // description of the proposal
+  string description = 3;
+
+  // height at which the param update must be performed
+  int64 height = 4;
+
+  // denom_list is the list of denoms to add to the oracle registry
+  repeated Denom denom_list = 5 [
+    (gogoproto.castrepeated) = "DenomList",
+    (gogoproto.nullable) = false
+  ];
+
+  // whether or not the assets should be mandatory
+  bool mandatory = 6;
+
+  // reward_band determines what the reward_band will be for every
+  // asset in the proposal. If not provided, it will default.
+  string reward_band = 7 [
+    (gogoproto.moretags) = "yaml:\"vote_threshold\"",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = true
+  ];
+
+  // currency_pair_providers defines the currency provider pairs for
+  // each denom being added.
+  repeated CurrencyPairProviders currency_pair_providers = 8 [
+    (gogoproto.moretags) = "yaml:\"currency_pair_providers\"",
+    (gogoproto.castrepeated) = "CurrencyPairProvidersList",
+    (gogoproto.nullable) = false
+  ];
+
+  // currency_deviation_thresholds defines the deviation thresholds
+  // for each denom being added.
+  repeated CurrencyDeviationThreshold currency_deviation_thresholds = 9 [
+    (gogoproto.moretags) = "yaml:\"currency_deviation_thresholds\"",
+    (gogoproto.castrepeated) = "CurrencyDeviationThresholdList",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// MsgGovAddDenomResponse defines the Msg/GovAddDenomResponse response type.
+message MsgGovAddDenomsResponse {}
+
+// MsgGovRemoveCurrencyPairProviders defines the Msg/GovRemoveCurrencyPairProviders request type.
+message MsgGovRemoveCurrencyPairProviders {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority is the address of the governance account.
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // title of the proposal
+  string title = 2;
+
+  // description of the proposal
+  string description = 3;
+
+  // height at which the param update must be performed
+  int64 height = 4;
+
+  // currency_pair_providers to remove from the current CurrencyPairProvidersList
+  repeated CurrencyPairProviders currency_pair_providers = 5 [
+    (gogoproto.moretags) = "yaml:\"currency_pair_providers\"",
+    (gogoproto.castrepeated) = "CurrencyPairProvidersList",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// MsgGovRemoveCurrencyPairProvidersResponse defines the Msg/GovRemoveCurrencyPairProvidersResponse response type.
+message MsgGovRemoveCurrencyPairProvidersResponse {}
+
+// MsgGovRemoveCurrencyDeviationThresholds defines the Msg/GovRemoveCurrencyDeviationThresholds request type.
+message MsgGovRemoveCurrencyDeviationThresholds {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority is the address of the governance account.
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // title of the proposal
+  string title = 2;
+
+  // description of the proposal
+  string description = 3;
+
+  // height at which the param update must be performed
+  int64 height = 4;
+
+  // currencies to remove from the current CurrencyDeviationThresholdsList
+  repeated string currencies = 5;
+}
+
+// MsgGovRemoveCurrencyDeviationThresholdsResponse defines the Msg/GovRemoveCurrencyDeviationThresholdsResponse response type.
+message MsgGovRemoveCurrencyDeviationThresholdsResponse {}
+
+// MsgGovCancelUpdateParamPlan defines the Msg/GovCancelUpdateParamPlan request type.
+message MsgGovCancelUpdateParamPlan {
+  option (gogoproto.equal) = true;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority is the address of the governance account.
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // title of the proposal
+  string title = 2;
+
+  // description of the proposal
+  string description = 3;
+
+  // height of param update plan to cancel
+  int64 height = 4;
+}
+
+// MsgGovCancelUpdateParamPlanResponse defines the Msg/GovCancelUpdateParamPlanResponse response type.
+message MsgGovCancelUpdateParamPlanResponse {}

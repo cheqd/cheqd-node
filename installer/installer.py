@@ -37,12 +37,16 @@ PRINT_PREFIX = "********* "
 # Set branch dynamically in CI workflow for testing if Python dev mode is enabled and DEFAULT_DEBUG_BRANCH is set
 # Otherwise, use the main branch
 DEFAULT_DEBUG_BRANCH = os.getenv("DEFAULT_DEBUG_BRANCH") if os.getenv("DEFAULT_DEBUG_BRANCH") is not None else "main"
-
+# RPC endpoints
+MAINNET_RPC_ENDPOINT_EU = "https://eu-rpc.cheqd.net:443"
+MAINNET_RPC_ENDPOINT_AP = "https://ap-rpc.cheqd.net:443"
+TESTNET_RPC_ENDPOINT_EU = "https://eu-rpc.cheqd.network:443"
+TESTNET_RPC_ENDPOINT_AP = "https://ap-rpc.cheqd.network:443"
 
 ###############################################################
 ###     		Cosmovisor configuration      				###
 ###############################################################
-DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.7.1"
+DEFAULT_LATEST_COSMOVISOR_VERSION = "v1.3.0"
 COSMOVISOR_BINARY_URL = "https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2F{}/cosmovisor-{}-linux-{}.tar.gz"
 DEFAULT_USE_COSMOVISOR = "yes"
 DEFAULT_BUMP_COSMOVISOR = "yes"
@@ -350,7 +354,7 @@ class Installer():
                 with request.urlopen(COSMOVISOR_SERVICE_TEMPLATE) as response:
                     # Replace the values for environment variables in the template file
                     s = re.sub(
-                        r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY})',
+                        r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY}|{DAEMON_DOWNLOAD_MUST_HAVE_CHECKSUM}|{DAEMON_SHUTDOWN_GRACE})',
                         lambda m: {'{CHEQD_ROOT_DIR}': self.cheqd_root_dir,
                                 '{DEFAULT_BINARY_NAME}': DEFAULT_BINARY_NAME,
                                 '{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}':  self.interviewer.daemon_allow_download_binaries,
@@ -380,7 +384,7 @@ class Installer():
                 with request.urlopen(COSMOVISOR_CONFIG_TEMPLATE) as response:
                     # Replace the values for environment variables in the template file
                     s = re.sub(
-                        r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY})',
+                        r'({CHEQD_ROOT_DIR}|{DEFAULT_BINARY_NAME}|{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}|{COSMOVISOR_DAEMON_RESTART_AFTER_UPGRADE}|{DEFAULT_DAEMON_POLL_INTERVAL}|{DEFAULT_UNSAFE_SKIP_BACKUP}|{DEFAULT_DAEMON_RESTART_DELAY}|{DAEMON_DOWNLOAD_MUST_HAVE_CHECKSUM}|{DAEMON_SHUTDOWN_GRACE})',
                         lambda m: {'{CHEQD_ROOT_DIR}': self.cheqd_root_dir,
                                 '{DEFAULT_BINARY_NAME}': DEFAULT_BINARY_NAME,
                                 '{COSMOVISOR_DAEMON_ALLOW_DOWNLOAD_BINARIES}':  self.interviewer.daemon_allow_download_binaries,
@@ -478,7 +482,9 @@ class Installer():
             # Setup cheqd-noded environment variables
             # These are independent of Cosmovisor environment variables
             # Set them regardless of whether Cosmovisor is used or not
+            logging.info("Setting cheqd-noded environment variables...")
             self.set_cheqd_env_vars()
+            logging.info("Finished setting cheqd-noded environment variables")
 
             # Configure cheqd-noded settings
             # This edits the config.toml and app.toml files
@@ -487,6 +493,15 @@ class Installer():
             else:
                 logging.error("Failed to configure cheqd-noded settings")
                 return False
+
+            # Configure state sync only for fresh installs
+            if self.interviewer.is_from_scratch and getattr(self.interviewer, 'use_statesync', False):
+                logging.info("Configuring state sync (default)")
+                if not self.configure_statesync():
+                    logging.error("Failed to configure state sync")
+                    return False
+                # Ensure snapshot is not attempted
+                self.interviewer.init_from_snapshot = False
 
             # Configure systemd service for cheqd-noded
             # Sets up either a standalone service or a Cosmovisor service
@@ -898,6 +913,7 @@ class Installer():
         # Applicable for both standalone and Cosmovisor installations
         # Only environment variables that are required required for transactions are set here
         try:
+            logging.info("Starting to set cheqd-noded environment variables...")
             # If RPC port is set, set to user-specified value
             if self.interviewer.rpc_port:
                 self.set_environment_variable("CHEQD_NODED_NODE", f"tcp://localhost:{self.interviewer.rpc_port}")
@@ -910,6 +926,18 @@ class Installer():
                 self.set_environment_variable("CHEQD_NODED_CHAIN_ID", TESTNET_CHAIN_ID)
             elif self.interviewer.chain == "mainnet":
                 self.set_environment_variable("CHEQD_NODED_CHAIN_ID", MAINNET_CHAIN_ID)
+
+            # Proceed with Cosmovisor-specific environment variables
+            if self.interviewer.is_cosmovisor_needed:
+                self.set_environment_variable("DAEMON_HOME", self.cheqd_root_dir)
+                self.set_environment_variable("DAEMON_NAME", DEFAULT_BINARY_NAME)
+                self.set_environment_variable("DAEMON_ALLOW_DOWNLOAD_BINARIES", self.interviewer.daemon_allow_download_binaries)
+                self.set_environment_variable("DAEMON_RESTART_AFTER_UPGRADE", self.interviewer.daemon_restart_after_upgrade)
+                self.set_environment_variable("DAEMON_POLL_INTERVAL", DEFAULT_DAEMON_POLL_INTERVAL)
+                self.set_environment_variable("UNSAFE_SKIP_BACKUP", DEFAULT_UNSAFE_SKIP_BACKUP)
+                self.set_environment_variable("DAEMON_DOWNLOAD_MUST_HAVE_CHECKSUM", DAEMON_DOWNLOAD_MUST_HAVE_CHECKSUM)
+                self.set_environment_variable("DAEMON_SHUTDOWN_GRACE", DAEMON_SHUTDOWN_GRACE)
+
         except Exception as e:
             logging.exception(f"Failed to set environment variables for cheqd-noded. Reason: {e}")
             raise
@@ -970,6 +998,73 @@ class Installer():
             else:
                 logging.debug(f"{self.cheqd_user_bashrc_path} doesn't exist. Skipped adding {env_var_name} to the file...")
 
+            # Check if the cheqd user's default shell is fish
+            try:
+                cheqd_user_info = pwd.getpwnam(DEFAULT_CHEQD_USER)
+                cheqd_user_shell = cheqd_user_info.pw_shell
+                fish_detected = 'fish' in cheqd_user_shell
+
+                if fish_detected:
+                    # Set environment variable for fish shell
+                    fish_config_dir = os.path.join(self.cheqd_home_dir, ".config", "fish")
+                    fish_config_file = os.path.join(fish_config_dir, "config.fish")
+
+                    # Create fish config directory if it doesn't exist
+                    os.makedirs(fish_config_dir, exist_ok=True)
+
+                    # Read existing config or create new one
+                    lines = []
+                    if os.path.exists(fish_config_file):
+                        with open(fish_config_file, "r") as f:
+                            lines = f.readlines()
+
+                    # Check if interactive block exists
+                    interactive_block_start = -1
+                    interactive_block_end = -1
+                    for i, line in enumerate(lines):
+                        if line.strip() == "if status is-interactive":
+                            interactive_block_start = i
+                        elif line.strip() == "end" and interactive_block_start != -1:
+                            interactive_block_end = i
+                            break
+
+                    # Prepare the fish environment variable line
+                    fish_line = f"    set -gx {env_var_name} {env_var_value}\n"
+
+                    # Update or add the environment variable
+                    updated = False
+                    new_lines = []
+
+                    for i, line in enumerate(lines):
+                        if line.strip().startswith(f"set -gx {env_var_name} "):
+                            new_lines.append(fish_line)
+                            updated = True
+                        else:
+                            new_lines.append(line)
+
+                    # If not updated, add to interactive block or create one
+                    if not updated:
+                        if interactive_block_start != -1 and interactive_block_end != -1:
+                            # Insert into existing interactive block
+                            new_lines.insert(interactive_block_end, fish_line)
+                        else:
+                            # Create new interactive block
+                            new_lines.extend([
+                                "if status is-interactive\n",
+                                "    # Commands to run in interactive sessions can go here\n",
+                                fish_line,
+                                "end\n"
+                            ])
+
+                    # Write the updated config
+                    with open(fish_config_file, "w") as f:
+                        f.writelines(new_lines)
+
+                    logging.debug(f"Set {env_var_name} for fish shell in {fish_config_file}")
+
+            except (KeyError, ImportError) as e:
+                logging.warning(f"Could not determine cheqd user shell or set fish config: {e}")
+
         except Exception as e:
             logging.exception(f"Failed to set environment variable {env_var_name}. Reason: {e}")
             raise
@@ -994,7 +1089,7 @@ class Installer():
                 if not os.path.exists(os.path.join(self.cheqd_config_dir, 'priv_validator_key.json')):
                     # Initialize the node
                     logging.info(f"Initializing {self.cheqd_root_dir} directory")
-                    self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'cheqd-noded init {self.interviewer.moniker}'")
+                    self.exec(f"sudo -u {DEFAULT_CHEQD_USER} bash -c 'cheqd-noded init {self.interviewer.moniker} --chain-id {TESTNET_CHAIN_ID if self.interviewer.chain == 'testnet' else MAINNET_CHAIN_ID}'")
                 else:
                     logging.debug(f"Validator key already exists in {self.cheqd_config_dir}. Skipping cheqd-noded init...")
 
@@ -1028,6 +1123,22 @@ class Installer():
                 search_and_replace(rpc_default_value, new_rpc_default_value, config_toml_path)
             else:
                 logging.debug("Skipping cheqd-noded init as setup is not needed")
+
+            # Download genesis.json from GitHub repository if chain is set
+            # For fresh installs, chain is always set
+            # For upgrades, chain is only set if user chose to check genesis.json
+            if self.interviewer.chain and is_valid_url(genesis_url):
+                logging.info(f"Downloading genesis file for {self.interviewer.chain} from GitHub repository")
+
+                with request.urlopen(genesis_url) as response, open(genesis_file_path, "w") as file:
+                    file.write(response.read().decode("utf-8").strip())
+
+                logging.info(f"Successfully downloaded and overwrote genesis.json for {self.interviewer.chain}")
+            elif self.interviewer.chain and not is_valid_url(genesis_url):
+                logging.error(f"Invalid URL for genesis file: {genesis_url}")
+                return False
+            else:
+                logging.debug("Skipping genesis.json download (chain not set or user chose not to check)")
 
             ### This next section changes values in configuration files only if the user has provided input ###
 
@@ -1089,6 +1200,11 @@ class Installer():
             else:
                 logging.debug("Log format not set by user. Skipping...")
 
+            # Remove [mempool] section from app.toml
+            if not self.remove_mempool_section(app_toml_path):
+                logging.error("Failed to remove [mempool] section from app.toml.")
+                return False
+
             # Set ownership of configuration directory to cheqd:cheqd
             logging.info(f"Setting ownership of {self.cheqd_config_dir} to {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER}")
             self.exec(f"chown -R {DEFAULT_CHEQD_USER}:{DEFAULT_CHEQD_USER} {self.cheqd_config_dir}")
@@ -1097,6 +1213,170 @@ class Installer():
             return True
         except Exception as e:
             logging.exception(f"Failed to configure cheqd-noded settings. Reason: {e}")
+            return False
+
+    def remove_mempool_section(self, app_toml_path: str) -> bool:
+        # Remove or comment out the [mempool] section from app.toml
+        try:
+            if not os.path.exists(app_toml_path):
+                logging.debug(f"app.toml not found at {app_toml_path}. Skipping mempool section removal...")
+                return True
+
+            with open(app_toml_path, "r") as file:
+                lines = file.readlines()
+
+            # Find and comment out the [mempool] section
+            in_mempool_section = False
+            modified_lines = []
+
+            for line in lines:
+                stripped = line.strip()
+
+                # Check if we're entering the [mempool] section
+                if stripped in {"[mempool]", "#[mempool]"}:
+                    in_mempool_section = True
+                    # Comment out the section header if not already commented
+                    if not stripped.startswith("#"):
+                        # Preserve original indentation
+                        leading_space = line[:len(line) - len(line.lstrip())]
+                        modified_lines.append(leading_space + "# " + line.lstrip())
+                    else:
+                        modified_lines.append(line)
+                    continue
+
+                # Check if we're exiting the [mempool] section (next section starts)
+                if in_mempool_section and stripped.startswith("[") and not stripped.startswith("#"):
+                    in_mempool_section = False
+
+                # Comment out lines within the [mempool] section
+                if in_mempool_section:
+                    # Only comment out non-empty, non-commented lines
+                    if stripped and not stripped.startswith("#"):
+                        # Preserve original indentation
+                        leading_space = line[:len(line) - len(line.lstrip())]
+                        modified_lines.append(leading_space + "# " + line.lstrip())
+                    else:
+                        modified_lines.append(line)
+                else:
+                    modified_lines.append(line)
+
+            # Write the modified content back to the file
+            with open(app_toml_path, "w") as file:
+                file.writelines(modified_lines)
+
+            logging.info(f"Successfully commented out [mempool] section in {app_toml_path}")
+            return True
+        except Exception as e:
+            logging.exception(f"Failed to comment out [mempool] section in app.toml. Reason: {e}")
+            return False
+
+    def _get_latest_block_height(self, rpc_endpoint: str) -> int:
+        try:
+            req = request.Request(f"{rpc_endpoint}/status")
+            with request.urlopen(req, timeout=10) as resp:
+                status = json.loads(resp.read().decode("utf-8").strip())
+                # Tendermint /status -> result.sync_info.latest_block_height
+                latest_height = int(status["result"]["sync_info"]["latest_block_height"])
+                return latest_height
+        except Exception as e:
+            logging.exception(f"Failed to fetch latest block height from {rpc_endpoint}. Reason: {e}")
+            raise
+
+    def _get_block_hash_at_height(self, rpc_endpoint: str, height: int) -> str:
+        try:
+            req = request.Request(f"{rpc_endpoint}/block?height={height}")
+            with request.urlopen(req, timeout=10) as resp:
+                block = json.loads(resp.read().decode("utf-8").strip())
+                # Tendermint /block -> result.block_id.hash
+                return block["result"]["block_id"]["hash"]
+        except Exception as e:
+            logging.exception(f"Failed to fetch block hash at height {height} from {rpc_endpoint}. Reason: {e}")
+            raise
+
+
+    def configure_statesync(self) -> bool:
+        # Configure statesync settings in config.toml using selected network RPCs
+        try:
+            config_toml_path = os.path.join(self.cheqd_config_dir, "config.toml")
+
+            # Determine RPC servers for the chosen network
+            if self.interviewer.chain == "testnet":
+                candidates = [TESTNET_RPC_ENDPOINT_EU, TESTNET_RPC_ENDPOINT_AP]
+            else:
+                candidates = [MAINNET_RPC_ENDPOINT_EU, MAINNET_RPC_ENDPOINT_AP]
+
+            # Always set both endpoints and use the first for trusted state
+            rpc_servers = f"{candidates[0]},{candidates[1]}"
+            working_rpc = candidates[0]
+
+            # Try to compute trusted state from the first endpoint; warn softly if unavailable
+            trust_height = None
+            trust_hash = None
+            try:
+                latest_height = self._get_latest_block_height(working_rpc)
+                trust_height = max(latest_height - 2000, 1)
+                trust_hash = self._get_block_hash_at_height(working_rpc, trust_height)
+            except Exception:
+                logging.warning(
+                    "Could not fetch trusted state from %s. "
+                    "Please calculate trust_height and trust_hash manually and update config.toml. "
+                    "See more details at "
+                    "https://docs.cheqd.io/node/validator-guides/validator-guide/reenable-pruning#state-sync",
+                    working_rpc,
+                )
+
+            # Safely edit only the [statesync] section for 'enable'
+            with open(config_toml_path, "r") as f:
+                lines = f.readlines()
+
+            start = -1
+            end = len(lines)
+            for i, line in enumerate(lines):
+                if line.strip() == "[statesync]":
+                    start = i
+                    break
+
+            if start == -1:
+                logging.error("[statesync] section not found in config.toml")
+                return False
+
+            # Find end of [statesync] block (next top-level table)
+            for j in range(start + 1, len(lines)):
+                stripped = lines[j].lstrip()
+                if stripped.startswith('['):
+                    end = j
+                    break
+
+            block = lines[start:end]
+
+            def upsert(key: str, value: str, quote: bool = False):
+                nonlocal block
+                key_prefix = f"{key} ="
+                new_line = f"{key} = \"{value}\"\n" if quote else f"{key} = {value}\n"
+                for idx, l in enumerate(block):
+                    if l.strip().startswith(key_prefix):
+                        block[idx] = new_line
+                        return
+                # insert after header
+                block.insert(1, new_line)
+
+            upsert("enable", "true", quote=False)
+
+            # Write back
+            new_lines = lines[:start] + block + lines[end:]
+            with open(config_toml_path, "w") as f:
+                f.writelines(new_lines)
+
+            # Use existing search_and_replace helper for other statesync fields (unique keys)
+            search_and_replace('rpc_servers = ""', f'rpc_servers = "{rpc_servers}"', config_toml_path)
+            if trust_height is not None and trust_hash is not None:
+                search_and_replace('trust_height = 0', f'trust_height = {trust_height}', config_toml_path)
+                search_and_replace('trust_hash = ""', f'trust_hash = "{trust_hash}"', config_toml_path)
+
+            logging.info("Configured state sync settings in config.toml")
+            return True
+        except Exception as e:
+            logging.exception(f"Failed to configure state sync. Reason: {e}")
             return False
 
     def setup_node_systemd(self) -> bool:
@@ -1604,6 +1884,7 @@ class Interviewer:
         self._is_cosmovisor_installed = False
         self._systemd_service_file = ""
         self._init_from_snapshot = False
+        self._use_statesync = True
         self._release = None
         self._chain = ""
         self._is_configuration_needed = False
@@ -1681,6 +1962,10 @@ class Interviewer:
     @property
     def init_from_snapshot(self) -> bool:
         return self._init_from_snapshot
+
+    @property
+    def use_statesync(self) -> bool:
+        return self._use_statesync
 
     @property
     def chain(self) -> str:
@@ -1782,6 +2067,10 @@ class Interviewer:
     @chain.setter
     def chain(self, chain):
         self._chain = chain
+
+    @use_statesync.setter
+    def use_statesync(self, value: bool):
+        self._use_statesync = value
 
     @is_configuration_needed.setter
     def is_configuration_needed(self, is_configuration_needed):
@@ -2014,17 +2303,35 @@ class Interviewer:
                 self.is_cosmovisor_needed = True
             elif answer.lower().startswith("n"):
                 self.is_cosmovisor_needed = False
+                self.is_cosmovisor_bump_needed = False
             else:
                 logging.error("Invalid input provided during installation. Please choose either 'yes' or 'no'.\n")
                 self.ask_for_cosmovisor()
         except Exception as e:
             logging.exception(f"Failed to set whether installation should be done with Cosmovisor. Reason: {e}")
 
+    # Ask whether to initialize via state sync (default yes). If declined, snapshot remains available.
+    def ask_for_statesync(self):
+        try:
+            logging.info("State sync rapidly bootstraps a node without downloading state DB snapshot and uses less storage. You can still choose snapshot (slower, much larger storage, but contains more historic data and blocks) if you decline state sync.\n")
+            answer = self.ask(
+                "Initialize chain via State Sync? (yes/no)", default="yes")
+            if answer.lower().startswith("y"):
+                self.use_statesync = True
+                self.init_from_snapshot = False
+            elif answer.lower().startswith("n"):
+                self.use_statesync = False
+            else:
+                logging.error("Invalid input provided. Please choose either 'yes' or 'no'.\n")
+                self.ask_for_statesync()
+        except Exception as e:
+            logging.exception(f"Failed to set state sync preference. Reason: {e}")
+
     # Ask user whether to bump Cosmovisor to latest version
     def ask_for_cosmovisor_bump(self):
         try:
             answer = self.ask(
-                f"Do you want to bump your Cosmovisor to {DEFAULT_LATEST_COSMOVISOR_VERSION}? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
+                f"Do you want to install Cosmovisor version {DEFAULT_LATEST_COSMOVISOR_VERSION}? (yes/no)", default=DEFAULT_BUMP_COSMOVISOR)
             if answer.lower().startswith("y"):
                 self.is_cosmovisor_bump_needed = True
             elif answer.lower().startswith("n"):
@@ -2282,6 +2589,37 @@ class Interviewer:
         except Exception as e:
             logging.exception(f"Failed to set whether init snapshot. Reason: {e}")
 
+    # Ask user if they want to check their genesis.json during upgrade
+    def ask_for_genesis_check(self):
+        try:
+            logging.info("During upgrades, you can optionally verify that you have the correct genesis.json file for your network.\n")
+            answer = self.ask(
+                "Do you want to check and update your genesis.json file? (yes/no)", default="yes")
+            if answer.lower().startswith("y"):
+                # Ask which network they're running on (similar to fresh install)
+                network_answer = int(self.ask(
+                    "Which network are you running on?\n"
+                    f"1. Mainnet ({MAINNET_CHAIN_ID})\n"
+                    f"2. Testnet ({TESTNET_CHAIN_ID})", default=1))
+                if network_answer == 1:
+                    self.chain = "mainnet"
+                elif network_answer == 2:
+                    self.chain = "testnet"
+                else:
+                    logging.error("Invalid network selected. Please choose either 1 or 2.\n")
+                    self.ask_for_genesis_check()
+
+                logging.debug(f"Network set to {self.chain} for genesis.json check")
+            elif answer.lower().startswith("n"):
+                # Keep chain empty to skip genesis.json download
+                self.chain = ""
+                logging.debug("Skipping genesis.json check")
+            else:
+                logging.error("Please choose either 'yes' or 'no'\n")
+                self.ask_for_genesis_check()
+        except Exception as e:
+            logging.exception(f"Failed to set genesis.json check preference. Reason: {e}")
+
 
 if __name__ == '__main__':
     # Order of questions to ask the user if installing:
@@ -2321,7 +2659,11 @@ if __name__ == '__main__':
                 interviewer.ask_for_log_level()
                 interviewer.ask_for_log_format()
 
-            interviewer.ask_for_init_from_snapshot()
+            # Prefer state sync by default; if declined, offer snapshot option
+            interviewer.ask_for_statesync()
+            if interviewer.use_statesync is False:
+                logging.info("You chose not to use state sync. Snapshot restore is slower and requires substantially more disk space.")
+                interviewer.ask_for_init_from_snapshot()
 
         except Exception as e:
             logging.exception(f"Unable to complete user interview process for installation. Reason for exiting: {e}")
@@ -2353,6 +2695,8 @@ if __name__ == '__main__':
 
             if interviewer.is_systemd_config_installed(DEFAULT_JOURNAL_CONFIG_FILE) is True:
                 interviewer.ask_for_rewrite_journal()
+
+            interviewer.ask_for_genesis_check()
 
         except Exception as e:
             logging.exception(f"Unable to complete user interview process for upgrade. Reason for exiting: {e}")

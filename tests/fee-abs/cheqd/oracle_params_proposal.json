@@ -1,0 +1,21 @@
+{
+    "messages": [
+        {
+            "@type": "/cheqd.oracle.v2.MsgLegacyGovUpdateParams",
+            "authority": "cheqd10d07y265gmmuvt4z0w9aw880jnsr700j5ql9az",
+            "title": "Update UsdcIbcDenom param value",
+            "description": "Update UsdcIbcDenom param value",
+            "keys": [
+                "UsdcIbcDenom"
+            ],
+            "changes": {
+                "usdc_ibc_denom": "ibc/A1A6E963EBFE83F5BA5785DD7804B388C1FD50F4F3BF30C14A66A1FC48500F3E"
+            }
+        }
+    ],
+    "metadata": "",
+    "deposit": "10000000000ncheq",
+    "title": "Update UsdcIbcDenom param value",
+    "summary": "Update UsdcIbcDenom param value in oracle params",
+    "expedited": false
+}

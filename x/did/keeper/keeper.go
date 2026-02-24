@@ -20,6 +20,7 @@ type (
 		accountKeeper types.AccountKeeper
 		bankkeeper    types.BankKeeper
 		stakingKeeper types.StakingKeeper
+		oracleKeeper  types.OracleKeeper
 		authority     string
 		Schema        collections.Schema
 
@@ -31,7 +32,7 @@ type (
 	}
 )
 
-func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSpace types.ParamSubspace, ak types.AccountKeeper, bk types.BankKeeper, sk types.StakingKeeper, authority string) *Keeper {
+func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSpace types.ParamSubspace, ak types.AccountKeeper, bk types.BankKeeper, sk types.StakingKeeper, ok types.OracleKeeper, authority string) *Keeper {
 	sb := collections.NewSchemaBuilder(storeService)
 	k := &Keeper{
 		cdc:              cdc,
@@ -40,6 +41,7 @@ func NewKeeper(cdc codec.BinaryCodec, storeService store.KVStoreService, paramSp
 		accountKeeper:    ak,
 		bankkeeper:       bk,
 		stakingKeeper:    sk,
+		oracleKeeper:     ok,
 		authority:        authority,
 		DidNamespace:     collections.NewItem(sb, types.DidNamespaceKeyPrefix, "did_namespace", collections.StringValue),
 		DidCount:         collections.NewItem(sb, types.DidDocCountKeyPrefix, "did_count", collections.Uint64Value),

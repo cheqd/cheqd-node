@@ -1,0 +1,40 @@
+syntax = "proto3";
+package cheqd.oracle.v2;
+
+import "cheqd/oracle/v2/oracle.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/cheqd/cheqd-node/x/oracle/types";
+option (gogoproto.goproto_getters_all) = false;
+
+// GenesisState defines the oracle module's genesis state.
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+  repeated FeederDelegation feeder_delegations = 2 [(gogoproto.nullable) = false];
+  repeated cosmos.base.v1beta1.DecCoin exchange_rates = 3 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.DecCoins",
+    (gogoproto.nullable) = false
+  ];
+  repeated MissCounter miss_counters = 4 [(gogoproto.nullable) = false];
+  repeated AggregateExchangeRatePrevote aggregate_exchange_rate_prevotes = 5 [(gogoproto.nullable) = false];
+  repeated AggregateExchangeRateVote aggregate_exchange_rate_votes = 6 [(gogoproto.nullable) = false];
+  repeated PriceStamp medians = 7 [(gogoproto.nullable) = false];
+  repeated PriceStamp historic_prices = 8 [(gogoproto.nullable) = false];
+  repeated PriceStamp median_deviations = 9 [(gogoproto.nullable) = false];
+}
+
+// FeederDelegation is the address for where oracle feeder authority are
+// delegated to. By default this struct is only used at genesis to feed in
+// default feeder addresses.
+message FeederDelegation {
+  string feeder_address = 1;
+  string validator_address = 2;
+}
+
+// MissCounter defines an miss counter and validator address pair used in
+// oracle module's genesis state
+message MissCounter {
+  string validator_address = 1;
+  uint64 miss_counter = 2;
+}

@@ -86,9 +86,15 @@ sleep 5
 SWAPROUTER_ADDRESS=osmo1nc5tatafv6eyq7llkr2gv50ff9e22mnf70qgjlv737ktmt4eswrqvlx82r
 echo $SWAPROUTER_ADDRESS
 
-info "execute swaprouter set_route"
+info "execute swaprouter set_route for cheqd-osmo pool"
 # Configure the swaprouter
 CONFIG_SWAPROUTER='{"set_route":{"input_denom":"uosmo","output_denom":"ibc/19D515BB82FEAFCEC357D04C1B75DBF123DB5479041A9BAE38BFCF295477404D","pool_route":[{"pool_id":"1","token_out_denom":"ibc/19D515BB82FEAFCEC357D04C1B75DBF123DB5479041A9BAE38BFCF295477404D"}]}}'
+RES=$(osmosisd tx wasm execute $SWAPROUTER_ADDRESS "$CONFIG_SWAPROUTER" --keyring-backend=test --home=$HOME/.osmosisd --from osmosis-user --chain-id osmosis -y --fees 5000uosmo)
+assert_tx_successful $RES
+sleep 5
+
+info "execute swaprouter set_route for cheqd-usdc pool"
+CONFIG_SWAPROUTER='{"set_route":{"input_denom":"usdc","output_denom":"ibc/19D515BB82FEAFCEC357D04C1B75DBF123DB5479041A9BAE38BFCF295477404D","pool_route":[{"pool_id":"2","token_out_denom":"ibc/19D515BB82FEAFCEC357D04C1B75DBF123DB5479041A9BAE38BFCF295477404D"}]}}'
 RES=$(osmosisd tx wasm execute $SWAPROUTER_ADDRESS "$CONFIG_SWAPROUTER" --keyring-backend=test --home=$HOME/.osmosisd --from osmosis-user --chain-id osmosis -y --fees 5000uosmo)
 assert_tx_successful $RES
 sleep 5

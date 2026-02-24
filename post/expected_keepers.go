@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	feeabstypes "github.com/osmosis-labs/fee-abstraction/v8/x/feeabs/types"
 
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
 )
@@ -34,6 +35,15 @@ type BankKeeper interface {
 	SendCoinsFromModuleToModule(ctx context.Context, senderModule, recipientModule string, amt sdk.Coins) error
 	SendCoinsFromModuleToAccount(ctx context.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error
 	BurnCoins(ctx context.Context, name string, amt sdk.Coins) error
+}
+
+// FeeAbsKeeper defines the contract needed for fee abstraction related APIs.
+//
+//go:generate mockery --name FeeAbsKeeper --filename mock_feeabs_keeper.go
+type FeeAbsKeeper interface {
+	GetHostZoneConfig(ctx sdk.Context, ibcDenom string) (feeabstypes.HostChainFeeAbsConfig, bool)
+	CalculateNativeFromIBCCoins(ctx sdk.Context, ibcCoins sdk.Coins, hostChainConfig feeabstypes.HostChainFeeAbsConfig) (sdk.Coins, error)
+	GetFeeAbsModuleAddress() sdk.AccAddress
 }
 
 // FeeMarketKeeper defines the expected feemarket keeper.

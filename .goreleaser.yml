@@ -80,8 +80,7 @@ archives:
     wrap_in_directory: false
     name_template: "{{ .Binary }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
     files:
-      - LICENSE
-      - README.md
+      - none*
 
 checksum:
   algorithm: sha256

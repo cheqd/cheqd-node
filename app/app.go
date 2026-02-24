@@ -20,6 +20,7 @@ import (
 	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/log"
 	sdkmath "cosmossdk.io/math"
+	"cosmossdk.io/store/iavl"
 	storetypes "cosmossdk.io/store/types"
 	"cosmossdk.io/x/circuit"
 	circuitkeeper "cosmossdk.io/x/circuit/keeper"
@@ -39,6 +40,7 @@ import (
 	did "github.com/cheqd/cheqd-node/x/did"
 	didkeeper "github.com/cheqd/cheqd-node/x/did/keeper"
 	didtypes "github.com/cheqd/cheqd-node/x/did/types"
+	"github.com/cheqd/cheqd-node/x/oracle"
 	"github.com/cheqd/cheqd-node/x/resource"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
@@ -135,6 +137,7 @@ import (
 	ibcclient "github.com/cosmos/ibc-go/v8/modules/core/02-client"
 	ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	ibcconnectiontypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
+	channeltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	porttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
@@ -147,6 +150,9 @@ import (
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
 
+	globalfee "github.com/noble-assets/globalfee"
+	globalfeekeeper "github.com/noble-assets/globalfee/keeper"
+	globalfeetypes "github.com/noble-assets/globalfee/types"
 	feemarketmodule "github.com/skip-mev/feemarket/x/feemarket"
 	feemarketkeeper "github.com/skip-mev/feemarket/x/feemarket/keeper"
 	feemarkettypes "github.com/skip-mev/feemarket/x/feemarket/types"
@@ -160,6 +166,10 @@ import (
 	upgradeV4 "github.com/cheqd/cheqd-node/app/upgrades/v4"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	protov2 "google.golang.org/protobuf/proto"
+
+	oracleabci "github.com/cheqd/cheqd-node/x/oracle/abci"
+	oraclekeeper "github.com/cheqd/cheqd-node/x/oracle/keeper"
+	oracletypes "github.com/cheqd/cheqd-node/x/oracle/types"
 )
 
 var (
@@ -180,6 +190,7 @@ var (
 		didtypes.ModuleName:             {authtypes.Minter, authtypes.Burner},
 		feemarkettypes.ModuleName:       {authtypes.Burner},
 		feemarkettypes.FeeCollectorName: {authtypes.Burner},
+		oracletypes.ModuleName:          {authtypes.Minter},
 		feeabstypes.ModuleName:          nil,
 		ibcfeetypes.ModuleName:          nil,
 	}
@@ -228,6 +239,7 @@ type App struct {
 	TransferKeeper        ibctransferkeeper.Keeper
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	FeeMarketKeeper       *feemarketkeeper.Keeper
+	GlobalFeeKeeper       *globalfeekeeper.Keeper
 	AuthzKeeper           authzkeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
@@ -246,6 +258,7 @@ type App struct {
 
 	DidKeeper      didkeeper.Keeper
 	ResourceKeeper resourcekeeper.Keeper
+	OracleKeeper   oraclekeeper.Keeper
 
 	// the module manager
 	ModuleManager      *module.Manager
@@ -326,8 +339,8 @@ func New(
 	// baseAppOptions = append(baseAppOptions, prepareOpt)
 
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName).String()
-
 	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
+
 	bApp := baseapp.NewBaseApp(Name, logger, db, txConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetVersion(version.Version)
@@ -363,6 +376,8 @@ func New(
 		feeabstypes.StoreKey,
 		feemarkettypes.StoreKey,
 		circuittypes.StoreKey,
+		oracletypes.StoreKey,
+		globalfeetypes.ModuleName,
 	)
 
 	tkeys := storetypes.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -561,6 +576,13 @@ func New(
 		app.IBCKeeper.PortKeeper, app.AccountKeeper, app.BankKeeper,
 	)
 
+	app.GlobalFeeKeeper = globalfeekeeper.NewKeeper(
+		authority,
+		app.interfaceRegistry,
+		runtime.NewKVStoreService(keys[globalfeetypes.ModuleName]),
+		appCodec,
+	)
+
 	// ICA Controller keeper
 	app.ICAControllerKeeper = icacontrollerkeeper.NewKeeper(
 		appCodec,
@@ -704,15 +726,6 @@ func New(
 		AddRoute(icahosttypes.SubModuleName, icaHostStack).
 		AddRoute(feeabstypes.ModuleName, feeabsIBCModule)
 
-	// x/resource
-	app.ResourceKeeper = *resourcekeeper.NewKeeper(
-		appCodec, runtime.NewKVStoreService(keys[resourcetypes.StoreKey]),
-		app.GetSubspace(resourcetypes.ModuleName),
-		app.IBCKeeper.PortKeeper,
-		scopedResourceKeeper,
-		authority,
-	)
-
 	// create the resource IBC stack
 	var resourceIbcStack porttypes.IBCModule
 	resourceIbcStack = resource.NewIBCModule(app.ResourceKeeper)
@@ -737,11 +750,33 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
+	app.OracleKeeper = oraclekeeper.NewKeeper(
+		appCodec,
+		keys[oracletypes.ModuleName],
+		app.GetSubspace(oracletypes.ModuleName),
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.DistrKeeper,
+		app.StakingKeeper,
+		distrtypes.ModuleName,
+		cast.ToBool(appOpts.Get("telemetry.enabled")),
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
+	// x/resource
+	app.ResourceKeeper = *resourcekeeper.NewKeeper(
+		appCodec, runtime.NewKVStoreService(keys[resourcetypes.StoreKey]),
+		app.GetSubspace(resourcetypes.ModuleName),
+		app.IBCKeeper.PortKeeper,
+		scopedResourceKeeper,
+		authority,
+		app.OracleKeeper,
+	)
 	app.DidKeeper = *didkeeper.NewKeeper(
 		appCodec, runtime.NewKVStoreService(keys[didtypes.StoreKey]),
 		app.GetSubspace(didtypes.ModuleName),
 		app.AccountKeeper, app.BankKeeper,
-		app.StakingKeeper, authority,
+		app.StakingKeeper, app.OracleKeeper, authority,
 	)
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
@@ -783,10 +818,12 @@ func New(
 		ibctm.NewAppModule(),
 
 		// cheqd modules
+		globalfee.NewAppModule(app.interfaceRegistry, app.GetSubspace(globalfeetypes.ModuleName), app.GlobalFeeKeeper),
 		feemarketmodule.NewAppModule(appCodec, *app.FeeMarketKeeper),
 		did.NewAppModule(appCodec, app.DidKeeper, app.GetSubspace(didtypes.ModuleName)),
 		resource.NewAppModule(appCodec, app.ResourceKeeper, app.DidKeeper, app.GetSubspace(resourcetypes.ModuleName)),
 		feeabsModule,
+		oracle.NewAppModule(appCodec, app.OracleKeeper, app.AccountKeeper, app.BankKeeper, app.FeeabsKeeper),
 	)
 
 	// BasicModuleManager defines the module BasicManager is in charge of setting up basic,
@@ -845,7 +882,9 @@ func New(
 		didtypes.ModuleName,
 		resourcetypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		globalfeetypes.ModuleName,
 		feemarkettypes.ModuleName,
+		oracletypes.ModuleName,
 	)
 
 	app.ModuleManager.SetOrderEndBlockers(
@@ -875,7 +914,9 @@ func New(
 		icqtypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		globalfeetypes.ModuleName,
 		feemarkettypes.ModuleName,
+		oracletypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -911,7 +952,9 @@ func New(
 		circuittypes.ModuleName,
 		didtypes.ModuleName,
 		resourcetypes.ModuleName,
+		globalfeetypes.ModuleName,
 		feemarkettypes.ModuleName,
+		oracletypes.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
 	app.ModuleManager.SetOrderExportGenesis(genesisModuleOrder...)
@@ -938,6 +981,20 @@ func New(
 	}
 	reflectionv1.RegisterReflectionServiceServer(app.GRPCQueryRouter(), reflectionSvc)
 
+	proposalHandler := oracleabci.NewProposalHandler(
+		app.Logger(),
+		app.OracleKeeper,
+		app.StakingKeeper,
+	)
+	app.SetPrepareProposal(proposalHandler.PrepareProposalHandler())
+	app.SetProcessProposal(proposalHandler.ProcessProposalHandler())
+
+	voteExtensionsHandler := oracleabci.NewVoteExtensionHandler(
+		app.Logger(),
+		app.OracleKeeper,
+	)
+	app.SetExtendVoteHandler(voteExtensionsHandler.ExtendVoteHandler())
+	app.SetVerifyVoteExtensionHandler(voteExtensionsHandler.VerifyVoteExtensionHandler())
 	// initialize stores
 	app.MountKVStores(keys)
 	app.MountTransientStores(tkeys)
@@ -1003,6 +1060,8 @@ func (app *App) setAnteHandler(txConfig client.TxConfig) {
 		FeeAbskeeper:    app.FeeabsKeeper,
 		FeeMarketKeeper: app.FeeMarketKeeper,
 		CircuitKeeper:   &app.CircuitKeeper,
+		TxFeeChecker:    cheqdante.TxFeeChecker(app.GlobalFeeKeeper),
+		GlobalFeeKeeper: app.GlobalFeeKeeper,
 	})
 	if err != nil {
 		panic(err)
@@ -1020,6 +1079,10 @@ func (app *App) setPostHandler() {
 		DidKeeper:       app.DidKeeper,
 		ResourceKeeper:  app.ResourceKeeper,
 		FeeMarketKeeper: app.FeeMarketKeeper,
+		OracleKeeper:    app.OracleKeeper,
+		FeeabsKeeper:    app.FeeabsKeeper,
+		PriceFeeder:     app.OracleKeeper.PriceFeeder,
+		GlobalFeeKeeper: app.GlobalFeeKeeper,
 	})
 	if err != nil {
 		panic(err)
@@ -1030,11 +1093,6 @@ func (app *App) setPostHandler() {
 
 // Name returns the name of the App
 func (app *App) Name() string { return app.BaseApp.Name() }
-
-// PreBlocker application updates every pre block
-func (app *App) PreBlocker(ctx sdk.Context, _ *abci.RequestFinalizeBlock) (*sdk.ResponsePreBlock, error) {
-	return app.ModuleManager.PreBlock(ctx)
-}
 
 // BeginBlocker application updates every begin block
 func (app *App) BeginBlocker(ctx sdk.Context) (sdk.BeginBlock, error) {
@@ -1059,7 +1117,17 @@ func (app *App) InitChainer(ctx sdk.Context, req *abci.RequestInitChain) (*abci.
 	if err := app.UpgradeKeeper.SetModuleVersionMap(ctx, app.ModuleManager.GetVersionMap()); err != nil {
 		panic(err)
 	}
-	return app.ModuleManager.InitGenesis(ctx, app.appCodec, genesisState)
+	valUpdates, err := app.ModuleManager.InitGenesis(ctx, app.appCodec, genesisState)
+	if err != nil {
+		return valUpdates, err
+	}
+
+	// set consensus params app version to current protocol version
+	if err := UpdateConsParamsVersion(ctx, &app.ConsensusParamsKeeper); err != nil {
+		return nil, err
+	}
+
+	return valUpdates, nil
 }
 
 // LoadHeight loads a particular height
@@ -1189,7 +1257,7 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	// Register grpc-gateway routes for all modules.
 	app.BasicModuleManager.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
-	// register swagger API from root so that oticqher applications can override easily
+	// register swagger API from root so that other applications can override easily
 	if apiConfig.Swagger {
 		RegisterSwaggerAPI(apiSvr.Router)
 	}
@@ -1249,8 +1317,11 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(didtypes.ModuleName).WithKeyTable(didtypes.ParamKeyTable())
 	paramsKeeper.Subspace(resourcetypes.ModuleName).WithKeyTable(resourcetypes.ParamKeyTable())
 	paramsKeeper.Subspace(feeabstypes.ModuleName).WithKeyTable(feeabstypes.ParamKeyTable())
+	//nolint:staticcheck
+	paramsKeeper.Subspace(globalfeetypes.ModuleName).WithKeyTable(globalfeetypes.ParamKeyTable())
 	paramsKeeper.Subspace(icqtypes.ModuleName)
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
+	paramsKeeper.Subspace(oracletypes.ModuleName).WithKeyTable(oracletypes.ParamKeyTable())
 
 	return paramsKeeper
 }
@@ -1367,6 +1438,153 @@ func (app *App) RegisterUpgradeHandlers() {
 			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
 		},
 	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		upgradeV4.PatchUpgradeName,
+
+		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			sdkCtx := sdk.UnwrapSDKContext(ctx)
+			storeKeys := []*storetypes.KVStoreKey{
+				app.GetKey(ibcfeetypes.StoreKey),        // ibc-fee module store key
+				app.GetKey(icqtypes.StoreKey),           // icq module store key
+				app.GetKey(icacontrollertypes.StoreKey), // ica-controller module store key
+				app.GetKey(group.StoreKey),              // group module store key
+			}
+
+			for _, key := range storeKeys {
+				store := app.CommitMultiStore().GetCommitKVStore(key)
+
+				iavlStore, ok := store.(*iavl.Store)
+				if !ok {
+					return nil, fmt.Errorf("store for key %s is not an iavl.Store", key.Name())
+				}
+
+				targetVersion := sdkCtx.BlockHeight() - 1
+				version := iavlStore.LastCommitID().Version
+
+				// set iavl store version to last block
+				iavlStore.SetVersion(targetVersion)
+
+				// delete older versions of store
+				_ = iavlStore.DeleteVersionsTo(version)
+				lastCommit := iavlStore.LastCommitID()
+
+				sdkCtx.Logger().Info(fmt.Sprintf("Committed store %s to version %d (hash: %X)",
+					key.Name(), lastCommit.Version, lastCommit.Hash))
+			}
+
+			// update consensus params app version to fix statesync issue
+			if err := UpdateConsParamsVersion(sdkCtx, &app.ConsensusParamsKeeper); err != nil {
+				return nil, err
+			}
+
+			// fetch and update fee-abstraction params
+			sdkCtx.Logger().Info("Updating fee-abstraction parameters")
+			feeAbsParams := app.FeeabsKeeper.GetParams(sdkCtx)
+			feeAbsParams.ChainName = sdkCtx.ChainID()
+			feeAbsParams.IbcQueryIcqChannel = "channel-39"
+			feeAbsParams.IbcTransferChannel = "channel-0"
+			feeAbsParams.NativeIbcedInOsmosis = "ibc/7A08C6F11EF0F59EB841B9F788A87EC9F2361C7D9703157EC13D940DC53031FA"
+			app.FeeabsKeeper.SetParams(sdkCtx, feeAbsParams)
+
+			// remove the old host zone config and add the new one
+			if err := ReplaceHostZoneConfig(sdkCtx, &app.FeeabsKeeper); err != nil {
+				return nil, err
+			}
+
+			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+		},
+	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		upgradeV4.MinorUpgradeName,
+		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			// define type url of the message to bypass
+			sdkCtx := sdk.UnwrapSDKContext(ctx)
+			sdkCtx.Logger().Info("Bypassing fee for MsgAcknowledgement")
+
+			// allow MsgAcknowledgement to bypass fees, i.e. be executed with zero fees
+			// as otherwise, relayers would need to pay fees on destination chain for every packet
+			if err := app.GlobalFeeKeeper.BypassMessages.Set(ctx, sdk.MsgTypeURL(&channeltypes.MsgAcknowledgement{})); err != nil {
+				return nil, err
+			}
+
+			// allow MsgUpdateClient to bypass fees
+			sdkCtx.Logger().Info("Bypassing fee for MsgUpdateClient")
+			if err := app.GlobalFeeKeeper.BypassMessages.Set(ctx, sdk.MsgTypeURL(&ibcclienttypes.MsgUpdateClient{})); err != nil {
+				return nil, err
+			}
+
+			// allow MsgRecvPacket to bypass fees
+			sdkCtx.Logger().Info("Bypassing fee for MsgRecvPacket")
+			if err := app.GlobalFeeKeeper.BypassMessages.Set(ctx, sdk.MsgTypeURL(&channeltypes.MsgRecvPacket{})); err != nil {
+				return nil, err
+			}
+
+			// allow MsgTimeout to bypass fees
+			sdkCtx.Logger().Info("Bypassing fee for MsgTimeout")
+			if err := app.GlobalFeeKeeper.BypassMessages.Set(ctx, sdk.MsgTypeURL(&channeltypes.MsgTimeout{})); err != nil {
+				return nil, err
+			}
+
+			versionMap, err := app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+			if err != nil {
+				return nil, err
+			}
+
+			// update expedited gov proposal params
+			sdkCtx.Logger().Info("Updating expedited gov proposal params")
+			govParams, err := app.GovKeeper.Params.Get(sdkCtx)
+			if err != nil {
+				return nil, err
+			}
+			govParams.ExpeditedMinDeposit = sdk.NewCoins(sdk.NewCoin(resourcetypes.BaseMinimalDenom, sdkmath.NewInt(8000000000000))) // 8000 CHEQ, identical to regular min deposit
+			if err := app.GovKeeper.Params.Set(sdkCtx, govParams); err != nil {
+				return nil, err
+			}
+
+			return versionMap, nil
+		},
+	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		upgradeV4.FeatureUpgradeName,
+		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			migrations, err := app.ModuleManager.RunMigrations(ctx, app.Configurator(), fromVM)
+			if err != nil {
+				return migrations, err
+			}
+
+			sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+			currentParams, err := app.ConsensusParamsKeeper.ParamsStore.Get(sdkCtx)
+			if err != nil {
+				return migrations, err
+			}
+			newParams := currentParams
+			newParams.Abci = &tmproto.ABCIParams{
+				VoteExtensionsEnableHeight: plan.Height + 10,
+			}
+			// Only on non-mainnet chains, and only if TWAP rate not already set
+			if sdkCtx.ChainID() != "cheqd-mainnet-1" {
+				denom := oracletypes.DefaultParams().UsdcIbcDenom
+
+				// Check if TWAP rate is already set
+				rate, err := app.FeeabsKeeper.GetTwapRate(sdkCtx, denom)
+				if err != nil || rate.IsZero() {
+					defaultRate := sdkmath.LegacyMustNewDecFromStr("1.0")
+					app.FeeabsKeeper.SetTwapRate(sdkCtx, denom, defaultRate)
+					sdkCtx.Logger().Info("Initialized default TWAP rate", "denom", denom, "rate", defaultRate.String())
+				}
+			}
+			err = app.ConsensusParamsKeeper.ParamsStore.Set(sdkCtx, newParams)
+			if err != nil {
+				return migrations, err
+			}
+
+			return migrations, nil
+		},
+	)
 }
 
 // configure store loader that checks if version == upgradeHeight and applies store upgrades
@@ -1391,6 +1609,33 @@ func (app *App) setupUpgradeStoreLoaders() {
 		storeUpgrades := storetypes.StoreUpgrades{
 			Added: []string{
 				circuittypes.ModuleName,
+			},
+		}
+
+		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	}
+
+	if upgradeInfo.Name == upgradeV4.PatchUpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		storeUpgrades := storetypes.StoreUpgrades{}
+		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	}
+
+	if upgradeInfo.Name == upgradeV4.MinorUpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		storeUpgrades := storetypes.StoreUpgrades{
+			Added: []string{
+				globalfeetypes.ModuleName,
+			},
+		}
+		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	}
+
+	if upgradeInfo.Name == upgradeV4.FeatureUpgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		storeUpgrades := storetypes.StoreUpgrades{
+			Added: []string{
+				oracletypes.ModuleName,
 			},
 		}
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
@@ -1453,8 +1698,10 @@ func ReplaceHostZoneConfig(ctx sdk.Context, feeAbsKeeper *feeabskeeper.Keeper) e
 	if ctx.ChainID() != "cheqd-mainnet-1" {
 		return nil
 	}
+
 	// remove the old host zone config and add the new one
-	err := feeAbsKeeper.DeleteHostZoneConfig(ctx, "ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4")
+	ctx.Logger().Info("Updating host zone config")
+	err := feeAbsKeeper.DeleteHostZoneConfig(ctx, "ibc/F5FABF52B54E65064B57BF6DBD8E5FAD22CEE9F4B8A57ADBB20CCD0173AA72A4")
 	// ignore error if not found
 	if err != nil && !errors.Is(err, feeabstypes.ErrHostZoneConfigNotFound) {
 		return err
@@ -1463,9 +1710,26 @@ func ReplaceHostZoneConfig(ctx sdk.Context, feeAbsKeeper *feeabskeeper.Keeper) e
 		IbcDenom:                "ibc/F5FABF52B54E65064B57BF6DBD8E5FAD22CEE9F4B8A57ADBB20CCD0173AA72A4",
 		OsmosisPoolTokenDenomIn: "ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4",
 		PoolId:                  1273,
+		Status:                  feeabstypes.HostChainFeeAbsStatus_UPDATED,
 	})
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func UpdateConsParamsVersion(ctx sdk.Context, ck *consensusparamkeeper.Keeper) error {
+	ctx.Logger().Info(fmt.Sprintf("Updating consensus params app version to %d", ProtocolVersion))
+	consensusParams, err := ck.ParamsStore.Get(ctx)
+	if err != nil {
+		return err
+	}
+
+	// Hack to fix state-sync issue
+	consensusParams.Version = &tmproto.VersionParams{App: ProtocolVersion}
+	if err := ck.ParamsStore.Set(ctx, consensusParams); err != nil {
+		return err
+	}
+
 	return nil
 }

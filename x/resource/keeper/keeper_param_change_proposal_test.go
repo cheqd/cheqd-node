@@ -5,6 +5,8 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	cheqdapp "github.com/cheqd/cheqd-node/app"
+	"github.com/cheqd/cheqd-node/util"
+	didtypes "github.com/cheqd/cheqd-node/x/did/types"
 	resourcekeeper "github.com/cheqd/cheqd-node/x/resource/keeper"
 	resourcetypes "github.com/cheqd/cheqd-node/x/resource/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -51,7 +53,6 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 	err := keeperSuite.SetupTest()
 
 	Expect(err).To(BeNil())
-	// ✅ Only set authority if the test case didn't define one
 	if strings.TrimSpace(testCase.input.Authority) == "" {
 		testCase.input.Authority = keeperSuite.resourceKeeper.GetAuthority()
 	}
@@ -77,9 +78,27 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 			name: "valid params - all fields",
 			input: &resourcetypes.MsgUpdateParams{
 				Params: resourcetypes.FeeParams{
-					Image:      sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					Json:       sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					Default:    sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
+					Image: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(10000000000),
+							MaxAmount: util.PtrInt(10000000000),
+						},
+					},
+					Json: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(4000000000),
+							MaxAmount: util.PtrInt(4000000000),
+						},
+					},
+					Default: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(2000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
 					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"),
 				},
 			},
@@ -90,9 +109,27 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 			name: "invalid create_did amount 0",
 			input: &resourcetypes.MsgUpdateParams{
 				Params: resourcetypes.FeeParams{
-					Image:      sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(0)},
-					Json:       sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					Default:    sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
+					Image: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(0),
+							MaxAmount: util.PtrInt(0),
+						},
+					},
+					Json: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(4000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
+					Default: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(2000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
 					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"),
 				},
 			},
@@ -103,9 +140,27 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 			name: "invalid image denom",
 			input: &resourcetypes.MsgUpdateParams{
 				Params: resourcetypes.FeeParams{
-					Image:      sdk.Coin{Denom: "", Amount: sdkmath.NewInt(10000000000)},
-					Json:       sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					Default:    sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
+					Image: []didtypes.FeeRange{
+						{
+							Denom:     "wrongdenom",
+							MinAmount: util.PtrInt(10000000000),
+							MaxAmount: util.PtrInt(10000000000),
+						},
+					},
+					Json: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(4000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
+					Default: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(2000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
 					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"),
 				},
 			},
@@ -116,9 +171,27 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 			name: "invalid json amount 0",
 			input: &resourcetypes.MsgUpdateParams{
 				Params: resourcetypes.FeeParams{
-					Image:      sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					Json:       sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(0)},
-					Default:    sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
+					Image: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(10000000000),
+							MaxAmount: util.PtrInt(10000000000),
+						},
+					},
+					Json: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(0),
+							MaxAmount: util.PtrInt(0),
+						},
+					},
+					Default: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(2000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
 					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"),
 				},
 			},
@@ -129,9 +202,27 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 			name: "invalid json denom",
 			input: &resourcetypes.MsgUpdateParams{
 				Params: resourcetypes.FeeParams{
-					Image:      sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					Json:       sdk.Coin{Denom: "wrongdenom", Amount: sdkmath.NewInt(4000000000)},
-					Default:    sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
+					Image: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(10000000000),
+							MaxAmount: util.PtrInt(10000000000),
+						},
+					},
+					Json: []didtypes.FeeRange{
+						{
+							Denom:     "wrongdenom",
+							MinAmount: util.PtrInt(4000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
+					Default: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(2000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
 					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"),
 				},
 			},
@@ -142,9 +233,27 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 			name: "invalid burn_factor 0",
 			input: &resourcetypes.MsgUpdateParams{
 				Params: resourcetypes.FeeParams{
-					Image:      sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					Json:       sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					Default:    sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
+					Image: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(10000000000),
+							MaxAmount: util.PtrInt(10000000000),
+						},
+					},
+					Json: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(4000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
+					Default: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(2000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
 					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0"),
 				},
 			},
@@ -155,9 +264,27 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 			name: "invalid burn_factor negative",
 			input: &resourcetypes.MsgUpdateParams{
 				Params: resourcetypes.FeeParams{
-					Image:      sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					Json:       sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					Default:    sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
+					Image: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(10000000000),
+							MaxAmount: util.PtrInt(10000000000),
+						},
+					},
+					Json: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(4000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
+					Default: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(2000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
 					BurnFactor: sdkmath.LegacyMustNewDecFromStr("-0.1"),
 				},
 			},
@@ -168,9 +295,27 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 			name: "invalid burn_factor equal to 1",
 			input: &resourcetypes.MsgUpdateParams{
 				Params: resourcetypes.FeeParams{
-					Image:      sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					Json:       sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					Default:    sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
+					Image: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(10000000000),
+							MaxAmount: util.PtrInt(10000000000),
+						},
+					},
+					Json: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(4000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
+					Default: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(2000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
 					BurnFactor: sdkmath.LegacyMustNewDecFromStr("1.0"),
 				},
 			},
@@ -181,9 +326,27 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 			name: "invalid burn_factor greater than 1",
 			input: &resourcetypes.MsgUpdateParams{
 				Params: resourcetypes.FeeParams{
-					Image:      sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					Json:       sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					Default:    sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
+					Image: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(10000000000),
+							MaxAmount: util.PtrInt(10000000000),
+						},
+					},
+					Json: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(4000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
+					Default: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(2000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
 					BurnFactor: sdkmath.LegacyMustNewDecFromStr("1.1"),
 				},
 			},
@@ -193,12 +356,30 @@ var _ = DescribeTable("UpdateParams", func(testCase TestCaseUpdateParams) {
 		TestCaseUpdateParams{
 			name: "invalid authority",
 			input: &resourcetypes.MsgUpdateParams{
-				Authority: "invalid",
+				Authority: "invalidauthority",
 				Params: resourcetypes.FeeParams{
-					Image:      sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(10000000000)},
-					Json:       sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(4000000000)},
-					Default:    sdk.Coin{Denom: resourcetypes.BaseMinimalDenom, Amount: sdkmath.NewInt(2000000000)},
-					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.6"),
+					Image: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(10000000000),
+							MaxAmount: util.PtrInt(10000000000),
+						},
+					},
+					Json: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(4000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
+					Default: []didtypes.FeeRange{
+						{
+							Denom:     resourcetypes.BaseMinimalDenom,
+							MinAmount: util.PtrInt(2000000000),
+							MaxAmount: util.PtrInt(2000000000),
+						},
+					},
+					BurnFactor: sdkmath.LegacyMustNewDecFromStr("0.600000000000000000"),
 				},
 			},
 			expErr: true,

@@ -3,18 +3,22 @@ services:
     image: ${BUILD_IMAGE}
     ports:
       - target: 26656
-        published: 26656    # Tendermint peer-to-peer (P2P) port
+        published: 26656 # Tendermint peer-to-peer (P2P) port
       - target: 26657
-        published: 26657    # Tendermint RPC port
+        published: 26657 # Tendermint RPC port
       - target: 1317
-        published: 1317     # Cosmos REST API port
+        published: 1317 # Cosmos REST API port
       - target: 9090
-        published: 9090     # gRPC port
+        published: 9090 # gRPC port
       - target: 9091
-        published: 9091     # gRPC-Gateway port
+        published: 9091 # gRPC-Gateway port
       - target: 26660
-        published: 26660    # Prometheus metrics port
-    entrypoint: [ "node-start" ]
+        published: 26660 # Prometheus metrics port
+      - target: 7171 # Price-feeder port
+        published: 7171
+      - target: 8080
+        published: 8080 # Mock price feed server port
+    entrypoint: ["node-start"]
     healthcheck:
       test: curl -s http://localhost:26657/status | grep -c true
       interval: 10s
@@ -25,34 +29,35 @@ services:
       - type: volume
         source: validator-0-data
         target: /home/cheqd
+      - type: bind
+        source: ./network-config/validator-0
+        target: /home/cheqd/.cheqdnode
     env_file:
       - container-env/validator-0.env
     configs:
-      - source: genesis
-        target: /genesis
       - source: seeds
         target: /seeds
-      - source: validator-0-node-key
-        target: /node_key
-      - source: validator-0-priv-val-key
-        target: /priv_validator_key
 
   validator-1:
     image: ${BUILD_IMAGE}
     ports:
       - target: 26656
-        published: 26756    # Tendermint peer-to-peer (P2P) port
+        published: 26756 # Tendermint peer-to-peer (P2P) port
       - target: 26657
-        published: 26757    # Tendermint RPC port
+        published: 26757 # Tendermint RPC port
       - target: 1317
-        published: 1417     # Cosmos REST API port
+        published: 1417 # Cosmos REST API port
       - target: 9090
-        published: 9190     # gRPC port
+        published: 9190 # gRPC port
       - target: 9091
-        published: 9191     # gRPC-Gateway port
+        published: 9191 # gRPC-Gateway port
       - target: 26660
-        published: 26760    # Prometheus metrics port
-    entrypoint: [ "node-start" ]
+        published: 26760 # Prometheus metrics port
+      - target: 7171
+        published: 7172 # Price-feeder port
+      - target: 8080
+        published: 8180 # Mock price feed server port
+    entrypoint: ["node-start"]
     healthcheck:
       test: curl -s http://localhost:26757/status | grep -c true
       interval: 10s
@@ -63,34 +68,35 @@ services:
       - type: volume
         source: validator-1-data
         target: /home/cheqd
+      - type: bind
+        source: ./network-config/validator-1
+        target: /home/cheqd/.cheqdnode
     env_file:
       - container-env/validator-1.env
     configs:
-      - source: genesis
-        target: /genesis
       - source: seeds
         target: /seeds
-      - source: validator-1-node-key
-        target: /node_key
-      - source: validator-1-priv-val-key
-        target: /priv_validator_key
 
   validator-2:
     image: ${BUILD_IMAGE}
     ports:
       - target: 26656
-        published: 26856    # Tendermint peer-to-peer (P2P) port
+        published: 26856 # Tendermint peer-to-peer (P2P) port
       - target: 26657
-        published: 26857    # Tendermint RPC port
+        published: 26857 # Tendermint RPC port
       - target: 1317
-        published: 1517     # Cosmos REST API port
+        published: 1517 # Cosmos REST API port
       - target: 9090
-        published: 9290     # gRPC port
+        published: 9290 # gRPC port
       - target: 9091
-        published: 9291     # gRPC-Gateway port
+        published: 9291 # gRPC-Gateway port
       - target: 26660
-        published: 26860    # Prometheus metrics port
-    entrypoint: [ "node-start" ]
+        published: 26860 # Prometheus metrics port
+      - target: 7171
+        published: 7173 # Price-feeder port
+      - target: 8080
+        published: 8280 # Mock price feed server port
+    entrypoint: ["node-start"]
     healthcheck:
       test: curl -s http://localhost:26857/status | grep -c true
       interval: 10s
@@ -101,34 +107,35 @@ services:
       - type: volume
         source: validator-2-data
         target: /home/cheqd
+      - type: bind
+        source: ./network-config/validator-2
+        target: /home/cheqd/.cheqdnode
     env_file:
       - container-env/validator-2.env
     configs:
-      - source: genesis
-        target: /genesis
       - source: seeds
         target: /seeds
-      - source: validator-2-node-key
-        target: /node_key
-      - source: validator-2-priv-val-key
-        target: /priv_validator_key
 
   validator-3:
     image: ${BUILD_IMAGE}
     ports:
       - target: 26656
-        published: 26956    # Tendermint peer-to-peer (P2P) port
+        published: 26956 # Tendermint peer-to-peer (P2P) port
       - target: 26657
-        published: 26957    # Tendermint RPC port
+        published: 26957 # Tendermint RPC port
       - target: 1317
-        published: 1617     # Cosmos REST API port
+        published: 1617 # Cosmos REST API port
       - target: 9090
-        published: 9390     # gRPC port
+        published: 9390 # gRPC port
       - target: 9091
-        published: 9391     # gRPC-Gateway port
+        published: 9391 # gRPC-Gateway port
       - target: 26660
-        published: 26960    # Prometheus metrics port
-    entrypoint: [ "node-start" ]
+        published: 26960 # Prometheus metrics port
+      - target: 7171
+        published: 7174 # Price-feeder port
+      - target: 8080
+        published: 8380 # Mock price feed server port
+    entrypoint: ["node-start"]
     healthcheck:
       test: curl -s http://localhost:26957/status | grep -c true
       interval: 10s
@@ -139,34 +146,31 @@ services:
       - type: volume
         source: validator-3-data
         target: /home/cheqd
+      - type: bind
+        source: ./network-config/validator-3
+        target: /home/cheqd/.cheqdnode
     env_file:
       - container-env/validator-3.env
     configs:
-      - source: genesis
-        target: /genesis
       - source: seeds
         target: /seeds
-      - source: validator-3-node-key
-        target: /node_key
-      - source: validator-3-priv-val-key
-        target: /priv_validator_key
 
   seed-0:
     image: ${BUILD_IMAGE}
     ports:
       - target: 26656
-        published: 27056    # Tendermint peer-to-peer (P2P) port
+        published: 27056 # Tendermint peer-to-peer (P2P) port
       - target: 26657
-        published: 27057    # Tendermint RPC port
+        published: 27057 # Tendermint RPC port
       - target: 1317
-        published: 1717     # Cosmos REST API port
+        published: 1717 # Cosmos REST API port
       - target: 9090
-        published: 9490     # gRPC port
+        published: 9490 # gRPC port
       - target: 9091
-        published: 9491     # gRPC-Gateway port
+        published: 9491 # gRPC-Gateway port
       - target: 26660
-        published: 27060    # Prometheus metrics port
-    entrypoint: [ "node-start" ]
+        published: 27060 # Prometheus metrics port
+    entrypoint: ["node-start"]
     healthcheck:
       test: curl -s http://localhost:27057/status | grep -c true
       interval: 10s
@@ -177,98 +181,54 @@ services:
       - type: volume
         source: seed-0-data
         target: /home/cheqd
+      - type: bind
+        source: ./network-config/seed-0
+        target: /home/cheqd/.cheqdnode
     env_file:
       - container-env/seed-0.env
     configs:
-      - source: genesis
-        target: /genesis
       - source: seeds
         target: /seeds
-      - source: seed-0-node-key
-        target: /node_key
-      - source: seed-0-priv-val-key
-        target: /priv_validator_key
 
   observer-0:
     image: ${BUILD_IMAGE}
     ports:
       - target: 26656
-        published: 27156    # Tendermint peer-to-peer (P2P) port
+        published: 27156 # Tendermint peer-to-peer (P2P) port
       - target: 26657
-        published: 27157    # Tendermint RPC port
+        published: 27157 # Tendermint RPC port
       - target: 1317
-        published: 1817     # Cosmos REST API port
+        published: 1817 # Cosmos REST API port
       - target: 9090
-        published: 9590     # gRPC port
+        published: 9590 # gRPC port
       - target: 9091
-        published: 9591     # gRPC-Gateway port
+        published: 9591 # gRPC-Gateway port
       - target: 26660
-        published: 27160    # Prometheus metrics port
-    volumes:
-      - type: volume
-        source: observer-0-data
-        target: /home/cheqd
-    entrypoint: [ "node-start" ]
+        published: 27160 # Prometheus metrics port
+    entrypoint: ["node-start"]
     healthcheck:
       test: curl -s http://localhost:27157/status | grep -c true
       interval: 10s
       timeout: 2s
       retries: 6
       start_period: 15s
+    volumes:
+      - type: volume
+        source: observer-0-data
+        target: /home/cheqd
+      - type: bind
+        source: ./network-config/observer-0
+        target: /home/cheqd/.cheqdnode
     env_file:
       - container-env/observer-0.env
     configs:
-      - source: genesis
-        target: /genesis
       - source: seeds
         target: /seeds
-      - source: observer-0-node-key
-        target: /node_key
-      - source: observer-0-priv-val-key
-        target: /priv_validator_key
 
 configs:
   # Genesis and seeds
-  genesis:
-    file: network-config/genesis.json
   seeds:
     file: network-config/seeds.txt
-
-  # Validator 0
-  validator-0-node-key:
-    file: network-config/validator-0/config/node_key.json
-  validator-0-priv-val-key:
-    file: network-config/validator-0/config/priv_validator_key.json
-
-  # Validator 1
-  validator-1-node-key:
-    file: network-config/validator-1/config/node_key.json
-  validator-1-priv-val-key:
-    file: network-config/validator-1/config/priv_validator_key.json
-
-  # Validator 2
-  validator-2-node-key:
-    file: network-config/validator-2/config/node_key.json
-  validator-2-priv-val-key:
-    file: network-config/validator-2/config/priv_validator_key.json
-
-  # Validator 3
-  validator-3-node-key:
-    file: network-config/validator-3/config/node_key.json
-  validator-3-priv-val-key:
-    file: network-config/validator-3/config/priv_validator_key.json
-
-  # Seed 0
-  seed-0-node-key:
-    file: network-config/seed-0/config/node_key.json
-  seed-0-priv-val-key:
-    file: network-config/seed-0/config/priv_validator_key.json
-
-  # Observer 0
-  observer-0-node-key:
-    file: network-config/observer-0/config/node_key.json
-  observer-0-priv-val-key:
-    file: network-config/observer-0/config/priv_validator_key.json
 
 volumes:
   validator-0-data:

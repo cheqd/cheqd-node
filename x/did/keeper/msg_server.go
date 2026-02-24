@@ -209,7 +209,7 @@ func (k MsgServer) UpdateParams(goCtx context.Context, req *types.MsgUpdateParam
 		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", k.GetAuthority(), req.Authority)
 	}
 
-	if err := req.Params.ValidateBasic(); err != nil {
+	if err := req.Params.ValidateWithOracle(goCtx, k.oracleKeeper); err != nil {
 		return nil, err
 	}
 	if err := k.SetParams(goCtx, req.Params); err != nil {

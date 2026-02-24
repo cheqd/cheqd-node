@@ -1,0 +1,19 @@
+{
+	"messages": [
+		{
+			"@type": "/feeabstraction.feeabs.v1beta1.MsgAddHostZone",
+			"authority": "cheqd10d07y265gmmuvt4z0w9aw880jnsr700j5ql9az",
+			"host_chain_config": {
+				"ibc_denom": "ibc/A1A6E963EBFE83F5BA5785DD7804B388C1FD50F4F3BF30C14A66A1FC48500F3E",
+				"osmosis_pool_token_denom_in": "usdc",
+				"pool_id": "2",
+				"status": "UPDATED"
+			}
+		}
+	],
+	"metadata": "",
+	"deposit": "100000000ncheq",
+	"title": "Add CHEQD-USDC Fee Abstraction Host Zone Proposal",
+	"summary": "Add CHEQD-USDC Fee Abstraction Host Zone",
+	"expedited": false
+}

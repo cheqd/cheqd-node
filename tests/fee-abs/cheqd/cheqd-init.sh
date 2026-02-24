@@ -5,9 +5,9 @@ set -euox pipefail
 
 # sed in MacOS requires extra argument
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  SED_EXT='.orig'
+    SED_EXT='.orig'
 else
-  SED_EXT=''
+    SED_EXT=''
 fi
 
 CHAIN_ID="cheqd"
@@ -29,7 +29,11 @@ sed -i $SED_EXT 's/timeout_prevote = "1s"/timeout_prevote = "500ms"/g' "${CONFIG
 sed -i $SED_EXT 's/timeout_precommit = "1s"/timeout_precommit = "500ms"/g' "${CONFIG_TOML}"
 sed -i $SED_EXT 's/timeout_commit = "5s"/timeout_commit = "2s"/g' "${CONFIG_TOML}"
 sed -i $SED_EXT 's/log_level = "info"/log_level = "debug"/g' "${CONFIG_TOML}"
-sed -i $SED_EXT 's/"voting_period": "172800s"/"voting_period": "12s"/' "$HOME/.cheqdnode/config/genesis.json"
+
+
+sed -i 's/"voting_period"[[:space:]]*:[[:space:]]*"172800s"/"voting_period": "12s"/' "$HOME/.cheqdnode/config/genesis.json"
+sed -i $SED_EXT 's/"vote_extensions_enable_height"[[:space:]]*:[[:space:]]*"0"/"vote_extensions_enable_height": "2"/' "$HOME/.cheqdnode/config/genesis.json"
+
 sed -i $SED_EXT 's/"expedited_voting_period": "86400s"/"expedited_voting_period": "10s"/' "$HOME/.cheqdnode/config/genesis.json"
 
 # shellcheck disable=SC2086
@@ -41,8 +45,10 @@ sed -i $SED_EXT 's|log_level = "error"|log_level = "info"|g' "$HOME/.cheqdnode/c
 GENESIS="$HOME/.cheqdnode/config/genesis.json"
 sed -i $SED_EXT 's/"stake"/"ncheq"/' "$GENESIS"
 
-cheqd-noded genesis add-genesis-account cheqd-user 1000000000000000000ncheq --keyring-backend test
-cheqd-noded genesis gentx cheqd-user 10000000000000000ncheq --chain-id $CHAIN_ID --pubkey "$NODE_0_VAL_PUBKEY" --keyring-backend test
+cp "$(dirname "$0")/price-feeder.toml.template" "${HOME}/.cheqdnode/price-feeder.toml"
+
+cheqd-noded genesis add-genesis-account cheqd-user 1000000000000000000000000000000ncheq --keyring-backend test
+cheqd-noded genesis gentx cheqd-user 1000000000000000000000ncheq --chain-id $CHAIN_ID --pubkey "$NODE_0_VAL_PUBKEY" --keyring-backend test
 
 cheqd-noded genesis collect-gentxs
 cheqd-noded genesis validate-genesis
