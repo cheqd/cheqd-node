@@ -27,7 +27,6 @@ builds:
       - -trimpath
     ldflags:
       - -s -w
-      - -checklinkname=0
       - -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded
       - -X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded
       - -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
