@@ -1,6 +1,6 @@
 module github.com/cheqd/cheqd-node/api/v2
 
-go 1.23.8
+go 1.24.0
 
 require (
 	cosmossdk.io/api v0.7.6
@@ -14,9 +14,9 @@ require (
 require (
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	golang.org/x/net v0.43.0 // indirect
-	golang.org/x/sys v0.35.0 // indirect
-	golang.org/x/text v0.28.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
+	golang.org/x/text v0.31.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250303144028-a0af3efb3deb // indirect
 )
 

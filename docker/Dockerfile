@@ -2,7 +2,7 @@
 ###        STAGE 1: Build node and mock binaries           ###
 ###############################################################
 
-FROM golang:1.23-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
 # Install minimum necessary dependencies
 ENV PACKAGES="curl make git libc-dev bash gcc linux-headers findutils gettext"
