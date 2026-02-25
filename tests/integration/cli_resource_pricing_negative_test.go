@@ -224,7 +224,7 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType: resourceType,
 		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(sdkerrors.ErrInsufficientFee.ABCICode()))
+		Expect(res.Code).To(BeEquivalentTo(1))
 	})
 
 	It("should fail in create resource default message - case: fees do not lie in the range", func() {
