@@ -494,6 +494,13 @@ class Installer():
                 logging.error("Failed to configure cheqd-noded settings")
                 return False
 
+            # Configure pricefeeder settings
+            if self.configure_pricefeeder():
+                logging.info("Successfully configured pricefeeder settings")
+            else:
+                logging.error("Failed to configure pricefeeder settings")
+                return False
+
             # Configure state sync only for fresh installs
             if self.interviewer.is_from_scratch and getattr(self.interviewer, 'use_statesync', False):
                 logging.info("Configuring state sync (default)")
@@ -1268,6 +1275,79 @@ class Installer():
             return True
         except Exception as e:
             logging.exception(f"Failed to comment out [mempool] section in app.toml. Reason: {e}")
+            return False
+
+    def configure_pricefeeder(self) -> bool:
+        # Download price-feeder.toml and configure pricefeeder section in app.toml
+        # This is required for the node to function properly with the oracle module
+        try:
+            app_toml_path = os.path.join(self.cheqd_config_dir, "app.toml")
+            price_feeder_config_path = os.path.join(self.cheqd_config_dir, "price-feeder.toml")
+            price_feeder_url = f"https://raw.githubusercontent.com/cheqd/cheqd-node/{DEFAULT_DEBUG_BRANCH}/pricefeeder/price-feeder.toml"
+
+            # Download price-feeder.toml if it doesn't exist
+            if os.path.exists(price_feeder_config_path):
+                logging.info(f"price-feeder.toml already exists at {price_feeder_config_path}. Skipping download...")
+            else:
+                logging.info("Downloading price-feeder.toml configuration file...")
+                if is_valid_url(price_feeder_url):
+                    with request.urlopen(price_feeder_url) as response:
+                        price_feeder_content = response.read().decode("utf-8")
+                        with open(price_feeder_config_path, "w") as file:
+                            file.write(price_feeder_content)
+                        logging.info(f"Successfully downloaded price-feeder.toml to {price_feeder_config_path}")
+                else:
+                    logging.error(f"Invalid URL for price-feeder.toml: {price_feeder_url}")
+                    return False
+
+            # Update pricefeeder settings in app.toml
+            if not os.path.exists(app_toml_path):
+                logging.debug(f"app.toml not found at {app_toml_path}. Skipping pricefeeder configuration...")
+                return True
+
+            logging.info("Configuring pricefeeder settings in app.toml...")
+            with open(app_toml_path, "r") as file:
+                lines = file.readlines()
+
+            # Remove existing [pricefeeder] section entirely
+            in_pricefeeder_section = False
+            modified_lines = []
+
+            for line in lines:
+                stripped = line.strip()
+
+                if stripped == "[pricefeeder]":
+                    in_pricefeeder_section = True
+                    continue
+
+                if in_pricefeeder_section and stripped.startswith("[") and stripped != "[pricefeeder]":
+                    in_pricefeeder_section = False
+
+                if in_pricefeeder_section:
+                    continue
+
+                modified_lines.append(line)
+
+            # Add pricefeeder config params
+            pricefeeder_config = f"""
+###############################################################################
+###                         Pricefeeder                                     ###
+###############################################################################
+
+[pricefeeder]
+config_path = "{price_feeder_config_path}"
+log_level = "info"
+enable = true
+"""
+            modified_lines.append(pricefeeder_config)
+
+            with open(app_toml_path, "w") as file:
+                file.writelines(modified_lines)
+
+            logging.info("Successfully configured pricefeeder in app.toml")
+            return True
+        except Exception as e:
+            logging.exception(f"Failed to configure pricefeeder. Reason: {e}")
             return False
 
     def _get_latest_block_height(self, rpc_endpoint: str) -> int:
