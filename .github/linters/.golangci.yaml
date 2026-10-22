@@ -1,6 +1,8 @@
+version: "2"
+
 run:
   timeout: 10m
-  go: "1.23"
+  go: "1.26"
 
 linters:
   enable:
@@ -11,69 +13,76 @@ linters:
     - errcheck
     - goconst
     - gocritic
-    - gofumpt
-    - gofmt
-    - goimports
-    - gosimple
     - govet
     - ineffassign
     - misspell
     - nakedret
     - nestif
     - nolintlint
-    - staticcheck
-    - stylecheck
-    - typecheck
+    - staticcheck # includes former gosimple and stylecheck
     - unconvert
     - unused
-    
-issues:
-  exclude-rules:
-    - text: "ST1003:"
-      linters:
-        - stylecheck
 
-linters-settings:
-  dogsled:
-    # Checks assignments with too many blank identifiers.
-    # Default: 2
-    max-blank-identifiers: 3
+  settings:
+    dogsled:
+      # Checks assignments with too many blank identifiers.
+      # Default: 2
+      max-blank-identifiers: 3
 
-  gocritic:
-    # Which checks should be disabled; can't be combined with 'enabled-checks'.
-    # See https://go-critic.github.io/overview#checks-overview.
-    # Default: []
-    disabled-checks:
-      - regexpMust
-      - badCall # Remove this after CI workflow PR
+    gocritic:
+      # Which checks should be disabled; can't be combined with 'enabled-checks'.
+      # See https://go-critic.github.io/overview#checks-overview.
+      # Default: []
+      disabled-checks:
+        - regexpMust
+        - badCall # Remove this after CI workflow PR
 
-  misspell:
-    ignore-words:
-      - cheqd
-      - cheq
-      - ncheq
+    misspell:
+      ignore-rules:
+        - cheqd
+        - cheq
+        - ncheq
 
-  stylecheck:
-    # STxxxx checks in https://staticcheck.io/docs/configuration/options/#checks
-    # Default: ["*"]
-    checks: ["all"]
-    # https://staticcheck.io/docs/configuration/options/#dot_import_whitelist
-    dot-import-whitelist:
-      - "github.com/cheqd/cheqd-node/x/did/utils"
-      - "github.com/onsi/gomega"
-    # https://staticcheck.io/docs/configuration/options/#initialisms
-    initialisms: ["ACL", "API", "ASCII", "CPU", "CSS", "DNS", "EOF", "GUID", "HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "QPS", "RAM", "RPC", "SLA", "SMTP", "SQL", "SSH", "TCP", "TLS", "TTL", "UDP", "UI", "GID", "UID", "UUID", "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS", "SIP", "RTP", "AMQP", "DB", "TS"]
+    staticcheck:
+      # SAxxxx, Sxxxx and STxxxx checks in https://staticcheck.dev/docs/configuration/options/#checks
+      checks: ["all", "-ST1003"]
+      # https://staticcheck.dev/docs/configuration/options/#dot_import_whitelist
+      dot-import-whitelist:
+        - "github.com/cheqd/cheqd-node/x/did/utils"
+        - "github.com/onsi/gomega"
+      # https://staticcheck.dev/docs/configuration/options/#initialisms
+      initialisms: ["ACL", "API", "ASCII", "CPU", "CSS", "DNS", "EOF", "GUID", "HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "QPS", "RAM", "RPC", "SLA", "SMTP", "SQL", "SSH", "TCP", "TLS", "TTL", "UDP", "UI", "GID", "UID", "UUID", "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS", "SIP", "RTP", "AMQP", "DB", "TS"]
 
-  depguard:
+    depguard:
+      rules:
+        main:
+          files:
+            - $all
+          list-mode: lax
+          allow: "*"
+
+    goconst:
+      min-occurrences: 5
+      ignore-string-values:
+        - "echo '"
+
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
     rules:
-      main:
-        files:
-          - $all
-        list-mode: lax
-        allow: "*"
-  
-  goconst:
-    min-occurrences: 5
-    ignore-tests: true
-    ignore-strings: "echo '"
-    
+      # replaces goconst ignore-tests from golangci-lint v1
+      - path: _test\.go
+        linters:
+          - goconst
+
+formatters:
+  enable:
+    - gofmt
+    - gofumpt
+    - goimports
+  exclusions:
+    generated: lax
