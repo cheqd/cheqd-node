@@ -1,6 +1,6 @@
 module github.com/cheqd/cheqd-node/api/v2
 
-go 1.23.8
+go 1.26.10
 
 require (
 	cosmossdk.io/api v0.7.6
