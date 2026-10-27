@@ -32,7 +32,7 @@ If successfully configured, your node would become the latest validator on the c
 Our [testnet](https://testnet-explorer.cheqd.io) is the easiest place for developers and node operators to get started if you're not *quite* ready yet to dive into building apps on our mainnet. To get started...
 
 1. Install [the latest stable release](https://github.com/cheqd/cheqd-node/releases/latest) of `cheqd-node` software (currently `v3.x.x`) on a hosting platform of your choice by [following the setup guide](https://docs.cheqd.io/node/getting-started/setup-and-configure).
-2. Acquire testnet CHEQ tokens through [our testnet faucet](https://testnet-faucet.cheqd.io).
+2. Acquire testnet CHEQ tokens from the [testnet faucet](https://docs.cheqd.io/product/network/tools/testnet-faucet) in [cheqd Studio](https://studio.cheqd.net) (**Account** > **Balances & Faucet**).
 3. Once you have acquired CHEQ tokens, [promote your node to a validator](https://docs.cheqd.io/node/validator-guides/validator-guide)
 
 ## 🧑‍💻 Using cheqd
