@@ -667,7 +667,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		feeCollector := s.app.AccountKeeper.GetModuleAddress(feemarkettypes.FeeCollectorName)
 		feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
 
-		Expect((feeCollectorBalance.Amount).GT(math.NewInt(0)))
+		Expect(feeCollectorBalance.Amount.GT(math.NewInt(0)))
 	})
 
 	It("Non TaxableTx Lifecycle - Ensure minimum gas prices", func() {
@@ -761,7 +761,7 @@ var _ = Describe("Fee tests on DeliverTx", func() {
 		feeCollector := s.app.AccountKeeper.GetModuleAddress(feemarkettypes.FeeCollectorName)
 		feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
 
-		Expect((feeCollectorBalance.Amount).GT(math.NewInt(0)))
+		Expect(feeCollectorBalance.Amount.GT(math.NewInt(0)))
 	})
 
 	It("TaxableTx Lifecycle on Simulation", func() {
@@ -1788,7 +1788,7 @@ var _ = Describe("Fee abstraction along with fee market", func() {
 		feeCollector := s.app.AccountKeeper.GetModuleAddress(feemarkettypes.FeeCollectorName)
 		feeCollectorBalance := s.app.BankKeeper.GetBalance(s.ctx, feeCollector, didtypes.BaseMinimalDenom)
 
-		Expect((feeCollectorBalance.Amount).GT(math.NewInt(0)))
+		Expect(feeCollectorBalance.Amount.GT(math.NewInt(0)))
 	})
 
 	It("Ensure taxable txn working fine after integrating the fee-abs", func() {

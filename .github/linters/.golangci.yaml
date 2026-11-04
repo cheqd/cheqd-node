@@ -45,7 +45,8 @@ linters:
 
     staticcheck:
       # SAxxxx, Sxxxx and STxxxx checks in https://staticcheck.dev/docs/configuration/options/#checks
-      checks: ["all", "-ST1003"]
+      # QF* are editor quick-fix suggestions, newly reported by golangci-lint v2; not enforced
+      checks: ["all", "-ST1003", "-QF1007", "-QF1008", "-QF1012"]
       # https://staticcheck.dev/docs/configuration/options/#dot_import_whitelist
       dot-import-whitelist:
         - "github.com/cheqd/cheqd-node/x/did/utils"
@@ -76,6 +77,14 @@ linters:
     rules:
       # replaces goconst ignore-tests from golangci-lint v1
       - path: _test\.go
+        linters:
+          - goconst
+      # integration and upgrade test helpers build CLI arguments from literals
+      - path: (^|/)tests/
+        linters:
+          - goconst
+      # store migrations list exchange and denom names as data; keep them literal
+      - path: x/oracle/keeper/migrations\.go
         linters:
           - goconst
 
