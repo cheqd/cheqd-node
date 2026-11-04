@@ -130,7 +130,8 @@ var _ = Describe("Upgrade_v4_1 - Pre", func() {
 
 		It("should wait for the voting end height to be reached", func() {
 			By("pinging the node status until the voting end height is reached")
-			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, VotingEndHeight, cli.VotingPeriod*10)
+			// See the same wait in pre_test.go for why this is VotingPeriod*20, not *10.
+			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, VotingEndHeight, cli.VotingPeriod*20)
 			Expect(err).To(BeNil())
 		})
 
