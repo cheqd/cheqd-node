@@ -211,7 +211,10 @@ var _ = Describe("Upgrade - Pre", func() {
 
 		It("should wait for the voting end height to be reached", func() {
 			By("pinging the node status until the voting end height is reached")
-			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, VotingEndHeight, cli.VotingPeriod*10)
+			// VotingEndHeight is ~120 blocks out (VotingPeriod/ExpectedBlockSeconds + ExtraBlocks + 100) at the
+			// assumed 1s/block rate, so the prior VotingPeriod*10 (100s) budget had no margin and failed
+			// consistently once CI block production slowed even slightly. VotingPeriod*20 restores headroom.
+			err := cli.WaitForChainHeight(cli.Validator0, cli.CliBinaryName, VotingEndHeight, cli.VotingPeriod*20)
 			Expect(err).To(BeNil())
 		})
 
