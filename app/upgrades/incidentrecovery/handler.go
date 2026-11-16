@@ -13,6 +13,7 @@ import (
 
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	vestingexported "github.com/cosmos/cosmos-sdk/x/auth/vesting/exported"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
@@ -79,10 +80,16 @@ type StakingKeeper interface {
 	GetUnbondingDelegation(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) (stakingtypes.UnbondingDelegation, error)
 	GetAllUnbondingDelegations(ctx context.Context, delegator sdk.AccAddress) ([]stakingtypes.UnbondingDelegation, error)
 	RemoveUnbondingDelegation(ctx context.Context, ubd stakingtypes.UnbondingDelegation) error
-	SetUnbondingDelegation(ctx context.Context, ubd stakingtypes.UnbondingDelegation) error
 }
 
 type DistrKeeper interface {
+	// SetWithdrawAddr is called for each affected address before withdrawing
+	// any rewards, resetting its withdraw address back to itself. If the
+	// attacker had already called MsgSetWithdrawAddress pointing it
+	// somewhere they control, withdrawing rewards without doing this first
+	// would hand those rewards straight to them while the on-chain event
+	// still logs it as "recovered".
+	SetWithdrawAddr(ctx context.Context, delegatorAddr, withdrawAddr sdk.AccAddress) error
 	WithdrawDelegationRewards(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) (sdk.Coins, error)
 }
 
@@ -128,15 +135,25 @@ func (r *SweepResult) warn(format string, args ...any) {
 // directly without the full module-manager machinery.
 //
 // For each address in cfg.AffectedAddresses, in order:
-//  1. Withdraw any pending distribution rewards into the liquid balance.
+//  0. Reset its distribution withdraw address back to itself, so step 1
+//     can't pay rewards out to an address the attacker redirected them to.
+//  1. Withdraw any pending distribution rewards into the liquid balance
+//     (skipped if step 0 failed).
 //  2. Force-convert any active delegations to liquid balance immediately
-//     (bypassing the normal 14-day unbonding period entirely).
+//     (bypassing the normal 14-day unbonding period entirely) — skipped
+//     entirely for a vesting account, see the isVesting comment below.
 //  3. Force-complete any already-in-progress unbonding delegation entries
 //     immediately (bypassing both the remaining wait AND, critically, the
 //     jailed-validator check that MsgCancelUnbondingDelegation enforces —
 //     this is a direct state operation, not that message handler, so it
-//     is not subject to that check).
-//  4. Sweep the resulting full liquid balance to cfg.DestinationAddress.
+//     is not subject to that check) — also skipped for a vesting account.
+//  4. Sweep the resulting spendable balance to cfg.DestinationAddress.
+//
+// Any failure in step 2 or 3 after the destructive Unbond/pool-debit call
+// has already run aborts the ENTIRE run (not just that one address) with an
+// error, so the upgrade block fails and nothing commits — see the comments
+// at each such call site for why a "skip and continue" there would have
+// been actively unsafe.
 //
 // Reads live on-chain state at execution time throughout — it does not
 // trust or replay any amounts recorded when this config was drafted, so it
@@ -188,6 +205,39 @@ func RunIncidentRecovery(
 			continue
 		}
 
+		// Reset the withdraw address to the delegator itself before
+		// withdrawing anything. If the attacker already called
+		// MsgSetWithdrawAddress to point it somewhere they control,
+		// withdrawing rewards without this first would hand those rewards
+		// straight to them while the on-chain event still logs it as
+		// "recovered". Not fatal if it fails — nothing destructive has
+		// happened yet — but reward withdrawal for this address is skipped
+		// rather than risk paying out to an attacker-controlled address.
+		canWithdrawRewardsSafely := true
+		if err := distrKeeper.SetWithdrawAddr(ctx, delAddr, delAddr); err != nil {
+			canWithdrawRewardsSafely = false
+			result.warn("could not reset withdraw address to the delegator itself, skipping reward withdrawal for this address to avoid paying out to a possibly attacker-controlled address: %v", err)
+		}
+
+		// A vesting account's delegated-vesting coins, once force-converted
+		// by steps 2/3 below, come back as LOCKED balance (per the vesting
+		// accounting the bank keeper runs on undelegation), not spendable —
+		// and locked balance unlocks and becomes spendable by the
+		// compromised account itself over the vesting schedule, with none
+		// of the normal 21-day unbonding wait. Force-converting a vesting
+		// account's stake would make this handler actively help the
+		// attacker rather than recover funds, so active delegations and
+		// unbonding entries are deliberately left untouched for one; only
+		// its already-spendable balance (step 4) and rewards (above) are
+		// swept.
+		isVesting := false
+		if acc := accountKeeper.GetAccount(ctx, delAddr); acc != nil {
+			if _, ok := acc.(vestingexported.VestingAccount); ok {
+				isVesting = true
+				result.warn("address is a vesting account: active delegations and unbonding entries were left untouched and require separate, manual handling — force-converting them would release locked-but-unvested coins back to the compromised account with no unbonding wait")
+			}
+		}
+
 		// 1. Withdraw pending rewards from every active delegation.
 		delegations, err := stakingKeeper.GetAllDelegatorDelegations(ctx, delAddr)
 		if err != nil {
@@ -197,100 +247,95 @@ func RunIncidentRecovery(
 			continue
 		}
 
-		for _, d := range delegations {
-			valAddr, err := sdk.ValAddressFromBech32(d.ValidatorAddress)
-			if err != nil {
-				result.warn("reward withdrawal: validator address %q did not parse: %v", d.ValidatorAddress, err)
-				continue
-			}
-			rewards, err := distrKeeper.WithdrawDelegationRewards(ctx, delAddr, valAddr)
-			if err != nil {
-				// Deliberately not failing the whole sweep for this address on
-				// a reward-withdrawal error — the bulk of the value is
-				// principal, not rewards — but it IS recorded, not dropped.
-				result.warn("reward withdrawal from validator %s failed: %v", d.ValidatorAddress, err)
-				continue
-			}
-			result.RewardsWithdrawn = result.RewardsWithdrawn.Add(rewards...)
-		}
-
-		// 2. Force-convert active delegations to liquid balance immediately.
-		for _, d := range delegations {
-			valAddr, err := sdk.ValAddressFromBech32(d.ValidatorAddress)
-			if err != nil {
-				result.warn("delegation conversion: validator address %q did not parse: %v", d.ValidatorAddress, err)
-				continue
-			}
-			validator, err := stakingKeeper.GetValidator(ctx, valAddr)
-			if err != nil {
-				result.warn("delegation conversion: could not load validator %s: %v", d.ValidatorAddress, err)
-				continue
-			}
-			amount, err := stakingKeeper.Unbond(ctx, delAddr, valAddr, d.Shares)
-			if err != nil {
-				result.warn("delegation conversion: Unbond from validator %s failed: %v", d.ValidatorAddress, err)
-				continue
-			}
-			if !amount.IsPositive() {
-				// Not a warning case: shares converted to zero tokens is a
-				// legitimate (if unusual) outcome, not a failure.
-				continue
-			}
-			coins := sdk.NewCoins(sdk.NewCoin(bondDenom, amount))
-			sourceModule := stakingtypes.BondedPoolName
-			if !validator.IsBonded() {
-				sourceModule = stakingtypes.NotBondedPoolName
-			}
-			if err := bankKeeper.UndelegateCoinsFromModuleToAccount(ctx, sourceModule, delAddr, coins); err != nil {
-				// Unbond has ALREADY removed the delegation's shares at
-				// this point — there is no way to put them back. Letting
-				// the loop continue would commit that destructive change
-				// while the matching tokens never reach any account.
-				// Aborting the whole run here means the block fails and
-				// nothing in it commits, so the shares are never actually
-				// lost: the chain halts, instead of silently losing funds.
-				return nil, fmt.Errorf("%s: delegation conversion: Unbond succeeded (removed %s shares, %s tokens) from validator %s but crediting the account failed, aborting entire recovery run to avoid committing unaccounted-for tokens: %w", addrStr, d.Shares.String(), coins.String(), d.ValidatorAddress, err)
-			}
-			result.DelegationsMoved = result.DelegationsMoved.Add(coins...)
-		}
-
-		// 3. Force-complete in-progress unbonding delegation entries
-		//    immediately. This is the step that recovers stake stuck behind
-		//    a jailed validator — it never calls MsgCancelUnbondingDelegation
-		//    or its jailed-validator check at all.
-		unbondings, err := stakingKeeper.GetAllUnbondingDelegations(ctx, delAddr)
-		if err != nil {
-			result.warn("listing unbonding delegations failed: %v", err)
-		} else {
-			for _, ubd := range unbondings {
-				var moved sdk.Coins
-				// failedEntries keeps every entry whose credit transfer
-				// failed, so the unbonding record below can be trimmed down
-				// to just those rather than deleted wholesale. The transfer
-				// itself is a single bank call per entry — if it errors,
-				// nothing has moved for that entry yet, so leaving it in
-				// place (instead of treating it as moved) is safe, not just
-				// a cosmetic bookkeeping choice.
-				var failedEntries []stakingtypes.UnbondingDelegationEntry
-				for _, entry := range ubd.Entries {
-					if !entry.Balance.IsPositive() {
-						continue
-					}
-					coins := sdk.NewCoins(sdk.NewCoin(bondDenom, entry.Balance))
-					if err := bankKeeper.UndelegateCoinsFromModuleToAccount(ctx, stakingtypes.NotBondedPoolName, delAddr, coins); err != nil {
-						result.warn("unbonding completion: crediting account from validator %s (creation height %d) failed, leaving this entry in place for a later run: %v", ubd.ValidatorAddress, entry.CreationHeight, err)
-						failedEntries = append(failedEntries, entry)
-						continue
-					}
-					moved = moved.Add(coins...)
-				}
-				if moved == nil {
-					// Nothing moved for this record at all — leave it
-					// completely untouched.
+		if canWithdrawRewardsSafely {
+			for _, d := range delegations {
+				valAddr, err := sdk.ValAddressFromBech32(d.ValidatorAddress)
+				if err != nil {
+					result.warn("reward withdrawal: validator address %q did not parse: %v", d.ValidatorAddress, err)
 					continue
 				}
-				result.UnbondingMoved = result.UnbondingMoved.Add(moved...)
-				if len(failedEntries) == 0 {
+				rewards, err := distrKeeper.WithdrawDelegationRewards(ctx, delAddr, valAddr)
+				if err != nil {
+					// Deliberately not failing the whole sweep for this address on
+					// a reward-withdrawal error — the bulk of the value is
+					// principal, not rewards — but it IS recorded, not dropped.
+					result.warn("reward withdrawal from validator %s failed: %v", d.ValidatorAddress, err)
+					continue
+				}
+				result.RewardsWithdrawn = result.RewardsWithdrawn.Add(rewards...)
+			}
+		}
+
+		if !isVesting {
+			// 2. Force-convert active delegations to liquid balance immediately.
+			for _, d := range delegations {
+				valAddr, err := sdk.ValAddressFromBech32(d.ValidatorAddress)
+				if err != nil {
+					result.warn("delegation conversion: validator address %q did not parse: %v", d.ValidatorAddress, err)
+					continue
+				}
+				validator, err := stakingKeeper.GetValidator(ctx, valAddr)
+				if err != nil {
+					result.warn("delegation conversion: could not load validator %s: %v", d.ValidatorAddress, err)
+					continue
+				}
+				amount, err := stakingKeeper.Unbond(ctx, delAddr, valAddr, d.Shares)
+				if err != nil {
+					result.warn("delegation conversion: Unbond from validator %s failed: %v", d.ValidatorAddress, err)
+					continue
+				}
+				if !amount.IsPositive() {
+					// Not a warning case: shares converted to zero tokens is a
+					// legitimate (if unusual) outcome, not a failure.
+					continue
+				}
+				coins := sdk.NewCoins(sdk.NewCoin(bondDenom, amount))
+				sourceModule := stakingtypes.BondedPoolName
+				if !validator.IsBonded() {
+					sourceModule = stakingtypes.NotBondedPoolName
+				}
+				if err := bankKeeper.UndelegateCoinsFromModuleToAccount(ctx, sourceModule, delAddr, coins); err != nil {
+					// Unbond has ALREADY removed the delegation's shares at
+					// this point — there is no way to put them back. Letting
+					// the loop continue would commit that destructive change
+					// while the matching tokens never reach any account.
+					// Aborting the whole run here means the block fails and
+					// nothing in it commits, so the shares are never actually
+					// lost: the chain halts, instead of silently losing funds.
+					return nil, fmt.Errorf("%s: delegation conversion: Unbond succeeded (removed %s shares, %s tokens) from validator %s but crediting the account failed, aborting entire recovery run to avoid committing unaccounted-for tokens: %w", addrStr, d.Shares.String(), coins.String(), d.ValidatorAddress, err)
+				}
+				result.DelegationsMoved = result.DelegationsMoved.Add(coins...)
+			}
+
+			// 3. Force-complete in-progress unbonding delegation entries
+			//    immediately. This is the step that recovers stake stuck behind
+			//    a jailed validator — it never calls MsgCancelUnbondingDelegation
+			//    or its jailed-validator check at all.
+			unbondings, err := stakingKeeper.GetAllUnbondingDelegations(ctx, delAddr)
+			if err != nil {
+				result.warn("listing unbonding delegations failed: %v", err)
+			} else {
+				for _, ubd := range unbondings {
+					for _, entry := range ubd.Entries {
+						if !entry.Balance.IsPositive() {
+							continue
+						}
+						coins := sdk.NewCoins(sdk.NewCoin(bondDenom, entry.Balance))
+						if err := bankKeeper.UndelegateCoinsFromModuleToAccount(ctx, stakingtypes.NotBondedPoolName, delAddr, coins); err != nil {
+							// UndelegateCoinsFromModuleToAccount debits the
+							// NotBonded pool BEFORE crediting the account
+							// internally — a failure here does NOT mean
+							// "nothing moved". Treating it as a skippable
+							// warning (the original bug) would let the pool
+							// debit commit while the matching record is kept
+							// as if nothing happened, letting a later
+							// CompleteUnbonding pay this entry out of OTHER
+							// delegators' funds in that pool. Abort the whole
+							// run instead, same as the Unbond case above.
+							return nil, fmt.Errorf("%s: unbonding completion: crediting account from validator %s (creation height %d) failed, aborting entire recovery run to avoid committing a pool debit with no matching credit: %w", addrStr, ubd.ValidatorAddress, entry.CreationHeight, err)
+						}
+						result.UnbondingMoved = result.UnbondingMoved.Add(coins...)
+					}
 					if err := stakingKeeper.RemoveUnbondingDelegation(ctx, ubd); err != nil {
 						// Tokens have already moved to the account at this point.
 						// Not removing the (now-empty) unbonding record is a
@@ -298,16 +343,6 @@ func RunIncidentRecovery(
 						// but it should be investigated if it happens.
 						result.warn("unbonding completion: tokens moved from validator %s but RemoveUnbondingDelegation failed: %v", ubd.ValidatorAddress, err)
 					}
-					continue
-				}
-				// Some, but not all, entries succeeded: keep the record but
-				// shrink it to only the entries that are still genuinely
-				// unbonding. Removing the whole record here (the original
-				// bug) would permanently strand the failed entries' tokens
-				// in the NotBonded pool with no record pointing to them.
-				ubd.Entries = failedEntries
-				if err := stakingKeeper.SetUnbondingDelegation(ctx, ubd); err != nil {
-					result.warn("unbonding completion: partially moved tokens from validator %s but failed to persist the trimmed unbonding record (%d entries remaining): %v", ubd.ValidatorAddress, len(failedEntries), err)
 				}
 			}
 		}

@@ -8,6 +8,7 @@ import (
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
@@ -85,7 +86,6 @@ type mockStakingKeeper struct {
 	unbondErr    map[string]error                              // keyed by delegator+"|"+validator address string
 	removedUBDs  []string                                      // records every delegator|validator RemoveUnbondingDelegation was called for
 	removeUBDErr map[string]error
-	setUBDs      []stakingtypes.UnbondingDelegation // records every record SetUnbondingDelegation was called with
 }
 
 func newMockStakingKeeper(bondDenom string) *mockStakingKeeper {
@@ -145,18 +145,23 @@ func (m *mockStakingKeeper) RemoveUnbondingDelegation(_ context.Context, ubd sta
 	return nil
 }
 
-func (m *mockStakingKeeper) SetUnbondingDelegation(_ context.Context, ubd stakingtypes.UnbondingDelegation) error {
-	m.setUBDs = append(m.setUBDs, ubd)
-	return nil
-}
-
 type mockDistrKeeper struct {
-	rewards     map[string]sdk.Coins // keyed by delegator+"|"+validator address string
-	withdrawErr map[string]error
+	rewards         map[string]sdk.Coins // keyed by delegator+"|"+validator address string
+	withdrawErr     map[string]error
+	setWithdrawErr  map[string]error // keyed by delegator address string
+	setWithdrawCall []string         // records every delegator address SetWithdrawAddr was called for
 }
 
 func newMockDistrKeeper() *mockDistrKeeper {
-	return &mockDistrKeeper{rewards: map[string]sdk.Coins{}, withdrawErr: map[string]error{}}
+	return &mockDistrKeeper{rewards: map[string]sdk.Coins{}, withdrawErr: map[string]error{}, setWithdrawErr: map[string]error{}}
+}
+
+func (m *mockDistrKeeper) SetWithdrawAddr(_ context.Context, delegatorAddr, _ sdk.AccAddress) error {
+	m.setWithdrawCall = append(m.setWithdrawCall, delegatorAddr.String())
+	if err, ok := m.setWithdrawErr[delegatorAddr.String()]; ok {
+		return err
+	}
+	return nil
 }
 
 func (m *mockDistrKeeper) WithdrawDelegationRewards(_ context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) (sdk.Coins, error) {
@@ -167,20 +172,31 @@ func (m *mockDistrKeeper) WithdrawDelegationRewards(_ context.Context, delAddr s
 	return m.rewards[key], nil
 }
 
-// mockAccountKeeper models whether a given address is a module account.
-// Defaults to "no account at all" (GetAccount returns nil), same as a real
-// AccountKeeper for any ordinary, never-module address.
+// mockAccountKeeper models whether a given address is a module account or a
+// vesting account. Defaults to "no account at all" (GetAccount returns
+// nil), same as a real AccountKeeper for any ordinary, never-registered
+// address.
 type mockAccountKeeper struct {
-	moduleAccounts map[string]bool // keyed by address string
+	moduleAccounts  map[string]bool // keyed by address string
+	vestingAccounts map[string]bool // keyed by address string
 }
 
 func newMockAccountKeeper() *mockAccountKeeper {
-	return &mockAccountKeeper{moduleAccounts: map[string]bool{}}
+	return &mockAccountKeeper{moduleAccounts: map[string]bool{}, vestingAccounts: map[string]bool{}}
 }
 
 func (m *mockAccountKeeper) GetAccount(_ context.Context, addr sdk.AccAddress) sdk.AccountI {
 	if m.moduleAccounts[addr.String()] {
 		return authtypes.NewEmptyModuleAccount("mock-module")
+	}
+	if m.vestingAccounts[addr.String()] {
+		base := authtypes.NewBaseAccountWithAddress(addr)
+		originalVesting := sdk.NewCoins(sdk.NewCoin("ncheq", math.NewInt(1)))
+		vesting, err := vestingtypes.NewContinuousVestingAccount(base, originalVesting, 0, 1)
+		if err != nil {
+			panic(err) // test setup error, not a real failure path
+		}
+		return vesting
 	}
 	return nil
 }
@@ -294,17 +310,17 @@ func TestRunIncidentRecovery_CompletesUnbondingBypassingJailedCheck(t *testing.T
 	}
 }
 
-func TestRunIncidentRecovery_PartialUnbondingFailureKeepsFailedEntryOnRecord(t *testing.T) {
-	// Review finding #5: if one unbonding entry in a record succeeds and a
-	// sibling entry in the SAME record fails to credit, only the
-	// successful entry's tokens have actually moved. Deleting the whole
-	// record (the original bug) would strand the failed entry's tokens in
-	// the NotBonded pool with nothing pointing to them ever again. The
-	// fix must keep the record with only the failed entry remaining.
+func TestRunIncidentRecovery_AbortsEntireRunOnUnbondingCreditFailure(t *testing.T) {
+	// Second-pass review finding: UndelegateCoinsFromModuleToAccount debits
+	// the NotBonded pool BEFORE crediting the account internally, so a
+	// credit failure does NOT mean "nothing moved" — the pool has already
+	// been debited. Treating this as a skippable warning (the first-pass
+	// fix) would let that debit commit while the unbonding record is kept
+	// as if nothing happened, letting a later CompleteUnbonding pay this
+	// entry out of OTHER delegators' funds in the same pool. It must abort
+	// the whole run instead, same as the Unbond case.
 	bank := newMockBankKeeper()
-	key := stakingtypes.NotBondedPoolName + "|" + testDelAddr1
-	// first entry's credit succeeds (nil), second entry's credit fails.
-	bank.undelegateErrSeq[key] = []error{nil, errors.New("simulated credit failure")}
+	bank.undelegateErr[stakingtypes.NotBondedPoolName+"|"+testDelAddr1] = errors.New("simulated credit failure")
 	staking := newMockStakingKeeper(testBondDenom)
 	distr := newMockDistrKeeper()
 	accounts := newMockAccountKeeper()
@@ -315,7 +331,94 @@ func TestRunIncidentRecovery_PartialUnbondingFailureKeepsFailedEntryOnRecord(t *
 			ValidatorAddress: testValAddr1,
 			Entries: []stakingtypes.UnbondingDelegationEntry{
 				{CreationHeight: 12345, Balance: math.NewInt(5000)},
-				{CreationHeight: 12400, Balance: math.NewInt(3000)},
+			},
+		},
+	}
+
+	cfg := testConfig(testDelAddr1)
+	_, err := RunIncidentRecovery(context.Background(), cfg, bank, staking, distr, accounts)
+	if err == nil {
+		t.Fatal("expected RunIncidentRecovery to return an error aborting the whole run, got nil")
+	}
+	if len(staking.removedUBDs) != 0 {
+		t.Fatalf("expected RemoveUnbondingDelegation to NOT be called when the credit failed, got %d calls", len(staking.removedUBDs))
+	}
+}
+
+func TestRunIncidentRecovery_ResetsWithdrawAddressBeforeWithdrawingRewards(t *testing.T) {
+	// Second-pass review finding: if the attacker already called
+	// MsgSetWithdrawAddress on a compromised account, withdrawing rewards
+	// without resetting it first would pay those rewards straight to the
+	// attacker while the event still logs them as recovered.
+	bank := newMockBankKeeper()
+	bank.balances[testDelAddr1] = sdk.NewCoins(sdk.NewCoin(testBondDenom, math.NewInt(1000)))
+	staking := newMockStakingKeeper(testBondDenom)
+	distr := newMockDistrKeeper()
+	accounts := newMockAccountKeeper()
+
+	cfg := testConfig(testDelAddr1)
+	_, err := RunIncidentRecovery(context.Background(), cfg, bank, staking, distr, accounts)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(distr.setWithdrawCall) != 1 || distr.setWithdrawCall[0] != testDelAddr1 {
+		t.Fatalf("expected SetWithdrawAddr to be called once for %s, got calls: %v", testDelAddr1, distr.setWithdrawCall)
+	}
+}
+
+func TestRunIncidentRecovery_SkipsRewardWithdrawalIfWithdrawAddrResetFails(t *testing.T) {
+	bank := newMockBankKeeper()
+	staking := newMockStakingKeeper(testBondDenom)
+	distr := newMockDistrKeeper()
+	distr.setWithdrawErr[testDelAddr1] = errors.New("simulated SetWithdrawAddr failure")
+	distr.rewards[testDelAddr1+"|"+testValAddr1] = sdk.NewCoins(sdk.NewCoin(testBondDenom, math.NewInt(500)))
+	accounts := newMockAccountKeeper()
+
+	staking.delegations[testDelAddr1] = []stakingtypes.Delegation{
+		{DelegatorAddress: testDelAddr1, ValidatorAddress: testValAddr1, Shares: math.LegacyNewDec(0)},
+	}
+
+	cfg := testConfig(testDelAddr1)
+	results, err := RunIncidentRecovery(context.Background(), cfg, bank, staking, distr, accounts)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	r := results[0]
+	if !r.RewardsWithdrawn.IsZero() {
+		t.Fatalf("expected reward withdrawal to be skipped when SetWithdrawAddr fails, got %s withdrawn", r.RewardsWithdrawn)
+	}
+	if len(r.Warnings) == 0 {
+		t.Fatal("expected a warning explaining reward withdrawal was skipped")
+	}
+}
+
+func TestRunIncidentRecovery_SkipsDelegationAndUnbondingForVestingAccount(t *testing.T) {
+	// Second-pass review finding: force-converting a vesting account's
+	// delegations/unbonding entries releases them as LOCKED balance (per
+	// the vesting accounting cosmos-sdk's bank keeper runs on
+	// undelegation), which then unlocks and becomes spendable by the
+	// compromised account itself with no unbonding wait at all — actively
+	// helping the attacker rather than recovering funds. Both must be left
+	// untouched for a vesting account.
+	bank := newMockBankKeeper()
+	staking := newMockStakingKeeper(testBondDenom)
+	distr := newMockDistrKeeper()
+	accounts := newMockAccountKeeper()
+	accounts.vestingAccounts[testDelAddr1] = true
+
+	staking.delegations[testDelAddr1] = []stakingtypes.Delegation{
+		{DelegatorAddress: testDelAddr1, ValidatorAddress: testValAddr1, Shares: math.LegacyNewDec(2000)},
+	}
+	staking.validators[testValAddr1] = stakingtypes.Validator{
+		OperatorAddress: testValAddr1,
+		Status:          stakingtypes.Bonded,
+	}
+	staking.unbondings[testDelAddr1] = []stakingtypes.UnbondingDelegation{
+		{
+			DelegatorAddress: testDelAddr1,
+			ValidatorAddress: testValAddr1,
+			Entries: []stakingtypes.UnbondingDelegationEntry{
+				{CreationHeight: 12345, Balance: math.NewInt(5000)},
 			},
 		},
 	}
@@ -326,18 +429,17 @@ func TestRunIncidentRecovery_PartialUnbondingFailureKeepsFailedEntryOnRecord(t *
 		t.Fatalf("unexpected error: %v", err)
 	}
 	r := results[0]
-	if !r.UnbondingMoved.Equal(sdk.NewCoins(sdk.NewCoin(testBondDenom, math.NewInt(5000)))) {
-		t.Fatalf("expected only the successful 5000%s entry to be recorded as moved, got %s", testBondDenom, r.UnbondingMoved)
+	if !r.DelegationsMoved.IsZero() {
+		t.Fatalf("expected no active delegation to be force-converted for a vesting account, got %s moved", r.DelegationsMoved)
+	}
+	if !r.UnbondingMoved.IsZero() {
+		t.Fatalf("expected no unbonding entry to be force-completed for a vesting account, got %s moved", r.UnbondingMoved)
 	}
 	if len(staking.removedUBDs) != 0 {
-		t.Fatalf("expected RemoveUnbondingDelegation to NOT be called while one entry is still outstanding, got %d calls", len(staking.removedUBDs))
+		t.Fatalf("expected RemoveUnbondingDelegation to never be called for a vesting account, got %d calls", len(staking.removedUBDs))
 	}
-	if len(staking.setUBDs) != 1 {
-		t.Fatalf("expected SetUnbondingDelegation to persist the trimmed record once, got %d calls", len(staking.setUBDs))
-	}
-	remaining := staking.setUBDs[0]
-	if len(remaining.Entries) != 1 || !remaining.Entries[0].Balance.Equal(math.NewInt(3000)) {
-		t.Fatalf("expected the trimmed record to retain only the failed 3000%s entry, got %+v", testBondDenom, remaining.Entries)
+	if len(r.Warnings) == 0 {
+		t.Fatal("expected a warning explaining the vesting account was left untouched")
 	}
 }
 
