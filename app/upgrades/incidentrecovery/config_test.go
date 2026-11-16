@@ -1,6 +1,8 @@
 package incidentrecovery
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/cosmos/btcutil/bech32"
@@ -143,5 +145,64 @@ func TestValidate_AcceptsWellFormedConfig_NonModuleDestination(t *testing.T) {
 	// config" test) would be a false negative.
 	if err := rejectModuleAccountAddress(wellFormedDest); err != nil {
 		t.Fatalf("expected wellFormedDest to NOT be flagged as a module account, got: %v", err)
+	}
+}
+
+// --- LoadConfigVerified / ConfigSHA256 tests ---
+//
+// These exist for review finding #2: the config file lives on each
+// node's own disk, not on-chain. Without binding it to something from the
+// governance proposal itself (plan.Info), nothing stops two validators
+// from running with two different, individually "valid" files and
+// silently diverging. LoadConfigVerified is what makes that impossible.
+
+func writeTestConfigFile(t *testing.T, cfg *Config) (path string, raw []byte) {
+	t.Helper()
+	raw = []byte("upgrade_name: " + cfg.UpgradeName + "\n" +
+		"destination_address: " + cfg.DestinationAddress + "\n" +
+		"destination_address_confirm: " + cfg.DestinationAddressConfirm + "\n" +
+		"affected_addresses:\n")
+	for _, a := range cfg.AffectedAddresses {
+		raw = append(raw, []byte("  - "+a+"\n")...)
+	}
+	path = filepath.Join(t.TempDir(), "config.yaml")
+	if err := os.WriteFile(path, raw, 0o600); err != nil {
+		t.Fatalf("test setup: writing config file: %v", err)
+	}
+	return path, raw
+}
+
+func TestLoadConfigVerified_AcceptsMatchingHash(t *testing.T) {
+	cfg := testConfig(wellFormedAff1)
+	path, raw := writeTestConfigFile(t, cfg)
+
+	loaded, err := LoadConfigVerified(path, ConfigSHA256(raw))
+	if err != nil {
+		t.Fatalf("expected a matching hash to be accepted, got error: %v", err)
+	}
+	if loaded.DestinationAddress != wellFormedDest {
+		t.Fatalf("expected destination %q, got %q", wellFormedDest, loaded.DestinationAddress)
+	}
+}
+
+func TestLoadConfigVerified_RejectsMismatchedHash(t *testing.T) {
+	cfg := testConfig(wellFormedAff1)
+	path, _ := writeTestConfigFile(t, cfg)
+
+	_, err := LoadConfigVerified(path, "0000000000000000000000000000000000000000000000000000000000000000")
+	if err == nil {
+		t.Fatal("expected a mismatched hash to be rejected, got nil error")
+	}
+}
+
+func TestLoadConfigVerified_RejectsEmptyExpectedHash(t *testing.T) {
+	// plan.Info being empty is exactly the case where a config would run
+	// completely unverified against what governance actually approved.
+	cfg := testConfig(wellFormedAff1)
+	path, _ := writeTestConfigFile(t, cfg)
+
+	_, err := LoadConfigVerified(path, "")
+	if err == nil {
+		t.Fatal("expected an empty expected hash to be rejected, got nil error")
 	}
 }

@@ -1599,7 +1599,7 @@ func (app *App) RegisterUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
 		incidentrecovery.UpgradeName,
 		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-			vm, err := incidentrecovery.NewUpgradeHandler(app.BankKeeper, app.StakingKeeper, app.DistrKeeper)(ctx, plan, fromVM)
+			vm, err := incidentrecovery.NewUpgradeHandler(app.BankKeeper, app.StakingKeeper, app.DistrKeeper, app.AccountKeeper)(ctx, plan, fromVM)
 			if err != nil {
 				return nil, err
 			}

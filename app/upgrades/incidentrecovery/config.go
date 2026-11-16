@@ -1,6 +1,8 @@
 package incidentrecovery
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"strings"
@@ -47,7 +49,59 @@ func LoadConfig(path string) (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("reading config file %q: %w", path, err)
 	}
+	return parseAndValidate(raw, path)
+}
 
+// LoadConfigVerified is LoadConfig plus a binding check: the raw config
+// file's sha256 must match expectedSHA256Hex exactly (case-insensitively).
+//
+// This exists because the config file is read from each node's own local
+// disk, not from on-chain state. Without this check, a software-upgrade
+// governance proposal only ever approves an upgrade *name* — the actual
+// addresses and destination are whatever each validator happens to have
+// in a local YAML file, which nothing guarantees is identical across
+// nodes. Two nodes with even slightly different (but both individually
+// "valid") files would silently compute different post-upgrade state and
+// diverge or halt unpredictably.
+//
+// The expected hash should be committed to the governance proposal's own
+// Plan.Info field (see upgrade.go), which IS part of consensus — every
+// node evaluates the exact same expected hash. A node whose local file
+// doesn't match it fails loudly and halts, rather than silently applying
+// different data; a node with no file at all fails the same way. This
+// doesn't guarantee every node's operator used the right file, but it
+// guarantees any node that proceeds did so starting from byte-identical
+// configuration, and anyone verifying the proposal can confirm the
+// expected hash matches the config their multisig/leadership approved
+// before voting yes.
+func LoadConfigVerified(path string, expectedSHA256Hex string) (*Config, error) {
+	expectedSHA256Hex = strings.ToLower(strings.TrimSpace(expectedSHA256Hex))
+	if expectedSHA256Hex == "" {
+		return nil, fmt.Errorf("refusing to load config: no expected sha256 was supplied (governance plan.Info was empty) — this config would be used completely unverified against what was actually voted on")
+	}
+
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("reading config file %q: %w", path, err)
+	}
+
+	actual := ConfigSHA256(raw)
+	if actual != expectedSHA256Hex {
+		return nil, fmt.Errorf("config file %q does not match the governance-approved config: expected sha256 %s, got %s — refusing to run with a config that was not the one voted on", path, expectedSHA256Hex, actual)
+	}
+
+	return parseAndValidate(raw, path)
+}
+
+// ConfigSHA256 returns the lowercase hex-encoded sha256 digest of raw config
+// file bytes, in the same form expected by LoadConfigVerified and recorded
+// in the governance proposal's Plan.Info.
+func ConfigSHA256(raw []byte) string {
+	sum := sha256.Sum256(raw)
+	return hex.EncodeToString(sum[:])
+}
+
+func parseAndValidate(raw []byte, path string) (*Config, error) {
 	var cfg Config
 	if err := yaml.Unmarshal(raw, &cfg); err != nil {
 		return nil, fmt.Errorf("parsing config file %q: %w", path, err)

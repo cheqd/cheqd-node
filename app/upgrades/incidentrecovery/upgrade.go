@@ -37,13 +37,19 @@ func NewUpgradeHandler(
 	bankKeeper BankKeeper,
 	stakingKeeper StakingKeeper,
 	distrKeeper DistrKeeper,
+	accountKeeper AccountKeeper,
 ) upgradetypes.UpgradeHandler {
 	return func(ctx context.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
-		cfg, err := LoadConfig(ConfigPath())
+		// plan.Info is part of the governance proposal itself — every node
+		// evaluates the exact same value, since it came through consensus,
+		// unlike the config file on disk. Binding the local file to it here
+		// is what makes "the config actually run" something voters approved,
+		// not just the plan's name. See LoadConfigVerified's doc comment.
+		cfg, err := LoadConfigVerified(ConfigPath(), plan.Info)
 		if err != nil {
-			return nil, fmt.Errorf("incident recovery upgrade fired but config could not be loaded from %q (env var %s): %w", ConfigPath(), ConfigPathEnvVar, err)
+			return nil, fmt.Errorf("incident recovery upgrade fired but config at %q (env var %s) could not be verified against the governance-approved plan.Info: %w", ConfigPath(), ConfigPathEnvVar, err)
 		}
-		return RegisterUpgradeHandler(cfg, bankKeeper, stakingKeeper, distrKeeper)(ctx, plan, vm)
+		return RegisterUpgradeHandler(cfg, bankKeeper, stakingKeeper, distrKeeper, accountKeeper)(ctx, plan, vm)
 	}
 }
 
@@ -53,7 +59,7 @@ func NewUpgradeHandler(
 //
 //	app.UpgradeKeeper.SetUpgradeHandler(
 //	    cfg.UpgradeName,
-//	    incidentrecovery.RegisterUpgradeHandler(cfg, app.BankKeeper, app.StakingKeeper, app.DistrKeeper),
+//	    incidentrecovery.RegisterUpgradeHandler(cfg, app.BankKeeper, app.StakingKeeper, app.DistrKeeper, app.AccountKeeper),
 //	)
 //
 // NOT done here, since this package isn't compiled against the real app.
@@ -62,11 +68,12 @@ func RegisterUpgradeHandler(
 	bankKeeper BankKeeper,
 	stakingKeeper StakingKeeper,
 	distrKeeper DistrKeeper,
+	accountKeeper AccountKeeper,
 ) upgradetypes.UpgradeHandler {
 	return func(ctx context.Context, _ upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
 		sdkCtx := sdk.UnwrapSDKContext(ctx)
 
-		results, err := RunIncidentRecovery(ctx, cfg, bankKeeper, stakingKeeper, distrKeeper)
+		results, err := RunIncidentRecovery(ctx, cfg, bankKeeper, stakingKeeper, distrKeeper, accountKeeper)
 		if err != nil {
 			return vm, fmt.Errorf("incident recovery upgrade handler failed: %w", err)
 		}

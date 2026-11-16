@@ -16,6 +16,18 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
+// A step that has already irreversibly mutated chain state (Unbond removing
+// shares, or a final sweep leaving liquidated funds spendable) must abort
+// the entire run with an error, not just skip or warn, if its matching
+// credit/send step then fails. Returned as a plain error from
+// RunIncidentRecovery, which propagates up through the registered upgrade
+// handler and causes the node to halt without committing the block — the
+// same effect as panicking, but via a normal error return. Everything
+// already applied in this block is discarded along with it, so no
+// inconsistent state (shares destroyed but tokens unaccounted for) can ever
+// be committed on chain; a corrected binary has to ship before the upgrade
+// can proceed.
+
 // The minimal keeper surface this handler needs. Kept as local interfaces
 // (rather than depending on the app's concrete keeper types directly) so
 // handler_test.go can exercise this logic with hand-written mocks instead
@@ -40,13 +52,24 @@ import (
 
 type BankKeeper interface {
 	GetAllBalances(ctx context.Context, addr sdk.AccAddress) sdk.Coins
+	// SpendableCoins excludes locked/vesting coins. The final sweep must use
+	// this, not GetAllBalances, since SendCoins itself refuses to move
+	// locked coins — using the full balance there would make the final
+	// sweep fail outright for any affected address that happens to be a
+	// vesting account.
+	SpendableCoins(ctx context.Context, addr sdk.AccAddress) sdk.Coins
 	SendCoins(ctx context.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) error
 	UndelegateCoinsFromModuleToAccount(ctx context.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error
 }
 
 type StakingKeeper interface {
 	BondDenom(ctx context.Context) (string, error)
-	GetDelegatorDelegations(ctx context.Context, delegator sdk.AccAddress, maxRetrieve uint16) ([]stakingtypes.Delegation, error)
+	// GetAllDelegatorDelegations, not GetDelegatorDelegations with a
+	// maxRetrieve of 0 — the real keeper treats maxRetrieve as a cap on how
+	// many delegations to return, so 0 always returns an empty list. An
+	// earlier draft of this handler passed 0 here, which silently skipped
+	// reward withdrawal and active-delegation sweeping entirely.
+	GetAllDelegatorDelegations(ctx context.Context, delegator sdk.AccAddress) ([]stakingtypes.Delegation, error)
 	GetValidator(ctx context.Context, addr sdk.ValAddress) (stakingtypes.Validator, error)
 	// Unbond converts shares to tokens and removes the delegation record.
 	// It does NOT move the underlying tokens to the delegator's account —
@@ -61,6 +84,16 @@ type StakingKeeper interface {
 
 type DistrKeeper interface {
 	WithdrawDelegationRewards(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) (sdk.Coins, error)
+}
+
+// AccountKeeper is used only to check, at execution time, whether the
+// configured destination address actually resolves to a module account on
+// this specific chain — a dynamic, always-complete check, rather than
+// relying solely on the hardcoded name list in config.go's
+// knownModuleAccountNames (which only covers the standard SDK modules and
+// would miss any cheqd-specific or newer module this binary registers).
+type AccountKeeper interface {
+	GetAccount(ctx context.Context, addr sdk.AccAddress) sdk.AccountI
 }
 
 // SweepResult records what actually happened for one affected address, for
@@ -115,6 +148,7 @@ func RunIncidentRecovery(
 	bankKeeper BankKeeper,
 	stakingKeeper StakingKeeper,
 	distrKeeper DistrKeeper,
+	accountKeeper AccountKeeper,
 ) ([]SweepResult, error) {
 	// Re-validate even though LoadConfig already did — this is the point of
 	// actual execution, and a second independent check here costs nothing.
@@ -125,6 +159,15 @@ func RunIncidentRecovery(
 	destAddr, err := sdk.AccAddressFromBech32(cfg.DestinationAddress)
 	if err != nil {
 		return nil, fmt.Errorf("refusing to run: destination_address did not parse as a valid address at execution time: %w", err)
+	}
+
+	// Dynamic check against the real account state, on top of config.go's
+	// static name-list check — catches any module account the hardcoded
+	// list doesn't know about.
+	if destAcc := accountKeeper.GetAccount(ctx, destAddr); destAcc != nil {
+		if _, ok := destAcc.(sdk.ModuleAccountI); ok {
+			return nil, fmt.Errorf("refusing to run: destination_address %q resolves to a module account on-chain", cfg.DestinationAddress)
+		}
 	}
 
 	bondDenom, err := stakingKeeper.BondDenom(ctx)
@@ -146,7 +189,7 @@ func RunIncidentRecovery(
 		}
 
 		// 1. Withdraw pending rewards from every active delegation.
-		delegations, err := stakingKeeper.GetDelegatorDelegations(ctx, delAddr, 0)
+		delegations, err := stakingKeeper.GetAllDelegatorDelegations(ctx, delAddr)
 		if err != nil {
 			result.Skipped = true
 			result.SkipReason = fmt.Sprintf("listing delegations failed: %v", err)
@@ -199,13 +242,14 @@ func RunIncidentRecovery(
 				sourceModule = stakingtypes.NotBondedPoolName
 			}
 			if err := bankKeeper.UndelegateCoinsFromModuleToAccount(ctx, sourceModule, delAddr, coins); err != nil {
-				// This is the dangerous case: Unbond already removed the
-				// delegation's shares above, but the tokens never reached
-				// the account. That value is not accounted for anywhere
-				// else — recording it loudly is the only way an auditor
-				// can know it happened at all.
-				result.warn("delegation conversion: Unbond succeeded (removed %s shares, %s tokens) from validator %s but crediting the account failed — TOKENS MAY BE UNACCOUNTED FOR: %v", d.Shares.String(), coins.String(), d.ValidatorAddress, err)
-				continue
+				// Unbond has ALREADY removed the delegation's shares at
+				// this point — there is no way to put them back. Letting
+				// the loop continue would commit that destructive change
+				// while the matching tokens never reach any account.
+				// Aborting the whole run here means the block fails and
+				// nothing in it commits, so the shares are never actually
+				// lost: the chain halts, instead of silently losing funds.
+				return nil, fmt.Errorf("%s: delegation conversion: Unbond succeeded (removed %s shares, %s tokens) from validator %s but crediting the account failed, aborting entire recovery run to avoid committing unaccounted-for tokens: %w", addrStr, d.Shares.String(), coins.String(), d.ValidatorAddress, err)
 			}
 			result.DelegationsMoved = result.DelegationsMoved.Add(coins...)
 		}
@@ -220,19 +264,33 @@ func RunIncidentRecovery(
 		} else {
 			for _, ubd := range unbondings {
 				var moved sdk.Coins
+				// failedEntries keeps every entry whose credit transfer
+				// failed, so the unbonding record below can be trimmed down
+				// to just those rather than deleted wholesale. The transfer
+				// itself is a single bank call per entry — if it errors,
+				// nothing has moved for that entry yet, so leaving it in
+				// place (instead of treating it as moved) is safe, not just
+				// a cosmetic bookkeeping choice.
+				var failedEntries []stakingtypes.UnbondingDelegationEntry
 				for _, entry := range ubd.Entries {
 					if !entry.Balance.IsPositive() {
 						continue
 					}
 					coins := sdk.NewCoins(sdk.NewCoin(bondDenom, entry.Balance))
 					if err := bankKeeper.UndelegateCoinsFromModuleToAccount(ctx, stakingtypes.NotBondedPoolName, delAddr, coins); err != nil {
-						result.warn("unbonding completion: crediting account from validator %s (creation height %d) failed — TOKENS MAY BE UNACCOUNTED FOR: %v", ubd.ValidatorAddress, entry.CreationHeight, err)
+						result.warn("unbonding completion: crediting account from validator %s (creation height %d) failed, leaving this entry in place for a later run: %v", ubd.ValidatorAddress, entry.CreationHeight, err)
+						failedEntries = append(failedEntries, entry)
 						continue
 					}
 					moved = moved.Add(coins...)
 				}
-				if moved != nil {
-					result.UnbondingMoved = result.UnbondingMoved.Add(moved...)
+				if moved == nil {
+					// Nothing moved for this record at all — leave it
+					// completely untouched.
+					continue
+				}
+				result.UnbondingMoved = result.UnbondingMoved.Add(moved...)
+				if len(failedEntries) == 0 {
 					if err := stakingKeeper.RemoveUnbondingDelegation(ctx, ubd); err != nil {
 						// Tokens have already moved to the account at this point.
 						// Not removing the (now-empty) unbonding record is a
@@ -240,29 +298,54 @@ func RunIncidentRecovery(
 						// but it should be investigated if it happens.
 						result.warn("unbonding completion: tokens moved from validator %s but RemoveUnbondingDelegation failed: %v", ubd.ValidatorAddress, err)
 					}
+					continue
+				}
+				// Some, but not all, entries succeeded: keep the record but
+				// shrink it to only the entries that are still genuinely
+				// unbonding. Removing the whole record here (the original
+				// bug) would permanently strand the failed entries' tokens
+				// in the NotBonded pool with no record pointing to them.
+				ubd.Entries = failedEntries
+				if err := stakingKeeper.SetUnbondingDelegation(ctx, ubd); err != nil {
+					result.warn("unbonding completion: partially moved tokens from validator %s but failed to persist the trimmed unbonding record (%d entries remaining): %v", ubd.ValidatorAddress, len(failedEntries), err)
 				}
 			}
 		}
 
-		// 4. Sweep the full resulting liquid balance.
-		balance := bankKeeper.GetAllBalances(ctx, delAddr)
-		if balance.IsZero() {
+		// 4. Sweep the resulting spendable balance. Deliberately
+		// SpendableCoins, not GetAllBalances: SendCoins itself refuses to
+		// move locked coins, so sweeping the full balance would make this
+		// final step fail outright for any address holding a vesting
+		// account. Any locked remainder is flagged below, not silently
+		// dropped — it is a known limitation (vesting lockup requires
+		// separate handling, out of scope here), not a bug to hide.
+		fullBalance := bankKeeper.GetAllBalances(ctx, delAddr)
+		spendable := bankKeeper.SpendableCoins(ctx, delAddr)
+		if locked := fullBalance.Sub(spendable...); !locked.IsZero() {
+			result.warn("address holds %s in locked/vesting balance that this handler cannot move via SendCoins and did NOT sweep — needs separate handling", locked.String())
+		}
+
+		if spendable.IsZero() {
 			result.Skipped = true
 			if result.SkipReason == "" {
-				result.SkipReason = "zero balance at execution time — nothing to sweep"
+				result.SkipReason = "zero spendable balance at execution time — nothing to sweep"
 			}
 			results = append(results, result)
 			continue
 		}
 
-		if err := bankKeeper.SendCoins(ctx, delAddr, destAddr, balance); err != nil {
-			result.Skipped = true
-			result.SkipReason = fmt.Sprintf("final sweep SendCoins failed: %v", err)
-			results = append(results, result)
-			continue
+		if err := bankKeeper.SendCoins(ctx, delAddr, destAddr, spendable); err != nil {
+			// By this point steps 1-3 may already have liquidated rewards,
+			// delegations and unbonding entries into this address's
+			// spendable balance. Skipping and moving on, as the original
+			// code did, would leave that freshly-liquidated balance sitting
+			// immediately spendable in the compromised account — worse
+			// than doing nothing. Abort the whole run instead, so the
+			// block fails and none of this commits.
+			return nil, fmt.Errorf("%s: final sweep SendCoins of %s failed, aborting entire recovery run to avoid leaving liquidated funds spendable in the compromised account: %w", addrStr, spendable.String(), err)
 		}
 
-		result.TotalSwept = balance
+		result.TotalSwept = spendable
 		results = append(results, result)
 	}
 

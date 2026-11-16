@@ -117,10 +117,13 @@ func (s *IncidentRecoveryUpgradeTestSuite) TestJailedValidatorUnbondingIsRecover
 
 	// --- Schedule the upgrade and advance to its height, same pattern as
 	// app/upgrades/v4/upgrade_test.go uses for the real app's other
-	// upgrade handlers. ---
+	// upgrade handlers. Plan.Info carries the config file's sha256, the
+	// same way a real governance proposal would bind the vote to this
+	// exact file content (see LoadConfigVerified) rather than just the
+	// upgrade name. ---
 	const upgradeHeight = 10
 	ctx = ctx.WithBlockHeight(upgradeHeight - 1).WithHeaderInfo(header.Info{Height: upgradeHeight - 1})
-	plan := upgradetypes.Plan{Name: incidentrecovery.UpgradeName, Height: upgradeHeight}
+	plan := upgradetypes.Plan{Name: incidentrecovery.UpgradeName, Height: upgradeHeight, Info: incidentrecovery.ConfigSHA256(cfgBytes)}
 	s.Require().NoError(s.App.UpgradeKeeper.ScheduleUpgrade(ctx, plan))
 
 	ctx = s.Ctx.WithBlockHeight(upgradeHeight).WithHeaderInfo(header.Info{Height: upgradeHeight})
@@ -145,4 +148,79 @@ func (s *IncidentRecoveryUpgradeTestSuite) TestJailedValidatorUnbondingIsRecover
 	stillJailed, err := s.App.StakingKeeper.GetValidator(ctx, valAddr)
 	s.Require().NoError(err)
 	s.Require().True(stillJailed.Jailed, "the validator was never unjailed during this test — the recovery did not depend on, or trigger, an unjail")
+}
+
+// TestActiveBondedDelegationIsSwept is a direct regression test for review
+// finding #1: the handler originally called GetDelegatorDelegations with a
+// maxRetrieve of 0, which the real keeper treats as a retrieval cap, not
+// "no limit" — so it always returned an empty list and silently skipped
+// reward withdrawal and active-delegation sweeping entirely. The earlier
+// jailed-validator test above never caught this because it fully
+// undelegates before the upgrade runs, leaving nothing bonded. This test
+// leaves the delegation active and bonded, and proves it still gets swept.
+func (s *IncidentRecoveryUpgradeTestSuite) TestActiveBondedDelegationIsSwept() {
+	s.Setup()
+	ctx := s.Ctx
+
+	affectedAddr := s.TestAccs[0]
+	destAddr := s.TestAccs[1]
+
+	bondDenom, err := s.App.StakingKeeper.BondDenom(ctx)
+	s.Require().NoError(err)
+
+	delegateAmt := sdkmath.NewInt(5_000_000)
+	s.Require().NoError(s.App.BankKeeper.MintCoins(ctx, minttypes.ModuleName, sdk.NewCoins(sdk.NewCoin(bondDenom, delegateAmt))))
+	s.Require().NoError(s.App.BankKeeper.SendCoinsFromModuleToAccount(ctx, minttypes.ModuleName, affectedAddr, sdk.NewCoins(sdk.NewCoin(bondDenom, delegateAmt))))
+
+	valPriv := ed25519.GenPrivKey()
+	valPub := valPriv.PubKey()
+	valAddr := sdk.ValAddress(valPub.Address())
+
+	validator, err := stakingtypes.NewValidator(valAddr.String(), valPub, stakingtypes.Description{Moniker: "active-test-validator"})
+	s.Require().NoError(err)
+	validator.Status = stakingtypes.Bonded
+	s.Require().NoError(s.App.StakingKeeper.SetValidator(ctx, validator))
+	s.Require().NoError(s.App.StakingKeeper.SetValidatorByConsAddr(ctx, validator))
+	s.Require().NoError(s.App.DistrKeeper.Hooks().AfterValidatorCreated(ctx, valAddr))
+
+	storedValidator, err := s.App.StakingKeeper.GetValidator(ctx, valAddr)
+	s.Require().NoError(err)
+	// Deliberately NOT undelegated — this stake is still actively bonded
+	// to the validator when the upgrade fires, which is exactly the case
+	// the 0-maxRetrieve bug caused this handler to silently skip.
+	shares, err := s.App.StakingKeeper.Delegate(ctx, affectedAddr, delegateAmt, stakingtypes.Unbonded, storedValidator, true)
+	s.Require().NoError(err)
+	s.Require().True(shares.IsPositive())
+
+	cfg := map[string]interface{}{
+		"upgrade_name":                incidentrecovery.UpgradeName,
+		"destination_address":         destAddr.String(),
+		"destination_address_confirm": destAddr.String(),
+		"affected_addresses":          []string{affectedAddr.String()},
+	}
+	cfgBytes, err := yaml.Marshal(cfg)
+	s.Require().NoError(err)
+	cfgPath := filepath.Join(s.T().TempDir(), "config.yaml")
+	s.Require().NoError(os.WriteFile(cfgPath, cfgBytes, 0o600))
+	s.T().Setenv(incidentrecovery.ConfigPathEnvVar, cfgPath)
+
+	const upgradeHeight = 10
+	ctx = ctx.WithBlockHeight(upgradeHeight - 1).WithHeaderInfo(header.Info{Height: upgradeHeight - 1})
+	plan := upgradetypes.Plan{Name: incidentrecovery.UpgradeName, Height: upgradeHeight, Info: incidentrecovery.ConfigSHA256(cfgBytes)}
+	s.Require().NoError(s.App.UpgradeKeeper.ScheduleUpgrade(ctx, plan))
+
+	ctx = s.Ctx.WithBlockHeight(upgradeHeight).WithHeaderInfo(header.Info{Height: upgradeHeight})
+	s.Require().NotPanics(func() {
+		_, err = s.App.PreBlocker(ctx, &types.RequestFinalizeBlock{})
+	})
+	s.Require().NoError(err)
+
+	destBalance := s.App.BankKeeper.GetBalance(ctx, destAddr, bondDenom)
+	s.Require().True(destBalance.Amount.Equal(delegateAmt),
+		"expected destination to receive the full %s%s bonded delegation (proves active delegations are actually listed and swept), got %s",
+		delegateAmt, bondDenom, destBalance)
+
+	remainingDelegations, err := s.App.StakingKeeper.GetAllDelegatorDelegations(ctx, affectedAddr)
+	s.Require().NoError(err)
+	s.Require().Empty(remainingDelegations, "expected the active delegation to have been fully converted and removed")
 }
