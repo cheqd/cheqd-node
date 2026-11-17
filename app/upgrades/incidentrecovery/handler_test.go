@@ -123,15 +123,6 @@ func (m *mockStakingKeeper) Unbond(_ context.Context, delAddr sdk.AccAddress, va
 	return shares.TruncateInt(), nil
 }
 
-func (m *mockStakingKeeper) GetUnbondingDelegation(_ context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) (stakingtypes.UnbondingDelegation, error) {
-	for _, u := range m.unbondings[delAddr.String()] {
-		if u.ValidatorAddress == valAddr.String() {
-			return u, nil
-		}
-	}
-	return stakingtypes.UnbondingDelegation{}, errors.New("not found")
-}
-
 func (m *mockStakingKeeper) GetAllUnbondingDelegations(_ context.Context, delegator sdk.AccAddress) ([]stakingtypes.UnbondingDelegation, error) {
 	return m.unbondings[delegator.String()], nil
 }
