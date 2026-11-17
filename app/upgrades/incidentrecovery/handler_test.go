@@ -84,6 +84,7 @@ type mockStakingKeeper struct {
 	validators   map[string]stakingtypes.Validator             // keyed by validator operator address string
 	unbondings   map[string][]stakingtypes.UnbondingDelegation // keyed by delegator address string
 	unbondErr    map[string]error                              // keyed by delegator+"|"+validator address string
+	unbondCalls  []string                                      // records every delegator|validator Unbond was called for
 	removedUBDs  []string                                      // records every delegator|validator RemoveUnbondingDelegation was called for
 	removeUBDErr map[string]error
 }
@@ -115,6 +116,7 @@ func (m *mockStakingKeeper) GetValidator(_ context.Context, addr sdk.ValAddress)
 
 func (m *mockStakingKeeper) Unbond(_ context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, shares math.LegacyDec) (math.Int, error) {
 	key := delAddr.String() + "|" + valAddr.String()
+	m.unbondCalls = append(m.unbondCalls, key)
 	if err, ok := m.unbondErr[key]; ok {
 		return math.ZeroInt(), err
 	}
@@ -140,14 +142,14 @@ type mockDistrKeeper struct {
 	rewards         map[string]sdk.Coins // keyed by delegator+"|"+validator address string
 	withdrawErr     map[string]error
 	setWithdrawErr  map[string]error // keyed by delegator address string
-	setWithdrawCall []string         // records every delegator address SetWithdrawAddr was called for
+	setWithdrawCall []string         // records every delegator address SetDelegatorWithdrawAddr was called for
 }
 
 func newMockDistrKeeper() *mockDistrKeeper {
 	return &mockDistrKeeper{rewards: map[string]sdk.Coins{}, withdrawErr: map[string]error{}, setWithdrawErr: map[string]error{}}
 }
 
-func (m *mockDistrKeeper) SetWithdrawAddr(_ context.Context, delegatorAddr, _ sdk.AccAddress) error {
+func (m *mockDistrKeeper) SetDelegatorWithdrawAddr(_ context.Context, delegatorAddr, _ sdk.AccAddress) error {
 	m.setWithdrawCall = append(m.setWithdrawCall, delegatorAddr.String())
 	if err, ok := m.setWithdrawErr[delegatorAddr.String()]; ok {
 		return err
@@ -336,6 +338,67 @@ func TestRunIncidentRecovery_AbortsEntireRunOnUnbondingCreditFailure(t *testing.
 	}
 }
 
+func TestRunIncidentRecovery_AbortsEntireRunOnUnbondFailure(t *testing.T) {
+	// Third-pass review finding: Unbond itself is not atomic — internally it
+	// can already reduce/remove the delegation's shares (SetDelegation /
+	// RemoveDelegation) and only then call RemoveValidatorTokensAndShares,
+	// possibly RemoveValidator, and the AfterDelegationModified hook, any of
+	// which can fail after the shares have already been written. Treating a
+	// non-nil error from Unbond as "nothing happened" and continuing (the
+	// prior behavior) could commit a delegation-shares mutation with no
+	// matching credit ever issued. It must abort the whole run, same as a
+	// post-Unbond credit failure.
+	bank := newMockBankKeeper()
+	staking := newMockStakingKeeper(testBondDenom)
+	staking.unbondErr[testDelAddr1+"|"+testValAddr1] = errors.New("simulated Unbond failure after partial state mutation")
+	distr := newMockDistrKeeper()
+	accounts := newMockAccountKeeper()
+
+	staking.delegations[testDelAddr1] = []stakingtypes.Delegation{
+		{DelegatorAddress: testDelAddr1, ValidatorAddress: testValAddr1, Shares: math.LegacyNewDec(100)},
+	}
+	staking.validators[testValAddr1] = stakingtypes.Validator{OperatorAddress: testValAddr1, Status: stakingtypes.Bonded}
+
+	cfg := testConfig(testDelAddr1)
+	_, err := RunIncidentRecovery(context.Background(), cfg, bank, staking, distr, accounts)
+	if err == nil {
+		t.Fatal("expected RunIncidentRecovery to return an error aborting the whole run when Unbond fails, got nil")
+	}
+}
+
+func TestRunIncidentRecovery_AbortsEntireRunOnRemoveUnbondingDelegationFailure(t *testing.T) {
+	// Third-pass review finding: by the time RemoveUnbondingDelegation is
+	// called, tokens have already been credited to the account for every
+	// entry in the record. If removal then fails, the stale record (still
+	// holding entries with a positive balance) is left in place, and a
+	// later EndBlocker CompleteUnbonding call for that same record would
+	// see those entries as still mature and pay their balance out a SECOND
+	// time from the NotBonded pool — funded by other delegators. Treating
+	// this as a non-fatal warning (the prior behavior) risked exactly that
+	// double payout. It must abort the whole run instead.
+	bank := newMockBankKeeper()
+	staking := newMockStakingKeeper(testBondDenom)
+	staking.removeUBDErr[testDelAddr1+"|"+testValAddr1] = errors.New("simulated RemoveUnbondingDelegation failure")
+	distr := newMockDistrKeeper()
+	accounts := newMockAccountKeeper()
+
+	staking.unbondings[testDelAddr1] = []stakingtypes.UnbondingDelegation{
+		{
+			DelegatorAddress: testDelAddr1,
+			ValidatorAddress: testValAddr1,
+			Entries: []stakingtypes.UnbondingDelegationEntry{
+				{CreationHeight: 12345, Balance: math.NewInt(5000)},
+			},
+		},
+	}
+
+	cfg := testConfig(testDelAddr1)
+	_, err := RunIncidentRecovery(context.Background(), cfg, bank, staking, distr, accounts)
+	if err == nil {
+		t.Fatal("expected RunIncidentRecovery to return an error aborting the whole run when RemoveUnbondingDelegation fails, got nil")
+	}
+}
+
 func TestRunIncidentRecovery_ResetsWithdrawAddressBeforeWithdrawingRewards(t *testing.T) {
 	// Second-pass review finding: if the attacker already called
 	// MsgSetWithdrawAddress on a compromised account, withdrawing rewards
@@ -365,9 +428,14 @@ func TestRunIncidentRecovery_SkipsRewardWithdrawalIfWithdrawAddrResetFails(t *te
 	distr.rewards[testDelAddr1+"|"+testValAddr1] = sdk.NewCoins(sdk.NewCoin(testBondDenom, math.NewInt(500)))
 	accounts := newMockAccountKeeper()
 
+	// Nonzero shares deliberately: a zero-share delegation would make step 2
+	// a no-op regardless of whether it ran, which is exactly why the real
+	// bug this test now also covers (Unbond's internal reward-withdrawal
+	// hook paying out to a stale withdraw address) went unnoticed before.
 	staking.delegations[testDelAddr1] = []stakingtypes.Delegation{
-		{DelegatorAddress: testDelAddr1, ValidatorAddress: testValAddr1, Shares: math.LegacyNewDec(0)},
+		{DelegatorAddress: testDelAddr1, ValidatorAddress: testValAddr1, Shares: math.LegacyNewDec(100)},
 	}
+	staking.validators[testValAddr1] = stakingtypes.Validator{OperatorAddress: testValAddr1, Status: stakingtypes.Bonded}
 
 	cfg := testConfig(testDelAddr1)
 	results, err := RunIncidentRecovery(context.Background(), cfg, bank, staking, distr, accounts)
@@ -376,10 +444,20 @@ func TestRunIncidentRecovery_SkipsRewardWithdrawalIfWithdrawAddrResetFails(t *te
 	}
 	r := results[0]
 	if !r.RewardsWithdrawn.IsZero() {
-		t.Fatalf("expected reward withdrawal to be skipped when SetWithdrawAddr fails, got %s withdrawn", r.RewardsWithdrawn)
+		t.Fatalf("expected reward withdrawal to be skipped when SetDelegatorWithdrawAddr fails, got %s withdrawn", r.RewardsWithdrawn)
+	}
+	// Delegation conversion (step 2) must also be skipped: Unbond withdraws
+	// rewards internally via a staking hook, paying out to whatever
+	// withdraw address is on record — calling it here would risk paying the
+	// attacker exactly the reward this test is checking isn't withdrawn.
+	if !r.DelegationsMoved.IsZero() {
+		t.Fatalf("expected delegation conversion to be skipped when SetDelegatorWithdrawAddr fails (Unbond's internal hook also withdraws rewards), got %s moved", r.DelegationsMoved)
+	}
+	if len(staking.unbondCalls) != 0 {
+		t.Fatalf("expected Unbond to never be called when SetDelegatorWithdrawAddr fails, got calls: %v", staking.unbondCalls)
 	}
 	if len(r.Warnings) == 0 {
-		t.Fatal("expected a warning explaining reward withdrawal was skipped")
+		t.Fatal("expected a warning explaining reward withdrawal and delegation conversion were skipped")
 	}
 }
 
@@ -558,6 +636,34 @@ func TestRunIncidentRecovery_RefusesModuleAccountDestinationAtExecutionTime(t *t
 	_, err := RunIncidentRecovery(context.Background(), cfg, bank, staking, distr, accounts)
 	if err == nil {
 		t.Fatal("expected RunIncidentRecovery to refuse a destination that is a module account on-chain, got nil error")
+	}
+}
+
+func TestRunIncidentRecovery_SkipsModuleAccountAffectedAddressAtExecutionTime(t *testing.T) {
+	// Third-pass review finding: the original code only applied the
+	// dynamic, execution-time module-account check to the destination, not
+	// to affected addresses. A module account slipping into
+	// affected_addresses (config.go's static check now also catches a
+	// known module name, but this proves the dynamic check catches one the
+	// static list doesn't know about) must be skipped, not swept.
+	bank := newMockBankKeeper()
+	bank.balances[testDelAddr1] = sdk.NewCoins(sdk.NewCoin(testBondDenom, math.NewInt(1000)))
+	staking := newMockStakingKeeper(testBondDenom)
+	distr := newMockDistrKeeper()
+	accounts := newMockAccountKeeper()
+	accounts.moduleAccounts[testDelAddr1] = true
+
+	cfg := testConfig(testDelAddr1)
+	results, err := RunIncidentRecovery(context.Background(), cfg, bank, staking, distr, accounts)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	r := results[0]
+	if !r.Skipped {
+		t.Fatal("expected the module-account affected address to be skipped, got not skipped")
+	}
+	if !bank.balances[testDelAddr1].Equal(sdk.NewCoins(sdk.NewCoin(testBondDenom, math.NewInt(1000)))) {
+		t.Fatalf("expected the module account's balance to be left untouched, got %s", bank.balances[testDelAddr1])
 	}
 }
 

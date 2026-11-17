@@ -3,6 +3,7 @@ package incidentrecovery
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/cosmos/btcutil/bech32"
@@ -135,6 +136,55 @@ func TestValidate_RejectsModuleAccountDestination(t *testing.T) {
 	err = cfg.Validate()
 	if err == nil {
 		t.Fatalf("expected error for a destination address that is actually the %q module account (%s), got nil", stakingtypes.BondedPoolName, cheqdEncodedModuleAddr)
+	}
+}
+
+// TestValidate_RejectsModuleAccountInAffectedAddresses is the same guard as
+// TestValidate_RejectsModuleAccountDestination, but for affected_addresses —
+// third-pass review finding: the original code only ever applied the
+// module-account check to destination_address, so a typo'd or malicious
+// affected_addresses entry could sweep a module account's (e.g. the fee
+// collector's) balance to the destination instead of recovering a real
+// compromised wallet.
+func TestValidate_RejectsModuleAccountInAffectedAddresses(t *testing.T) {
+	moduleAddr := authtypes.NewModuleAddress(stakingtypes.NotBondedPoolName)
+	data, err := bech32.ConvertBits(moduleAddr.Bytes(), 8, 5, true)
+	if err != nil {
+		t.Fatalf("test setup: converting bits: %v", err)
+	}
+	cheqdEncodedModuleAddr, err := bech32.Encode(bech32HRP, data)
+	if err != nil {
+		t.Fatalf("test setup: encoding bech32: %v", err)
+	}
+
+	cfg := &Config{
+		UpgradeName:               "v4.3.0-incident-recovery",
+		DestinationAddress:        wellFormedDest,
+		DestinationAddressConfirm: wellFormedDest,
+		AffectedAddresses:         []string{wellFormedAff1, cheqdEncodedModuleAddr},
+	}
+	if err := cfg.Validate(); err == nil {
+		t.Fatalf("expected error for an affected address that is actually the %q module account (%s), got nil", stakingtypes.NotBondedPoolName, cheqdEncodedModuleAddr)
+	}
+}
+
+// TestValidate_RejectsMixedCaseAddress covers a third-pass review finding:
+// bech32.Decode accepts an all-uppercase address and silently lowercases it
+// before decoding, but every equality/duplicate check in Validate compares
+// the raw strings as given. An address and its uppercase equivalent decode
+// to the identical account but would NOT be caught as the same address by
+// those checks (e.g. duplicate affected addresses, or destination ==
+// affected). Requiring lowercase input closes that gap.
+func TestValidate_RejectsMixedCaseAddress(t *testing.T) {
+	upper := strings.ToUpper(wellFormedAff1)
+	cfg := &Config{
+		UpgradeName:               "v4.3.0-incident-recovery",
+		DestinationAddress:        wellFormedDest,
+		DestinationAddressConfirm: wellFormedDest,
+		AffectedAddresses:         []string{upper},
+	}
+	if err := cfg.Validate(); err == nil {
+		t.Fatalf("expected an uppercase address (%s) to be rejected even though it bech32-decodes successfully", upper)
 	}
 }
 

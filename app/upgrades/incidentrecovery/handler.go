@@ -82,13 +82,22 @@ type StakingKeeper interface {
 }
 
 type DistrKeeper interface {
-	// SetWithdrawAddr is called for each affected address before withdrawing
-	// any rewards, resetting its withdraw address back to itself. If the
-	// attacker had already called MsgSetWithdrawAddress pointing it
-	// somewhere they control, withdrawing rewards without doing this first
-	// would hand those rewards straight to them while the on-chain event
-	// still logs it as "recovered".
-	SetWithdrawAddr(ctx context.Context, delegatorAddr, withdrawAddr sdk.AccAddress) error
+	// SetDelegatorWithdrawAddr (NOT the message-server-facing SetWithdrawAddr)
+	// is called for each affected address before withdrawing any rewards or
+	// calling Unbond, resetting its withdraw address back to itself. Unbond
+	// itself withdraws rewards internally via the BeforeDelegationSharesModified
+	// staking hook, paying out to whatever withdraw address is currently on
+	// record — so this reset has to happen, and has to actually succeed,
+	// before step 2 (delegation conversion) runs too, not just before the
+	// explicit reward-withdrawal loop. SetWithdrawAddr (the public, checked
+	// setter) refuses to run at all if the withdraw_addr_enabled chain
+	// parameter happens to be false, or if the address is bank-blocked —
+	// either of which would silently leave an attacker-set withdraw address
+	// in place while this handler proceeded anyway. SetDelegatorWithdrawAddr
+	// is the unchecked setter SetWithdrawAddr itself calls internally; using
+	// it directly bypasses both of those gates, since what we're doing here
+	// is an administrative recovery action, not a user-initiated message.
+	SetDelegatorWithdrawAddr(ctx context.Context, delegatorAddr, withdrawAddr sdk.AccAddress) error
 	WithdrawDelegationRewards(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) (sdk.Coins, error)
 }
 
@@ -204,18 +213,37 @@ func RunIncidentRecovery(
 			continue
 		}
 
+		// Dynamic module-account check, same as the destination check
+		// above: config.go's static affected-address check only knows the
+		// standard SDK module names, so this catches any module account
+		// (including any cheqd-specific one) a typo'd or malicious config
+		// entry might have slipped past it.
+		if acc := accountKeeper.GetAccount(ctx, delAddr); acc != nil {
+			if _, ok := acc.(sdk.ModuleAccountI); ok {
+				result.Skipped = true
+				result.SkipReason = "address resolves to a module account on-chain, refusing to treat it as a compromised wallet"
+				results = append(results, result)
+				continue
+			}
+		}
+
 		// Reset the withdraw address to the delegator itself before
-		// withdrawing anything. If the attacker already called
-		// MsgSetWithdrawAddress to point it somewhere they control,
+		// withdrawing anything OR calling Unbond. If the attacker already
+		// called MsgSetWithdrawAddress to point it somewhere they control,
 		// withdrawing rewards without this first would hand those rewards
 		// straight to them while the on-chain event still logs it as
-		// "recovered". Not fatal if it fails — nothing destructive has
-		// happened yet — but reward withdrawal for this address is skipped
-		// rather than risk paying out to an attacker-controlled address.
+		// "recovered" — and Unbond (step 2 below) withdraws rewards
+		// internally via a staking hook, paying out to whatever withdraw
+		// address is on record, regardless of whether this handler also
+		// withdraws rewards explicitly. Not fatal if it fails — nothing
+		// destructive has happened yet — but BOTH explicit reward
+		// withdrawal AND delegation conversion are skipped for this address
+		// rather than risk paying rewards out to an attacker-controlled
+		// address via either path.
 		canWithdrawRewardsSafely := true
-		if err := distrKeeper.SetWithdrawAddr(ctx, delAddr, delAddr); err != nil {
+		if err := distrKeeper.SetDelegatorWithdrawAddr(ctx, delAddr, delAddr); err != nil {
 			canWithdrawRewardsSafely = false
-			result.warn("could not reset withdraw address to the delegator itself, skipping reward withdrawal for this address to avoid paying out to a possibly attacker-controlled address: %v", err)
+			result.warn("could not reset withdraw address to the delegator itself, skipping reward withdrawal and delegation conversion for this address to avoid paying rewards out to a possibly attacker-controlled address: %v", err)
 		}
 
 		// A vesting account's delegated-vesting coins, once force-converted
@@ -265,7 +293,7 @@ func RunIncidentRecovery(
 			}
 		}
 
-		if !isVesting {
+		if !isVesting && canWithdrawRewardsSafely {
 			// 2. Force-convert active delegations to liquid balance immediately.
 			for _, d := range delegations {
 				valAddr, err := sdk.ValAddressFromBech32(d.ValidatorAddress)
@@ -280,8 +308,18 @@ func RunIncidentRecovery(
 				}
 				amount, err := stakingKeeper.Unbond(ctx, delAddr, valAddr, d.Shares)
 				if err != nil {
-					result.warn("delegation conversion: Unbond from validator %s failed: %v", d.ValidatorAddress, err)
-					continue
+					// Unbond is not atomic: internally it can reduce or
+					// remove the delegation's shares (SetDelegation /
+					// RemoveDelegation) and only THEN call
+					// RemoveValidatorTokensAndShares, possibly
+					// RemoveValidator, and the AfterDelegationModified hook —
+					// any of which can fail after the shares have already
+					// been written to the store. An error here does not mean
+					// "nothing happened," the same reasoning as the credit
+					// failure below. Aborting the whole run, rather than
+					// warning and continuing, means the block fails and
+					// nothing commits either way.
+					return nil, fmt.Errorf("%s: delegation conversion: Unbond from validator %s returned an error, but Unbond is not atomic and may have already mutated delegation/validator state before failing; aborting entire recovery run rather than risk committing that partial mutation: %w", addrStr, d.ValidatorAddress, err)
 				}
 				if !amount.IsPositive() {
 					// Not a warning case: shares converted to zero tokens is a
@@ -305,7 +343,9 @@ func RunIncidentRecovery(
 				}
 				result.DelegationsMoved = result.DelegationsMoved.Add(coins...)
 			}
+		}
 
+		if !isVesting {
 			// 3. Force-complete in-progress unbonding delegation entries
 			//    immediately. This is the step that recovers stake stuck behind
 			//    a jailed validator — it never calls MsgCancelUnbondingDelegation
@@ -336,11 +376,17 @@ func RunIncidentRecovery(
 						result.UnbondingMoved = result.UnbondingMoved.Add(coins...)
 					}
 					if err := stakingKeeper.RemoveUnbondingDelegation(ctx, ubd); err != nil {
-						// Tokens have already moved to the account at this point.
-						// Not removing the (now-empty) unbonding record is a
-						// bookkeeping inconsistency, not a fund-safety issue,
-						// but it should be investigated if it happens.
-						result.warn("unbonding completion: tokens moved from validator %s but RemoveUnbondingDelegation failed: %v", ubd.ValidatorAddress, err)
+						// Tokens have already moved to the account at this
+						// point, but the record still holds entries with a
+						// positive balance. If it isn't removed, a later
+						// EndBlocker CompleteUnbonding call for this exact
+						// record will see those same entries as still mature
+						// and pay their balance out AGAIN from the
+						// NotBonded pool — a real double payout funded by
+						// other delegators' unbonding funds, not just a
+						// bookkeeping inconsistency. Abort the whole run
+						// instead, same reasoning as the credit failure above.
+						return nil, fmt.Errorf("%s: unbonding completion: tokens already credited from validator %s but RemoveUnbondingDelegation failed, aborting entire recovery run to avoid leaving a stale unbonding record that a later EndBlocker would pay out a second time: %w", addrStr, ubd.ValidatorAddress, err)
 					}
 				}
 			}

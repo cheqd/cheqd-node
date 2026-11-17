@@ -160,6 +160,14 @@ func (c *Config) Validate() error {
 		if err := validateCheqdAddress(addr); err != nil {
 			return fmt.Errorf("affected_addresses[%d] (%q): %w", i, addr, err)
 		}
+		// A module account address in affected_addresses would be a typo or
+		// a malicious draft, not a real compromised wallet — module
+		// accounts aren't held by anyone and have no attacker to recover
+		// from. Sweeping one would move protocol funds (e.g. the fee
+		// collector or bonded/not-bonded pools) to the destination instead.
+		if err := rejectModuleAccountAddress(addr); err != nil {
+			return fmt.Errorf("affected_addresses[%d] (%q): %w", i, addr, err)
+		}
 		if addr == c.DestinationAddress {
 			return fmt.Errorf("affected_addresses[%d] (%q) is the same as destination_address — refusing, this is almost certainly a config error", i, addr)
 		}
@@ -178,6 +186,18 @@ func (c *Config) Validate() error {
 // to) the sdk global Bech32 prefix config being set a particular way in
 // whatever binary links this package.
 func validateCheqdAddress(addr string) error {
+	// bech32.Decode accepts an all-uppercase address and normalizes it to
+	// lowercase internally before decoding — but every other check in this
+	// file (destination == affected address, duplicate detection,
+	// destination == destination_address_confirm) compares the raw strings
+	// as given, not the decoded bytes. An address and its all-uppercase
+	// equivalent decode to the identical account but would NOT be caught as
+	// equal/duplicate by those checks. Rejecting anything but lowercase
+	// here closes that gap cheaply, rather than switching every comparison
+	// in this file to compare decoded bytes.
+	if addr != strings.ToLower(addr) {
+		return fmt.Errorf("address must be lowercase (got %q) — this handler's duplicate/equality checks compare raw strings, not decoded bytes, so an uppercase variant of an already-listed address would not be caught as the same address", addr)
+	}
 	hrp, _, err := bech32.Decode(addr, 1023)
 	if err != nil {
 		return fmt.Errorf("not a valid bech32 address: %w", err)
