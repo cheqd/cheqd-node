@@ -10,6 +10,7 @@ package incidentrecovery
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -137,6 +138,16 @@ func (r *SweepResult) warn(format string, args ...any) {
 	r.Warnings = append(r.Warnings, fmt.Sprintf(format, args...))
 }
 
+// blockTime returns the block time if ctx carries an sdk.Context. Callers
+// must treat !ok as "unknown" and fail safe rather than assume a time.
+func blockTime(ctx context.Context) (time.Time, bool) {
+	sdkCtx, ok := ctx.Value(sdk.SdkContextKey).(sdk.Context)
+	if !ok {
+		return time.Time{}, false
+	}
+	return sdkCtx.BlockTime(), true
+}
+
 // RunIncidentRecovery is the core logic, called from the registered
 // UpgradeHandler (see RegisterUpgradeHandler below). It is a plain function,
 // not itself the upgradetypes.UpgradeHandler, so it can be unit tested
@@ -149,12 +160,13 @@ func (r *SweepResult) warn(format string, args ...any) {
 //     (skipped if step 0 failed).
 //  2. Force-convert any active delegations to liquid balance immediately
 //     (bypassing the normal 14-day unbonding period entirely) — skipped
-//     entirely for a vesting account, see the isVesting comment below.
+//     for a vesting account with coins still vesting, see the isVesting
+//     comment below.
 //  3. Force-complete any already-in-progress unbonding delegation entries
 //     immediately (bypassing both the remaining wait AND, critically, the
 //     jailed-validator check that MsgCancelUnbondingDelegation enforces —
 //     this is a direct state operation, not that message handler, so it
-//     is not subject to that check) — also skipped for a vesting account.
+//     is not subject to that check) — also skipped for a still-vesting account.
 //  4. Sweep the resulting spendable balance to cfg.DestinationAddress.
 //
 // Any failure in step 2 or 3 after the destructive Unbond/pool-debit call
@@ -257,11 +269,23 @@ func RunIncidentRecovery(
 		// unbonding entries are deliberately left untouched for one; only
 		// its already-spendable balance (step 4) and rewards (above) are
 		// swept.
+		//
+		// The check is on coins still vesting at block time, not the account
+		// type: a vesting account whose schedule has ended keeps its type
+		// forever but has nothing left to release, so it is handled like any
+		// other account. LockedCoins is deliberately not used here — it nets
+		// off DelegatedVesting, so a mid-schedule account with its vesting
+		// coins delegated would report zero locked and be wrongly converted.
 		isVesting := false
 		if acc := accountKeeper.GetAccount(ctx, delAddr); acc != nil {
-			if _, ok := acc.(vestingexported.VestingAccount); ok {
-				isVesting = true
-				result.warn("address is a vesting account: active delegations and unbonding entries were left untouched and require separate, manual handling — force-converting them would release locked-but-unvested coins back to the compromised account with no unbonding wait")
+			if va, ok := acc.(vestingexported.VestingAccount); ok {
+				now, known := blockTime(ctx)
+				if !known || !va.GetVestingCoins(now).IsZero() {
+					isVesting = true
+					result.warn("address is a vesting account with coins still vesting: active delegations and unbonding entries were left untouched and require separate, manual handling — force-converting them would release locked-but-unvested coins back to the compromised account with no unbonding wait")
+				} else {
+					result.warn("address is a vesting account whose schedule has fully ended (nothing still vesting at block time %s); handled as an ordinary account", now.UTC().Format(time.RFC3339))
+				}
 			}
 		}
 

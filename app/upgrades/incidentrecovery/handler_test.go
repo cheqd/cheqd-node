@@ -4,8 +4,11 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
+	"cosmossdk.io/log"
 	"cosmossdk.io/math"
+	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
@@ -20,10 +23,10 @@ import (
 // multiple affected addresses' state in one test.
 
 type mockBankKeeper struct {
-	balances        map[string]sdk.Coins // keyed by account address string
-	locked          map[string]sdk.Coins // keyed by account address string; subtracted from balances for SpendableCoins
-	sendErr         map[string]error     // keyed by "from" address string
-	undelegateErr   map[string]error     // keyed by sourceModule+"|"+recipient address string
+	balances      map[string]sdk.Coins // keyed by account address string
+	locked        map[string]sdk.Coins // keyed by account address string; subtracted from balances for SpendableCoins
+	sendErr       map[string]error     // keyed by "from" address string
+	undelegateErr map[string]error     // keyed by sourceModule+"|"+recipient address string
 	// undelegateErrSeq overrides undelegateErr for a key, if present:
 	// each call for that key pops the next entry (nil = succeed that
 	// call), letting a test make e.g. the first of two credits for the
@@ -171,16 +174,29 @@ func (m *mockDistrKeeper) WithdrawDelegationRewards(_ context.Context, delAddr s
 // address.
 type mockAccountKeeper struct {
 	moduleAccounts  map[string]bool // keyed by address string
-	vestingAccounts map[string]bool // keyed by address string
+	vestingAccounts map[string]bool // keyed by address string; schedule ended at unix 1
+	// stillVesting: schedule runs to year ~2100 with every vesting coin
+	// delegated, so LockedCoins reports zero while coins are still vesting.
+	stillVesting map[string]bool
 }
 
 func newMockAccountKeeper() *mockAccountKeeper {
-	return &mockAccountKeeper{moduleAccounts: map[string]bool{}, vestingAccounts: map[string]bool{}}
+	return &mockAccountKeeper{moduleAccounts: map[string]bool{}, vestingAccounts: map[string]bool{}, stillVesting: map[string]bool{}}
 }
 
 func (m *mockAccountKeeper) GetAccount(_ context.Context, addr sdk.AccAddress) sdk.AccountI {
 	if m.moduleAccounts[addr.String()] {
 		return authtypes.NewEmptyModuleAccount("mock-module")
+	}
+	if m.stillVesting[addr.String()] {
+		base := authtypes.NewBaseAccountWithAddress(addr)
+		originalVesting := sdk.NewCoins(sdk.NewCoin("ncheq", math.NewInt(1000)))
+		vesting, err := vestingtypes.NewContinuousVestingAccount(base, originalVesting, 0, 4102444800)
+		if err != nil {
+			panic(err)
+		}
+		vesting.DelegatedVesting = originalVesting
+		return vesting
 	}
 	if m.vestingAccounts[addr.String()] {
 		base := authtypes.NewBaseAccountWithAddress(addr)
@@ -509,6 +525,65 @@ func TestRunIncidentRecovery_SkipsDelegationAndUnbondingForVestingAccount(t *tes
 	}
 	if len(r.Warnings) == 0 {
 		t.Fatal("expected a warning explaining the vesting account was left untouched")
+	}
+}
+
+// ctxAtBlockTime returns a context the handler can read a block time from.
+func ctxAtBlockTime(ts time.Time) context.Context {
+	return sdk.NewContext(nil, cmtproto.Header{Time: ts}, false, log.NewNopLogger())
+}
+
+func vestingTestFixture() (*mockBankKeeper, *mockStakingKeeper, *mockDistrKeeper, *mockAccountKeeper) {
+	staking := newMockStakingKeeper(testBondDenom)
+	staking.delegations[testDelAddr1] = []stakingtypes.Delegation{
+		{DelegatorAddress: testDelAddr1, ValidatorAddress: testValAddr1, Shares: math.LegacyNewDec(2000)},
+	}
+	staking.validators[testValAddr1] = stakingtypes.Validator{OperatorAddress: testValAddr1, Status: stakingtypes.Bonded}
+	staking.unbondings[testDelAddr1] = []stakingtypes.UnbondingDelegation{{
+		DelegatorAddress: testDelAddr1,
+		ValidatorAddress: testValAddr1,
+		Entries:          []stakingtypes.UnbondingDelegationEntry{{CreationHeight: 12345, Balance: math.NewInt(5000)}},
+	}}
+	return newMockBankKeeper(), staking, newMockDistrKeeper(), newMockAccountKeeper()
+}
+
+// Found on a local mainnet fork: the largest affected address was a
+// ContinuousVestingAccount whose schedule had already ended. Gating on the
+// account type left ~60% of recoverable funds delegated. A fully vested
+// account has nothing left to release and must be handled normally.
+func TestRunIncidentRecovery_ConvertsFullyVestedAccount(t *testing.T) {
+	bank, staking, distr, accounts := vestingTestFixture()
+	accounts.vestingAccounts[testDelAddr1] = true // schedule ended at unix 1
+
+	results, err := RunIncidentRecovery(ctxAtBlockTime(time.Unix(1794960000, 0)), testConfig(testDelAddr1), bank, staking, distr, accounts)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	r := results[0]
+	if !r.DelegationsMoved.Equal(sdk.NewCoins(sdk.NewCoin(testBondDenom, math.NewInt(2000)))) {
+		t.Fatalf("expected the fully vested account's delegation to be converted, got %s moved", r.DelegationsMoved)
+	}
+	if !r.UnbondingMoved.Equal(sdk.NewCoins(sdk.NewCoin(testBondDenom, math.NewInt(5000)))) {
+		t.Fatalf("expected the fully vested account's unbonding entry to be completed, got %s moved", r.UnbondingMoved)
+	}
+}
+
+// Guards against using LockedCoins for the check: with every vesting coin
+// delegated, LockedCoins is zero even though coins are still vesting.
+func TestRunIncidentRecovery_SkipsStillVestingAccountEvenWhenFullyDelegated(t *testing.T) {
+	bank, staking, distr, accounts := vestingTestFixture()
+	accounts.stillVesting[testDelAddr1] = true
+
+	results, err := RunIncidentRecovery(ctxAtBlockTime(time.Unix(1794960000, 0)), testConfig(testDelAddr1), bank, staking, distr, accounts)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	r := results[0]
+	if !r.DelegationsMoved.IsZero() || !r.UnbondingMoved.IsZero() {
+		t.Fatalf("expected a still-vesting account to be left untouched, got delegations %s / unbonding %s moved", r.DelegationsMoved, r.UnbondingMoved)
+	}
+	if len(staking.removedUBDs) != 0 {
+		t.Fatalf("expected no unbonding records removed, got %d", len(staking.removedUBDs))
 	}
 }
 

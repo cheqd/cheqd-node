@@ -107,6 +107,14 @@ func RegisterUpgradeHandler(
 			sdkCtx.EventManager().EmitEvent(
 				sdk.NewEvent("incident_recovery_sweep", attrs...),
 			)
+			// Also logged: if the upgrade block is applied during a restart's
+			// handshake replay, its events never reach block_results, so the
+			// node log is the only place operators can see the outcome.
+			logArgs := make([]any, 0, len(attrs)*2)
+			for _, a := range attrs {
+				logArgs = append(logArgs, a.Key, a.Value)
+			}
+			sdkCtx.Logger().Info("incident_recovery_sweep", logArgs...)
 		}
 
 		// Returning the version map unchanged for modules this upgrade
