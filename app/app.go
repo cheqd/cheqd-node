@@ -162,6 +162,7 @@ import (
 	didv2 "github.com/cheqd/cheqd-node/api/v2/cheqd/did/v2"
 	resourcev2 "github.com/cheqd/cheqd-node/api/v2/cheqd/resource/v2"
 	_ "github.com/cheqd/cheqd-node/app/client/docs/statik"
+	"github.com/cheqd/cheqd-node/app/upgrades/incidentrecovery"
 	upgradeV3 "github.com/cheqd/cheqd-node/app/upgrades/v3"
 	upgradeV4 "github.com/cheqd/cheqd-node/app/upgrades/v4"
 	"github.com/cosmos/cosmos-sdk/runtime"
@@ -1583,6 +1584,22 @@ func (app *App) RegisterUpgradeHandlers() {
 			}
 
 			return migrations, nil
+		},
+	)
+
+	// Incident recovery upgrade: see app/upgrades/incidentrecovery. One-time
+	// migration for the 2026-11-13 compromised-wallet incident. The handler
+	// reads its config (affected addresses and destination) from the
+	// governance-approved plan.Info at upgrade-execution time, not here, so
+	// it never affects node startup or any other upgrade.
+	app.UpgradeKeeper.SetUpgradeHandler(
+		incidentrecovery.UpgradeName,
+		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+			vm, err := incidentrecovery.NewUpgradeHandler(app.BankKeeper, app.StakingKeeper, app.DistrKeeper, app.AccountKeeper)(ctx, plan, fromVM)
+			if err != nil {
+				return nil, err
+			}
+			return app.ModuleManager.RunMigrations(ctx, app.Configurator(), vm)
 		},
 	)
 }
