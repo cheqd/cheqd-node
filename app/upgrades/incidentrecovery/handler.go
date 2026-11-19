@@ -187,7 +187,7 @@ func RunIncidentRecovery(
 	distrKeeper DistrKeeper,
 	accountKeeper AccountKeeper,
 ) ([]SweepResult, error) {
-	// Re-validate even though LoadConfig already did — this is the point of
+	// Re-validate even though ParsePlanInfo already did — this is the point of
 	// actual execution, and a second independent check here costs nothing.
 	if err := cfg.Validate(); err != nil {
 		return nil, fmt.Errorf("refusing to run: config failed validation at execution time: %w", err)
@@ -317,6 +317,7 @@ func RunIncidentRecovery(
 			}
 		}
 
+		//nolint:nestif // fund-moving steps are kept inline, in order, so each error path is auditable in one place
 		if !isVesting && canWithdrawRewardsSafely {
 			// 2. Force-convert active delegations to liquid balance immediately.
 			for _, d := range delegations {
@@ -369,6 +370,7 @@ func RunIncidentRecovery(
 			}
 		}
 
+		//nolint:nestif // fund-moving steps are kept inline, in order, so each error path is auditable in one place
 		if !isVesting {
 			// 3. Force-complete in-progress unbonding delegation entries
 			//    immediately. This is the step that recovers stake stuck behind

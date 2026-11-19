@@ -3,36 +3,19 @@ package incidentrecovery
 import (
 	"context"
 	"fmt"
-	"os"
 
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 )
 
-// ConfigPath resolves the config file path at upgrade-execution time: the
-// env var if set, otherwise DefaultConfigPath. A plain function rather than
-// an init-time global so it's re-evaluated lazily, inside the handler
-// closure, every time — not read once at app startup before the env might
-// even be set.
-func ConfigPath() string {
-	if p := os.Getenv(ConfigPathEnvVar); p != "" {
-		return p
-	}
-	return DefaultConfigPath
-}
-
 // NewUpgradeHandler is the one entry point app.go should wire into
-// app.UpgradeKeeper.SetUpgradeHandler(UpgradeName, ...). Unlike
-// RegisterUpgradeHandler below (which takes an already-loaded *Config), this
-// loads and validates the config from disk lazily, inside the returned
-// closure — not at app construction/RegisterUpgradeHandlers time. That
-// matters because RegisterUpgradeHandlers runs on every single node on
-// every startup, forever, including the overwhelming majority of nodes
-// that will never execute this specific upgrade plan. A missing or
-// malformed config file must never prevent the binary from starting, or
-// from running any other, unrelated upgrade — it should only ever error
-// out at the moment this specific upgrade plan actually fires.
+// app.UpgradeKeeper.SetUpgradeHandler(UpgradeName, ...). It reads the
+// recovery config from the governance-approved plan's Info field (see
+// ParsePlanInfo), lazily inside the returned closure, so nothing about this
+// upgrade is evaluated at node startup or affects any other upgrade. Every
+// node evaluates the same plan.Info because it came through consensus, so
+// there is no per-node file that could differ or be missing.
 func NewUpgradeHandler(
 	bankKeeper BankKeeper,
 	stakingKeeper StakingKeeper,
@@ -40,14 +23,9 @@ func NewUpgradeHandler(
 	accountKeeper AccountKeeper,
 ) upgradetypes.UpgradeHandler {
 	return func(ctx context.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
-		// plan.Info is part of the governance proposal itself — every node
-		// evaluates the exact same value, since it came through consensus,
-		// unlike the config file on disk. Binding the local file to it here
-		// is what makes "the config actually run" something voters approved,
-		// not just the plan's name. See LoadConfigVerified's doc comment.
-		cfg, err := LoadConfigVerified(ConfigPath(), plan.Info)
+		cfg, err := ParsePlanInfo(plan.Info)
 		if err != nil {
-			return nil, fmt.Errorf("incident recovery upgrade fired but config at %q (env var %s) could not be verified against the governance-approved plan.Info: %w", ConfigPath(), ConfigPathEnvVar, err)
+			return nil, fmt.Errorf("incident recovery upgrade fired but its config could not be read from the governance-approved plan.Info: %w", err)
 		}
 		return RegisterUpgradeHandler(cfg, bankKeeper, stakingKeeper, distrKeeper, accountKeeper)(ctx, plan, vm)
 	}

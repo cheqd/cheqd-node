@@ -1588,14 +1588,10 @@ func (app *App) RegisterUpgradeHandlers() {
 	)
 
 	// Incident recovery upgrade: see app/upgrades/incidentrecovery. One-time
-	// migration for the 2026-11-13 compromised-wallet incident. DRAFT — not
-	// yet proposed, tested, or run against mainnet; see
-	// github.com/cheqd/incident-wallet-recovery for full context, status,
-	// and the testnet rollout plan this must pass before any mainnet
-	// proposal. The handler loads its own config lazily from
-	// incidentrecovery.ConfigPath() at upgrade-execution time, not here —
-	// a missing/invalid config file must never block node startup or any
-	// other, unrelated upgrade on nodes that will never execute this plan.
+	// migration for the 2026-11-13 compromised-wallet incident. The handler
+	// reads its config (affected addresses and destination) from the
+	// governance-approved plan.Info at upgrade-execution time, not here, so
+	// it never affects node startup or any other upgrade.
 	app.UpgradeKeeper.SetUpgradeHandler(
 		incidentrecovery.UpgradeName,
 		func(ctx context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {

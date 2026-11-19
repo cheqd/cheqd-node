@@ -1,8 +1,7 @@
 package incidentrecovery
 
 import (
-	"os"
-	"path/filepath"
+	"encoding/json"
 	"strings"
 	"testing"
 
@@ -198,61 +197,71 @@ func TestValidate_AcceptsWellFormedConfig_NonModuleDestination(t *testing.T) {
 	}
 }
 
-// --- LoadConfigVerified / ConfigSHA256 tests ---
+// --- ParsePlanInfo tests ---
 //
-// These exist for review finding #2: the config file lives on each
-// node's own disk, not on-chain. Without binding it to something from the
-// governance proposal itself (plan.Info), nothing stops two validators
-// from running with two different, individually "valid" files and
-// silently diverging. LoadConfigVerified is what makes that impossible.
+// The config travels in the governance-approved plan.Info, so every node
+// evaluates byte-identical input. These tests pin the accepted shape and
+// make sure anything malformed fails loudly rather than decoding as an
+// empty or partial config.
 
-func writeTestConfigFile(t *testing.T, cfg *Config) (path string, raw []byte) {
+func planInfoJSON(t *testing.T, cfg *Config, extra map[string]any) string {
 	t.Helper()
-	raw = []byte("upgrade_name: " + cfg.UpgradeName + "\n" +
-		"destination_address: " + cfg.DestinationAddress + "\n" +
-		"destination_address_confirm: " + cfg.DestinationAddressConfirm + "\n" +
-		"affected_addresses:\n")
-	for _, a := range cfg.AffectedAddresses {
-		raw = append(raw, []byte("  - "+a+"\n")...)
+	top := map[string]any{PlanInfoKey: cfg}
+	for k, v := range extra {
+		top[k] = v
 	}
-	path = filepath.Join(t.TempDir(), "config.yaml")
-	if err := os.WriteFile(path, raw, 0o600); err != nil {
-		t.Fatalf("test setup: writing config file: %v", err)
-	}
-	return path, raw
-}
-
-func TestLoadConfigVerified_AcceptsMatchingHash(t *testing.T) {
-	cfg := testConfig(wellFormedAff1)
-	path, raw := writeTestConfigFile(t, cfg)
-
-	loaded, err := LoadConfigVerified(path, ConfigSHA256(raw))
+	b, err := json.Marshal(top)
 	if err != nil {
-		t.Fatalf("expected a matching hash to be accepted, got error: %v", err)
+		t.Fatalf("test setup: marshalling plan info: %v", err)
 	}
-	if loaded.DestinationAddress != wellFormedDest {
-		t.Fatalf("expected destination %q, got %q", wellFormedDest, loaded.DestinationAddress)
+	return string(b)
+}
+
+func TestParsePlanInfo_AcceptsConfigWithCosmovisorBinaries(t *testing.T) {
+	info := planInfoJSON(t, testConfig(wellFormedAff1, wellFormedAff2), map[string]any{
+		"binaries": map[string]string{
+			"linux/amd64": "https://example.com/cheqd-noded-linux-amd64.tar.gz?checksum=sha256:00",
+		},
+	})
+	cfg, err := ParsePlanInfo(info)
+	if err != nil {
+		t.Fatalf("expected plan info with binaries to be accepted, got: %v", err)
+	}
+	if cfg.DestinationAddress != wellFormedDest || len(cfg.AffectedAddresses) != 2 {
+		t.Fatalf("unexpected config: %+v", cfg)
 	}
 }
 
-func TestLoadConfigVerified_RejectsMismatchedHash(t *testing.T) {
-	cfg := testConfig(wellFormedAff1)
-	path, _ := writeTestConfigFile(t, cfg)
-
-	_, err := LoadConfigVerified(path, "0000000000000000000000000000000000000000000000000000000000000000")
-	if err == nil {
-		t.Fatal("expected a mismatched hash to be rejected, got nil error")
+func TestParsePlanInfo_AcceptsConfigWithoutBinaries(t *testing.T) {
+	if _, err := ParsePlanInfo(planInfoJSON(t, testConfig(wellFormedAff1), nil)); err != nil {
+		t.Fatalf("expected plan info without binaries to be accepted, got: %v", err)
 	}
 }
 
-func TestLoadConfigVerified_RejectsEmptyExpectedHash(t *testing.T) {
-	// plan.Info being empty is exactly the case where a config would run
-	// completely unverified against what governance actually approved.
-	cfg := testConfig(wellFormedAff1)
-	path, _ := writeTestConfigFile(t, cfg)
-
-	_, err := LoadConfigVerified(path, "")
-	if err == nil {
-		t.Fatal("expected an empty expected hash to be rejected, got nil error")
+func TestParsePlanInfo_Rejects(t *testing.T) {
+	valid := planInfoJSON(t, testConfig(wellFormedAff1), nil)
+	cases := map[string]string{
+		"empty":                     "",
+		"whitespace":                "   ",
+		"old bare sha256 format":    "7d07abb1203403ee43eecd9a8e624d677358a3f972e1d1c0527234fbf0a30582",
+		"url":                       "https://example.com/upgrade-info.json",
+		"json array":                `[1,2]`,
+		"missing incident_recovery": `{"binaries":{}}`,
+		"unknown top-level key":     strings.Replace(valid, `"incident_recovery"`, `"incident_recovery_typo"`, 1),
+		"extra top-level key":       strings.TrimSuffix(valid, "}") + `,"notes":"x"}`,
+		"unknown config field":      strings.Replace(valid, `"affected_addresses"`, `"affected_adresses"`, 1),
+		"trailing data":             valid + `{}`,
+		"trailing bracket":          valid + `]`,
+		"placeholder destination":   planInfoJSON(t, &Config{UpgradeName: UpgradeName, DestinationAddress: placeholderDestination, DestinationAddressConfirm: placeholderDestination, AffectedAddresses: []string{wellFormedAff1}}, nil),
+		"destination mismatch":      planInfoJSON(t, &Config{UpgradeName: UpgradeName, DestinationAddress: wellFormedDest, DestinationAddressConfirm: wellFormedAff2, AffectedAddresses: []string{wellFormedAff1}}, nil),
+		"wrong upgrade name":        planInfoJSON(t, &Config{UpgradeName: "v9", DestinationAddress: wellFormedDest, DestinationAddressConfirm: wellFormedDest, AffectedAddresses: []string{wellFormedAff1}}, nil),
+		"empty affected list":       planInfoJSON(t, &Config{UpgradeName: UpgradeName, DestinationAddress: wellFormedDest, DestinationAddressConfirm: wellFormedDest}, nil),
+	}
+	for name, info := range cases {
+		t.Run(name, func(t *testing.T) {
+			if _, err := ParsePlanInfo(info); err == nil {
+				t.Fatalf("expected plan info to be rejected, got nil error for: %s", info)
+			}
+		})
 	}
 }

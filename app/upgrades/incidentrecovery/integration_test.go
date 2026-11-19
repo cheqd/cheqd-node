@@ -1,8 +1,7 @@
 package incidentrecovery_test
 
 import (
-	"os"
-	"path/filepath"
+	"encoding/json"
 	"testing"
 
 	"cosmossdk.io/core/header"
@@ -14,7 +13,6 @@ import (
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/suite"
-	"gopkg.in/yaml.v3"
 
 	"github.com/cheqd/cheqd-node/app/testsuite"
 	"github.com/cheqd/cheqd-node/app/upgrades/incidentrecovery"
@@ -100,30 +98,24 @@ func (s *IncidentRecoveryUpgradeTestSuite) TestJailedValidatorUnbondingIsRecover
 	s.Require().NoError(err)
 	s.Require().True(jailedValidator.Jailed, "validator must actually be jailed for this test to mean anything")
 
-	// --- Write the incident-recovery config pointing at this address, and
-	// point the handler at it via the env var it reads lazily at
-	// upgrade-execution time (see upgrade.go's ConfigPath). ---
+	// --- Build the incident-recovery config pointing at this address. It
+	// travels in the upgrade plan's Info, exactly as a real governance
+	// proposal would carry it (see ParsePlanInfo). ---
 	cfg := map[string]interface{}{
 		"upgrade_name":                incidentrecovery.UpgradeName,
 		"destination_address":         destAddr.String(),
 		"destination_address_confirm": destAddr.String(),
 		"affected_addresses":          []string{affectedAddr.String()},
 	}
-	cfgBytes, err := yaml.Marshal(cfg)
+	infoBytes, err := json.Marshal(map[string]interface{}{incidentrecovery.PlanInfoKey: cfg})
 	s.Require().NoError(err)
-	cfgPath := filepath.Join(s.T().TempDir(), "config.yaml")
-	s.Require().NoError(os.WriteFile(cfgPath, cfgBytes, 0o600))
-	s.T().Setenv(incidentrecovery.ConfigPathEnvVar, cfgPath)
 
 	// --- Schedule the upgrade and advance to its height, same pattern as
 	// app/upgrades/v4/upgrade_test.go uses for the real app's other
-	// upgrade handlers. Plan.Info carries the config file's sha256, the
-	// same way a real governance proposal would bind the vote to this
-	// exact file content (see LoadConfigVerified) rather than just the
-	// upgrade name. ---
+	// upgrade handlers. ---
 	const upgradeHeight = 10
 	ctx = ctx.WithBlockHeight(upgradeHeight - 1).WithHeaderInfo(header.Info{Height: upgradeHeight - 1})
-	plan := upgradetypes.Plan{Name: incidentrecovery.UpgradeName, Height: upgradeHeight, Info: incidentrecovery.ConfigSHA256(cfgBytes)}
+	plan := upgradetypes.Plan{Name: incidentrecovery.UpgradeName, Height: upgradeHeight, Info: string(infoBytes)}
 	s.Require().NoError(s.App.UpgradeKeeper.ScheduleUpgrade(ctx, plan))
 
 	ctx = s.Ctx.WithBlockHeight(upgradeHeight).WithHeaderInfo(header.Info{Height: upgradeHeight})
@@ -198,15 +190,12 @@ func (s *IncidentRecoveryUpgradeTestSuite) TestActiveBondedDelegationIsSwept() {
 		"destination_address_confirm": destAddr.String(),
 		"affected_addresses":          []string{affectedAddr.String()},
 	}
-	cfgBytes, err := yaml.Marshal(cfg)
+	infoBytes, err := json.Marshal(map[string]interface{}{incidentrecovery.PlanInfoKey: cfg})
 	s.Require().NoError(err)
-	cfgPath := filepath.Join(s.T().TempDir(), "config.yaml")
-	s.Require().NoError(os.WriteFile(cfgPath, cfgBytes, 0o600))
-	s.T().Setenv(incidentrecovery.ConfigPathEnvVar, cfgPath)
 
 	const upgradeHeight = 10
 	ctx = ctx.WithBlockHeight(upgradeHeight - 1).WithHeaderInfo(header.Info{Height: upgradeHeight - 1})
-	plan := upgradetypes.Plan{Name: incidentrecovery.UpgradeName, Height: upgradeHeight, Info: incidentrecovery.ConfigSHA256(cfgBytes)}
+	plan := upgradetypes.Plan{Name: incidentrecovery.UpgradeName, Height: upgradeHeight, Info: string(infoBytes)}
 	s.Require().NoError(s.App.UpgradeKeeper.ScheduleUpgrade(ctx, plan))
 
 	ctx = s.Ctx.WithBlockHeight(upgradeHeight).WithHeaderInfo(header.Info{Height: upgradeHeight})

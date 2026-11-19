@@ -1,10 +1,9 @@
 package incidentrecovery
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/cosmos/btcutil/bech32"
@@ -13,16 +12,15 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"gopkg.in/yaml.v3"
 )
 
 // Config is the configurable input to the incident-recovery upgrade handler.
-// Loaded from a YAML file (see config/addresses.example.yaml) — nothing here
-// is hardcoded in Go source, so the affected-address list and destination
-// can be changed without recompiling.
+// It is carried inside the governance proposal itself, in the upgrade
+// plan's Info field (see ParsePlanInfo) — nothing here is hardcoded in Go
+// source, and nothing is read from any node's local disk.
 type Config struct {
-	UpgradeName        string `yaml:"upgrade_name"`
-	DestinationAddress string `yaml:"destination_address"`
+	UpgradeName        string `json:"upgrade_name"`
+	DestinationAddress string `json:"destination_address"`
 	// DestinationAddressConfirm must be typed/pasted independently and must
 	// match DestinationAddress exactly, byte for byte. This exists
 	// specifically because a single unconfirmed destination field is what
@@ -30,93 +28,99 @@ type Config struct {
 	// (or the same person, twice, from two independent sources) agreeing on
 	// the exact same string is a much stronger check than one field typed
 	// once.
-	DestinationAddressConfirm string   `yaml:"destination_address_confirm"`
-	AffectedAddresses         []string `yaml:"affected_addresses"`
+	DestinationAddressConfirm string   `json:"destination_address_confirm"`
+	AffectedAddresses         []string `json:"affected_addresses"`
 }
 
 const placeholderDestination = "PLACEHOLDER_UNVERIFIED_DO_NOT_USE"
 
 const bech32HRP = "cheqd"
 
-// LoadConfig reads and validates the config file at path. It deliberately
-// fails loudly and refuses to return a usable Config if the destination
-// address is still the placeholder, is malformed, or if the affected-address
-// list is empty — the Juno Prop 21 incident ($36M sent to an inaccessible
-// address via a copy-paste error) is exactly the failure mode these checks
-// exist to catch before it ever reaches a running handler.
-func LoadConfig(path string) (*Config, error) {
-	raw, err := os.ReadFile(path)
-	if err != nil {
-		return nil, fmt.Errorf("reading config file %q: %w", path, err)
-	}
-	return parseAndValidate(raw, path)
-}
+// PlanInfoKey is the top-level key of the upgrade plan's Info JSON that
+// holds the recovery Config.
+const PlanInfoKey = "incident_recovery"
 
-// LoadConfigVerified is LoadConfig plus a binding check: the raw config
-// file's sha256 must match expectedSHA256Hex exactly (case-insensitively).
+// planInfoBinariesKey is the key Cosmovisor reads from the same Info JSON to
+// auto-download the upgrade binary. It is the only other top-level key
+// allowed, so a typo in PlanInfoKey fails loudly instead of being ignored.
+const planInfoBinariesKey = "binaries"
+
+// ParsePlanInfo extracts and validates the recovery Config from a
+// software-upgrade plan's Info string. The expected shape is:
 //
-// This exists because the config file is read from each node's own local
-// disk, not from on-chain state. Without this check, a software-upgrade
-// governance proposal only ever approves an upgrade *name* — the actual
-// addresses and destination are whatever each validator happens to have
-// in a local YAML file, which nothing guarantees is identical across
-// nodes. Two nodes with even slightly different (but both individually
-// "valid") files would silently compute different post-upgrade state and
-// diverge or halt unpredictably.
+//	{
+//	  "binaries": { "linux/amd64": "https://...?checksum=sha256:..." },
+//	  "incident_recovery": {
+//	    "upgrade_name": "v4.3.0-incident-recovery",
+//	    "destination_address": "cheqd1...",
+//	    "destination_address_confirm": "cheqd1...",
+//	    "affected_addresses": ["cheqd1...", "..."]
+//	  }
+//	}
 //
-// The expected hash should be committed to the governance proposal's own
-// Plan.Info field (see upgrade.go), which IS part of consensus — every
-// node evaluates the exact same expected hash. A node whose local file
-// doesn't match it fails loudly and halts, rather than silently applying
-// different data; a node with no file at all fails the same way. This
-// doesn't guarantee every node's operator used the right file, but it
-// guarantees any node that proceeds did so starting from byte-identical
-// configuration, and anyone verifying the proposal can confirm the
-// expected hash matches the config their multisig/leadership approved
-// before voting yes.
-func LoadConfigVerified(path string, expectedSHA256Hex string) (*Config, error) {
-	expectedSHA256Hex = strings.ToLower(strings.TrimSpace(expectedSHA256Hex))
-	if expectedSHA256Hex == "" {
-		return nil, fmt.Errorf("refusing to load config: no expected sha256 was supplied (governance plan.Info was empty) — this config would be used completely unverified against what was actually voted on")
+// "binaries" is optional and ignored here; Cosmovisor uses it (and ignores
+// "incident_recovery") to download the binary.
+//
+// Carrying the config in Plan.Info rather than in a file on each node's
+// disk means every node evaluates byte-identical input, because Plan.Info
+// came through consensus. Voters approve the actual addresses and
+// destination, not just an upgrade name or a hash of a file they may never
+// see. And no operator has to place a file correctly for the chain to
+// upgrade.
+//
+// Decoding is strict: unknown top-level keys, unknown fields inside
+// "incident_recovery" and trailing data are all rejected. A typo such as
+// "affected_adresses" would otherwise decode as an empty list or be silently
+// dropped. Validate then applies the same checks as before, so the
+// placeholder destination, a destination/confirm mismatch, module-account
+// addresses, duplicates and non-cheqd addresses are all refused.
+func ParsePlanInfo(info string) (*Config, error) {
+	info = strings.TrimSpace(info)
+	if info == "" {
+		return nil, fmt.Errorf("upgrade plan info is empty: it must carry the %q config JSON that voters approved", PlanInfoKey)
 	}
 
-	raw, err := os.ReadFile(path)
-	if err != nil {
-		return nil, fmt.Errorf("reading config file %q: %w", path, err)
+	var top map[string]json.RawMessage
+	if err := decodeStrict([]byte(info), &top); err != nil {
+		return nil, fmt.Errorf("upgrade plan info is not a JSON object: %w", err)
+	}
+	for k := range top {
+		if k != PlanInfoKey && k != planInfoBinariesKey {
+			return nil, fmt.Errorf("upgrade plan info has unexpected top-level key %q (allowed: %q, %q)", k, PlanInfoKey, planInfoBinariesKey)
+		}
+	}
+	raw, ok := top[PlanInfoKey]
+	if !ok {
+		return nil, fmt.Errorf("upgrade plan info has no %q key", PlanInfoKey)
 	}
 
-	actual := ConfigSHA256(raw)
-	if actual != expectedSHA256Hex {
-		return nil, fmt.Errorf("config file %q does not match the governance-approved config: expected sha256 %s, got %s — refusing to run with a config that was not the one voted on", path, expectedSHA256Hex, actual)
-	}
-
-	return parseAndValidate(raw, path)
-}
-
-// ConfigSHA256 returns the lowercase hex-encoded sha256 digest of raw config
-// file bytes, in the same form expected by LoadConfigVerified and recorded
-// in the governance proposal's Plan.Info.
-func ConfigSHA256(raw []byte) string {
-	sum := sha256.Sum256(raw)
-	return hex.EncodeToString(sum[:])
-}
-
-func parseAndValidate(raw []byte, path string) (*Config, error) {
 	var cfg Config
-	if err := yaml.Unmarshal(raw, &cfg); err != nil {
-		return nil, fmt.Errorf("parsing config file %q: %w", path, err)
+	if err := decodeStrict(raw, &cfg); err != nil {
+		return nil, fmt.Errorf("upgrade plan info %q: %w", PlanInfoKey, err)
 	}
-
 	if err := cfg.Validate(); err != nil {
-		return nil, fmt.Errorf("invalid config %q: %w", path, err)
+		return nil, fmt.Errorf("upgrade plan info %q: invalid config: %w", PlanInfoKey, err)
 	}
-
 	return &cfg, nil
 }
 
-// Validate checks the config is safe to use. Called by LoadConfig, and
-// should also be called again immediately before the upgrade handler
-// actually executes, as a second independent check at the point of use.
+// decodeStrict decodes exactly one JSON value into v, rejecting unknown
+// struct fields and any trailing data.
+func decodeStrict(data []byte, v any) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
+	dec.DisallowUnknownFields()
+	if err := dec.Decode(v); err != nil {
+		return err
+	}
+	if rest := bytes.TrimSpace(data[dec.InputOffset():]); len(rest) > 0 {
+		return fmt.Errorf("unexpected data after the JSON value")
+	}
+	return nil
+}
+
+// Validate checks the config is safe to use. Called by ParsePlanInfo, and
+// again by the handler immediately before it executes, as a second
+// independent check at the point of use.
 func (c *Config) Validate() error {
 	if strings.TrimSpace(c.UpgradeName) == "" {
 		return fmt.Errorf("upgrade_name must be set")
