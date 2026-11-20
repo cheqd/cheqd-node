@@ -306,6 +306,11 @@ func New(
 	legacyAmino := codec.NewLegacyAmino()
 	txConfig := tx.NewTxConfig(appCodec, tx.DefaultSignModes)
 
+	// Wrap the standard TxDecoder with a fallback that allows custom AuthInfo
+	// formats (produced by the fee-abstraction module's reward distribution
+	// transactions) to decode without the strict rejection of unknown fields.
+	txDecoder := CustomTxDecoder(txConfig.TxDecoder(), appCodec)
+
 	if err := interfaceRegistry.SigningContext().Validate(); err != nil {
 		panic(err)
 	}
@@ -342,7 +347,7 @@ func New(
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName).String()
 	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
 
-	bApp := baseapp.NewBaseApp(Name, logger, db, txConfig.TxDecoder(), baseAppOptions...)
+	bApp := baseapp.NewBaseApp(Name, logger, db, txDecoder, baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetVersion(version.Version)
 	bApp.SetProtocolVersion(ProtocolVersion)
