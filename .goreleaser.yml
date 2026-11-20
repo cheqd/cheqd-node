@@ -27,8 +27,8 @@ builds:
       - -trimpath
     ldflags:
       - -s -w
-      - -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded 
-      - -X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded 
+      - -X github.com/cosmos/cosmos-sdk/version.Name=cheqd-noded
+      - -X github.com/cosmos/cosmos-sdk/version.AppName=cheqd-noded
       - -X github.com/cosmos/cosmos-sdk/version.Version={{ .Version }}
       - -X github.com/cosmos/cosmos-sdk/version.Commit={{ .Commit }}
       - -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,goleveldb
@@ -79,6 +79,8 @@ archives:
     format: tar.gz
     wrap_in_directory: false
     name_template: "{{ .Binary }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    files:
+      - none*
 
 checksum:
   algorithm: sha256
