@@ -197,7 +197,11 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType: resourceType,
 		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(1))
+		// When the oracle price makes the minimum fee 1 CHEQ or less, lowerAmount
+		// clamps to 1ncheq and the global min gas price rejects the tx first
+		// (code 13, insufficient fee) before the resource fee check (code 1).
+		// Either way the underpaying tx must be rejected.
+		Expect(res.Code).To(SatisfyAny(BeEquivalentTo(1), BeEquivalentTo(13)))
 	})
 
 	It("should fail in create resource image message - case: fee ranging between two values so lower value than lower bound fails", func() {
@@ -224,7 +228,11 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType: resourceType,
 		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(1))
+		// When the oracle price makes the minimum fee 1 CHEQ or less, lowerAmount
+		// clamps to 1ncheq and the global min gas price rejects the tx first
+		// (code 13, insufficient fee) before the resource fee check (code 1).
+		// Either way the underpaying tx must be rejected.
+		Expect(res.Code).To(SatisfyAny(BeEquivalentTo(1), BeEquivalentTo(13)))
 	})
 
 	It("should fail in create resource default message - case: fees do not lie in the range", func() {
@@ -250,7 +258,11 @@ var _ = Describe("cheqd cli - negative resource pricing", func() {
 			ResourceType: resourceType,
 		}, signInputs, resourceFile, testdata.BASE_ACCOUNT_4, helpers.GenerateFees(lowerTax.String()))
 		Expect(err).To(BeNil())
-		Expect(res.Code).To(BeEquivalentTo(1))
+		// When the oracle price makes the minimum fee 1 CHEQ or less, lowerAmount
+		// clamps to 1ncheq and the global min gas price rejects the tx first
+		// (code 13, insufficient fee) before the resource fee check (code 1).
+		// Either way the underpaying tx must be rejected.
+		Expect(res.Code).To(SatisfyAny(BeEquivalentTo(1), BeEquivalentTo(13)))
 	})
 
 	It("should not succeed in create resource json message - case: fixed fee, insufficient funds", func() {
