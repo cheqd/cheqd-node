@@ -59,7 +59,7 @@ func deepCopy(src interface{}) interface{} {
 	var reflection interface{}
 	var dst reflect.Value
 
-	switch actualSrc := (src).(type) {
+	switch actualSrc := src.(type) {
 	case didtypes.MsgCreateDidDocPayload:
 		// Create a reflection slice of the same length as the source slice
 		reflection = reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(actualSrc)), 1, 1).Interface()

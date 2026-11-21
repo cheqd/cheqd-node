@@ -53,10 +53,10 @@ func (s *IntegrationTestSuite) TestRewardBallotWinners() {
 	val2ExpectedRewardFactor := fmt.Sprintf("%f", 1-math.Log(float64(missCounters[1].MissCounter-missCounters[0].MissCounter+1))/
 		math.Log(float64(maximumMissCounts-missCounters[0].MissCounter+1)))
 
-	votePeriodsPerWindow := sdkmath.LegacyNewDec((int64)(app.OracleKeeper.RewardDistributionWindow(ctx))).
-		QuoInt64((int64)(app.OracleKeeper.VotePeriod(ctx))).
+	votePeriodsPerWindow := sdkmath.LegacyNewDec(int64(app.OracleKeeper.RewardDistributionWindow(ctx))).
+		QuoInt64(int64(app.OracleKeeper.VotePeriod(ctx))).
 		TruncateInt64()
-	app.OracleKeeper.RewardBallotWinners(ctx, (int64)(app.OracleKeeper.VotePeriod(ctx)), (int64)(app.OracleKeeper.RewardDistributionWindow(ctx)), voteTargets, claims)
+	app.OracleKeeper.RewardBallotWinners(ctx, int64(app.OracleKeeper.VotePeriod(ctx)), int64(app.OracleKeeper.RewardDistributionWindow(ctx)), voteTargets, claims)
 	outstandingRewardsDecVal1, err := app.DistrKeeper.GetValidatorOutstandingRewardsCoins(ctx, valAddr)
 	s.Require().NoError(err)
 	outstandingRewardsVal1, _ := outstandingRewardsDecVal1.TruncateDecimal()
@@ -89,10 +89,10 @@ func (s *IntegrationTestSuite) TestRewardBallotWinnersZeroMissCounters() {
 		voteTargets = append(voteTargets, v.SymbolDenom)
 	}
 
-	votePeriodsPerWindow := sdkmath.LegacyNewDec((int64)(app.OracleKeeper.RewardDistributionWindow(ctx))).
-		QuoInt64((int64)(app.OracleKeeper.VotePeriod(ctx))).
+	votePeriodsPerWindow := sdkmath.LegacyNewDec(int64(app.OracleKeeper.RewardDistributionWindow(ctx))).
+		QuoInt64(int64(app.OracleKeeper.VotePeriod(ctx))).
 		TruncateInt64()
-	app.OracleKeeper.RewardBallotWinners(ctx, (int64)(app.OracleKeeper.VotePeriod(ctx)), (int64)(app.OracleKeeper.RewardDistributionWindow(ctx)), voteTargets, claims)
+	app.OracleKeeper.RewardBallotWinners(ctx, int64(app.OracleKeeper.VotePeriod(ctx)), int64(app.OracleKeeper.RewardDistributionWindow(ctx)), voteTargets, claims)
 	outstandingRewardsDecVal1, err := app.DistrKeeper.GetValidatorOutstandingRewardsCoins(ctx, valAddr)
 	s.Require().NoError(err)
 	outstandingRewardsVal1, _ := outstandingRewardsDecVal1.TruncateDecimal()
@@ -114,7 +114,7 @@ func (s *IntegrationTestSuite) TestRewardBallotWinnersZeroVoteTargets() {
 		types.NewClaim(20, 0, 0, valAddr2),
 	}
 
-	app.OracleKeeper.RewardBallotWinners(ctx, (int64)(app.OracleKeeper.VotePeriod(ctx)), (int64)(app.OracleKeeper.RewardDistributionWindow(ctx)), []string{}, claims)
+	app.OracleKeeper.RewardBallotWinners(ctx, int64(app.OracleKeeper.VotePeriod(ctx)), int64(app.OracleKeeper.RewardDistributionWindow(ctx)), []string{}, claims)
 	outstandingRewardsDecVal1, err := app.DistrKeeper.GetValidatorOutstandingRewardsCoins(ctx, valAddr)
 	s.Require().NoError(err)
 	outstandingRewardsVal1, _ := outstandingRewardsDecVal1.TruncateDecimal()
@@ -134,7 +134,7 @@ func (s *IntegrationTestSuite) TestRewardBallotWinnersZeroClaims() {
 		voteTargets = append(voteTargets, v.SymbolDenom)
 	}
 
-	app.OracleKeeper.RewardBallotWinners(ctx, (int64)(app.OracleKeeper.VotePeriod(ctx)), (int64)(app.OracleKeeper.RewardDistributionWindow(ctx)), voteTargets, []types.Claim{})
+	app.OracleKeeper.RewardBallotWinners(ctx, int64(app.OracleKeeper.VotePeriod(ctx)), int64(app.OracleKeeper.RewardDistributionWindow(ctx)), voteTargets, []types.Claim{})
 	outstandingRewardsDecVal1, err := app.DistrKeeper.GetValidatorOutstandingRewardsCoins(ctx, valAddr)
 	s.Require().NoError(err)
 	outstandingRewardsVal1, _ := outstandingRewardsDecVal1.TruncateDecimal()

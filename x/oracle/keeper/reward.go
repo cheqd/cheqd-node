@@ -81,7 +81,7 @@ func (k Keeper) RewardBallotWinners(
 		}
 
 		missCount := util.SafeUint64ToInt64(k.GetMissCounter(ctx, winner.Recipient))
-		maxMissCount := int64(len(voteTargets)) * (util.SafeUint64ToInt64((k.SlashWindow(ctx) / k.VotePeriod(ctx))))
+		maxMissCount := int64(len(voteTargets)) * util.SafeUint64ToInt64((k.SlashWindow(ctx) / k.VotePeriod(ctx)))
 		rewardFactor := reward.CalculateRewardFactor(
 			missCount,
 			maxMissCount,

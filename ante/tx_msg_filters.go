@@ -183,8 +183,8 @@ func IsTaxableTx(ctx sdk.Context, didKeeper DidKeeper, resourceKeeper ResourceKe
 	if !ok {
 		return false, sdk.Coins{}, sdk.Coins{}, errorsmod.Wrapf(sdkerrors.ErrTxDecode, "invalid transaction type: %T, must implement FeeTx", tx)
 	}
-	reward := (sdk.Coins)(nil)
-	burn := (sdk.Coins)(nil)
+	reward := sdk.Coins(nil)
+	burn := sdk.Coins(nil)
 	msgs := tx.GetMsgs()
 	for _, msg := range msgs {
 
